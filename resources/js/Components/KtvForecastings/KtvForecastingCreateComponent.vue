@@ -542,10 +542,11 @@ export default {
                 this.selectedRoomList.push({
                     roomName: response.data[0].name,
                     entity_id: response.data[0].entity_id,
-                    mrp_forecastable_id: response.data[0].entity_id,
+                    mrp_forecastable_id: response.data[0].id,
                     quantity: response.data[0].session,
                     hour: response.data[0].hour,
-                    mrp_forecastable_type : mrp_forecastable_type
+                    mrp_forecastable_type : mrp_forecastable_type,
+                    date: this.selectedMonth,
                 })
                 this.selectedRoom = null;
                 this.session = null;
