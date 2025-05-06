@@ -6,7 +6,6 @@ use App\Models\Uom;
 use Illuminate\Http\Request;
 use App\Models\UomConversion;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class UomRepository implements UomRepositoryInterface
 {
