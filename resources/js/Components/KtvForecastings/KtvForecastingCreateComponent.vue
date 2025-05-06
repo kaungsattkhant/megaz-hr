@@ -260,6 +260,9 @@
                                         <th scope="col" class="">
                                             Working Time
                                         </th>
+                                        <th scope="col" class="">
+                                            Cost
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -270,6 +273,9 @@
                                         </td>
                                         <td class="">
                                             {{ convertMinutesToHoursMinutes(hr.total_duration) }}
+                                        </td>
+                                        <td class="">
+                                            {{ (hr.hr_cost_cal).toLocaleString() }} Ks
                                         </td>
                                     </tr>
                                 </tbody>
@@ -617,12 +623,18 @@ export default {
         },
 
         async clickedBtnCreate(){
-            this.is_step = 2;
-            initTE({ Modal });
-            this.getSelectedRoomList();
-            this.getRawMaterialList();
-            this.getHrList();
-            
+            if(this.selectedRoomList.length < 1){
+                this.alertValidationMessage(`Room`);
+                return 1;
+            }
+            else {
+                this.selectedRoomList.forEach(room => room.date = this.selectedMonth);
+                this.is_step = 2;
+                initTE({ Modal });
+                this.getSelectedRoomList();
+                this.getRawMaterialList();
+                this.getHrList();
+            }
         },
         async getSelectedRoomList(){
             let formData = new FormData();

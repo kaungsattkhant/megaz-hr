@@ -260,6 +260,9 @@
                                         <th scope="col" class="">
                                             Working Hour
                                         </th>
+                                        <th scope="col" class="">
+                                            Cost
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -269,7 +272,10 @@
                                             {{ hr.department_name }}
                                         </td>
                                         <td class="">
-                                            {{ hr.total_duration }}
+                                            {{ convertMinutesToHoursMinutes(hr.total_duration) }}
+                                        </td>
+                                        <td class="">
+                                            {{ (hr.hr_cost_cal).toLocaleString() }} Ks
                                         </td>
                                     </tr>
                                 </tbody>
@@ -530,7 +536,8 @@ export default {
                     mrp_forecastable_id: mrp.mrp_forecastable_id,
                     quantity: mrp.quantity,
                     hour: mrp.hour,
-                    mrp_forecastable_type : mrp.mrp_forecastable_type
+                    mrp_forecastable_type : mrp.mrp_forecastable_type,
+                    date: detail.date,
                 })  
             });
         },
@@ -571,7 +578,8 @@ export default {
                     mrp_forecastable_id: response.data[0].entity_id,
                     quantity: response.data[0].session,
                     hour: response.data[0].hour,
-                    mrp_forecastable_type : mrp_forecastable_type
+                    mrp_forecastable_type : mrp_forecastable_type,
+                    date: this.selectedMonth,
                 })
                 this.selectedRoom = null;
                 this.session = null;
@@ -649,6 +657,7 @@ export default {
                 return 1;
             }
             else {
+                this.selectedRoomList.forEach(room => room.date = this.selectedMonth);
                 this.is_step = 2;
                 initTE({ Modal });
                 this.getSelectedRoomList();
@@ -831,6 +840,11 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
+        },
+        convertMinutesToHoursMinutes(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours}h ${mins}m`;
         },
 
     },

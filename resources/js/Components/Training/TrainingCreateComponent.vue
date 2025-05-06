@@ -336,7 +336,7 @@ export default {
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data;
+                this.staffList = response.data.data;
             }
         },
         async getTypeList(){
