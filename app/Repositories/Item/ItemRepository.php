@@ -95,7 +95,7 @@ class ItemRepository implements ItemRepositoryInterface
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
 
-            $item = Item::create($data);
+            $item = Item::firstOrCreate(['name' => $data['name'], 'code' => $data['code']], $data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
@@ -113,6 +113,9 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::find($id);
+            if (!$item) {
+                return ResponseMessage('Item not found.', 404);
+            }
 
             if ($item) {
                 if (isset($data['base_uom_id']) && isset($data['uom_id'])) {
