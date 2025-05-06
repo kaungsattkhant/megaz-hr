@@ -3,9 +3,10 @@
 namespace App\Repositories\Uom;
 
 use App\Models\Uom;
-use App\Models\UomConversion;
 use Illuminate\Http\Request;
+use App\Models\UomConversion;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class UomRepository implements UomRepositoryInterface
 {
@@ -58,15 +59,16 @@ class UomRepository implements UomRepositoryInterface
         DB::beginTransaction();
         try {
             $uom = Uom::find($id);
-            if ($uom) {
-                $uom->name = $data['name'];
-                $uom->uom_code = $data['uom_code'];
-                $uom->save();
-                DB::commit();
-                return $uom;
-            } else {
+            if (!$uom) {
                 ResponseMessage("Uom not found", 404);
             }
+
+            $uom->update([
+                'name' => $data['name'],
+                'uom_code' => $data['uom_code'],
+            ]);
+            DB::commit();
+            return $uom;
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
