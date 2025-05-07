@@ -75,7 +75,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Role
                 </label>
-                <multiselect
+                <multiselect @close="roleChange()"
                 v-model="selectedRole"
                 :options="roleList"
                 :multiple="true"
@@ -140,7 +140,7 @@
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedChairedBy" class="input-ui !text-black"
                     data-te-select-filter="true">
-                        <option :value="item" v-for="(item, itemIndex) in staffList" :key="itemIndex">
+                        <option :value="item" v-for="(item, itemIndex) in chairByList" :key="itemIndex">
                             {{ item.name }}
                         </option>
                     </select>
@@ -188,6 +188,7 @@ export default {
             roleList:[],
             allRoleList:[],
             staffList:[],
+            chairByList: [],
             placeList:[],
             chairedByList:[],
 
@@ -235,7 +236,7 @@ export default {
                         roles:department.roles
                     })
                 });
-                
+                this.getStaffList();
             }
             else{
                 this.getRoleList();
@@ -264,14 +265,42 @@ export default {
             // }
         },
         roleChange(){
-            this.getStaffList()
+            this.getStaffList();
         },
         async getStaffList(){
+            let url_department = '';
+            if(this.selectedDepartment.length > 0){
+                this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
+                url_department = url_department.slice(0, -1); 
+                console.log(url_department);
+            }
+            let url_role = '';
+            if(this.selectedRole.length > 0){
+                this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
+                url_role = url_role.slice(0, -1); 
+                console.log(url_role);
+            }
+            let url_joint = '';
+            if(url_role){
+                url_joint = '&'
+            }
+            else{
+                url_joint = ''
+            }
+            let url = '/api/staffs?' + url_department + url_joint + url_role ;
+            // let url = `/api/staffs?department_id[]=1&department_id[]=2&role_id[]=4&role_id[]=3`;
+            // let url = `/api/staffs`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.staffList = response.data.data;
+            }
+        },
+        async getChairByList(){
             // let url = `/api/staff_by_department/`+this.selectedDepartment.id+`/role/`+this.selectedRole.id;
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.chairByList = response.data.data;
             }
         },
 
@@ -371,6 +400,7 @@ export default {
         this.getDepartmentList();
         // this.getRoleList();
         this.getStaffList();
+        this.getChairByList();
     },
 
     mounted() {
