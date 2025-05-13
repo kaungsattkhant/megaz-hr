@@ -97,4 +97,22 @@ class ItemAPIController extends Controller
         $item = $this->itemRepo->createItemType($request);
         return $item;
     }
+
+    public function importItemType(Request $request)
+    {
+        $item = $this->itemRepo->importItemType($request);
+        return $item;
+    }
+
+    public function importCategory(Request $request)
+    {
+        $item = $this->itemRepo->importCategory($request);
+        return $item;
+    }
+
+    public function importUom(Request $request)
+    {
+        $item = $this->itemRepo->importUom($request);
+        return $item;
+    }
 }

@@ -17,16 +17,16 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                        <option :value="department.value" v-for="(department, departmentIndex) in departmentList"
+                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange"
+                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
                             :key="departmentIndex"> {{ department.name }} </option>
                     </select>
                 </div>
                 <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                        <option :value="role.value" v-for="(role, roleIndex) in roleList"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange"
+                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                        <option :value="role" v-for="(role, roleIndex) in roleList"
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
@@ -456,6 +456,8 @@ export default {
             url_search:'',
             url_department:'',
             url_role:'',
+            searchDepartment: null,
+            searchRole: null,
             deleteId:null,
 
             currentTime: getCurretDateTime(),
@@ -477,6 +479,15 @@ export default {
             if (response.data) {
                 this.departmentList = response.data;
             }
+        },
+        searchDepartmentChange(){
+            this.url_department = '?department_id='+this.searchDepartment.id;
+            this.roleList = this.searchDepartment.roles;
+            this.getOvertimeList();
+        },
+        searchRoleChange(){
+            this.url_role = '&role_id='+this.searchRole.id;
+            this.getOvertimeList();
         },
         async getShiftList(){
             let response = await getApiData({ url: '/api/time_shifts', token: this.getToken() });

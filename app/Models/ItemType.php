@@ -9,5 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class ItemType extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'item_type_code',
+        'name',
+        'is_active'
+    ];
 }

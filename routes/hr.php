@@ -46,6 +46,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/salaries/{id}', 'updateBasicSalary');
     Route::get('/overtime_fees', 'getOvertimeFee');
     Route::post('/overtime_fees', 'createOvertimeFee');
+    Route::delete('/overtime_fees/{id}', 'deleteOvertimeFee');
     Route::get('/overtime_categories', 'getOvertimeCategories');
     Route::post('/overtime_categories', 'createOvertimeCategories');
     Route::post('/overtimes', 'createOvertime');

@@ -17,16 +17,16 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                        <option :value="department.value" v-for="(department, departmentIndex) in departmentList"
+                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
                             :key="departmentIndex"> {{ department.name }} </option>
                     </select>
                 </div>
                 <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedRoleChange()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                        <option :value="role.value" v-for="(role, roleIndex) in roleList"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange()"
+                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                        <option :value="role" v-for="(role, roleIndex) in roleList"
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
@@ -346,6 +346,8 @@ export default {
             url_search:'',
             url_department:'',
             url_role:'',
+            searchDepartment: null,
+            searchRole: null,
             deleteId:null,
         };
     },
@@ -366,6 +368,16 @@ export default {
                 this.departmentList = response.data;
             }
         },
+        searchDepartmentChange(){
+            this.url_department = '?department_id='+this.searchDepartment.id;
+            this.roleList = this.searchDepartment.roles;
+            this.getOvertimeList();
+        },
+        searchRoleChange(){
+            this.url_role = '&role_id='+this.searchRole.id;
+            this.getOvertimeList();
+        },
+
         selectedDepartmentChange(){
             this.roleList = this.selectedDepartment.roles;
             this.selectedRole = null;
@@ -432,15 +444,20 @@ export default {
             }
         },
         
-        // async searchBtnClicked() {
-        //     this.url_search = '&search=' + this.searchInput
-        //     this.getOvertimeList(1);
-        // },
-        // clearSearchBtnClicked() {
-        //     this.searchInput = null;
-        //     this.url_search = '';
-        //     this.getOvertimeList(1);
-        // },
+        async searchBtnClicked() {
+            this.searchDepartment = null;
+            this.roleList = [];
+            this.searchRole = null;
+            this.url_role = '';
+            this.url_department = '';
+            this.url_search = '?search=' + this.searchInput
+            this.getOvertimeList(1);
+        },
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.url_search = '';
+            this.getOvertimeList(1);
+        },
 
 
 
@@ -454,7 +471,7 @@ export default {
             }
             else {
                 this.$notify({
-                    title: `Input validation`,
+                    title: `Delete Failed`,
                     text: response.message,
                     type: "warn"
                 });

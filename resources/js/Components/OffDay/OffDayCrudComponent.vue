@@ -377,7 +377,7 @@ export default {
         return {
             offDayList: [],
             repetitionList:[
-                {value: 'Default', name: 'Default'},
+                // {value: 'Default', name: 'Default'},
                 {value: 'Weekly', name: 'Weekly'},
                 {value: 'Bi-weekly', name: 'Bi weekly'},
                 {value: 'Monthly', name: 'Monthly'},
@@ -441,7 +441,7 @@ export default {
         async getStaffList(){
             let response = await getApiData({ url: '/api/staffs', token: this.getToken() });
             if (response.data) {
-                this.staffList = response.data;
+                this.staffList = response.data.data;
             }
         },
         btnCreateOffDay(){
@@ -540,7 +540,7 @@ export default {
             
             let response = await postApiData({url:`/api/hr/public_holidays`, form_data:formData, token:this.getToken()})
             if(response.success){
-                // this.getHolidayList();
+                this.getOffDayList();
                 document.getElementById("close_create_holiday_modal").click();
             }
         },

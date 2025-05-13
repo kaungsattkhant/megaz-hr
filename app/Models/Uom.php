@@ -9,6 +9,7 @@ class Uom extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'uom_code',
         'name',
         'is_active',
         'created_by',

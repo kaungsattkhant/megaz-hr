@@ -3,8 +3,8 @@
 namespace App\Repositories\Uom;
 
 use App\Models\Uom;
-use App\Models\UomConversion;
 use Illuminate\Http\Request;
+use App\Models\UomConversion;
 use Illuminate\Support\Facades\DB;
 
 class UomRepository implements UomRepositoryInterface
@@ -26,7 +26,8 @@ class UomRepository implements UomRepositoryInterface
         try {
             $data['created_by'] = UserData()->id;
             $data['name'] = $data['name'];
-            $uom = Uom::firstOrCreate(['name' => $data['name']], $data);
+            $data['uom_code'] = $data['uom_code'];
+            $uom = Uom::firstOrCreate(['name' => $data['name'], 'uom_code' => $data['uom_code']], $data);
             if ($uom) {
                 UomConversion::firstOrCreate(
                     [
@@ -57,14 +58,16 @@ class UomRepository implements UomRepositoryInterface
         DB::beginTransaction();
         try {
             $uom = Uom::find($id);
-            if ($uom) {
-                $uom->name = $data['name'];
-                $uom->save();
-                DB::commit();
-                return $uom;
-            } else {
+            if (!$uom) {
                 ResponseMessage("Uom not found", 404);
             }
+
+            $uom->update([
+                'name' => $data['name'],
+                'uom_code' => $data['uom_code'],
+            ]);
+            DB::commit();
+            return $uom;
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);

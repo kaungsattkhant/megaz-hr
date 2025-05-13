@@ -9,13 +9,18 @@ class UomConversion extends Model
 {
     use HasFactory;
 
-    protected $fillable =[
-        'base_unit_id','conversion_unit_id','conversion','is_show', 'is_active','created_by'
+    protected $fillable = [
+        'base_unit_id',
+        'conversion_unit_id',
+        'conversion',
+        'is_show',
+        'is_active',
+        'created_by'
     ];
 
     public function createdStaff()
     {
-        return $this->belongsTo(Staff::class,'created_by');
+        return $this->belongsTo(Staff::class, 'created_by');
     }
 
     public function baseUnit()
