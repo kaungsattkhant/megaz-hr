@@ -341,6 +341,8 @@ export default {
             }
         },
 
+
+
         async getDepartmentList(){
             let url = `/api/departments`;
             let response = await getApiData({url: url, token: this.getToken()});
