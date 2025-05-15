@@ -429,6 +429,9 @@ export default {
             console.log(this.orderItems[orderItemIndex]);
             this.itemId = itemId;
             this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === purchaseOrder.uom_conversion_id);
+            if(typeof this.selectedUomConversion === 'undefined'){
+                this.alertValidationMessage('UoM Conversion not Found');
+            }
             this.uomUpperLimit = this.selectedUomConversion.conversion - 1;
             this.confirmPO = purchaseOrder;
             this.uomName = this.orderItems[orderItemIndex].uom_name;
