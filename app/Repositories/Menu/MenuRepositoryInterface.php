@@ -29,4 +29,6 @@ interface MenuRepositoryInterface
     // user app
     public function listAllMenu(Request $request);
 
+    public function menuByMenuCategory($id,$request);
+
 }

@@ -406,7 +406,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
-            if (checkDepartmentAndRoles('HR', ['Staff'])) {
+            if (checkDepartmentAndRoles('HR', ['Staff']) || checkDepartmentAndRoles('HR', ['Supervisor'])) {
                 ResponseMessage("Permission isn't allowed", 422);
             }
             $departmentName = UserData()->department->name;
@@ -440,6 +440,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     // if (!$model->createdBy->department->inventory) {
                     //     ResponseMessage('Inventory is required', 422);
                     // }
+                } else {
+                    ResponseMessage("Permission isn't allowed", 422);
                 }
             }
         }

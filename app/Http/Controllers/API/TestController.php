@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-
-use App\Actions\Inventory\GetInventoryStockAction;
-
-use App\Models\Inventory;
-use App\Models\Invoice;
-use App\Models\InventoryLedger;
 use App\Models\Item;
+use App\Models\Invoice;
+use App\Models\Inventory;
+
+use Illuminate\Http\Request;
+
+use App\Models\InventoryLedger;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Actions\Inventory\GetInventoryStockAction;
+use Reinbier\LaravelHoliday\Facades\LaravelHoliday;
 
 class TestController extends Controller
 {
@@ -19,7 +20,7 @@ class TestController extends Controller
     public function index()
     {
         $invoiceId = 1;
-        $categoryIds = [1,2,3,4];
+        $categoryIds = [1, 2, 3, 4];
         $menus = Invoice::where('invoices.id', $invoiceId)
             ->whereIn('menu_categories.id', $categoryIds)
             ->join('orders', 'invoices.id', '=', 'orders.invoice_id') // Join orders
@@ -59,5 +60,16 @@ class TestController extends Controller
         // $items = (new GetInventoryStockAction(2))->run();
 
         // ResponseData($items);
+    }
+
+    public function getHolidays()
+    {
+        $holiday = LaravelHoliday::model();
+        return $holiday;
+        LaravelHoliday::forYear(2025)
+            ->addHoliday('2025-07-02', 'National-Day')
+            ->getHolidays();
+        $holidays = LaravelHoliday::getHolidays();
+        ResponseMessage($holidays, 200);
     }
 }

@@ -96,11 +96,11 @@ class EntityRepository implements EntityRepositoryInterface
                 if ($invoiceSession) {
                     $entity->start_time = $invoiceSession->start_date_time;
                     $entity->end_time = $invoiceSession->end_date_time;
-                    $entity->invoice=$invoiceSession;
+                    $entity->invoice = $invoiceSession;
                 } else {
                     $entity->start_time = null;
                     $entity->end_time = null;
-                    $entity->invoice=null;
+                    $entity->invoice = null;
                 }
             }
             //     $roomSessions = collect();
@@ -486,7 +486,8 @@ class EntityRepository implements EntityRepositoryInterface
             $invoiceAccessories = $invoice->accessories;
             foreach ($invoiceAccessories as $invoiceAccessorie) {
                 $invoiceAccessorie->load('accessory');
-                $total_accessory_value += $invoiceAccessorie->is_package ? 0 : $invoiceAccessorie->accessory_price;
+                // dd($invoiceAccessorie->accessory->accessory_price->price);
+                $total_accessory_value += $invoiceAccessorie->is_package ? 0 : $invoiceAccessorie->accessory->accessory_price->price;
             }
             // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
             //end_accessoryI
@@ -542,11 +543,11 @@ class EntityRepository implements EntityRepositoryInterface
                 foreach ($order->orderItems as $orderItem) {
                     $orderItem->load('menu');
                     // if ($orderItem->status == 'done') {
-                    if($invoice->invoice_type!='package'){
+                    if ($invoice->invoice_type != 'package') {
                         $total += $orderItem->price;
                         $totalDiscount += $orderItem->discount_value;
                     }
-                   
+
                     // }
                 }
                 foreach ($orderItems as $orderItem) {
@@ -836,10 +837,13 @@ class EntityRepository implements EntityRepositoryInterface
                     // $q->withCount('entitySessions'); // Adds entity_sessions_count attribute
     
                 })
-                ->where('area_id', $area->id)->where("is_active", 0)
+                ->where('area_id', $area->id)
+                ->where("is_active", 0)
+                ->where('is_available', 1)// available room
                 ->get();
         } else {
             $entities = Entity::where("is_active", 0)
+                ->where('is_available', 1)// available room
                 ->where('area_id', $area->id)
                 ->get();
         }

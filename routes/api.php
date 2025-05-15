@@ -167,7 +167,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/staffs_by_role', [StaffAPIController::class, 'getStaffListBySupervisor']);
-    Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    Route::get('/supervisor/staff/{staffId}/tasks', action: [TaskController::class, 'getStaffTasksBySupervisor']);
     // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
 
     Route::controller(TaskController::class)->group(function () {
@@ -670,4 +670,8 @@ Route::controller(FoodOrderAPIController::class)->group(function () {
 Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::get('/delivery_charges', 'getDeliveryChargeData');
     Route::post('/delivery_charges', 'createDeliveryCharge');
+});
+
+Route::controller(TestController::class)->group(function () {
+    Route::get('/get_holidays', 'getHolidays');
 });
