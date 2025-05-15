@@ -31,7 +31,7 @@ class StaffRepository implements StaffRepositoryInterface
                     $q->whereIn('id', $roleIds);
                 });
             })
-            ->where('is_active', 1)
+            // ->where('is_active', 1)
             ->paginate(config('common.list_count'));
     }
 

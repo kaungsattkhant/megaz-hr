@@ -151,11 +151,11 @@
                             </a>
                         </li>
                         <!-- <li>
-                                <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
-                                    <i class="fal fa-clipboard-list  pr-3"></i>
-                                    Selling Menus
-                                </a>
-                            </li> -->
+                                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                                Selling Menus
+                                            </a>
+                                        </li> -->
                         <li>
                             <a href="{{ route('menu_sale_report.index') }}"
                                 class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
@@ -177,6 +177,12 @@
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-mrp-50.png') }}" alt="">
                                 <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 MRP
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Menu Area
                             </a>
                         </li>
                     @endif
@@ -610,6 +616,13 @@
                                 Purchase Order Invoices
                             </a>
                         </li>
+                        <li>
+                            <a href="/lead_time" class="flex items-center @yield('lead_time') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-time-50.png') }}" alt="">
+                                Lead Time
+                            </a>
+                        </li>
                     @endif
                     @if (checkFeaturePermission('fixed-asset'))
                         <li>
@@ -845,23 +858,17 @@
                             </a>
                         </li>
                     @endif
-                    <li>
-                        <a href="/contact" class="flex items-center @yield('contact') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-contact-50.png') }}" alt="">
-                            Contact
-                        </a>
-                    </li>
 
-                    <li>
-                        <a href="/lead_time" class="flex items-center @yield('lead_time') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-time-50.png') }}" alt="">
-                            Lead Time
-                        </a>
-                    </li>
-                    @if(checkFeaturePermission('check-in'))
 
+
+                    @if(checkFeaturePermission('hr'))
+                        <li>
+                            <a href="/contact" class="flex items-center @yield('contact') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-contact-50.png') }}" alt="">
+                                Contact
+                            </a>
+                        </li>
                         <li>
                             <a href="/meeting" class="flex items-center @yield('meeting') sidebar-gap-x">
                                 <!-- <i class="fal fa-braille pr-3"></i> -->
@@ -887,12 +894,7 @@
                                 Warning
                             </a>
                         </li>
-                        <li>
-                            <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
-                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                                Menu Area
-                            </a>
-                        </li>
+                      
                         <li>
                             <a href="/off_day" class="flex items-center @yield('off_day') sidebar-gap-x">
                                 <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
@@ -954,19 +956,20 @@
                                 Salary Batch
                             </a>
                         </li>
+                        <li>
+                            <a href="/salary_calculate" class="flex items-center @yield('salary_calculate') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Salary Calculate
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/pay_slip" class="flex items-center @yield('pay_slip') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Pay Slip
+                            </a>
+                        </li>
                     @endif
-                    <li>
-                        <a href="/salary_calculate" class="flex items-center @yield('salary_calculate') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Salary Calculate
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/pay_slip" class="flex items-center @yield('pay_slip') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Pay Slip
-                        </a>
-                    </li>
+
 
 
                 </ul>
