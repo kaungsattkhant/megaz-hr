@@ -18,7 +18,8 @@ class StaffRepository implements StaffRepositoryInterface
     {
         $departmentIds = $request->department_id;
         $roleIds = $request->role_id;
-        return Staff::orderByDesc('id')
+
+        $staffQuery = Staff::orderByDesc('id')
             ->with(['department', 'roles'])
             ->when($request->search_input, function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search_input . '%');
@@ -31,8 +32,11 @@ class StaffRepository implements StaffRepositoryInterface
                     $q->whereIn('id', $roleIds);
                 });
             })
-            // ->where('is_active', 1)
-            ->paginate(config('common.list_count'));
+            ->when(isset($request->page), function ($q) {
+                $q->where('is_active', 1);
+            });
+        $staff = isset($request->page) ? $staffQuery->paginate(config('common.list_count')) : $staffQuery->get();
+        return $staff;
     }
 
     public function staffBalanceList(Request $request)

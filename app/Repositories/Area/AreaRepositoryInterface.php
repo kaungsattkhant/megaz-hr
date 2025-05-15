@@ -21,4 +21,6 @@ interface AreaRepositoryInterface
     public function getAreaByDepartment($department_id);
 
     public function getSellingAreas(Request $request);
+
+    public function getCookingAreas($request);
 }
