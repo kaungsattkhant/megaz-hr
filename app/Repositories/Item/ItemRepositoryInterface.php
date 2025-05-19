@@ -31,4 +31,10 @@ interface ItemRepositoryInterface
     public function createCategory(Request $request);
 
     public function createItemType(Request $request);
+
+    public function importItemType($request);
+
+    public function importCategory($request);
+
+    public function importUom($request);
 }

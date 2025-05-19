@@ -213,9 +213,6 @@ class Item extends BaseModel
             );
     }
 
-
-
-
     public function balance()
     {
         return $this->hasOne(InventoryLedgerItem::class, 'item_id')
@@ -230,83 +227,83 @@ class Item extends BaseModel
             ->groupBy('inventory_ledger_items.item_id');
     }
 
-    public function scopeWithBalanceDetails(Builder $query, $inventoryId, $itemId, $fromDate = null, $toDate = null)
-    {
-        return $query
-            ->join('inventory_ledger_items', 'items.id', '=', 'inventory_ledger_items.item_id')
-            ->joinSub(
-                DB::table('supplier_items as si')
-                    ->join('item_prices as ip', 'si.id', '=', 'ip.supplier_item_id')
-                    ->select(
-                        'si.item_id',
-                        DB::raw('CAST(AVG(ip.price) AS DECIMAL(10,2)) AS average_price'),
-                        'ip.base_uom_id'
-                    )
-                    ->whereIn(
-                        'ip.id',
-                        DB::table('item_prices as sub_ip')
-                            ->select(DB::raw('MAX(sub_ip.id)'))
-                            ->whereColumn('sub_ip.supplier_item_id', 'si.id')
-                            ->groupBy('sub_ip.supplier_item_id')
-                    )
-                    ->groupBy('si.item_id', 'ip.base_uom_id'),
-                'latest_prices',
-                'items.id',
-                'latest_prices.item_id'
-            )
-            ->join('uoms as item_uom', 'items.uom_id', '=', 'item_uom.id')
-            ->join('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
-            ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-            ->join('uom_conversions', function ($join) {
-                $join->on('latest_prices.base_uom_id', '=', 'uom_conversions.base_unit_id')
-                    ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
-                    ->where('uom_conversions.is_active', 1);
-            })
-            ->select(
-                'items.name',
-                'inventory_ledger_items.item_id',
-                'items.uom_id as item_uom_id',
-                'latest_prices.base_uom_id as base_uom_id',
-                'latest_prices.average_price as price',
-                'items.base_uom_id as base_unit_id',
-                'item_uom.name as conversion_uom_name',
-                'base_uom.name as base_uom_name',
-                'uom_conversions.conversion as conversion',
-                'uom_conversions.id as conversion_id',
-                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
-                  SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as opening_balance'),
-                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
-                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
-                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) +
-                  SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
-                  SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) <= CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance'),
-                DB::raw('((latest_prices.average_price / uom_conversions.conversion) *
-                  (SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) +
-                   SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
-                   SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) <= CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END))) as total_value')
-            )
-            ->where('items.id', $itemId)
-            ->where('inventory_id', $inventoryId)
-            ->when($fromDate && $toDate, function ($q) use ($fromDate, $toDate) {
-                $q->whereBetween(DB::raw('DATE(inventory_ledgers.created_at)'), [$fromDate, $toDate]);
-            })
-            ->when($fromDate && !$toDate, function ($q) use ($fromDate) {
-                $q->whereDate('inventory_ledgers.created_at', '>=', $fromDate);
-            })
-            ->when(!$fromDate && $toDate, function ($q) use ($toDate) {
-                $q->whereDate('inventory_ledgers.created_at', '<=', $toDate);
-            })
-            ->groupBy(
-                'inventory_ledger_items.item_id',
-                'items.name',
-                'latest_prices.average_price',
-                'latest_prices.base_uom_id',
-                'items.base_uom_id',
-                'uom_conversions.conversion',
-                'item_uom.name',
-                'base_uom.name'
-            );
-    }
+    // public function scopeWithBalanceDetails(Builder $query, $inventoryId, $itemId, $fromDate = null, $toDate = null)
+    // {
+    //     return $query
+    //         ->join('inventory_ledger_items', 'items.id', '=', 'inventory_ledger_items.item_id')
+    //         ->joinSub(
+    //             DB::table('supplier_items as si')
+    //                 ->join('item_prices as ip', 'si.id', '=', 'ip.supplier_item_id')
+    //                 ->select(
+    //                     'si.item_id',
+    //                     DB::raw('CAST(AVG(ip.price) AS DECIMAL(10,2)) AS average_price'),
+    //                     'ip.base_uom_id'
+    //                 )
+    //                 ->whereIn(
+    //                     'ip.id',
+    //                     DB::table('item_prices as sub_ip')
+    //                         ->select(DB::raw('MAX(sub_ip.id)'))
+    //                         ->whereColumn('sub_ip.supplier_item_id', 'si.id')
+    //                         ->groupBy('sub_ip.supplier_item_id')
+    //                 )
+    //                 ->groupBy('si.item_id', 'ip.base_uom_id'),
+    //             'latest_prices',
+    //             'items.id',
+    //             'latest_prices.item_id'
+    //         )
+    //         ->join('uoms as item_uom', 'items.uom_id', '=', 'item_uom.id')
+    //         ->join('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
+    //         ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+    //         ->join('uom_conversions', function ($join) {
+    //             $join->on('latest_prices.base_uom_id', '=', 'uom_conversions.base_unit_id')
+    //                 ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
+    //                 ->where('uom_conversions.is_active', 1);
+    //         })
+    //         ->select(
+    //             'items.name',
+    //             'inventory_ledger_items.item_id',
+    //             'items.uom_id as item_uom_id',
+    //             'latest_prices.base_uom_id as base_uom_id',
+    //             'latest_prices.average_price as price',
+    //             'items.base_uom_id as base_unit_id',
+    //             'item_uom.name as conversion_uom_name',
+    //             'base_uom.name as base_uom_name',
+    //             'uom_conversions.conversion as conversion',
+    //             'uom_conversions.id as conversion_id',
+    //             DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
+    //               SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as opening_balance'),
+    //             DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
+    //             DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
+    //             DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) +
+    //               SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
+    //               SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) <= CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance'),
+    //             DB::raw('((latest_prices.average_price / uom_conversions.conversion) *
+    //               (SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) +
+    //                SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
+    //                SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) <= CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END))) as total_value')
+    //         )
+    //         ->where('items.id', $itemId)
+    //         ->where('inventory_id', $inventoryId)
+    //         ->when($fromDate && $toDate, function ($q) use ($fromDate, $toDate) {
+    //             $q->whereBetween(DB::raw('DATE(inventory_ledgers.created_at)'), [$fromDate, $toDate]);
+    //         })
+    //         ->when($fromDate && !$toDate, function ($q) use ($fromDate) {
+    //             $q->whereDate('inventory_ledgers.created_at', '>=', $fromDate);
+    //         })
+    //         ->when(!$fromDate && $toDate, function ($q) use ($toDate) {
+    //             $q->whereDate('inventory_ledgers.created_at', '<=', $toDate);
+    //         })
+    //         ->groupBy(
+    //             'inventory_ledger_items.item_id',
+    //             'items.name',
+    //             'latest_prices.average_price',
+    //             'latest_prices.base_uom_id',
+    //             'items.base_uom_id',
+    //             'uom_conversions.conversion',
+    //             'item_uom.name',
+    //             'base_uom.name'
+    //         );
+    // }
 
     public function MrpRawMaterials()
     {

@@ -75,7 +75,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Role
                 </label>
-                <multiselect
+                <multiselect @close="roleChange"
                 v-model="selectedRole"
                 :options="roleList"
                 :multiple="true"
@@ -140,7 +140,7 @@
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedChairedBy" class="input-ui !text-black"
                     data-te-select-filter="true">
-                        <option :value="item" v-for="(item, itemIndex) in staffList" :key="itemIndex">
+                        <option :value="item" v-for="(item, itemIndex) in chairedByList" :key="itemIndex">
                             {{ item.name }}
                         </option>
                     </select>
@@ -189,8 +189,9 @@ export default {
             roleList:[],
             allRoleList:[],
             staffList:[],
+            chairedByList: [],
             placeList:[],
-            chairedByList:[],
+            // chairedByList:[],
 
             title:null,
             selectedDate:null,
@@ -232,37 +233,73 @@ export default {
                 this.addDetail(response.data)
             }
         },
-        addDetail(data){
-            this.title = data.title;
-            this.selectedDate = data.date_time;
-            this.selectedFrom = data.from_date;
-            this.selectedTo = data.to_date;
-            this.selectedPlace = data.place;
-            this.selectedChairedBy = this.staffList.find(chairman => chairman.id == data.chaired_by);
-            this.description = data.description;
-            if(data.meeting_type === 'dep_type'){
+        async addDetail(detail){
+            this.title = detail.title;
+            this.selectedDate = detail.date_time;
+            this.selectedFrom = detail.from_date;
+            this.selectedTo = detail.to_date;
+            this.selectedPlace = detail.place;
+            this.selectedChairedBy = this.chairedByList.find(chairman => chairman.id == detail.chaired_by);
+            this.description = detail.description;
+            if(detail.meeting_type === 'dep_type'){
                 let departments = []
-                data.participants.forEach(participant => {
+                detail.participants.forEach(participant => {
                     departments.push(this.allDepartmentList.find(department => department.id == participant.department_id))
                     this.previous_dep_id.push(participant.department_id)
                 });
-                this.selectedDepartment = departments
+                this.selectedDepartment = departments;
             }
-            if(data.meeting_type === 'role_type'){
+            if(detail.meeting_type === 'role_type'){
                 let roles = []
-                data.participants.forEach(participant => {
+                detail.participants.forEach(participant => {
+                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.role.department.id));
                     roles.push(this.allRoleList.find(role => role.id == participant.role_id))
                     this.previous_role_id.push(participant.role_id)
                 });
-                this.selectedRole = roles
+                this.selectedRole = roles;
             }
-            if(data.meeting_type === 'staff_type'){
-                let roles = []
-                data.participants.forEach(participant => {
-                    roles.push(this.allRoleList.find(role => role.id == participant.role_id))
-                    this.previous_staff_id.push(participant.staff_id)
+            if(detail.meeting_type === 'staff_type'){
+                detail.participants.forEach(participant => {
+                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.staff.department.id));
+                    this.roleList = [];
+                    this.selectedDepartment.forEach(department => {
+                        this.roleList.push({
+                            title: department.name,
+                            roles:department.roles,
+                        })
+                    });
+                    this.selectedRole.push(this.allRoleList.find(role => role.id == participant.staff.roles[0].id));
                 });
-                this.selectedRole = roles
+                let url_department = '';
+                if(this.selectedDepartment.length > 0){
+                    this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
+                    url_department = url_department.slice(0, -1); 
+                    console.log(url_department);
+                }
+                let url_role = '';
+                if(this.selectedRole.length > 0){
+                    this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
+                    url_role = url_role.slice(0, -1); 
+                    console.log(url_role);
+                }
+                let url_joint = '';
+                if(url_role){
+                    url_joint = '&'
+                }
+                else{
+                    url_joint = ''
+                }
+                let url = '/api/staffs?' + url_department + url_joint + url_role;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.staffList = response.data.data;
+                    let staffs = [];
+                    detail.participants.forEach(participant => {
+                        staffs.push(this.staffList.find(staff => staff.id == participant.staff_id)) 
+                        this.previous_staff_id.push(participant.staff_id)
+                    });
+                    this.selectedStaff = staffs;
+                }
             }
         },
 
@@ -312,12 +349,43 @@ export default {
             //     this.roleList = response.data;
             // }
         },
+        roleChange(){
+            this.getStaffList();
+        },
         async getStaffList(){
+            let url_department = '';
+            if(this.selectedDepartment.length > 0){
+                this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
+                url_department = url_department.slice(0, -1); 
+                console.log(url_department);
+            }
+            let url_role = '';
+            if(this.selectedRole.length > 0){
+                this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
+                url_role = url_role.slice(0, -1); 
+                console.log(url_role);
+            }
+            let url_joint = '';
+            if(url_role){
+                url_joint = '&'
+            }
+            else{
+                url_joint = ''
+            }
+            let url = '/api/staffs?' + url_department + url_joint + url_role;
+            // let url = `/api/staffs?department_id[]=1&department_id[]=2&role_id[]=4&role_id[]=3`;
+            // let url = `/api/staffs`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.staffList = response.data.data;
+            }
+        },
+        async getChairedByList(){
             // let url = `/api/staff_by_department/`+this.selectedDepartment.id+`/role/`+this.selectedRole.id;
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data;
+                this.chairedByList = response.data.data;
             }
         },
 
@@ -376,6 +444,7 @@ export default {
                 this.alertValidationMessage(`Chaired By`);
                 return 1;
             }
+            
             let meetingType = null;
             if(this.selectedStaff.length > 0){
                 meetingType = 'staff_type'
@@ -458,11 +527,12 @@ export default {
     },
     
     created(){
+        this.getChairedByList();
         this.getDepartmentList();
         // this.getRoleList();
-        this.getStaffList();
         // this.getAllRoleList();
         this.getMeetingDetail();
+        
     },
 
     mounted() {

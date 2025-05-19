@@ -399,6 +399,15 @@ class LeaveRepository implements LeaveRepositoryInterface
       })
       ->when($request->staff_id, function ($query) use ($request) {
         $query->where('staff_id', $request->staff_id);
+      })->when($request->department_id, function ($query) use ($request) {
+        $query->whereHas('staff.department', function ($q) use ($request) {
+          $q->where('id', $request->department_id);
+        });
+      })
+      ->when($request->role_id, function ($query) use ($request) {
+        $query->whereHas('staff.roles', function ($q) use ($request) {
+          $q->where('id', $request->role_id);
+        });
       })
       ->paginate(config('common.list_count'));
   }

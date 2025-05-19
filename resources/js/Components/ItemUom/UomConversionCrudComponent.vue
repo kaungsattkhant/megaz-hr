@@ -21,13 +21,17 @@
             </div>
             <div class="flex justify-end flex-col">
                 <div class="flex gap-3">
-                    <button type="button"
+                    <label for="excel_import" class="add-btn h-8 cursor-pointer">
+                        Excel Import
+                        <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
+                    <button type="button"  @click="createUomConversionBtnClicked"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
                         Add New
                     </button>
 
-                    <button type="button"
+                    <button type="button" @click="createUomBtnClicked"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#uom">
                         Create Uom
@@ -196,7 +200,7 @@
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
+                        aria-label="Close" id="close_uom_conversion_modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -210,8 +214,8 @@
                         <label for="" class="label-form mb-3">
                             Base Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="baseUnit" class="input-ui">
-                            <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
+                        <select placeholder="Unit" v-model="baseUnit" class="input-ui">
+                            <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }} <small class="text-gray-400">({{ uom.uom_code }})</small></option>
                         </select>
 
                     </div>
@@ -219,8 +223,8 @@
                         <label for="" class="label-form mb-3">
                             Conversion Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="conversionUnit" class="input-ui">
-                            <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
+                        <select placeholder="Unit" v-model="conversionUnit" class="input-ui">
+                            <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }} <small class="text-gray-400">({{ uom.uom_code }})</small></option>
                         </select>
                     </div>
                     <div class="mb-4">
@@ -261,7 +265,7 @@
                         Create UOM
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_uom"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -278,6 +282,12 @@
                         </label>
                         <input type="text" placeholder="Uom" v-model="uom_name" class="input-ui">
                     </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Uom Code
+                        </label>
+                        <input type="text" placeholder="eg.uom-11" pattern="^uom-\d+$" required v-model="uom_code" class="input-ui">
+                    </div>
 
                 </div>
 
@@ -287,8 +297,7 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmUomCreate"
-                        data-te-modal-dismiss>
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmUomCreate">
                         Create
                     </button>
                 </div>
@@ -312,7 +321,7 @@
                     </h5>
                     <!--Close button-->
                     <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                        data-te-modal-dismiss aria-label="Close">
+                        data-te-modal-dismiss aria-label="Close" id="close_uom_conversion_edit_modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-5 w-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -326,7 +335,7 @@
                         <label for="" class="block text-sm text-black mb-3">
                             Base Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="baseUnitedit"
+                        <select  placeholder="Unit" v-model="baseUnitedit"
                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
                         </select>
@@ -335,7 +344,7 @@
                         <label for="" class="block text-sm text-black mb-3">
                             Conversion Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="conversionUnitedit"
+                        <select  placeholder="Unit" v-model="conversionUnitedit"
                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
                         </select>
@@ -379,6 +388,7 @@ export default {
             conversionUnitId: null,
 
             uom_name: null,
+            uom_code: null,
             uomList: [],
 
             baseUnitedit: null,
@@ -392,6 +402,8 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+
+            selectedFile: null,
         };
     },
 
@@ -429,25 +441,56 @@ export default {
                 type: "warn"
             });
         },
-
+        createUomBtnClicked(){
+            this.uom_name = null;
+            this.uom_code = null;
+        },
         async confirmUomCreate() {
+            const pattern = /^uom-\d*$/;
             if (!this.uom_name) {
                 this.alertValiationMessage('Uom name');
                 return 1;
             }
-
+            if (!this.uom_code) {
+                this.alertValiationMessage('Uom Code');
+                return 1;
+            }
+            if (!pattern.test(this.uom_code)) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `Format must be like uom-11`,
+                    type: "warn"
+                });
+                return 1;
+            }
             let url = `/api/uoms`
             let formData = new FormData();
             formData.append('name', this.uom_name);
+            formData.append('uom_code', this.uom_code);
 
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success == true) {
                 this.uom_name = "";
+                this.uom_code = null;
                 this.getUom();
+                document.getElementById('close_create_uom').click();
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+
+                return 1;
             }
 
         },
-
+        createUomConversionBtnClicked(){
+            this.baseUnit = null;
+            this.conversionUnit = null;
+            this.conversionRate = null;
+        },
         async confirmCreateBtnClicked() {
             if (!this.baseUnit) {
                 this.alertValiationMessage(`base unit`);
@@ -481,7 +524,15 @@ export default {
                 this.baseUnit = null;
                 this.conversionUnit = null;
                 this.conversionRate = null;
-                // window.location.reload();
+                document.getElementById('close_uom_conversion_modal').click();
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+                return 1;
             }
         },
 
@@ -515,6 +566,7 @@ export default {
                 this.baseUnitedit = null;
                 this.conversionUnitedit = null;
                 this.conversionRate = null;
+                document.getElementById('close_uom_conversion_edit_modal').click();
 
             }
         },
@@ -526,6 +578,40 @@ export default {
             this.searchInput = null;
             this.getUomConversionList(1);
         },
+
+
+
+
+        handleFileChange(event) {
+            console.log("Event object:", event);
+            const selectedFile = event.target.files[0];
+            this.selectedFile = selectedFile;
+            if(this.selectedFile){
+                this.importBtnClicked();
+            }
+        },
+        async importBtnClicked() {
+            let formData = new FormData();
+            formData.append('uom_import', this.selectedFile);
+            let response = await postApiData({ url: '/api/import/uoms', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedFile = null;
+                this.getUomConversionList(1);
+                this.getUom();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
+
+
 
     },
 

@@ -260,6 +260,9 @@
                                         <th scope="col" class="">
                                             Working Time
                                         </th>
+                                        <th scope="col" class="">
+                                            Cost
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -270,6 +273,9 @@
                                         </td>
                                         <td class="">
                                             {{ convertMinutesToHoursMinutes(hr.total_duration) }}
+                                        </td>
+                                        <td class="">
+                                            {{ (hr.hr_cost_cal).toLocaleString() }} Ks
                                         </td>
                                     </tr>
                                 </tbody>
@@ -542,10 +548,11 @@ export default {
                 this.selectedRoomList.push({
                     roomName: response.data[0].name,
                     entity_id: response.data[0].entity_id,
-                    mrp_forecastable_id: response.data[0].entity_id,
+                    mrp_forecastable_id: response.data[0].id,
                     quantity: response.data[0].session,
                     hour: response.data[0].hour,
-                    mrp_forecastable_type : mrp_forecastable_type
+                    mrp_forecastable_type : mrp_forecastable_type,
+                    date: this.selectedMonth,
                 })
                 this.selectedRoom = null;
                 this.session = null;
@@ -616,12 +623,18 @@ export default {
         },
 
         async clickedBtnCreate(){
-            this.is_step = 2;
-            initTE({ Modal });
-            this.getSelectedRoomList();
-            this.getRawMaterialList();
-            this.getHrList();
-            
+            if(this.selectedRoomList.length < 1){
+                this.alertValidationMessage(`Room`);
+                return 1;
+            }
+            else {
+                this.selectedRoomList.forEach(room => room.date = this.selectedMonth);
+                this.is_step = 2;
+                initTE({ Modal });
+                this.getSelectedRoomList();
+                this.getRawMaterialList();
+                this.getHrList();
+            }
         },
         async getSelectedRoomList(){
             let formData = new FormData();

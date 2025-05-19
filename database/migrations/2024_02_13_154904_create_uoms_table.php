@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('uoms', function (Blueprint $table) {
             $table->id();
-            $table->string('name',45);
+            $table->string('uom_code', 255)->unique();
+            $table->string('name', 45);
             $table->unsignedBigInteger('created_by');
-            $table->boolean('is_active',0)->default(1);
+            $table->boolean('is_active', 0)->default(1);
             $table->timestamps();
         });
     }

@@ -49,6 +49,8 @@ class StaffSeeder extends Seeder
                         $phoneNumber = str_repeat($department->id, 5);
                     } elseif ($departmentRole->name == 'Cashier') {
                         $phoneNumber = str_repeat($department->id, 6);
+                    } elseif ($departmentRole->name == 'Receptionist') {
+                        $phoneNumber = str_repeat($department->id, 7);
                     } elseif ($departmentRole->name == 'MD' || $departmentRole->name == 'Supervisor') {
                         $phoneNumber = str_repeat($department->id, 1);
                     }

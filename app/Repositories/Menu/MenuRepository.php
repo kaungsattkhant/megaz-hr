@@ -16,13 +16,17 @@ class MenuRepository implements MenuRepositoryInterface
     public function listAllData(Request $request)
     {
         $validateDate = $request->date ?? CurrentDate();
-        $sellingAreaId= isset($request->selling_area_id) ? $request->selling_area_id : null;
+        $sellingAreaId = isset($request->selling_area_id) ? $request->selling_area_id : null;
         if ($request->per_page || $request->page) {
             $menu_category_id = $request->menu_category_id;
-
-            return Menu::with(['menu_category', 'prices', 'items', 'menuServiceDiscounts' => function ($query) use ($validateDate) {
-                $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
-            }])
+            return Menu::with([
+                'menu_category',
+                'prices',
+                'items',
+                'menuServiceDiscounts' => function ($query) use ($validateDate) {
+                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
+                }
+            ])
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
@@ -36,22 +40,49 @@ class MenuRepository implements MenuRepositoryInterface
             // }])->where('is_active', 1)->get();
             // $sellingAreaId=7;
             $menus = Menu::with([
-                'menu_category', 
-                'prices', 
-                'items', 
+                'menu_category',
+                'prices',
+                'items',
                 'menuServiceDiscounts' => function ($query) use ($validateDate) {
-                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);                                                                                                                                                                                                                                                                                                                                                                                                                     
-                }                                                                                                                                                                                               
+                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
+                }
             ])
-            ->leftJoin('menu_category_areas', 'menus.menu_category_id', '=', 'menu_category_areas.menu_category_id')
-            ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
-            ->where('menu_category_areas.selling_area_id', $sellingAreaId)
-            ->where('menu_areas.is_default', 1)
-            ->where('menus.is_active', 1)
-            ->select('menus.*', 'menu_areas.cooking_area_id')
-            ->get();
-            
+                ->leftJoin('menu_category_areas', 'menus.menu_category_id', '=', 'menu_category_areas.menu_category_id')
+                ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
+                ->where('menu_category_areas.selling_area_id', $sellingAreaId)
+                ->where('menu_areas.is_default', 1)
+                ->where('menus.is_active', 1)
+                ->select('menus.*', 'menu_areas.cooking_area_id')
+                ->get();
+
             return $menus;
+        }
+    }
+
+    public function menuByMenuCategory($id, $request)
+    {
+        if (isset($request->selling_area_id)) {
+            $validateDate = $request->date ?? CurrentDate();
+            $sellingAreaId = $request->selling_area_id;
+            $menus = Menu::with([
+                'menu_category',
+                'prices',
+                'items',
+                'menuServiceDiscounts' => function ($query) use ($validateDate) {
+                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
+                }
+            ])
+                ->leftJoin('menu_category_areas', 'menus.menu_category_id', '=', 'menu_category_areas.menu_category_id')
+                ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
+                ->where('menu_category_areas.selling_area_id', $sellingAreaId)
+                ->where('menu_areas.is_default', 1)
+                ->where('menus.is_active', 1)
+                ->select('menus.*', 'menu_areas.cooking_area_id')
+                ->get();
+
+            return $menus;
+        } else {
+            return Menu::where('menu_category_id', $id)->with('prices', 'menuServiceDiscounts')->get();
         }
     }
 
@@ -408,10 +439,10 @@ class MenuRepository implements MenuRepositoryInterface
                 $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
             }
         ])
-        // ->where('is_feature', 1)
-        ->orderBy('created_at', 'desc')
-        ->where('is_active', 1)
-        ->paginate(config('common.list_count'));
+            // ->where('is_feature', 1)
+            ->orderBy('created_at', 'desc')
+            ->where('is_active', 1)
+            ->paginate(config('common.list_count'));
         return $menus;
     }
 }

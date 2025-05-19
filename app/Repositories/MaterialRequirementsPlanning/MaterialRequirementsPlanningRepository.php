@@ -25,7 +25,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   public function getMrpLists(Request $request)
   {
     $search = $request->input('search');
-    $category = $request->input('category');
+    $category = $request->input('menu_category_id'); //change to category_id to menu_category_id
     $price = $request->input('price');
     $code = $request->input('code');
     $menuList = Menu::menuFilter($search, $price, $category, $code)->with([

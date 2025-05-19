@@ -252,8 +252,8 @@ export default {
         ...mapGetters(['getToken']),
 
         async getAreaList(departmentId){
-            // let response = await getApiData({ url: '/api/areas', token: this.getToken() });
-            let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
+            let response = await getApiData({ url: '/api/cooking_areas', token: this.getToken() });
+            // let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
             if (response.data) {
                 this.areaList = response.data;
             }

@@ -22,7 +22,7 @@ class ItemImportRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'item_import' => 'required|file|mimes:xlsx,xls,csv'
+            'item_import' => 'required'
         ];
     }
 

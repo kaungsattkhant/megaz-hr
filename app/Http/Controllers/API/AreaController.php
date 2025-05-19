@@ -78,4 +78,9 @@ class AreaController extends Controller
         $data = $this->areaRepo->getSellingAreas($request);
         ResponseData($data);
     }
+
+    public function getCookingAreas(Request $request){
+        $data = $this->areaRepo->getCookingAreas($request);
+        ResponseData($data);
+    }
 }
