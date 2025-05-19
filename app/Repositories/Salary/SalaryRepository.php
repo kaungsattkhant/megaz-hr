@@ -753,8 +753,8 @@ class SalaryRepository implements SalaryRepositoryInterface
             }
           }
         }
-        $actualWorkDays = $totalDays - $offDayCount - $unpaidLeaveCount - $publicHolidays;
-        $actualBasicSalary = ($salary->basic_salary) / $actualWorkDays;
+        $actualWorkDays = max(0, $totalDays - $offDayCount - $unpaidLeaveCount - $publicHolidays);
+        $actualBasicSalary = $actualWorkDays > 0 ?  ($salary->basic_salary) / $actualWorkDays : 0;
         $checkIns = CheckIn::where('staff_id', $staff->id)
           ->whereBetween('check_in_date_time', [$startDate, $endDate])
           ->whereBetween('check_out_date_time', [$startDate, $endDate])
@@ -794,8 +794,12 @@ class SalaryRepository implements SalaryRepositoryInterface
           }
         }
         $totalOvertimeHours = max(0, $totalOvertimeHours);
-        $actualWorkedHours = $totalWorkedHours - $totalOvertimeHours;
-        $hourlyRate = $salary->basic_salary / $actualWorkedHours > 0 ? $salary->basic_salary / $actualWorkedHours : 0;
+        $actualWorkedHours = max(0, $totalWorkedHours - $totalOvertimeHours);
+        $hourlyRate = 0;
+        if ($actualWorkedHours > 0 && $salary->basic_salary > 0) {
+          $hourlyRate = $salary->basic_salary / $actualWorkedHours;
+          // $hourlyRate = $salary->basic_salary / $actualWorkedHours > 0 ? $salary->basic_salary / $actualWorkedHours : 0;
+        }
         $role = $staff->roles->first();
         $overtimePay = 0;
         if ($role) {
@@ -804,7 +808,8 @@ class SalaryRepository implements SalaryRepositoryInterface
         } else {
           $overtimePay = 0;
         }
-        $netSalary = (float) ($actualBasicSalary - $totalDeduction) + ($totalAllowance + $overtimePay);
+
+        $netSalary =  max(0, (float) ($actualBasicSalary - $totalDeduction) + ($totalAllowance + $overtimePay));
         $salaryDetails[] = [
           'staff_id' => $staff->id,
           'staff_name' => $staff->name,
@@ -814,7 +819,7 @@ class SalaryRepository implements SalaryRepositoryInterface
           'role_name' => $staff->roles->first() ? $staff->roles->first()->name : null,
           'salary_batch_id' => $request->salary_batch_id,
           'salary_id' => $salary->id,
-          // 'basic_salary' =>  $salary->basic_salary,
+          // 'formal_basic_salary' =>  $salary->basic_salary,
           'allowance' =>  round($totalAllowance, 2),
           'deductions' => $totalDeduction,
           'overtime_hours' => round(max(0, $totalOvertimeHours), 2) ?? null,
@@ -827,6 +832,7 @@ class SalaryRepository implements SalaryRepositoryInterface
           // 'actual_worked_hours' => $actualWorkedHours,
           'public_holidays' => $publicHolidays,
           'total_days' => $totalDays,
+          '$offDayCount' => $offDayCount,
           // 'total_worked_hours' => $totalWorkedHours,
           // 'total_overtime_hours' => $totalOvertimeHours,
           // 'total_allowances_amount' => $totalAllowance,
