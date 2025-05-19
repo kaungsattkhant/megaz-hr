@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Hr\ExitCategoryRequest;
+use App\Http\Requests\Hr\LeaveCategoryRequest;
 use App\Http\Requests\Hr\StoreLeaveAllowanceRequest;
 use App\Repositories\Leave\LeaveRepositoryInterface;
 
@@ -20,9 +22,9 @@ class LeaveController extends Controller
         $data = $this->leaveRepository->getLeaveCategoryLists($request);
         ResponseData($data);
     }
-    public function createLeaveCategory(Request $request)
+    public function createLeaveCategory(LeaveCategoryRequest $request)
     {
-        $data = $this->leaveRepository->createLeaveCategory($request->all());
+        $data = $this->leaveRepository->createLeaveCategory($request->validated());
         ResponseData($data);
     }
 
@@ -66,6 +68,54 @@ class LeaveController extends Controller
     public function getLeaveTotalByStaff($staffId)
     {
         $data = $this->leaveRepository->getLeaveTotalByStaff($staffId);
+        ResponseData($data);
+    }
+
+    public function getExitCategoryLists(Request $request)
+    {
+        $data = $this->leaveRepository->getExitCategoryLists($request);
+        ResponseData($data);
+    }
+
+    public function createExitCategory(ExitCategoryRequest $request)
+    {
+        $data = $this->leaveRepository->createExitCategory($request->validated());
+        ResponseData($data);
+    }
+
+    public function createExitPass(Request $request)
+    {
+        $data = $this->leaveRepository->createExitPass($request->all());
+        ResponseData($data);
+    }
+
+    public function getExitPass(Request $request)
+    {
+        $data = $this->leaveRepository->getExitPass($request);
+        ResponseData($data);
+    }
+
+    public function updateExitPass(Request $request, $id)
+    {
+        $data = $this->leaveRepository->updateExitPass($request->all(), $id);
+        ResponseData($data);
+    }
+
+    public function deleteExitPass($id)
+    {
+        $data = $this->leaveRepository->deleteExitPass($id);
+        ResponseData($data);
+    }
+
+    public function getExitPassByStaff($staffId)
+    {
+        $data = $this->leaveRepository->getExitPassByStaff($staffId);
+        ResponseData($data);
+    }
+
+    public function getStaffListByRoleAndDepartment($roleId, $departmentId)
+    {
+        $data = $this->leaveRepository->getStaffListByRoleAndDepartment($roleId, $departmentId);
         ResponseData($data);
     }
 }

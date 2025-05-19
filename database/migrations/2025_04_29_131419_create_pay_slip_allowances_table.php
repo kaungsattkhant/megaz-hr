@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('off_day_assignments', function (Blueprint $table) {
+        Schema::create('pay_slip_allowances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('off_day_id');
-            $table->unsignedBigInteger('offdayable_id')->nullable();
-            $table->string('offdayable_type')->nullable();
-
+            $table->foreignId('pay_slip_id')->constrained('pay_slips');
+            $table->foreignId('allowance_id')->constrained('allowances');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('off_day_assignments');
+        Schema::dropIfExists('pay_slip_allowances');
     }
 };

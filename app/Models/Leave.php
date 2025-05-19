@@ -25,6 +25,7 @@ class Leave extends Model
         'created_by',
         'image_url',
         'image_path',
+        'is_unpaid_leave',
         'confirmed_at',
         'confirmed_by',
         'cancelled_at',
@@ -36,7 +37,7 @@ class Leave extends Model
     {
         return $this->belongsTo(LeaveCategory::class, 'leave_category_id');
     }
-    public function Staff(): BelongsTo
+    public function staff(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'staff_id');
     }

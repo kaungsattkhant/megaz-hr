@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('off_day_assignments', function (Blueprint $table) {
+        Schema::create('exit_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('off_day_id');
-            $table->unsignedBigInteger('offdayable_id')->nullable();
-            $table->string('offdayable_type')->nullable();
-
+            $table->string('name');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('off_day_assignments');
+        Schema::dropIfExists('exit_categories');
     }
 };
