@@ -304,15 +304,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
       },
-      'participants.staff',
-      'participants.department',
-      'participants.role',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
-      // 'participants.role.staffs',
+      // 'participants.staff',
+      // 'participants.department',
+      // 'participants.role',
+      'participants.staff.department',
+      'participants.staff.roles',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
+      'participants.role.staffs',
     ])->orderBy('id', 'desc')->get();
     return $training;
   }
@@ -325,15 +325,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         $query->where('participantable_type', 'training');
       },
       'trainedBy',
-      'participants.staff',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
+      // 'participants.staff',
+      'participants.staff.department',
+      'participants.staff.roles',
       'participants.department',
       'participants.role',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
-      // 'participants.role.staffs',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
+      'participants.role.staffs',
     ])->find($trainingId);
     if (!$training) {
       return ResponseData(null, 404, false, 'Training not found.');
@@ -559,15 +559,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
-      'participants.staff',
-      'participants.department',
-      'participants.role',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
+      // 'participants.staff',
+      // 'participants.department',
+      // 'participants.role',
+      'participants.staff.department',
+      'participants.staff.roles',
       'participants.department.roles',
-      // 'participants.department.staffs',
+      'participants.department.staffs',
       'participants.role.department',
-      // 'participants.role.staffs',
+      'participants.role.staffs',
     ])->orderBy('id', 'desc')->get();
     return  $orgNew;
   }
@@ -584,9 +584,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.department',
       'participants.role',
       'participants.department.roles',
-      // 'participants.department.staffs',
+      'participants.department.staffs',
       'participants.role.department',
-      // 'participants.role.staffs',
+      'participants.role.staffs',
     ])->find($orgNewsId);
     if (!$orgNew) {
       return ResponseData(null, 404, false, 'OrgNew not found.');
@@ -793,15 +793,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
-      'participants.staff',
-      'participants.department',
-      'participants.role',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
-      // 'participants.role.staffs',
+      // 'participants.staff',
+      // 'participants.department',
+      // 'participants.role',
+      'participants.staff.department',
+      'participants.staff.roles',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
+      'participants.role.staffs',
     ])->orderBy('id', 'desc');
 
     if ($request->has('from_date') && $request->has('to_date')) {
@@ -822,15 +822,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
-      'participants.staff',
-      'participants.department',
-      'participants.role',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
-      // 'participants.role.staffs',
+      // 'participants.staff',
+      // 'participants.department',
+      // 'participants.role',
+      'participants.staff.department',
+      'participants.staff.roles',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
+      'participants.role.staffs',
     ])->find($warningId);
     if (!$warning) {
       return ResponseData(null, 404, false, 'Warning not found.');
