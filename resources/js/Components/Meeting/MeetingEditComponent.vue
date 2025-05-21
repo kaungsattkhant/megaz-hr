@@ -444,6 +444,7 @@ export default {
                 this.alertValidationMessage(`Chaired By`);
                 return 1;
             }
+            
             let meetingType = null;
             if(this.selectedStaff.length > 0){
                 meetingType = 'staff_type'

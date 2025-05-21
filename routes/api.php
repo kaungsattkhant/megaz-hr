@@ -167,7 +167,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/staffs_by_role', [StaffAPIController::class, 'getStaffListBySupervisor']);
-    Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    Route::get('/supervisor/staff/{staffId}/tasks', action: [TaskController::class, 'getStaffTasksBySupervisor']);
     // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
 
     Route::controller(TaskController::class)->group(function () {
@@ -506,6 +506,8 @@ Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 Route::get('areas_by_department/{department_id}', [AreaController::class, 'getAreaByDepartment']);
 Route::get('/sellings_areas', [AreaController::class, 'getSellingAreas']);
+Route::get('/cooking_areas', [AreaController::class, 'getCookingAreas']);
+
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
@@ -670,4 +672,8 @@ Route::controller(FoodOrderAPIController::class)->group(function () {
 Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::get('/delivery_charges', 'getDeliveryChargeData');
     Route::post('/delivery_charges', 'createDeliveryCharge');
+});
+
+Route::controller(TestController::class)->group(function () {
+    Route::get('/get_holidays', 'getHolidays');
 });

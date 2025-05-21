@@ -52,6 +52,8 @@ return [
         'cashbook',
         'fixed-asset',
         'customer',
+        'hr',
+        'check-in',
     ],
     'finance_feature_slug' => [
         'staff',

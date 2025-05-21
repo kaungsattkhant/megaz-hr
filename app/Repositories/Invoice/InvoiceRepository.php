@@ -222,8 +222,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
-                // $data['sub_total'] = $data['total_session_price'];
-
                 $invoice = Invoice::create($data);
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
                 $invoice->save();
@@ -231,7 +229,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
-             
+
                 $customer = Customer::find($invoice->customer_id);
                 //change ksk
                 if ($data['type'] == 'package' && $invoice) {
@@ -247,7 +245,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             ResponseMessage('Accessory Created Fail', 419);
                         }
                     }
-                    if (isset($data['is_waiter'])) {
+                    if (isset($data['is_waiter'])) {                                                                                
                         if ($data['is_waiter'] == 1) {
                             //send only package
                             $receptionistRole = Role::getRoleByName('Receptionist');
@@ -264,7 +262,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'invoice' => $invoice,
                     'entity' => $entity,
                 ];
-                return $returnData;
+                return $returnData;                                                                     
             }
             //change
         } catch (\Throwable $e) {

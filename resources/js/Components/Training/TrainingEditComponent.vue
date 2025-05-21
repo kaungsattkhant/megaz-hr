@@ -77,6 +77,7 @@
                 </label>
                 <multiselect
                 v-model="selectedRole"
+                @close="roleChange"
                 :options="roleList"
                 :multiple="true"
                 group-values="roles" 
@@ -140,7 +141,7 @@
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedTrainedBy" class="input-ui !text-black"
                     data-te-select-filter="true">
-                        <option :value="staff" v-for="(staff, staffIndex) in staffList" :key="staffIndex">
+                        <option :value="staff" v-for="(staff, staffIndex) in trainedByList" :key="staffIndex">
                             {{ staff.name }}
                         </option>
                     </select>
@@ -252,6 +253,7 @@ export default {
             roleList:[],
             allRoleList:[],
             staffList:[],
+            trainedByList:[],
             placeList:[],
             chairedByList:[],
 
@@ -295,7 +297,7 @@ export default {
                 this.addDetail(response.data)
             }
         },
-        addDetail(data){
+        async addDetail(data){
             this.title = data.title;
             this.selectedDate = data.date_time;
             this.selectedFrom = data.from_date;
@@ -315,20 +317,31 @@ export default {
             if(data.training_type === 'role_type'){
                 let roles = []
                 data.participants.forEach(participant => {
+                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.role.department.id));
                     roles.push(this.allRoleList.find(role => role.id == participant.role_id));
                     this.previous_role_id.push(participant.role_id);
                 });
                 this.selectedRole = roles
             }
             if(data.training_type === 'staff_type'){
+                // let department = [];
+                // data.participants.forEach(participant => {
+                //     department.push( this.departmentList.find(d => d.id == participant.staff.department_id) );
+                //     this.previous_staff_id.push(participant.staff_id)
+                // });
+                // this.selectedDepartment = department;
+
+
                 let staff = []
                 data.participants.forEach(participant => {
-                    staff.push(this.staffList.find(staff => staff.id == participant.staff_id));
+                    // staff.push( this.staffList.find(staff => staff.id == participant.staff_id) );
                     this.previous_staff_id.push(participant.staff_id)
                 });
                 this.selectedStaff = staff
             }
         },
+
+
 
         async getDepartmentList(){
             let url = `/api/departments`;
@@ -357,6 +370,7 @@ export default {
                         roles:department.roles
                     })
                 });
+                this.getStaffList();
             }
             else{
                 this.getRoleList();
@@ -376,12 +390,43 @@ export default {
             //     this.roleList = response.data;
             // }
         },
+        roleChange(){
+            this.getStaffList();
+        },
         async getStaffList(){
+            let url_department = '';
+            if(this.selectedDepartment.length > 0){
+                this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
+                url_department = url_department.slice(0, -1); 
+                console.log(url_department);
+            }
+            let url_role = '';
+            if(this.selectedRole.length > 0){
+                this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
+                url_role = url_role.slice(0, -1); 
+                console.log(url_role);
+            }
+            let url_joint = '';
+            if(url_role){
+                url_joint = '&'
+            }
+            else{
+                url_joint = ''
+            }
+            let url = '/api/staffs?' + url_department + url_joint + url_role;
+            // let url = `/api/staffs?department_id[]=1&department_id[]=2&role_id[]=4&role_id[]=3`;
+            // let url = `/api/staffs`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.staffList = response.data.data;
+            }
+        },
+        async getTrainedByList(){
             // let url = `/api/staff_by_department/`+this.selectedDepartment.id+`/role/`+this.selectedRole.id;
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.trainedByList = response.data.data;
             }
         },
         async getTypeList(){
@@ -548,6 +593,7 @@ export default {
         // this.getRoleList();
         this.getTypeList();
         this.getStaffList();
+        this.getTrainedByList();
         // this.getAllRoleList();
         this.getTrainingDetail();
     },

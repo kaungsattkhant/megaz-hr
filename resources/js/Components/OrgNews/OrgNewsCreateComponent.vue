@@ -38,7 +38,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     &nbsp;
                 </label>
-                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2">
+                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2" @click="newType = null">
                     <i class="fal fa-plus  pr-3"></i>
                 </button>
             </div>
@@ -83,6 +83,7 @@
                 </label>
                 <multiselect
                 v-model="selectedRole"
+                @close="roleChange"
                 :options="roleList"
                 :multiple="true"
                 group-values="roles" 
@@ -254,6 +255,7 @@ export default {
                         roles:department.roles
                     })
                 });
+                this.getStaffList();
             }
             else{
                 this.getRoleList();
@@ -272,12 +274,39 @@ export default {
             this.getStaffList()
         },
         async getStaffList(){
-            let url = `/api/staffs`;
+            console.log('department change')
+            let url_department = '';
+            if(this.selectedDepartment.length > 0){
+                this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
+                url_department = url_department.slice(0, -1); 
+                console.log(url_department);
+            }
+            let url_role = '';
+            if(this.selectedRole.length > 0){
+                this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
+                url_role = url_role.slice(0, -1); 
+                console.log(url_role);
+            }
+            let url_joint = '';
+            if(url_role){
+                url_joint = '&'
+            }
+            else{
+                url_joint = ''
+            }
+            let url = '/api/staffs?' + url_department + url_joint + url_role ;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.staffList = response.data.data;
             }
         },
+        // async getStaffList(){
+        //     let url = `/api/staffs`;
+        //     let response = await getApiData({url: url, token: this.getToken()});
+        //     if(response.data){
+        //         this.staffList = response.data.data;
+        //     }
+        // },
         async getTypeList(){
             let url = `/api/noti_types?type=orgNew`;
             let response = await getApiData({url: url, token: this.getToken()});

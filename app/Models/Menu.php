@@ -110,7 +110,7 @@ class Menu extends BaseModel
                 $q->where('price', $price);
             })
             ->when($category, function ($q) use ($category) {
-                $q->where('category', $category);
+                $q->where('menu_category_id', $category);
             })
             ->when($code, function ($q) use ($code) {
                 $q->where('code', 'like', '%' . $code . '%');
