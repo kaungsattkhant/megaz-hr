@@ -75,6 +75,7 @@ return [
         public_path('okrImages') => storage_path('app/okrImages'),
         public_path('staffImages') => storage_path('app/staffImages'),
         public_path('leaveImgs') => storage_path('app/leaveImgs'),
+        public_path('resignImgs') => storage_path('app/resignImgs'),
     ],
 
 ];

@@ -5,10 +5,11 @@ namespace App\Actions\Auth;
 use Illuminate\Support\Facades\Hash;
 
 /**
-* Sanctum token generator
-*
-*/
-class APILoginAction {
+ * Sanctum token generator
+ *
+ */
+class APILoginAction
+{
 
     private $credential_name;
     private $identity;
@@ -41,33 +42,34 @@ class APILoginAction {
      */
     public function run($token_name, array $abilities = null): array
     {
-        $user = $this->credential_type::where($this->credential_name, $this->identity)->get()->first();
+        $user = $this->credential_type::where($this->credential_name, $this->identity)->first();
         $login_response = [
             "token" => null,
             "code" => 401,
             "success" => false,
             "message" => null
         ];
+        if ($user->is_active === 0) {
+            $login_response["message"] = "User is not active";
 
-        if(!isset($user))
-        {
+            return $login_response;
+        }
+        if (!isset($user)) {
             $login_response["message"] = "User not found";
 
             return $login_response;
         }
 
-        if(!Hash::check($this->password, $user->getAuthPassword()))
-        {
+        if (!Hash::check($this->password, $user->getAuthPassword())) {
             $login_response["message"] = "Password not match";
 
             return $login_response;
         }
 
         $login_response["user"] = $user;
-        if($abilities){
+        if ($abilities) {
             $token = $user->createToken($token_name, $abilities)->plainTextToken;
-        }
-        else{
+        } else {
             $token = $user->createToken($token_name)->plainTextToken;
         }
         $login_response["token"] = $token;

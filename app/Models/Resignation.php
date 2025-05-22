@@ -36,11 +36,11 @@ class Resignation extends Model
     }
     public function confirmedBy()
     {
-        return $this->belongsTo(User::class, 'confirmed_by');
+        return $this->belongsTo(Staff::class, 'confirmed_by');
     }
     public function cancelledBy()
     {
-        return $this->belongsTo(User::class, 'cancelled_by');
+        return $this->belongsTo(Staff::class, 'cancelled_by');
     }
     public function getResignationDateAttribute($value)
     {

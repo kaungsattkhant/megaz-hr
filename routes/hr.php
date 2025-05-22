@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\LeaveController;
-use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\SalaryController;
+use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\ResignationController;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -66,5 +67,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
+  });
+  Route::prefix('hr')->controller(ResignationController::class)->group(function () {
+    Route::get('/resignation_categories', 'getResignationCategoryLists');
+    Route::post('/resignation_categories', 'createResignationCategory');
+    Route::post('/resignations', 'createResignation');
+    Route::get('/resignations', 'getAllResignations');
+    Route::get('/resignations/{id}', 'getResignationById');
+
+    Route::post('/resignations/{id}', 'updateResignation');
+    Route::get('/resignations-by-staff/{staffId}', 'getResignationByStaffId');
   });
 });
