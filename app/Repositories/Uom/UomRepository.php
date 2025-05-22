@@ -92,9 +92,7 @@ class UomRepository implements UomRepositoryInterface
     public function uomConversaionList(Request $request)
     {
         $uomsQuery = UomConversion::with('baseUnit', 'conversionUnit')
-            ->orderBy('created_at', 'desc')
-            ->where('is_show', 1);
-
+            ->orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
 
@@ -110,9 +108,12 @@ class UomRepository implements UomRepositoryInterface
         }
 
         if ($request->per_page || $request->page) {
-            return $uomsQuery->paginate(config('common.list_count'));
+            return $uomsQuery
+            ->where('is_show', 1)
+            ->paginate(config('common.list_count'));
         } else {
-            return $uomsQuery->get();
+            return $uomsQuery
+            ->get();
         }
     }
 

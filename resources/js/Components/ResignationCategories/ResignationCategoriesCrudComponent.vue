@@ -50,7 +50,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
                                             class="pr-3" @click="editBtnClicked(item, index)">
                                             <i class="fal fa-pen"></i>
@@ -59,7 +59,7 @@
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             </div>
                         </tbody>
@@ -124,7 +124,7 @@
                             data-te-modal-dismiss>
                             Close
                         </button>
-                        <button @click="deleteItem()" type="button" data-te-toggle="modal" data-te-target="#deleteModal"
+                        <button @click="deleteItem()" type="button"
                             class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                             Delete
                         </button>
@@ -134,7 +134,7 @@
         </div>
     </div>
 
-
+        <!-- create modal  -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
         id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
@@ -145,7 +145,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="create_modalLabel">
-                        Create Overtime Fees
+                        Create Resignation Category
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
                         id="close_create_modal" aria-label="Close">
@@ -156,37 +156,12 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Department
+                            Name
                         </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                                data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
-                                <option :value="department" v-for="(department, index) in departmentList"
-                                    :key="index"> {{ department.name }} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Role
-                        </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Day"
-                                data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
-                                <option :value="role" v-for="(role, index) in roleList"
-                                    :key="index"> {{ role.name }} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Overtime Fees
-                        </label>
-                        <input type="number" v-model="overtimeFees" class="input-ui mb-2">
+                        <input type="text" v-model="name" class="input-ui mb-2">
                     </div>
                 </div>
 
@@ -214,7 +189,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="edit_modalLabel">
-                        Edit Overtime Fees
+                        Edit Resignation Category
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
                         id="close_edit_modal" aria-label="Close">
@@ -225,37 +200,12 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Department
+                            Name
                         </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                                data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
-                                <option :value="department" v-for="(department, index) in departmentList"
-                                    :key="index"> {{ department.name }} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Role
-                        </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Day"
-                                data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
-                                <option :value="role" v-for="(role, index) in roleList"
-                                    :key="index"> {{ role.name }} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Overtime Fees
-                        </label>
-                        <input type="number" v-model="overtimeFees" class="input-ui mb-2">
+                        <input type="text" v-model="nameEdit" class="input-ui mb-2">
                     </div>
                 </div>
 
@@ -299,7 +249,8 @@ export default {
         return {
             primaryList: [],
             
-            name:null,
+            name: null,
+            nameEdit: null,
 
             currentPage: 0,
             perPage: 0,
@@ -323,7 +274,7 @@ export default {
             let url = this.url + this.url_search;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.primaryList = response.data.data;
+                this.primaryList = response.data;
             }
         },
         btnCreateResignationCategory(){
@@ -357,7 +308,7 @@ export default {
         },
         editBtnClicked(item){
             this.editId = item.id;
-            this.name = item.name;
+            this.nameEdit = item.name;
         },
         btnEditResignationCategory(){
             if(!this.nameEdit){
@@ -371,9 +322,8 @@ export default {
         async editResignationCategory(){
             let formData = new FormData();
             formData.append('name', this.nameEdit);
-            formData.append('role_id', this.selectedRole.id);
             formData.append('id', this.editId);
-            let response = await postApiData({url:`/api/hr/overtime_fees`, form_data:formData, token:this.getToken()})
+            let response = await postApiData({url:`/api/hr/resignation_categories`, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getOvertimeList();
                 document.getElementById("close_edit_modal").click();
@@ -430,8 +380,7 @@ export default {
         
     },
     created() {
-        this.getDepartmentList();
-        this.getOvertimeList(1);
+        this.getPrimaryList(1);
     }
 }
 </script>
