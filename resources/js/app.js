@@ -215,6 +215,7 @@ import SalaryBatchCreateComponent from './Components/SalaryBatch/SalaryBatchCrea
 import SalaryBatchEditComponent from './Components/SalaryBatch/SalaryBatchEditComponent.vue';
 import SalaryCalculateComponent from './Components/SalaryCalculate/SalaryCalculateComponent.vue';
 import PaySlipComponent from './Components/SalaryCalculate/PaySlipComponent.vue';
+import ResignationCategoriesCrudComponent from './Components/ResignationCategories/ResignationCategoriesCrudComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
@@ -413,6 +414,7 @@ app.component('SalaryBatchCreateComponent',SalaryBatchCreateComponent);
 app.component('SalaryBatchEditComponent',SalaryBatchEditComponent);
 app.component('SalaryCalculateComponent',SalaryCalculateComponent);
 app.component('PaySlipComponent',PaySlipComponent);
+app.component('ResignationCategoriesCrudComponent',ResignationCategoriesCrudComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);

@@ -396,6 +396,9 @@ Route::middleware(['departments:hr'])->group(function () {
     Route::view('/salary_calculate', 'salary_calculate.index')->name('salary_calculate.index');
     Route::view('/pay_slip', 'salary_calculate.pay_slip')->name('salary_calculate.pay_slip');
 });
+
+Route::view('/resignation_categories', 'resignation_categories.index')->name('resignation_categories.index');
+Route::view('/resignations', 'resignations.index')->name('resignations.index');
 // =======
 // Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
 // Route::view('/meeting', 'meeting.index')->name('meeting');
