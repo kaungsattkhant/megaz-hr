@@ -76,7 +76,7 @@ class ResignationRepository implements ResignationRepositoryInterface
       }
 
       DB::commit();
-      ResponseData($resignationData);
+      return ResponseMessage("The resignation has been successfully created.", 201);
     } catch (Exception $e) {
       DB::rollBack();
       throw $e;
