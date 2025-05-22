@@ -295,6 +295,9 @@
                                         <th scope="col" class="">
                                             Working Hour
                                         </th>
+                                        <th scope="col" class="">
+                                            Cost
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -305,6 +308,9 @@
                                         </td>
                                         <td class="">
                                             {{ convertMinutesToHoursMinutes(hr.total_working_hour) }}
+                                        </td>
+                                        <td class="">
+                                            {{ (hr.hr_cost_cal).toLocaleString() }} Ks
                                         </td>
                                     </tr>
                                 </tbody>
@@ -601,7 +607,8 @@ export default {
                         mrp_forecastable_id: response.data.id,
                         quantity: response.data.quantity,
                         amount: response.data.total_menu_forecast_amt,
-                        mrp_forecastable_type : mrp_forecastable_type
+                        mrp_forecastable_type : mrp_forecastable_type,
+                        date: this.selectedMonth,
                     })
                 // }
                 // this.menuTableList[index].quantity += response.data.quantity;
@@ -648,12 +655,18 @@ export default {
         },
 
         async clickedBtnCreate(){
-            this.is_step = 2;
-            initTE({ Modal });
-            this.getMenuTableList();
-            this.getRawMaterialList();
-            this.getHrList();
-            
+            if(this.menuTableList.length < 1){
+                this.alertValidationMessage(`Menu`);
+                return 1;
+            }
+            else {
+                this.menuTableList.forEach(menu => menu.date = this.selectedMonth)
+                this.is_step = 2;
+                initTE({ Modal });
+                this.getMenuTableList();
+                this.getRawMaterialList();
+                this.getHrList();
+            }
         },
         async getMenuTableList(){
             let formData = new FormData();

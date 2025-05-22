@@ -16,21 +16,58 @@ class StaffRepository implements StaffRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        $departmentIds = $request->department_id;
+        $roleIds = $request->role_id;
+        //         $staffQuery = Staff::orderByDesc('id')
+        //             ->with(['department', 'roles'])
+        //             ->when($request->search_input, function ($q) use ($request) {
+        //                 $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+        //             })
+        //             ->when($departmentIds, function ($query) use ($departmentIds) {
+        //                 $query->whereIn('department_id', $departmentIds);
+        //             })
+        //             ->when($roleIds, function ($query) use ($roleIds) {
+        //                 $query->whereHas('roles', function ($q) use ($roleIds) {
+        //                     $q->whereIn('id', $roleIds);
+        //                 });
+        //             })
+        //             ->when(isset($request->page), function ($q) {
+        //                 $q->where('is_active', 1);
+        //             });
+        //         $staff = isset($request->page) ? $staffQuery->paginate(config('common.list_count')) : $staffQuery->get();
+        //         return $staff;
+
         if ($request->per_page || $request->page) {
-            $departmentId = $request->department_id;
             return Staff::orderByDesc('id')
                 ->with(['department', 'roles'])
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
-                ->when($departmentId, function ($query) use ($departmentId) {
-                    $query->where('department_id', $departmentId);
+                ->when($departmentIds, function ($query) use ($departmentIds) {
+                    $query->whereIn('department_id', $departmentIds);
                 })
+                ->when($roleIds, function ($query) use ($roleIds) {
+                    $query->whereHas('roles', function ($q) use ($roleIds) {
+                        $q->whereIn('id', $roleIds);
+                    });
+                })
+                ->where('is_active', 1)
                 ->paginate(config('common.list_count'));
         } else {
-            $staffs = Staff::where('is_active', 1)->get();
-
-            return $staffs;
+            return Staff::orderByDesc('id')
+                ->with(['department', 'roles'])
+                ->when($request->search_input, function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+                })
+                ->when($departmentIds, function ($query) use ($departmentIds) {
+                    $query->whereIn('department_id', $departmentIds);
+                })
+                ->when($roleIds, function ($query) use ($roleIds) {
+                    $query->whereHas('roles', function ($q) use ($roleIds) {
+                        $q->whereIn('id', $roleIds);
+                    });
+                })
+                ->where('is_active', 1)->get();
         }
     }
 

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('item_types', function (Blueprint $table) {
             $table->id();
+            $table->string('item_type_code');
             $table->string('name');
             $table->boolean('is_active')->default(1);
             $table->timestamps();

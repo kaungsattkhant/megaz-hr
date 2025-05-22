@@ -7,10 +7,14 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Imports\UomsImport;
 use App\Imports\ItemsImport;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\UomConversion;
+use App\Services\ItemService;
+use App\Imports\CategoryImport;
+use App\Imports\ItemTypeImport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\HeadingRowImport;
 use App\Services\AveragePriceCalculator;
@@ -19,10 +23,13 @@ use Illuminate\Database\Eloquent\Builder;
 class ItemRepository implements ItemRepositoryInterface
 {
     protected $averagePriceCalculator;
-    public function __construct(AveragePriceCalculator $repo)
+    protected $itemService;
+    public function __construct(AveragePriceCalculator $repo, ItemService $itemService)
     {
         $this->averagePriceCalculator = $repo;
+        $this->itemService = $itemService;
     }
+
     public function listAllData(Request $request)
     {
         $category_id = $request->category_id;
@@ -81,14 +88,14 @@ class ItemRepository implements ItemRepositoryInterface
             }
 
             $conversionRate = $uomConversion->conversion;
-            $minimumHoldingAmount = $this->calculateMinimumHoldingAmount(
+            $minimumHoldingAmount = $this->itemService->calculateMinimumHoldingAmount(
                 $data['min_holding_base_uom_quantity'],
                 $data['min_holding_uom_quantity'],
                 $conversionRate
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
 
-            $item = Item::create($data);
+            $item = Item::firstOrCreate(['name' => $data['name'], 'code' => $data['code']], $data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
@@ -106,22 +113,22 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::find($id);
+            if (!$item) {
+                return ResponseMessage('Item not found.', 404);
+            }
 
             if ($item) {
                 if (isset($data['base_uom_id']) && isset($data['uom_id'])) {
                     $baseUomId = $data['base_uom_id'];
                     $uomId = $data['uom_id'];
-                    $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
-                        ->where('conversion_unit_id', $uomId)
-                        ->where('is_active', 1)
-                        ->first();
+                    $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
                     if (!$uomConversion) {
                         return ResponseMessage('No UOM conversion found for the given units.', 404);
                     }
                     $conversionRate = $uomConversion->conversion;
 
                     if (isset($data['min_holding_base_uom_quantity']) && isset($data['min_holding_uom_quantity'])) {
-                        $minimumHoldingAmount = $this->calculateMinimumHoldingAmount(
+                        $minimumHoldingAmount = $this->itemService->calculateMinimumHoldingAmount(
                             $data['min_holding_base_uom_quantity'],
                             $data['min_holding_uom_quantity'],
                             $conversionRate
@@ -144,14 +151,14 @@ class ItemRepository implements ItemRepositoryInterface
     }
 
 
-    private function calculateMinimumHoldingAmount($minHoldingBaseUomQuantity, $minHoldingUomQuantity, $conversionRate)
-    {
-        $minHoldingBaseUomQuantity = (float) $minHoldingBaseUomQuantity;
-        $minHoldingUomQuantity = (float) $minHoldingUomQuantity;
-        $conversionRate = (float) $conversionRate;
+    // private function calculateMinimumHoldingAmount($minHoldingBaseUomQuantity, $minHoldingUomQuantity, $conversionRate)
+    // {
+    //     $minHoldingBaseUomQuantity = (float) $minHoldingBaseUomQuantity;
+    //     $minHoldingUomQuantity = (float) $minHoldingUomQuantity;
+    //     $conversionRate = (float) $conversionRate;
 
-        return ($minHoldingBaseUomQuantity * $conversionRate) + $minHoldingUomQuantity;
-    }
+    //     return ($minHoldingBaseUomQuantity * $conversionRate) + $minHoldingUomQuantity;
+    // }
 
     public function addPriceItem($request)
     {
@@ -222,18 +229,18 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function itemImport($request)
     {
+
         $file = $request->file('item_import');
         $headings = (new HeadingRowImport)->toArray($file);
         $expectedHeadings = [
             'name',
             'code',
-            'category_id',
-            'item_type_id',
-            'base_uom_id',
-            'uom_id',
+            'category_code',
+            'item_type_code',
+            'base_uom_code',
+            'uom_code',
             'min_holding_base_uom_quantity',
             'min_holding_uom_quantity',
-            'minimum_holding_amount',
         ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {
@@ -241,7 +248,8 @@ class ItemRepository implements ItemRepositoryInterface
                 return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
             }
         }
-        $import = new ItemsImport();
+        $itemService = new ItemService();
+        $import = new ItemsImport($itemService);
         $import->import($file);
         ResponseMessage('Import Successfully', 200);
     }
@@ -299,5 +307,62 @@ class ItemRepository implements ItemRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function importItemType($request)
+    {
+        $file = $request->file('item_type_import');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = [
+            'item_type_code',
+            'name',
+        ];
+        $actualHeadings = $headings[0][0];
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
+        }
+        $import = new ItemTypeImport();
+        $import->import($file);
+        ResponseMessage('Import Type Import Successfully', 200);
+    }
+
+    public function importCategory($request)
+    {
+        $file = $request->file('category_import');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = [
+            'category_code',
+            'name',
+        ];
+        $actualHeadings = $headings[0][0];
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
+        }
+        $import = new CategoryImport();
+        $import->import($file);
+        ResponseMessage('Import Category Import Successfully', 200);
+    }
+
+    public function importUom($request)
+    {
+        $file = $request->file('uom_import');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = [
+            'uom_code',
+            'name',
+        ];
+        $actualHeadings = $headings[0][0];
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
+        }
+        $uom_import = new UomsImport();
+        $uom_import->import($file);
+        ResponseMessage('Import UOM Import Successfully', 200);
     }
 }

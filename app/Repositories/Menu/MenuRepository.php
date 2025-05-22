@@ -19,7 +19,6 @@ class MenuRepository implements MenuRepositoryInterface
         $sellingAreaId = isset($request->selling_area_id) ? $request->selling_area_id : null;
         if ($request->per_page || $request->page) {
             $menu_category_id = $request->menu_category_id;
-
             return Menu::with([
                 'menu_category',
                 'prices',

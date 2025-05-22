@@ -22,12 +22,6 @@ class ExitPass extends Model
         'status',
         'arrival_at'
     ];
-
-    protected $hidden = [
-        'created_at',
-        'updated_at'
-    ];
-
     public function exitCategory(): BelongsTo
     {
         return $this->belongsTo(ExitCategory::class);

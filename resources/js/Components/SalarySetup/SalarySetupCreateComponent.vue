@@ -52,7 +52,7 @@
                 <div class="flex gap-x-2">
                     <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Allowance Type"
+                        <select data-te-select-init data-te-select-placeholder="Select Allowance Type" @change="allowanceTypeChange"
                             data-te-select-filter="true" name="" id="" v-model="selectedAllowanceType" class="input-ui !text-black text-sm">
                             <option :value="allowance" v-for="(allowance, index) in allowanceTypeList"
                                 :key="index"> {{ allowance.name }} </option>
@@ -280,6 +280,9 @@ export default {
         },
         ATSelectedDepartmentChange(){
             this.ATRoleList = this.ATSelectedDepartment.roles;
+        },
+        allowanceTypeChange(){
+            this.amount = this.selectedAllowanceType.amount
         },
         btnClickedAddAllowanceType(){
             if(!this.ATSelectedRole){

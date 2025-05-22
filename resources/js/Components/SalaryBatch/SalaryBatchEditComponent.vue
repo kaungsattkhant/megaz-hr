@@ -122,7 +122,7 @@
 
         <div>
             <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
-                Create Salary Batch
+                Edit Salary Batch
             </button>
         </div>
     </div>
@@ -294,7 +294,7 @@ export default {
             let response = await postApiData({url:`/api/hr/salary_batches/` + this.salaryBatchId, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/salary_batch`);
+                window.location.replace(`/salary_batch`);
             }
         },
 

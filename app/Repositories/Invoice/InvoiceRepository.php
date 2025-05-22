@@ -245,7 +245,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             ResponseMessage('Accessory Created Fail', 419);
                         }
                     }
-                    if (isset($data['is_waiter'])) {
+                    if (isset($data['is_waiter'])) {                                                                                
                         if ($data['is_waiter'] == 1) {
                             //send only package
                             $receptionistRole = Role::getRoleByName('Receptionist');
@@ -262,7 +262,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'invoice' => $invoice,
                     'entity' => $entity,
                 ];
-                return $returnData;
+                return $returnData;                                                                     
             }
             //change
         } catch (\Throwable $e) {

@@ -69,6 +69,8 @@ class FeatureSeeder extends Seeder
             'po-order',
             'arrival-item',
             'po-order-invoice',
+            'check in',
+            'hr',
         ];
         foreach ($features as $feature) {
             Feature::create([

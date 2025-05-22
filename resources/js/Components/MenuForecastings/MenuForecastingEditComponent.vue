@@ -290,6 +290,9 @@
                                         <th scope="col" class="">
                                             Working Hour
                                         </th>
+                                        <th scope="col" class="">
+                                            Cost
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -300,6 +303,9 @@
                                         </td>
                                         <td class="">
                                             {{ convertMinutesToHoursMinutes(hr.total_working_hour) }}
+                                        </td>
+                                        <td class="">
+                                            {{ (hr.hr_cost_cal).toLocaleString() }} Ks
                                         </td>
                                     </tr>
                                 </tbody>
@@ -556,7 +562,8 @@ export default {
                     mrp_forecastable_id: mrp.mrp_forecastable_id,
                     quantity: mrp.quantity,
                     amount: mrp.amount,
-                    mrp_forecastable_type : mrp.mrp_forecastable_type
+                    mrp_forecastable_type : mrp.mrp_forecastable_type,
+                    date: detail.date,
                 })  
             });
         },
@@ -612,7 +619,8 @@ export default {
                     mrp_forecastable_id: response.data.id,
                     quantity: response.data.quantity,
                     amount: response.data.total_menu_forecast_amt,
-                    mrp_forecastable_type : mrp_forecastable_type
+                    mrp_forecastable_type : mrp_forecastable_type,
+                    date: this.selectedMonth,
                 })
                 this.selectedMenuCategory = null;
                 this.selectedMenu = null;
@@ -660,6 +668,7 @@ export default {
                 return 1;
             }
             else {
+                this.menuTableList.forEach(menu => menu.date = this.selectedMonth)
                 this.is_step = 2;
                 initTE({ Modal });
                 this.getMenuTableList();

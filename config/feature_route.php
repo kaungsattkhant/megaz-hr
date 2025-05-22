@@ -73,7 +73,7 @@ return [
     'duty' => 'duty.index',
     'asset-depreciation-balance' => 'asset_depreciation_balance.index',
     'journal' => 'journals.index',
-    'staff_balance' => 'advanced.index',
+    'staff-balance' => 'advanced.index',
     'prepaid' => 'prepaid.index',
     'ar' => 'AR.index',
     //financial
@@ -84,10 +84,13 @@ return [
     'feature' => 'accessories.index',
     'MRP' => 'MRP.index',
     'Objective' => 'OKR.index',
-    'KtvProductTree' => 'product_tree.index',
+    'ktv-product-tree' => 'product_tree.index',
     //procurement
     'po-order'=>'procurement_order_items.index',   //procurement order-item
     'arrival-item'=>'procurement_order_arrival.index',
-    'po-invoice'=>'purchase_order_invoices.index',   //purchase order invoice list
+    'po-invoice'=>'purchase_order_invoices.index',   //purchase order invoice listc
+    'hr'=>'meeting.index',   //
+    'check-in'=>'check_in.index', 
+
     //end procurement
 ];

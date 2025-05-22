@@ -406,6 +406,8 @@ export default {
                 this.getShiftList();
                 this.isShiftStep = false;
                 this.shiftName = null;
+                this.selectedShift = response.data;
+                this.selectedShiftEdit = response.data;
             }
         },
 

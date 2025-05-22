@@ -77,6 +77,12 @@ class SalaryController extends Controller
         ResponseData($data);
     }
 
+    public function deleteOvertimeFee($id)
+    {
+        $data = $this->salaryRepository->deleteOvertimeFee($id);
+        ResponseData($data);
+    }
+
     public function createOvertimeCategories(Request $request)
     {
         $data = $this->salaryRepository->createOvertimeCategories($request->all());

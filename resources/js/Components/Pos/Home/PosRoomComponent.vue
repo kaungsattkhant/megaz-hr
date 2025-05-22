@@ -2749,6 +2749,7 @@
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('accessory_id', this.selectedAccessory.id);
                 formData.append('quantity', this.selectedAccessoryQuantity);
+                formData.append('accessory_price', this.selectedAccessory.accessory_price.price);
                 let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
