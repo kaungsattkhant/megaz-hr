@@ -41,11 +41,10 @@ class ResignationRepository implements ResignationRepositoryInterface
     DB::beginTransaction();
     try {
       if (isset($validatedData['staff_id'])) {
-        $staff = Staff::find($validatedData['staff_id']);
-        if ($staff && $staff->is_active === 0) {
-          ResponseMessage("The staff member is already resigned.", 400);
+        $existingResignation = Resignation::where('staff_id', $validatedData['staff_id'])->first();
+        if ($existingResignation) {
+          ResponseMessage("A resignation already exists for this staff member.", 400);
         }
-        $validatedData['staff_id'] = $validatedData['staff_id'] ?? null;
       }
       if (isset($validatedData['image'])) {
         $imageData = $validatedData['image'];
