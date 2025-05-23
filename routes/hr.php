@@ -81,9 +81,11 @@ Route::middleware('auth:api')->group(function () {
   });
   Route::prefix('hr')->controller(CvController::class)->group(function () {
     Route::get('/cvs', 'getAllCvs');
-    // Route::post('/cv/{id}', 'updateCv');
-    // Route::delete('/cv/{id}', 'deleteCv');
+    Route::post('/cvs/{id}', 'updateCv');
+    Route::delete('/cvs/{id}', 'deleteCv');
     Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
+    Route::get('/cvs/{id}', 'getCvById');
+    Route::post('/cvs/{id}/status', 'updateCvStatus');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
