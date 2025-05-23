@@ -222,6 +222,10 @@ import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComp
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
 
+
+import CvFormComponent from './Components/CV/CvFormComponent.vue';
+
+
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
@@ -421,6 +425,10 @@ app.component('ResignationCrudComponent',ResignationCrudComponent);
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
+
+
+app.component('CvFormComponent',CvFormComponent);
+
 
 app.use(store);
 app.use(Notifications);
