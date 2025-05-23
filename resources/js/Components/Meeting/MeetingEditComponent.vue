@@ -260,7 +260,7 @@ export default {
             }
             if(detail.meeting_type === 'staff_type'){
                 detail.participants.forEach(participant => {
-                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.staff.department.id));
+                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.staff.department_id));
                     this.roleList = [];
                     this.selectedDepartment.forEach(department => {
                         this.roleList.push({
@@ -273,7 +273,7 @@ export default {
                 let url_department = '';
                 if(this.selectedDepartment.length > 0){
                     this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
-                    url_department = url_department.slice(0, -1); 
+                    url_department = url_department.slice(0, -1);
                     console.log(url_department);
                 }
                 let url_role = '';
@@ -385,7 +385,7 @@ export default {
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.chairedByList = response.data.data;
+                this.chairedByList = response.data;
             }
         },
 
