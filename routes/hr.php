@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\CvController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
@@ -78,4 +79,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/resignations/{id}', 'updateResignation');
     Route::get('/resignations-by-staff/{staffId}', 'getResignationByStaffId');
   });
+  Route::prefix('hr')->controller(CvController::class)->group(function () {
+    Route::get('/cvs', 'getAllCvs');
+    Route::post('/cvs/{id}', 'updateCv');
+    Route::delete('/cvs/{id}', 'deleteCv');
+    Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
+    Route::get('/cvs/{id}', 'getCvById');
+    Route::post('/cvs/{id}/status', 'updateCvStatus');
+  });
+});
+Route::prefix('hr')->controller(CvController::class)->group(function () {
+  Route::post('/cvs', 'createCv');
 });
