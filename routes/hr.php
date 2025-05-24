@@ -95,6 +95,9 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/exams/{id}', 'deleteExam');
     Route::get('/exams/{id}', 'getExamById');
     Route::delete('/exam_skills/{id}', 'deleteExamSkill');
+    Route::delete('/grades/{id}', 'deleteGrade');
+    Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
+    Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

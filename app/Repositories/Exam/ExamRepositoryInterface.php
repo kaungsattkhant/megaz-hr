@@ -15,4 +15,10 @@ interface ExamRepositoryInterface
   public function deleteExam($id);
 
   public function deleteExamSkill($id);
+
+  public function deleteGrade($id);
+
+  public function deleteExamQuestion($id);
+
+  public function toggleExamQuestion($id);
 }

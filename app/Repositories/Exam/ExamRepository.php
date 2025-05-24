@@ -3,7 +3,10 @@
 namespace App\Repositories\Exam;
 
 use App\Models\Exam;
+use App\Models\Grade;
+use App\Models\Answer;
 use App\Models\ExamSkill;
+use App\Models\ExamQuestion;
 use Illuminate\Support\Facades\DB;
 
 
@@ -44,7 +47,9 @@ class ExamRepository implements ExamRepositoryInterface
       $exam = Exam::create($data);
       if (isset($data['exam_skills'])) {
         $skills = json_decode($data['exam_skills'], true);
-
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          return ResponseMessage('Invalid JSON data provided for Exam Skills.', 400);
+        }
         foreach ($skills as $skill) {
           $exam->examSkills()->create([
             'skill_id' => $skill,
@@ -54,6 +59,9 @@ class ExamRepository implements ExamRepositoryInterface
 
       if (isset($data['grades'])) {
         $grades = json_decode($data['grades'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          return ResponseMessage('Invalid JSON data provided for grades.', 400);
+        }
         foreach ($grades  as $grade) {
           $exam->grades()->create([
             'mark' => $grade['mark'],
@@ -65,6 +73,9 @@ class ExamRepository implements ExamRepositoryInterface
 
       if (isset($data['exam_questions'])) {
         $exam_questions = json_decode($data['exam_questions'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          return ResponseMessage('Invalid JSON data provided for Exam Questions.', 400);
+        }
         foreach ($exam_questions as $question) {
           $examQuestion = $exam->examQuestions()->create([
             'question' => $question['question'],
@@ -114,6 +125,9 @@ class ExamRepository implements ExamRepositoryInterface
       $exam->update($data);
       if (isset($data['exam_skills'])) {
         $skills = json_decode($data['exam_skills'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          return ResponseMessage('Invalid JSON data provided for Exam Skills.', 400);
+        }
         foreach ($skills as $skill) {
           $exam->examSkills()->updateOrCreate(
             ['skill_id' => $skill],
@@ -123,6 +137,9 @@ class ExamRepository implements ExamRepositoryInterface
       }
       if (isset($data['grades'])) {
         $grades = json_decode($data['grades'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          return ResponseMessage('Invalid JSON data provided for grades.', 400);
+        }
         foreach ($grades as $grade) {
           if (isset($grade['id'])) {
             $exam->grades()->updateOrCreate(
@@ -145,6 +162,9 @@ class ExamRepository implements ExamRepositoryInterface
 
       if (isset($data['exam_questions'])) {
         $exam_questions = json_decode($data['exam_questions'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+          return ResponseMessage('Invalid JSON data provided for Exam Questions.', 400);
+        }
         foreach ($exam_questions as $question) {
           $examQuestion = $exam->examQuestions()->updateOrCreate(
             [
@@ -215,6 +235,70 @@ class ExamRepository implements ExamRepositoryInterface
       $examSkill->delete();
       DB::commit();
       return ResponseMessage('Exam skill deleted successfully', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+  public function deleteGrade($id)
+  {
+    DB::beginTransaction();
+    try {
+      $grade = Grade::find($id);
+      if (!$grade) {
+        ResponseMessage('Grade not found', 404);
+      }
+      $grade->delete();
+      DB::commit();
+      return ResponseMessage('Grade deleted successfully', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+  public function deleteExamQuestion($id)
+  {
+    DB::beginTransaction();
+    try {
+      $examQuestion = ExamQuestion::find($id);
+
+      if (!$examQuestion) {
+        ResponseMessage('Exam question not found', 404);
+      }
+      $examQuestion->answers()->delete();
+      $examQuestion->delete();
+      DB::commit();
+      return ResponseMessage('Exam question deleted successfully', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+  public function toggleExamQuestion($id)
+  {
+    DB::beginTransaction();
+    try {
+      $examQuestion = ExamQuestion::find($id);
+      if (!$examQuestion) {
+        ResponseMessage('Exam question not found', 404);
+      }
+      $result = toggleColumn(ExamQuestion::class, $id, 'is_active');
+      if ($result) {
+        foreach ($examQuestion->answers as $answer) {
+          $answerResult = toggleColumn(Answer::class, $answer->id, 'is_active');
+          if (!$answerResult) {
+            throw new \Exception('Failed to toggle one or more related answers.');
+          }
+        }
+
+        DB::commit();
+        return ResponseMessage('Exam question and related answers status successfully', 200);
+      }
+
+      return ResponseMessage('Failed to update status', 400);
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);

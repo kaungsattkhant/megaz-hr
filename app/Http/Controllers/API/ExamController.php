@@ -46,4 +46,22 @@ class ExamController extends Controller
         $data = $this->examRepository->deleteExamSkill($id);
         ResponseData($data);
     }
+
+    public function deleteGrade($id)
+    {
+        $data = $this->examRepository->deleteGrade($id);
+        ResponseData($data);
+    }
+
+    public function deleteExamQuestion($id)
+    {
+        $data = $this->examRepository->deleteExamQuestion($id);
+        ResponseData($data);
+    }
+
+    public function toggleExamQuestion($id)
+    {
+        $data = $this->examRepository->toggleExamQuestion($id);
+        ResponseData($data);
+    }
 }
