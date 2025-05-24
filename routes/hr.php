@@ -91,12 +91,10 @@ Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(ExamController::class)->group(function () {
     Route::get('/exams', 'getAllExams');
     Route::post('/exams', 'createExam');
-    // Route::post('/exams/{id}', 'updateExam');
-    // Route::delete('/exams/{id}', 'deleteExam');
-    // Route::get('/exam_categories', 'getExamCategories');
-    // Route::post('/exam_categories', 'createExamCategory');
-    // Route::post('/exam_categories/{id}', 'updateExamCategory');
-    // Route::delete('/exam_categories/{id}', 'deleteExamCategory');
+    Route::post('/exams/{id}', 'updateExam');
+    Route::delete('/exams/{id}', 'deleteExam');
+    Route::get('/exams/{id}', 'getExamById');
+    Route::delete('/exam_skills/{id}', 'deleteExamSkill');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

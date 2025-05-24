@@ -6,13 +6,13 @@ interface ExamRepositoryInterface
 {
   public function getAllExams($request);
 
-  // public function getExamById($id);
+  public function getExamById($id);
 
   public function createExam(array $data);
 
-  // public function updateExam($id, array $data);
+  public function updateExam(array $data, $id);
 
-  // public function deleteExam($id);
+  public function deleteExam($id);
 
-  // public function getExamsByUserId($userId);
+  public function deleteExamSkill($id);
 }

@@ -24,4 +24,26 @@ class ExamController extends Controller
         $data = $this->examRepository->createExam($request->all());
         ResponseData($data);
     }
+
+    public function getExamById($id)
+    {
+        $data = $this->examRepository->getExamById($id);
+        ResponseData($data);
+    }
+
+    public function updateExam(Request $request, $id)
+    {
+        $data = $this->examRepository->updateExam($request->all(), $id);
+        ResponseData($data);
+    }
+    public function deleteExam($id)
+    {
+        $data = $this->examRepository->deleteExam($id);
+        ResponseData($data);
+    }
+    public function deleteExamSkill($id)
+    {
+        $data = $this->examRepository->deleteExamSkill($id);
+        ResponseData($data);
+    }
 }
