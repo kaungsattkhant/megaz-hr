@@ -225,6 +225,9 @@ import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
 
 import CvFormComponent from './Components/CV/CvFormComponent.vue';
 import CvListComponent from './Components/CV/CvListComponent.vue';
+import CvDetailComponent from './Components/CV/CvDetailComponent.vue';
+import ExamListComponent from './Components/Exams/ExamListComponent.vue';
+import ExamCreateComponent from './Components/Exams/ExamCreateComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -430,6 +433,9 @@ app.component('PosRoomComponent',PosRoomComponent);
 
 app.component('CvFormComponent',CvFormComponent);
 app.component('CvListComponent',CvListComponent);
+app.component('CvDetailComponent',CvDetailComponent);
+app.component('ExamListComponent',ExamListComponent);
+app.component('ExamCreateComponent',ExamCreateComponent);
 
 
 app.use(store);
