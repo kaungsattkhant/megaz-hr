@@ -401,7 +401,8 @@ Route::view('/resignation_categories', 'resignation_categories.index')->name('re
 Route::view('/resignations', 'resignations.index')->name('resignations.index');
 
 
-Route::view('/CV/form', 'CV.form')->name('CV.form');
+Route::view('/cv/form', 'CV.form')->name('CV.form');
+Route::view('/cv', 'CV.index')->name('CV.index');
 
 // =======
 // Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');

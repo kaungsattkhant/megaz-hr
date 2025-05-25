@@ -982,6 +982,12 @@
                                 Resignation
                             </a>
                         </li>
+                        <li>
+                            <a href="/cv" class="flex items-center @yield('cv') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                CV
+                            </a>
+                        </li>
 
 
                 </ul>
