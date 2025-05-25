@@ -19,7 +19,6 @@ class CvRepository implements CvRepositoryInterface
   }
   public function getAllCvs($request)
   {
-    // $query = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])->where('is_cv', 1)->orderBy('id', 'desc');
     $query = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
       ->where('is_cv', 1)
       ->orderBy('created_at', 'desc');

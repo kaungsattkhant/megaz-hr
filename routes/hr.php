@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\API\CvController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\CvController;
+use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
 use App\Http\Controllers\API\OffDayHrController;
@@ -86,6 +87,17 @@ Route::middleware('auth:api')->group(function () {
     Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
     Route::get('/cvs/{id}', 'getCvById');
     Route::post('/cvs/{id}/status', 'updateCvStatus');
+  });
+  Route::prefix('hr')->controller(ExamController::class)->group(function () {
+    Route::get('/exams', 'getAllExams');
+    Route::post('/exams', 'createExam');
+    Route::post('/exams/{id}', 'updateExam');
+    Route::delete('/exams/{id}', 'deleteExam');
+    Route::get('/exams/{id}', 'getExamById');
+    Route::delete('/exam_skills/{id}', 'deleteExamSkill');
+    Route::delete('/grades/{id}', 'deleteGrade');
+    Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
+    Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
