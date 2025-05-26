@@ -438,7 +438,7 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function entityDetailByEntityId($invoice, $entityId, $startDateTime = null, $endDateTime = null)
     {
-        $entity = Entity::find(id: $entityId);
+        $entity = Entity::find( $entityId);
         // if($entity->entity_type=='table'){
         //     return $this->tableWithInvoiceDetail([],$entityId);
         // }
