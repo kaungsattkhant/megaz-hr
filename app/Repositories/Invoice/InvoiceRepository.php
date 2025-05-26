@@ -1417,7 +1417,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $invoice->payment_status = 'checkout';
             $invoice->save();
-            dd(Invoice::find(9));
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
