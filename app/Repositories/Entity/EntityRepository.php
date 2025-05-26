@@ -358,8 +358,11 @@ class EntityRepository implements EntityRepositoryInterface
         }
 
         if ($entity->entity_type == 'table') {
-            if (!$entity->latestInvoice) {
+            if (!$entity->latestInvoice && $entity->is_active == 1) {
                 ResponseMessage('Invoice Detail is invalid', 419);
+            }
+            if (!$entity->latestInvoice && $entity->is_active == 0) {
+                return $entity;
             }
             $invoice = $entity->latestInvoice;
             //Entity Detail changed 
@@ -438,7 +441,7 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function entityDetailByEntityId($invoice, $entityId, $startDateTime = null, $endDateTime = null)
     {
-        $entity = Entity::find( $entityId);
+        $entity = Entity::find($entityId);
         // if($entity->entity_type=='table'){
         //     return $this->tableWithInvoiceDetail([],$entityId);
         // }
@@ -604,7 +607,7 @@ class EntityRepository implements EntityRepositoryInterface
         $entity->food_discount = $totalDiscount;
         $entity->total = $totalDiscount;
         $entity->invoice_accessories = $invoiceAccessories;
-        $entity->total_service_value = $invoice->total_service_value+$total_service_value;
+        $entity->total_service_value = $invoice->total_service_value + $total_service_value;
         $entity->total_accessory_value = $total_accessory_value;
         $entity->total_order_discount_price = $total_order_discount_price;
         $entity->food_discount = $total_order_discount_price;
