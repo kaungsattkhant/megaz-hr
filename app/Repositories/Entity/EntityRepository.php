@@ -478,14 +478,17 @@ class EntityRepository implements EntityRepositoryInterface
                 $entity->is_service = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
-                $serviceValue = $this->invoiceModelService->getServiceValue($invoiceService, now());
+                // $serviceValue = $this->invoiceModelService->getServiceValue($invoiceService, now());
                 // $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
-                // $serviceValue=$this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                // $updatedInvoiceService=$this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                $serviceValue=$this->invoiceModelService->getServiceAmount($invoiceService, now());
+                $minutes=$this->invoiceModelService->getDiffMinutes($invoiceService, now());
                 if ($invoiceService->is_active == 1) {
-                    $invoiceService->end_date = now();
+                    // $invoiceService->end_date = now();
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->save();
-                    $total_service_value += $invoiceService->service_value;
+                    $invoiceService->minutes=$minutes;
+                    $total_service_value += $serviceValue;
                     // $updatedInvoice=$this->orderService->updateServiceAmountToInvoice($invoice,$serviceValue);
                 }
                 // $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
