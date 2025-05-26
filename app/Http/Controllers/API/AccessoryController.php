@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers\API;
-use App\Http\Requests\Admin\AccessoryCreateRequest;
 use App\Models\Accessory;
 use Illuminate\Http\Request;
 use App\Models\AccessoryCategory;
 use App\Http\Controllers\Controller;
 use App\Repositories\Accessory\AccessoryInterface;
+use App\Http\Requests\Admin\AccessoryCreateRequest;
+use App\Http\Requests\InvoiceAccessoryCreateRequest;
 
 class AccessoryController extends Controller
 {
