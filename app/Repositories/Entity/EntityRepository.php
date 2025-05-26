@@ -475,9 +475,18 @@ class EntityRepository implements EntityRepositoryInterface
                 $entity->is_service = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
-                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
-                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                $total_service_value += $invoiceService->service_value;
+                $serviceValue = $this->invoiceModelService->getServiceValue($invoiceService, now());
+                // $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                // $serviceValue=$this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                if ($invoiceService->is_active == 1) {
+                    $invoiceService->end_date = now();
+                    $invoiceService->service_value = $serviceValue;
+                    $invoiceService->save();
+                    $total_service_value += $invoiceService->service_value;
+                    // $updatedInvoice=$this->orderService->updateServiceAmountToInvoice($invoice,$serviceValue);
+                }
+                // $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                // $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
             }
             // $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
             //serice
@@ -575,7 +584,6 @@ class EntityRepository implements EntityRepositoryInterface
             unset($invoice['accessories']);
             unset($invoice['invoice_service']);
             unset($invoice['total_accessory_value']);
-            unset($invoice['total_service_value']);
             // unset($invoice,'invoice.accessories');
             //service list
         }
@@ -596,11 +604,11 @@ class EntityRepository implements EntityRepositoryInterface
         $entity->food_discount = $totalDiscount;
         $entity->total = $totalDiscount;
         $entity->invoice_accessories = $invoiceAccessories;
-        $entity->total_service_value = $total_service_value;
+        $entity->total_service_value = $invoice->total_service_value+$total_service_value;
         $entity->total_accessory_value = $total_accessory_value;
         $entity->total_order_discount_price = $total_order_discount_price;
         $entity->food_discount = $total_order_discount_price;
-        $entity->invoice_total = $invoice->total;
+        $entity->invoice_total = $invoice->total + $total_service_value;
         $entity->total_order_value = $total_order_value;
         $entity->deposit_balance = $customerDepositBalance;
         $entity->customer_id = $customer->id;

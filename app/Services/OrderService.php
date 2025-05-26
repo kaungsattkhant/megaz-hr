@@ -625,6 +625,14 @@ class OrderService
 
     }
 
+    public function updateServiceAmountToInvoice($invoice,$serviceValue){
+        $invoice->total+=$serviceValue;
+        $invoice->sub_total+=$serviceValue;
+        $invoice->total_service_value+=$serviceValue;
+        $invoice->save();
+        return $invoice;
+    }
+
     public function createAccessorty($invoice, $accessories)
     {
         $invoiceId = $invoice->id;

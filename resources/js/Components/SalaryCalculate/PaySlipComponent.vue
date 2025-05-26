@@ -31,10 +31,10 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 
-                <a href="/leave_allowance/create"
+                <!-- <a href="/leave_allowance/create"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
-                </a>
+                </a> -->
             </div>
         </div>
         <div class="box-container-table">
