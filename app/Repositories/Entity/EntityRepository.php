@@ -68,27 +68,49 @@ class EntityRepository implements EntityRepositoryInterface
         //         'entitySessions.roomSession.invoice'
         //     ])
         //     ->get();
+        $startTime = "09:01:00";
         $entities = Entity::where('is_available', 1)
             ->where('area_id', $area->id)
             ->with([
-                'entitySessions' => function ($query) {
-                    $query->where('start_time', '>=', '08:01:00')
+                'entitySessions' => function ($query) use ($startTime) {
+                    $query->where('start_time', '>=', $startTime)
                         ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
-                        ->orderByRaw("CASE WHEN start_time >= '08:01:00' THEN 1 ELSE 2 END")
+                        ->orderByRaw("CASE WHEN start_time >= ? THEN 1 ELSE 2 END", [$startTime])
                         ->orderBy('start_time')
-                        ->selectRaw('*, 
+                        ->selectRaw("*, 
                     CASE 
-                        WHEN start_time >= "08:01:00" THEN CONCAT(CURRENT_DATE, " ", start_time) 
-                        ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", start_time)
+                        WHEN start_time >= ? THEN CONCAT(CURRENT_DATE, ' ', start_time) 
+                        ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), ' ', start_time)
                     END AS start_date_time,
                     CASE 
-                        WHEN end_time >= "08:01:00" THEN CONCAT(CURRENT_DATE, " ", end_time) 
-                        ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", end_time)
-                    END AS end_date_time');
+                        WHEN end_time >= ? THEN CONCAT(CURRENT_DATE, ' ', end_time) 
+                        ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), ' ', end_time)
+                    END AS end_date_time", [$startTime, $startTime]);
                 },
                 'entitySessions.roomSession.invoice'
             ])
             ->get();
+        // $entities = Entity::where('is_available', 1)
+        //     ->where('area_id', $area->id)
+        //     ->with([
+        //         'entitySessions' => function ($query) {
+        //             $query->where('start_time', '>=', '08:01:00')
+        //                 ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
+        //                 ->orderByRaw("CASE WHEN start_time >= '08:01:00' THEN 1 ELSE 2 END")
+        //                 ->orderBy('start_time')
+        //                 ->selectRaw('*, 
+        //             CASE 
+        //                 WHEN start_time >= "08:01:00" THEN CONCAT(CURRENT_DATE, " ", start_time) 
+        //                 ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", start_time)
+        //             END AS start_date_time,
+        //             CASE 
+        //                 WHEN end_time >= "08:01:00" THEN CONCAT(CURRENT_DATE, " ", end_time) 
+        //                 ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", end_time)
+        //             END AS end_date_time');
+        //         },
+        //         'entitySessions.roomSession.invoice'
+        //     ])
+        //     ->get();
 
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
@@ -481,13 +503,13 @@ class EntityRepository implements EntityRepositoryInterface
                 // $serviceValue = $this->invoiceModelService->getServiceValue($invoiceService, now());
                 // $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
                 // $updatedInvoiceService=$this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                $serviceValue=$this->invoiceModelService->getServiceAmount($invoiceService, now());
-                $minutes=$this->invoiceModelService->getDiffMinutes($invoiceService, now());
+                $serviceValue = $this->invoiceModelService->getServiceAmount($invoiceService, now());
+                $minutes = $this->invoiceModelService->getDiffMinutes($invoiceService, now());
                 if ($invoiceService->is_active == 1) {
                     // $invoiceService->end_date = now();
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->save();
-                    $invoiceService->minutes=$minutes;
+                    $invoiceService->minutes = $minutes;
                     $total_service_value += $serviceValue;
                     // $updatedInvoice=$this->orderService->updateServiceAmountToInvoice($invoice,$serviceValue);
                 }
