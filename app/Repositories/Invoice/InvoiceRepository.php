@@ -257,7 +257,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
                 //broadcast on room opening to waiter 
                 //broadcast
-                if(!$data['is_waiter']){
+                if (!$data['is_waiter']) {
                     $waiterRole = Role::getRoleByName('Waiter');
                     $latestUpdatedEntity = Entity::find($entity->id);
                     broadcast(new WaiterNotificationRequest($latestUpdatedEntity, $waiterRole->department_id));
@@ -1314,9 +1314,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->is_active = 0;
                     $invoiceService->save();
+                    $total_service_value += $serviceValue;
                     // $updatedInvoice=$this->orderService->updateServiceAmountToInvoice($invoice,$serviceValue);
                 }
-                $total_service_value += $serviceValue;
             }
             // $data['discount_value'] = $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $order_discount;
@@ -1822,9 +1822,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         'service_value' => $calculatedServiceValue->service_value,
                         'is_active' => 0,
                     ]);
-                    $service=$existingService->service;
-                    $service->is_active=0;
-                    $service->save();
+                $service = $existingService->service;
+                $service->is_active = 0;
+                $service->save();
                 $invoice = $this->orderService->updateServiceAmountToInvoice($existingService->invoice, $calculatedServiceValue->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);

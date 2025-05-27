@@ -72,17 +72,17 @@ class EntityRepository implements EntityRepositoryInterface
             ->where('area_id', $area->id)
             ->with([
                 'entitySessions' => function ($query) {
-                    $query->where('start_time', '>=', '09:01:00')
+                    $query->where('start_time', '>=', '08:01:00')
                         ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
-                        ->orderByRaw("CASE WHEN start_time >= '09:01:00' THEN 1 ELSE 2 END")
+                        ->orderByRaw("CASE WHEN start_time >= '08:01:00' THEN 1 ELSE 2 END")
                         ->orderBy('start_time')
                         ->selectRaw('*, 
                     CASE 
-                        WHEN start_time >= "10:01:00" THEN CONCAT(CURRENT_DATE, " ", start_time) 
+                        WHEN start_time >= "08:01:00" THEN CONCAT(CURRENT_DATE, " ", start_time) 
                         ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", start_time)
                     END AS start_date_time,
                     CASE 
-                        WHEN end_time >= "10:01:00" THEN CONCAT(CURRENT_DATE, " ", end_time) 
+                        WHEN end_time >= "08:01:00" THEN CONCAT(CURRENT_DATE, " ", end_time) 
                         ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", end_time)
                     END AS end_date_time');
                 },
