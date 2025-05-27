@@ -71,7 +71,7 @@ class InvoiceAPIController extends Controller
                         ResponseMessage('Reception Role Not found', 419);
                     }
                     broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
-                    ResponseMessage('Room has been requested to open',200);
+                    // ResponseMessage('Room has been requested to open',200);
                 }
             }
             // if (isset($data['type']) && $data['type'] == 'package') {
