@@ -213,6 +213,7 @@ class OrderService
             $cancelledMenu = array_filter($data['menuArray'], function ($menu) {
                 return isset($menu['is_package']) && in_array($menu['is_package'], [-1]);
             });
+            $total=0;
             foreach ($filteredMenu as $menuData) {
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
@@ -220,6 +221,7 @@ class OrderService
                 if (!isset($menuData['cooking_area_id'])) {
                     ResponseMessage('Cooking Area  is required', 419);
                 } elseif (isset($menuData['cooking_area_id']) && ($menuData['cooking_area_id'] == null || $menuData['cooking_area_id'] == "null")) {
+                
                     ResponseMessage('Cooking Area  is required', 419);
                 }
 
@@ -287,7 +289,13 @@ class OrderService
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if (($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') || ($invoice->invoice_type == 'package' && !$menuData['is_package']) ) {
+                    if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') || ($invoice->invoice_type == 'package' && !$menuData['is_package']) ) {
+                        $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
+                    if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
+                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     // }
@@ -322,7 +330,7 @@ class OrderService
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if ($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') {
+                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     $menuData['order_id'] = $order->id;
@@ -586,10 +594,10 @@ class OrderService
     public function updateOrderItemAmountToOrder($action, $orderModel, $originalPrice, $quantity, $discountAmount)
     {
         if ($action == 'add') {
-            $orderModel->total_quantity += $quantity;
-            $orderModel->total_discount_price += $discountAmount;
-            $orderModel->total += $originalPrice * $quantity;
-            $orderModel->order_sub_total += ($originalPrice * $quantity) - $discountAmount;
+            $orderModel->total_quantity =$orderModel->total_quantity+ $quantity;
+            $orderModel->total_discount_price = $orderModel->total_discount_price+ $discountAmount;
+            $orderModel->total = $orderModel->total+ $originalPrice * $quantity;
+            $orderModel->order_sub_total = $orderModel->order_sub_total+ ( ($originalPrice * $quantity) - $discountAmount);
         } else if ($action == 'subtract') {
             $orderModel->total_quantity -= $quantity;
             $orderModel->total_discount_price -= $discountAmount;
