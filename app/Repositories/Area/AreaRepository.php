@@ -13,7 +13,7 @@ class AreaRepository implements AreaRepositoryInterface
     public function getAreas(Request $request)
     {
 
-        $areasQuery = Area::with(['areaType', 'areaCategory'])->where('is_active', 1)->orderBy('created_at', 'desc');
+        $areasQuery = Area::with(['areaType', 'areaCategory'])->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
             $areas = $areasQuery->where('department_id', $request->department_id)->get();
@@ -104,23 +104,23 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getSellingAreas($request)
     {
-        $areas = Area::with(['areaCategory','areaType'])->where('is_active', 1)
-        ->whereHas('areaCategory', function ($query) {
-            $query->where('name', 'Selling Area');
-        })
-        ->get();
-       
+        $areas = Area::with(['areaCategory', 'areaType'])->where('is_active', 1)
+            ->whereHas('areaCategory', function ($query) {
+                $query->where('name', 'Selling Area');
+            })
+            ->get();
+
         return $areas;
     }
 
-    public function getCookingAreas($request){
-        $areas = Area::with(['areaCategory','areaType'])->where('is_active', 1)
-        ->whereHas('areaCategory', function ($query) {
-            $query->where('name', 'Cooking Area');
-        })
-        ->get();
-       
+    public function getCookingAreas($request)
+    {
+        $areas = Area::with(['areaCategory', 'areaType'])->where('is_active', 1)
+            ->whereHas('areaCategory', function ($query) {
+                $query->where('name', 'Cooking Area');
+            })
+            ->get();
+
         return $areas;
     }
-
 }
