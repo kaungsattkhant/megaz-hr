@@ -377,7 +377,9 @@ class OrderService
                     $invoice = $this->updateOrderItemAmountToInvoice('subtract', $invoice, $cancelData['original_price'], $cancelData['quantity'], $discount = 0);
                 }
             }
-            broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
+            // temp command for checklist
+            // broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
+
             // broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
             $order->foc_total += $focTotal;
             $order->save();
