@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            CV Forms
+            Exam List
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -17,10 +17,10 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Status" @change="statusFilter"
-                        data-te-select-filter="true" name="" id="" v-model="selectedStatus" class="input-ui">
-                        <option :value="status" v-for="(status, statusIndex) in statusList" :key="statusIndex"> {{
-                            status.name }} </option>
+                    <select data-te-select-init data-te-select-placeholder="Select Status" @change="typeFilter"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex"> {{
+                            type.name }} </option>
                     </select>
                 </div>
                 <div class=" !text-sm" data-te-select-wrapper-ref>
@@ -38,7 +38,7 @@
                         </option>
                     </select>
                 </div>
-                <a href="/salary_setup/create" class="add-btn  h-8 whitespace-nowrap">
+                <a href="/exam/create" class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
             </div>
@@ -53,20 +53,18 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Date
+                                    Name
                                 </th>
                                 <th scope="col" class="">
-                                    Name
+                                    Category
                                 </th>
                                 <th scope="col" class="">
                                     Department
                                 </th>
                                 <th scope="col" class="">
                                     Role
-                                </th>
-                                <th scope="col" class="">
-                                    Stages
-                                </th>
+                                </th>   
+                                
                                 <th scope="col" class="">
 
                                 </th>
@@ -80,23 +78,19 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        cv date ??
-                                    </td>
-                                    <td class="whitespace-nowrap">
                                         {{ item.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.department.name }}
+                                        {{ item.type }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.roles[0] ? item.roles[0].name : '' }}
+                                        {{ item.role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.status }}
+                                        {{ item.role.name }}
                                     </td>
-
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/cv/' + item.id + '/detail'" class="pr-3">
+                                        <a :href="'/exam/' + item.id + '/edit'" class="pr-3">
                                             <i class="fal fa-pen"></i>
                                         </a>
                                         <button @click="deleteBtnClicked(item.id)" data-te-toggle="modal"
@@ -199,16 +193,14 @@ export default {
 
             departmentList: [],
             roleList: [],
-            statusList: [
-                { value: 'received', name: 'Received' },
-                { value: 'pending', name: 'Pending' },
-                { value: 'confirmed', name: 'Confirmed' },
-                { value: 'cancelled', name: 'Cancelled' },
+            typeList: [
+                {value: 'exam', name: 'Exam'},
+                {value: 'interview', name: 'Interview'}
             ],
 
             selectedDepartment: null,
             selectedRole: null,
-            selectedStatus: null,
+            selectedType: null,
 
             currentPage: 0,
             perPage: 0,
@@ -219,11 +211,11 @@ export default {
 
             overtime: null,
 
-            url: '/api/hr/cvs',
+            url: '/api/hr/exams',
             url_search: '',
             url_department: '',
             url_role: '',
-            url_status: '',
+            url_type: '',
             deleteId: null,
 
         };
@@ -238,7 +230,7 @@ export default {
                 url = this.url + this.url_search;
             }
             else {
-                url = this.url + this.url_status + this.url_department + this.url_role;
+                url = this.url + this.url_type + this.url_department + this.url_role;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -251,8 +243,8 @@ export default {
                 this.departmentList = response.data;
             }
         },
-        statusFilter() {
-            this.url_status = '?status=' + this.selectedStatus.value
+        typeFilter() {
+            this.url_type = '?type=' + this.selectedType.value
             if (this.selectedRole) {
                 this.roleFilter();
             }
@@ -265,18 +257,15 @@ export default {
             this.roleList = this.selectedDepartment.roles;
         },
         roleFilter() {
-            if (this.url_status) {
-                this.url_department = '&departmentIds[]=' + this.selectedDepartment.id;
-                this.url_role = '&roleIds[]=' + this.selectedRole.id;
+            if (this.url_type) {
+                this.url_department = '&department_id=' + this.selectedDepartment.id;
+                this.url_role = '&role_id=' + this.selectedRole.id;
             }
             else {
-                this.url_department = '?departmentIds[]=' + this.selectedDepartment.id;
-                this.url_role = '&roleIds[]=' + this.selectedRole.id;
+                this.url_department = '?department_id=' + this.selectedDepartment.id;
+                this.url_role = '&role_id=' + this.selectedRole.id;
             }
             this.getPrimaryList();
-        },
-        skillFilter() {
-
         },
 
 
@@ -296,7 +285,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/cvs/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/exams/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getPrimaryList(1);
             }

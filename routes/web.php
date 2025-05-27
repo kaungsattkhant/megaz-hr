@@ -405,7 +405,8 @@ Route::view('/cv/form', 'CV.form')->name('CV.form');
 Route::view('/cv', 'CV.index')->name('CV.index');
 Route::view('/cv/{id}/detail', 'CV.detail');
 Route::view('/exams', 'exams.index');
-Route::view('/exam_create', 'exams.create')->name('exams.create');
+Route::view('/exam/create', 'exams.create')->name('exams.create');
+Route::view('/exam/{id}/edit', 'exams.edit');
 
 // =======
 // Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');

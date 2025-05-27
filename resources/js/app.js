@@ -228,6 +228,7 @@ import CvListComponent from './Components/CV/CvListComponent.vue';
 import CvDetailComponent from './Components/CV/CvDetailComponent.vue';
 import ExamListComponent from './Components/Exams/ExamListComponent.vue';
 import ExamCreateComponent from './Components/Exams/ExamCreateComponent.vue';
+import ExamEditComponent from './Components/Exams/ExamEditComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -436,6 +437,7 @@ app.component('CvListComponent',CvListComponent);
 app.component('CvDetailComponent',CvDetailComponent);
 app.component('ExamListComponent',ExamListComponent);
 app.component('ExamCreateComponent',ExamCreateComponent);
+app.component('ExamEditComponent',ExamEditComponent);
 
 
 app.use(store);

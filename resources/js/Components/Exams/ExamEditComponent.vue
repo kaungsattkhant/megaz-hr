@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4">
             <p class="text-lg font-semibold font-inter">
-                Add New Exam
+                Edit Exam
             </p>
         </div>
         <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
@@ -47,7 +47,7 @@
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedType" class="input-ui !text-black"
                     data-te-select-filter="true" >
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
                             {{ type.name }}
                         </option>
                     </select>
@@ -55,7 +55,7 @@
             </div><div class="col-span-9"></div>
 
             <!-- skill set for exam -->
-            <div class="contents" v-if="selectedType == 'exam'">
+            <div class="contents" v-if="selectedType ? selectedType.value == 'exam' : false">
                 <div class="mb-4 col-span-3 pb-0 rounded-md">
                     <label class="label-form mb-3">Skillset</label>
                     <multiselect
@@ -97,7 +97,7 @@
                                 </td>
                                 <td class=" px-6 py-3 font-medium text-left">
                                     <button>
-                                        <i class="fal fa-times  pr-3" @click="deleteSeleted(skillsetIndex,selectedSkillsetList)" ></i>
+                                        <i class="fal fa-times  pr-3" @click="deleteSkillset(skillsetIndex,skillset)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -154,7 +154,7 @@
                                 <td class=" px-6 py-3 font-medium">
                                     <button>
                                         <i class="fal fa-times" data-te-toggle="modal"
-                                        data-te-target="#deleteModal" @click="gradeDeleteBtnClicked(gradeIndex)" ></i>
+                                        data-te-target="#deleteGradeModal" @click="gradeDeleteBtnClicked(gradeIndex,grade)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -213,7 +213,7 @@
                                     </button>
                                     <button>
                                         <i class="fal fa-times" data-te-toggle="modal"
-                                        data-te-target="#deleteModal" @click="questionDeleteBtnClikced(questionIndex)" ></i>
+                                        data-te-target="#deleteQuestionModal" @click="questionDeleteBtnClikced(questionIndex,question)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -224,7 +224,7 @@
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create 
+                Edit 
             </button>
         </div>
     </div>
@@ -330,10 +330,10 @@
             </div>
         </div>
 
-    <!--Delete Modal -->
+    <!--Delete grade Modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        id="deleteGradeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div data-te-modal-dialog-ref
             class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
             <div
@@ -341,9 +341,9 @@
                 <div
                     class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
                     <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
-                        Delete {{ isQuestion ? 'Question' : 'Grade' }} ?
+                        Delete Grade ?
                     </h5>
-                    <button type="button"
+                    <button type="button" id="close_delete_grade_modal"
                         class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                         data-te-modal-dismiss aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -364,7 +364,7 @@
                         data-te-modal-dismiss>
                         Close
                     </button>
-                    <button @click="deleteItem()" type="button" data-te-toggle="modal" data-te-target="#deleteModal"
+                    <button @click="deleteGrade()" type="button"
                         class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                         Delete
                     </button>
@@ -372,6 +372,50 @@
             </div>
         </div>
     </div>
+
+    <!--Delete Question Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="deleteQuestionModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                        Delete Question ?
+                    </h5>
+                    <button type="button" id="close_delete_question_modal"
+                        class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <p>
+                        Are you sure ?
+                    </p>
+                </div>
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button"
+                        class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
+                        Close
+                    </button>
+                    <button @click="deleteQuestion()" type="button"
+                        class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </template>
 
 <script>
@@ -379,11 +423,13 @@ import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import { onBeforeMount } from "vue";
 
 export default {
     components: {
         Multiselect
     },
+    props: ["examId"],
     data() {
         return {
             departmentList: [],
@@ -416,16 +462,66 @@ export default {
             
             name: null,
 
-            deleteIndex: null,
-            isQuestion: false,
+            gradeIndex: null,
+            gradeDetail: null,
+            questionIndex: null,
+            questionDetail: null,
 
-            
+            detail: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-
+        async getDetail() {
+            let response = await getApiData({ url: `/api/hr/exams/${this.examId}`, token: this.getToken() });
+            if (response.data) {
+                this.detail = response.data;
+                this.addDetail(response.data);
+            }
+        },
+        addDetail(detail){
+            this.name = detail.name
+            this.selectedDepartment = this.departmentList.find(department => department.id == detail.role.department_id);
+            this.roleList = this.selectedDepartment.roles;
+            if(this.roleList){
+                this.selectedRoles = this.roleList.find(role => role.id == detail.role_id);
+            }
+            this.selectedType = this.typeList.find(type => type.value === detail.type );
+            // this.selectedType = detail.type;
+            if(detail.exam_skills.length > 0){
+                detail.exam_skills.forEach(skill => {
+                    this.selectedSkillsetList.push({
+                        name: skill.skill.skill,
+                        id: skill.skill_id,
+                        role_id: skill.skill.role_id,
+                        exam_skill_id: skill.id
+                    });
+                });
+            }
+            if(detail.grades.length > 0){
+                detail.grades.forEach(grade => {
+                    this.selectedGradeList.push({
+                        mark: grade.mark,
+                        grade: grade.grade,
+                        id: grade.id,
+                    });
+                });
+            }
+            if(detail.exam_questions.length > 0){
+                detail.exam_questions.forEach(question => {
+                    this.selectedQuestionList.push({
+                        question: question.question,
+                        answers: question.answers,
+                        is_active: question.is_active,
+                        id: question.id,
+                    });
+                });
+            }
+            if(this.selectedDepartment && this.selectedRoles){
+                this.roleChange();
+            }
+        },
         
 
         async getDepartmentList() {
@@ -434,7 +530,6 @@ export default {
                 this.departmentList = response.data;
             }
         },
-
         async departmentSelectChanged() {
             this.selectedRoles = null;
             this.roleList = [];
@@ -453,7 +548,6 @@ export default {
                 this.skillsetList = response.data.data;
             }
         },
-
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
@@ -461,7 +555,6 @@ export default {
                 type: "warn"
             });
         },
-
         addSkillsetBtnClicked(){
             if(!this.selectedSkillset){
                 this.alertValidationMessage(`Skillset`);
@@ -475,6 +568,19 @@ export default {
                 });
                 this.selectedSkillset = null;
                 // this.selectedItemBrands = [];
+            }
+        },
+        async deleteSkillset(index,skillset){
+            let response = await deleteApiData({ url: `/api/hr/exam_skills/` + skillset.exam_skill_id, token: this.getToken() });
+            if (response.success) {
+                this.selectedSkillsetList.splice(index, 1);
+            }
+            else {
+                this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
+                });
             }
         },
 
@@ -496,6 +602,30 @@ export default {
                 this.grade = null;
             }
         },
+        gradeDeleteBtnClicked(index,detail){
+            this.gradeIndex = index;
+            this.gradeDetail = detail;
+        },
+        async deleteGrade(){
+            if(this.gradeDetail.id){
+                let response = await deleteApiData({ url: `/api/hr/grades/` + this.gradeDetail.id, token: this.getToken() });
+                if (response.success) {
+                    document.getElementById("close_delete_grade_modal").click();
+                    this.selectedGradeList.splice(this.gradeIndex, 1);
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            }
+            else{
+                document.getElementById("close_delete_grade_modal").click();
+                this.selectedGradeList.splice(this.gradeIndex, 1);
+            }
+        },
         btnclickedAddQuestion(){
             if(!this.question){
                 this.alertValidationMessage(`Question Name`);
@@ -508,6 +638,31 @@ export default {
                     is_active: 1,
                 });
                 this.question = null;
+            }
+        },
+        questionDeleteBtnClikced(index,detail){
+            this.deleteIndex = index;
+            this.questionDetail = detail;
+        },
+
+        async deleteQuestion(){
+            if(this.questionDetail){
+                let response = await deleteApiData({ url: `/api/hr/exam_questions/` + this.questionDetail.id, token: this.getToken() });
+                if (response.success) {
+                    document.getElementById("close_delete_question_modal").click();
+                    this.selectedQuestionList.splice(this.questionIndex, 1);
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            }
+            else{
+                document.getElementById("close_delete_question_modal").click();
+                this.selectedQuestionList.splice(this.questionIndex, 1);
             }
         },
         addAnswerBtnClicked(question,index){
@@ -563,7 +718,7 @@ export default {
                 this.alertValidationMessage(`Type`);
                 return 1;
             }
-            if(this.selectedType == 'exam' && this.selectedSkillsetList.length < 1){
+            if(this.selectedType.value == 'exam' && this.selectedSkillsetList.length < 1){
                 this.alertValidationMessage(`Skillset`);
                 return 1;
             }
@@ -584,35 +739,24 @@ export default {
             formData.append("name", this.name);
             formData.append("role_id", this.selectedRoles.id);
             // formData.append("phone_number", this.phoneNumber);
-            formData.append("type", this.selectedType);
+            formData.append("type", this.selectedType.value);
             formData.append("exam_skills", JSON.stringify(exam_skills));
             formData.append("grades", JSON.stringify(this.selectedGradeList));
             formData.append("exam_questions", JSON.stringify(this.selectedQuestionList));
             
-            let url = `/api/hr/exams`;
+            let url = '/api/hr/exams/'+this.examId;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 window.location.replace("/exams");
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
-        gradeDeleteBtnClicked(index){
-            this.deleteIndex = index;
-            this.isQuestion = false;
-        },
-        questionDeleteBtnClikced(index){
-            this.deleteIndex = index;
-            this.isQuestion = true;
-        },
-
-        deleteItem(){
-            if(this.isQuestion){
-                this.selectedQuestionList.splice(this.deleteIndex, 1);
-            }
-            else{
-                this.selectedGradeList.splice(this.deleteIndex, 1);
-            }
-        },
+        
         deleteSeleted(index,list){
             if(index != -1){
                 list.splice(index, 1);
@@ -622,7 +766,12 @@ export default {
 
     created(){
         this.getDepartmentList();
+        this.getDetail();
     },
+    onBeforeMount(){
+        this.getDetail();
+    },
+    
 
     mounted() {
         initTE({Modal, Ripple, Input, Select, Dropdown});
