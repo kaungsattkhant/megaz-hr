@@ -265,7 +265,7 @@
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
-                        Amount
+                        Qty
                     </label>
                     <input type="text" v-model="amount" class="input-ui">
                 </div>
@@ -629,20 +629,32 @@ export default {
         itemSelectChanged() {
             this.itemUoms = [];
             console.log(this.selectedItem)
-            this.itemUoms.push(
-                {
-                    id:this.selectedItem.base_uom_id,
-                    base_uom_id : this.selectedItem.base_uom_id,
-                    uom_name : this.selectedItem.base_uom_name,
-                    uom_conversion : this.selectedItem.uom_conversion
-                },
-                {
-                    id:this.selectedItem.uom_id,
-                    uom_id : this.selectedItem.uom_id,
-                    uom_name : this.selectedItem.item_uom,
-                    uom_conversion : this.selectedItem.uom_conversion
-                }
-            )
+            if(this.selectedItem.base_uom_id === this.selectedItem.uom_id){
+                this.itemUoms.push(
+                    {
+                        id:this.selectedItem.base_uom_id,
+                        base_uom_id : this.selectedItem.base_uom_id,
+                        uom_name : this.selectedItem.base_uom_name,
+                        uom_conversion : this.selectedItem.uom_conversion
+                    },
+                )
+            }
+            else{
+                this.itemUoms.push(
+                    {
+                        id:this.selectedItem.base_uom_id,
+                        base_uom_id : this.selectedItem.base_uom_id,
+                        uom_name : this.selectedItem.base_uom_name,
+                        uom_conversion : this.selectedItem.uom_conversion
+                    },
+                    {
+                        id:this.selectedItem.uom_id,
+                        uom_id : this.selectedItem.uom_id,
+                        uom_name : this.selectedItem.item_uom,
+                        uom_conversion : this.selectedItem.uom_conversion
+                    }
+                )
+            }
             // let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
             // if (index != -1) {
             //     let baseUom = this.uomList[index];
@@ -732,7 +744,7 @@ export default {
                 return 1;
             }
             else if(!this.amount){
-                this.alertValidationMessage('Amount');
+                this.alertValidationMessage('Qty');
                 return 1;
             }
             else if(!this.selectedUom){
@@ -851,11 +863,17 @@ export default {
             this.is_disable_custom = false;
         },
         addLevelBtnClicked(){
-            this.levelTable.push(
-                JSON.parse(JSON.stringify(this.menuLevel))
-            );
-            this.is_disable_custom = false
-            this.clearMenuLevel();
+            if(!this.menuLevel.level){
+                this.alertValidationMessage('Level');
+                return 1;
+            }
+            else{
+                this.levelTable.push(
+                    JSON.parse(JSON.stringify(this.menuLevel))
+                );
+                this.is_disable_custom = false
+                this.clearMenuLevel();
+            }
         },
         removeLevel(index) {
             this.levelTable.splice(index, 1);

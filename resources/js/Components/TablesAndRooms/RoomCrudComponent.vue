@@ -163,7 +163,7 @@
                                     Selling Area
                                 </label>
                                 <select name="" id="" v-model="area_id" class="input-ui">
-                                    <option :value="area.id" v-for="(area, index) in areaList" :key="index">{{ area.name }}</option>
+                                    <option :value="area.id" v-for="(area, index) in areaList" :key="index">{{ area.name }} ( {{area.area_type.name}} )</option>
                                 </select>
                             </div>
                         </div>

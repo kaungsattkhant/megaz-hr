@@ -22,7 +22,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
+                        <select data-te-select-init data-te-select-placeholder="Select Item"
                             data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
                             <option :value="item" v-for="(item, itemIndex) in itemList" :key="item.code">
                                 {{ item.name }}
@@ -416,10 +416,11 @@ import { find } from "lodash";
                     //     window.location.replace(`/purchase_orders`);
                     // }, 3000);
                 }
-                else{
+                else {
                     this.$notify({
-                        text: `Some errors occurred`,
-                        type: 'error'
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
                     });
                 }
             },
