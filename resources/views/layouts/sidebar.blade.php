@@ -988,6 +988,12 @@
                                 CV
                             </a>
                         </li>
+                        <li>
+                            <a href="/exmas" class="flex items-center @yield('exam') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Exam
+                            </a>
+                        </li>
 
 
                 </ul>

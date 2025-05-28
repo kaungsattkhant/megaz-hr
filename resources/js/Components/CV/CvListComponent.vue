@@ -38,9 +38,9 @@
                         </option>
                     </select>
                 </div>
-                <a href="/salary_setup/create" class="add-btn  h-8 whitespace-nowrap">
+                <!-- <a href="/salary_setup/create" class="add-btn  h-8 whitespace-nowrap">
                     Add New
-                </a>
+                </a> -->
             </div>
         </div>
         <div class="box-container-table">
