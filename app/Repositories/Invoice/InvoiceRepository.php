@@ -229,7 +229,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
-
                 $customer = Customer::find($invoice->customer_id);
                 //change ksk
                 if ($data['type'] == 'package' && $invoice) {
@@ -245,7 +244,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             ResponseMessage('Accessory Created Fail', 419);
                         }
                     }
-                    if (isset($data['is_waiter'])) {                                                                                
+                    if (isset($data['is_waiter'])) {
                         if ($data['is_waiter'] == 1) {
                             //send only package
                             $receptionistRole = Role::getRoleByName('Receptionist');
@@ -256,13 +255,21 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
+                //broadcast on room opening to waiter 
+                //broadcast
+                if (!$data['is_waiter']) {
+                    $waiterRole = Role::getRoleByName('Waiter');
+                    $latestUpdatedEntity = Entity::find($entity->id);
+                    broadcast(new WaiterNotificationRequest($latestUpdatedEntity, $waiterRole->department_id));
+                }
+                //end
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,
                     'invoice' => $invoice,
                     'entity' => $entity,
                 ];
-                return $returnData;                                                                     
+                return $returnData;
             }
             //change
         } catch (\Throwable $e) {
@@ -1174,6 +1181,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // dd($data);
             $invoice = Invoice::find($data['invoice_id']);
             $data['total'] = $invoice['total'] != null ? $invoice['total'] : 0;
+            $data['total_service_value'] = $invoice->total_service_value;
+            $data['sub_total'] = $invoice->sub_total;
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 404);
             }
@@ -1305,8 +1314,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->is_active = 0;
                     $invoiceService->save();
+                    $total_service_value += $serviceValue;
+                    // $updatedInvoice=$this->orderService->updateServiceAmountToInvoice($invoice,$serviceValue);
                 }
-                $total_service_value += $serviceValue;
             }
             // $data['discount_value'] = $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $order_discount;
@@ -1314,8 +1324,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // $data['tax'] = $tax;
             // $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
+            $data['total_service_value'] += $total_service_value;
+            $data['total'] += $total_service_value;
+            $data['sub_total'] += $total_service_value;
             // $data['order_discount_value'] = $order_discount;
-            $data['total_service_value'] = $total_service_value;
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
@@ -1334,6 +1346,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $entitySession = $roomSession->entitySession;
                 $entitySession->is_active = 0;
                 $entitySession->save();
+                $entity = $entitySession->entity;
+                $entity->status = 'inactive';
+                $entity->is_active = 0;
+                $entity->save();
                 // dd($entitySession);
                 Log::info('Room sesion is active updated ');
             }
@@ -1767,6 +1783,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         try {
             $existingService = InvoiceService::where('service_id', $request->service_id)
                 ->where('invoice_id', $request->invoice_id)
+                ->where('is_active', 1)
                 ->first();
             if (!$existingService) {
                 $createdService = InvoiceService::create([
@@ -1798,14 +1815,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->whereNull('end_date')
                 ->first();
             if ($existingService) {
-                $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
+                $calculatedServiceValue = $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
                     ->update([
                         'end_date' => $request->end_date,
-                        'service_value' => $existingService->service_value,
+                        'service_value' => $calculatedServiceValue->service_value,
                         'is_active' => 0,
                     ]);
-                // dd($existingService->service_value);
+                $service = $existingService->service;
+                $service->is_active = 0;
+                $service->save();
+                $invoice = $this->orderService->updateServiceAmountToInvoice($existingService->invoice, $calculatedServiceValue->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);
                 // return $invoiceService;

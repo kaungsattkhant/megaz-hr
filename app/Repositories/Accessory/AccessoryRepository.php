@@ -4,15 +4,22 @@ namespace App\Repositories\Accessory;
 
 
 use App\Models\Menu;
+use App\Models\Invoice;
 use App\Models\Accessory;
 use App\Models\AccessoryItem;
 use App\Models\AccessoryPrice;
+use App\Services\OrderService;
 use App\Models\InvoiceAccessory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AccessoryRepository implements AccessoryInterface
 {
+    private $orderService;
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
     public function list($request)
     {
         // $validateDate = $request->date ?? CurrentDate();
@@ -41,7 +48,7 @@ class AccessoryRepository implements AccessoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-            if(isset($data['image'])){
+            if (isset($data['image'])) {
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
@@ -125,7 +132,12 @@ class AccessoryRepository implements AccessoryInterface
         $data = $request->all();
         DB::beginTransaction();
         try {
+            $invoice=Invoice::find($request->invoice_id);
+            $accessoryPrice=(int)$data['quantity']*(int)$data['accessory_price'];
             $invoiceAccessory = InvoiceAccessory::create($data);
+            $updatedInvoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['accessory_price'], $data['quantity'], $discount = 0);
+            $updatedInvoice->total_accessory_value+=$accessoryPrice;
+            $updatedInvoice->save();
             DB::commit();
             return $invoiceAccessory;
         } catch (\Exception $e) {

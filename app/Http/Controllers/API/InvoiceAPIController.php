@@ -60,31 +60,46 @@ class InvoiceAPIController extends Controller
             }
             $data['entity_id'] = $request->entity_id;
             $returnData = $this->invoiceRepo->createData($data);
-            if (isset($data['type']) && $data['type'] == 'package') {
-                // $orderData['invoice_id'] = $returnData['invoice']->id;
-                // $orderData['menuArray'] = json_decode($request->orders, true);
-                // $order = $this->orderRepo->createMultipleOrder($orderData);
-
-                // if (isset($data['is_waiter'])) {
-                //     if ($data['is_waiter'] == 1) {
-                //         broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
-                //     }
-                // }
-            } else {
-                if (isset($data['is_waiter'])) {
-                    if ($data['is_waiter'] == 1) {
-                        //change noti requset from department to receptionist role
-                        // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
-                        // $getRoleByName='Receptionist';
-                        //send not package
-                        $receptionistRole = Role::getRoleByName('Receptionist');
-                        if (!$receptionistRole) {
-                            ResponseMessage('Reception Role Not found', 419);
-                        }
-                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
+            if (isset($data['is_waiter'])) {
+                if ($data['is_waiter'] == 1) {
+                    //change noti requset from department to receptionist role
+                    // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
+                    // $getRoleByName='Receptionist';
+                    //send not package
+                    $receptionistRole = Role::getRoleByName('Receptionist');
+                    if (!$receptionistRole) {
+                        ResponseMessage('Reception Role Not found', 419);
                     }
+                    broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
+                    ResponseMessage('Room has been requested to open',200);
                 }
             }
+            // if (isset($data['type']) && $data['type'] == 'package') {
+            //     // $orderData['invoice_id'] = $returnData['invoice']->id;
+            //     // $orderData['menuArray'] = json_decode($request->orders, true);
+            //     // $order = $this->orderRepo->createMultipleOrder($orderData);
+            //     // $receptionistRole = Role::getRoleByName('Receptionist');
+            //     // if (isset($data['is_waiter'])) {
+            //     //     if ($data['is_waiter'] == 1) {
+            //     //         // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
+            //     //         // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
+            //     //     }
+            //     // }
+            // } else {
+            //     if (isset($data['is_waiter'])) {
+            //         if ($data['is_waiter'] == 1) {
+            //             //change noti requset from department to receptionist role
+            //             // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
+            //             // $getRoleByName='Receptionist';
+            //             //send not package
+            //             $receptionistRole = Role::getRoleByName('Receptionist');
+            //             if (!$receptionistRole) {
+            //                 ResponseMessage('Reception Role Not found', 419);
+            //             }
+            //             broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
+            //         }
+            //     }
+            // }
             DB::commit();
             ResponseData($returnData);
         } catch (\Exception $e) {
