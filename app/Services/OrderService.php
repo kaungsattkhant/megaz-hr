@@ -288,7 +288,7 @@ class OrderService
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') || ($invoice->invoice_type == 'package' && !$menuData['is_package']) ) {
+                    if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') ) {
                         $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
@@ -378,6 +378,7 @@ class OrderService
                     $order_item->order = $order_item->order;
                     array_push($orderItemsArray, $order_item);
                 }
+
 
             }
             if (count($cancelledMenu) > 0) {
