@@ -24,8 +24,8 @@ class MenuToggleRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'is_active' => 'nullable|boolean',
-            'is_feature' => 'nullable|boolean',
+            'is_active' => 'nullable|in:0,1',
+            'is_feature' => 'nullable|in:0,1',
         ];
     }
 
