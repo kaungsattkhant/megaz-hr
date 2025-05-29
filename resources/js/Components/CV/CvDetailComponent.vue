@@ -11,7 +11,7 @@
                 </button>
                 <button type="button" @click="btnClickedConfirmCV()"
                     class="add-btn focus:outline-none focus:ring-0 ">
-                    Create
+                    Confirm
                 </button>
             </div>
         </div>
@@ -267,7 +267,7 @@
                     <p class="text-sm">Choose a department and role to get started.</p>
                   </div>
             </div>
-            <div class="col-span-12 flex gap-x-8">
+            <div class="col-span-12 flex gap-x-8 mb-8">
                 <label class="inline-flex items-center space-x-2" v-for="skill in skillList">
                     <input
                       type="checkbox" :value="skill" v-model="selectedSkills"
@@ -278,12 +278,10 @@
             </div>
 
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-2 container-card">
-            
-        </div>
+        
         <div class="px-4 mb-8">
             <button class="add-btn" @click="btnClickedCreateCVForm">
-                Send CV
+                Edit CV
             </button>
         </div>
 
@@ -367,13 +365,17 @@ export default {
             let response = await getApiData({ url: `/api/hr/cvs/${this.cvId}`, token: this.getToken() });
             if (response.data) {
                 this.detail = response.data;
-                this.addDetail(response.data);
+                setTimeout(() => {
+                    this.addDetail(response.data);
+                }, 500);
             }
         },
         async addDetail(detail){
             this.selectedDepartment = this.departmentList.find(department => department.id == detail.department_id);
-            this.roleList = this.selectedDepartment.roles;
-            if(this.roleList){
+            if(this.selectedDepartment){
+                this.roleList = this.selectedDepartment.roles;
+            }
+            if(this.roleList.length > 0){
                 this.selectedRoles = this.roleList.find(role => role.id == detail.roles[0].id);
             }
             this.selectedExp = detail.experience;
@@ -390,12 +392,20 @@ export default {
             this.selectedState = this.stateList.find(state => state.name == detail.state);
             if(this.selectedState){
                 this.state = this.selectedState.name;
-                let response = await getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
-                if (response.data) {
-                    this.cityList = response.data.cities;
-                    this.selectedCity = this.cityList.find(city => city.name == detail.city);
-                    this.city = this.selectedCity.name;
-                }
+                let responsePromise = getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
+                responsePromise.then(response => {
+                    if (response.data) {
+                        this.cityList = response.data.cities;
+                        this.selectedCity = this.cityList.find(city => city.name == detail.city);
+                        this.city = this.selectedCity.name;
+                    }
+                })
+                // let response = await getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
+                // if (response.data) {
+                //     this.cityList = response.data.cities;
+                //     this.selectedCity = this.cityList.find(city => city.name == detail.city);
+                //     this.city = this.selectedCity.name;
+                // }
             }
             
             this.address = detail.address;
@@ -408,14 +418,24 @@ export default {
             this.secondaryRelationship = detail.emergency_contacts[0].secondary_relationship;
             
             if(this.selectedRoles){
-                const response = await getApiData({ url: '/api/hr/departments/' + this.selectedDepartment.id + '/roles/' + this.selectedRoles.id + '/skills', token: this.getToken() });
-                if(response.data){
-                    this.skillList = response.data.data;
-                    detail.skills.forEach(skill => {
-                        let selectSk = this.skillList.find(sk => sk.id == skill.id);
-                        this.selectedSkills.push(selectSk)
-                    });
-                }
+                let responsePromise = getApiData({ url: '/api/hr/departments/' + this.selectedDepartment.id + '/roles/' + this.selectedRoles.id + '/skills', token: this.getToken() });
+                responsePromise.then(response => {
+                    if(response.data){
+                        this.skillList = response.data.data;
+                        detail.skills.forEach(skill => {
+                            let selectSk = this.skillList.find(sk => sk.id == skill.id);
+                            this.selectedSkills.push(selectSk)
+                        });
+                    }
+                })
+                // const response = await getApiData({ url: '/api/hr/departments/' + this.selectedDepartment.id + '/roles/' + this.selectedRoles.id + '/skills', token: this.getToken() });
+                // if(response.data){
+                //     this.skillList = response.data.data;
+                //     detail.skills.forEach(skill => {
+                //         let selectSk = this.skillList.find(sk => sk.id == skill.id);
+                //         this.selectedSkills.push(selectSk)
+                //     });
+                // }
             };
 
         },
@@ -496,7 +516,6 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/cv`);
-                // this.getPrimaryList();
             }else {
                 this.$notify({
                     text: response.message,
