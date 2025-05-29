@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('exam_id')->constrained('exams')->onDelete('cascade');
             $table->longText('question');
+            $table->longText('type');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
