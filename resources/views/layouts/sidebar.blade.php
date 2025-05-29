@@ -968,8 +968,32 @@
                                 Pay Slip
                             </a>
                         </li>
+                        
                     @endif
-
+                        <li>
+                            <a href="/resignation_categories" class="flex items-center @yield('resignation_categories') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Resignation Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/resignations" class="flex items-center @yield('resignations') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Resignation
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/cv" class="flex items-center @yield('cv') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                CV
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/exams" class="flex items-center @yield('exam') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Exam
+                            </a>
+                        </li>
 
 
                 </ul>

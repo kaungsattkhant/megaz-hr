@@ -83,7 +83,7 @@
                 <label for="" class="label-form mb-3">
                     Password
                 </label>
-                <input type="password" v-moel="password" placeholder="Password" class="input-ui">
+                <input type="password" v-model="password" placeholder="Password" autocomplete="new-password" class="input-ui">
             </div>
             <div class="col-span-3"></div>
 
@@ -527,6 +527,7 @@ export default {
                 this.zipCode = this.staff.zip_code;
                 this.address = this.staff.address;
                 this.bankAccountNumber = this.staff.bank_account_number;
+                this.password = null;
 
                 if (this.staff.emergency_contacts.length > 0) {
                     this.primaryName = this.staff.emergency_contacts[0].primary_name;

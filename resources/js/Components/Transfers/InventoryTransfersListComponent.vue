@@ -104,7 +104,9 @@
 
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ transfer.status }}
+                                        <span :class="transfer.status === 'complete' ? 'text-green-600' : '' ">
+                                            {{ transfer.status }}
+                                        </span>
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <!-- <button data-te-toggle="modal" data-te-target="#confirmModal" @click="transferBtnClicked(transfer.id)">
