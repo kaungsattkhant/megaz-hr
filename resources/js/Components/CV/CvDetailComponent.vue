@@ -371,7 +371,7 @@ export default {
         async addDetail(detail){
             this.selectedDepartment = this.departmentList.find(department => department.id == detail.department_id);
             if(this.selectedDepartment){
-                // this.roleList = this.selectedDepartment.roles;
+                this.roleList = this.selectedDepartment.roles;
             }
             if(this.roleList.length > 0){
                 this.selectedRoles = this.roleList.find(role => role.id == detail.roles[0].id);
