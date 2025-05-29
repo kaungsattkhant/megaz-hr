@@ -156,7 +156,7 @@
                                 <multiselect v-model="selectedCategory" :options="categoryList" :close-on-select="true"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Area Category"
                                     label="name" track-by="id" :preselect-first="false"></multiselect>
-                                <div class="mt-2">
+                                <!-- <div class="mt-2">
                                     <input
                                     class="relative mr-2 h-[1.125rem] w-[1.125rem]
                                     appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
@@ -164,7 +164,7 @@
                                     <label class="inline-block hover:cursor-pointer" for="checkboxDefault">
                                         Area for POS
                                     </label>
-                                </div>
+                                </div> -->
                             </div>
                             
                             <div class="mb-4">
@@ -339,12 +339,12 @@ export default {
             formData.append('area_type_id', this.selectedType.id);
             formData.append('area_category_id', this.selectedCategory.id);
             formData.append('department_id', this.selectedDepartment.id);
-            if(this.isPos = true){
-                formData.append('is_pos', 1);
-            }
-            else{
-                formData.append('is_pos', 0);
-            }
+            // if(this.isPos = true){
+            //     formData.append('is_pos', 1);
+            // }
+            // else{
+            //     formData.append('is_pos', 0);
+            // }
             let response = await postApiData({ url: '/api/areas', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.getAreasList(1);

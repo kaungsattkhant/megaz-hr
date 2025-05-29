@@ -95,7 +95,9 @@ class ItemRepository implements ItemRepositoryInterface
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
 
-            $item = Item::firstOrCreate(['name' => $data['name'], 'code' => $data['code']], $data);
+            // $item = Item::firstOrCreate(['name' => $data['name'], 'code' => $data['code']], $data);
+            $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
+            // $item = Item::create($data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
