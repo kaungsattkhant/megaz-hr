@@ -503,7 +503,9 @@ export default {
             responsePromise.then(response => {
                 if (response.data) {
                     this.detail = response.data;
-                    this.addDetail(response.data);
+                    setTimeout(() => {
+                        this.addDetail(response.data);
+                    }, 500);
                 }
             })
             // let response = await getApiData({ url: `/api/hr/exams/${this.examId}`, token: this.getToken() });
@@ -515,7 +517,9 @@ export default {
         addDetail(detail){
             this.name = detail.name
             this.selectedDepartment = this.departmentList.find(department => department.id == detail.role.department_id);
-            this.roleList = this.selectedDepartment.roles;
+            if(this.selectedDepartment){
+                this.roleList = this.selectedDepartment.roles;
+            }
             if(this.roleList){
                 this.selectedRoles = this.roleList.find(role => role.id == detail.role_id);
             }
