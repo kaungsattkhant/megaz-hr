@@ -242,9 +242,9 @@
                 </div>
             </div>
         </div>
-        <div>
+        <div class="mb-12">
             <button class="add-btn" @click="createBtnClicked">
-                Edit 
+                Edit Exam
             </button>
         </div>
     </div>
@@ -734,12 +734,28 @@ export default {
         isActiveToggled(question) {
             let index = this.selectedQuestionList.findIndex(item => item == question);
             if (index != -1) {
-                if (this.selectedQuestionList[index].is_active == 1) {
-                    this.selectedQuestionList[index].is_active = 0;
+                if(question.id){
+                    let url = `/api/hr/toggle/exam_questions/` + question.id;
+                    let formData = new FormData();
+                    let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+                    if(response.success){
+                        if (this.selectedQuestionList[index].is_active == 1) {
+                            this.selectedQuestionList[index].is_active = 0;
+                        }
+                        else {
+                            this.selectedQuestionList[index].is_active = 1;
+                        }
+                    }
                 }
-                else {
-                    this.selectedQuestionList[index].is_active = 1;
+                else{
+                    if (this.selectedQuestionList[index].is_active == 1) {
+                        this.selectedQuestionList[index].is_active = 0;
+                    }
+                    else {
+                        this.selectedQuestionList[index].is_active = 1;
+                    }
                 }
+                
 
                 // let url = `/api/is_active`;
                 // let formData = new FormData();
