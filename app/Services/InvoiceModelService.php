@@ -24,6 +24,49 @@ class InvoiceModelService
         ]);
     }
 
+    public function getServiceAmount($invoiceService,$end_time){
+        $startDateTime = Carbon::parse($invoiceService->start_date);
+        $currentDateTime = Carbon::parse($end_time);
+        $pricePerHour = $invoiceService->service->price_per_hour;
+        $hoursDifference = $startDateTime->diffInMinutes($currentDateTime) / 60;
+        $serviceAmount = $hoursDifference * $pricePerHour;
+        $nowDateTime = Carbon::parse(now());
+        $differenceBeforeStartDate = $startDateTime->diffInMinutes($nowDateTime);
+        if ($differenceBeforeStartDate < 0) {
+            $serviceValue = 0;
+        } else {
+            $serviceValue = ceil($serviceAmount);
+        }
+        return $serviceValue;
+    }
+
+    public function getDiffMinutes($invoiceService,$end_time){
+        $startDateTime = Carbon::parse($invoiceService->start_date);
+        $currentDateTime = Carbon::parse($end_time);
+        $pricePerHour = $invoiceService->service->price_per_hour;
+        $hoursDifference = $startDateTime->diffInMinutes($currentDateTime) / 60;
+        
+        $nowDateTime = Carbon::parse(now());
+        $differenceBeforeStartDate = $startDateTime->diffInMinutes($nowDateTime);
+
+        $hours = $startDateTime->diffInHours($currentDateTime);
+        $minuteDifference = ceil($startDateTime->diffInMinutes($currentDateTime));
+        // Calculate the total price with decimal places
+        if ($hours < 1) {
+            $formattedTimeDifference = "{$minuteDifference}min";
+        } else {
+            $hours = floor($hoursDifference);
+            $minutes = round(($hoursDifference - $hours) * 60);
+            $formattedTimeDifference = "{$hours}hr {$minutes}min";
+            // $formattedTimeDifference = "{$hours}hr {$minuteDifference}min";
+        }
+        if ($differenceBeforeStartDate < 0) {
+            $minutes = "0min";
+        } else {
+            $minutes = $formattedTimeDifference;
+        }
+        return $minutes;
+    }
     public function calculateInvoiceService($invoiceService, $end_time)
     {
         // foreach ($invoiceServices as $invoiceService) {
@@ -31,16 +74,17 @@ class InvoiceModelService
             // return $invoiceService;
         }
         $startDateTime = Carbon::parse($invoiceService->start_date);
+        $currentDateTime = Carbon::parse($end_time);
+        $pricePerHour = $invoiceService->service->price_per_hour;
+        $hoursDifference = $startDateTime->diffInMinutes($currentDateTime) / 60;
+        $serviceAmount = $hoursDifference * $pricePerHour;
+        
         $nowDateTime = Carbon::parse(now());
         $differenceBeforeStartDate = $startDateTime->diffInMinutes($nowDateTime);
 
-        $currentDateTime = Carbon::parse($end_time);
-        $pricePerHour = $invoiceService->service->price_per_hour;
         $hours = $startDateTime->diffInHours($currentDateTime);
         $minuteDifference = ceil($startDateTime->diffInMinutes($currentDateTime));
-        $hoursDifference = $startDateTime->diffInMinutes($currentDateTime) / 60;
         // Calculate the total price with decimal places
-        $serviceAmount = $hoursDifference * $pricePerHour;
         if ($hours < 1) {
             $formattedTimeDifference = "{$minuteDifference}min";
         } else {

@@ -11,6 +11,7 @@ class EntityStartValidationRequest extends APIRequest
     {
         $type=$this->get('type');
         return [
+            'start_time'=>'required',
             'customer_id'=>'required',
             'entity_type'=>'required',
             'entity_id'=>'required|exists:entities,id',

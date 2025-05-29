@@ -372,6 +372,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   public function getSellingAreas(Request $request)
   {
     $areaCategory = Area::with('areaCategory')
+      ->where('is_active', 1)
       ->whereHas('areaCategory', function ($query) {
         $query->whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))]);
       })->get();

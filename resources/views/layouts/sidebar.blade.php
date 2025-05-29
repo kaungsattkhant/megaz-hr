@@ -968,8 +968,20 @@
                                 Pay Slip
                             </a>
                         </li>
+                        
                     @endif
-
+                        <li>
+                            <a href="/resignation_categories" class="flex items-center @yield('resignation_categories') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Resignation Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/resignations" class="flex items-center @yield('resignations') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Resignation
+                            </a>
+                        </li>
 
 
                 </ul>
