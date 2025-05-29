@@ -390,12 +390,20 @@ export default {
             this.selectedState = this.stateList.find(state => state.name == detail.state);
             if(this.selectedState){
                 this.state = this.selectedState.name;
-                let response = await getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
-                if (response.data) {
-                    this.cityList = response.data.cities;
-                    this.selectedCity = this.cityList.find(city => city.name == detail.city);
-                    this.city = this.selectedCity.name;
-                }
+                let responsePromise = getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
+                responsePromise.then(response => {
+                    if (response.data) {
+                        this.cityList = response.data.cities;
+                        this.selectedCity = this.cityList.find(city => city.name == detail.city);
+                        this.city = this.selectedCity.name;
+                    }
+                })
+                // let response = await getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
+                // if (response.data) {
+                //     this.cityList = response.data.cities;
+                //     this.selectedCity = this.cityList.find(city => city.name == detail.city);
+                //     this.city = this.selectedCity.name;
+                // }
             }
             
             this.address = detail.address;
@@ -408,14 +416,24 @@ export default {
             this.secondaryRelationship = detail.emergency_contacts[0].secondary_relationship;
             
             if(this.selectedRoles){
-                const response = await getApiData({ url: '/api/hr/departments/' + this.selectedDepartment.id + '/roles/' + this.selectedRoles.id + '/skills', token: this.getToken() });
-                if(response.data){
-                    this.skillList = response.data.data;
-                    detail.skills.forEach(skill => {
-                        let selectSk = this.skillList.find(sk => sk.id == skill.id);
-                        this.selectedSkills.push(selectSk)
-                    });
-                }
+                let responsePromise = getApiData({ url: '/api/hr/departments/' + this.selectedDepartment.id + '/roles/' + this.selectedRoles.id + '/skills', token: this.getToken() });
+                responsePromise.then(response => {
+                    if(response.data){
+                        this.skillList = response.data.data;
+                        detail.skills.forEach(skill => {
+                            let selectSk = this.skillList.find(sk => sk.id == skill.id);
+                            this.selectedSkills.push(selectSk)
+                        });
+                    }
+                })
+                // const response = await getApiData({ url: '/api/hr/departments/' + this.selectedDepartment.id + '/roles/' + this.selectedRoles.id + '/skills', token: this.getToken() });
+                // if(response.data){
+                //     this.skillList = response.data.data;
+                //     detail.skills.forEach(skill => {
+                //         let selectSk = this.skillList.find(sk => sk.id == skill.id);
+                //         this.selectedSkills.push(selectSk)
+                //     });
+                // }
             };
 
         },
