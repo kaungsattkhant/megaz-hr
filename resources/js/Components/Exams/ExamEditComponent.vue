@@ -171,6 +171,20 @@
                     <input type="text" v-model="question" autocomplete="off"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                 </div>
+
+                <div class="mb-6 col-span-3 pb-6 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Type
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedQuestionType" class="input-ui !text-black"
+                        data-te-select-filter="true" >
+                            <option :value="type.value" v-for="(type, typeIndex) in questionTypeList" :key="typeIndex">
+                                {{ type.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
                 <div class="col-span-3">
                     <label class="label-form mb-3">&nbsp;</label>
                     <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnclickedAddQuestion()" >
@@ -184,6 +198,9 @@
                                 <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Question Name
                                 </th>
+                                <th scope="col" class=" pr-6 pl-2 py-4 ">
+                                    Question Type
+                                </th>
                                 <th scope="col" class=" px-6 py-4 ">
                                     Action
                                 </th>
@@ -193,6 +210,9 @@
                             <tr v-for="(question,questionIndex) in selectedQuestionList" >
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ question.question }}
+                                </td>
+                                <td class=" pr-6 pl-2 py-3 font-medium ">
+                                    {{ question.type }}
                                 </td>
                                 <td class=" px-6 py-3 font-medium relative">
                                     <input :checked="question.is_active == 1" @change="isActiveToggled(question)"
@@ -439,6 +459,10 @@ export default {
                 {value: 'exam', name: 'Exam'},
                 {value: 'interview', name: 'Interview'}
             ],
+            questionTypeList: [
+                {value: 'EQ', name: 'EQ'},
+                {value: 'IT', name: 'IT'}
+            ],
 
             selectedDepartment: null,
             selectedRoles: null,
@@ -447,6 +471,7 @@ export default {
             mark: null,
             grade: null,
             question: null,
+            selectedQuestionType: null,
 
             selectedSkillsetList: [],
             selectedGradeList: [],
@@ -512,6 +537,7 @@ export default {
                 detail.exam_questions.forEach(question => {
                     this.selectedQuestionList.push({
                         question: question.question,
+                        type: question.type,
                         answers: question.answers,
                         is_active: question.is_active,
                         id: question.id,
@@ -631,13 +657,19 @@ export default {
                 this.alertValidationMessage(`Question Name`);
                 return;
             }
+            if(!this.selectedQuestionType){
+                this.alertValidationMessage(`Question Type`);
+                return 1;
+            }
             else{
                 this.selectedQuestionList.push({
                     question: this.question,
+                    type: this.selectedQuestionType,
                     answers: [],
                     is_active: 1,
                 });
                 this.question = null;
+                this.selectedQuestionType = null;
             }
         },
         questionDeleteBtnClikced(index,detail){
