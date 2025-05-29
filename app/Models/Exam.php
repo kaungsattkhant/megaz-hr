@@ -38,4 +38,9 @@ class Exam extends Model
     {
         return $this->hasMany(Grade::class);
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'exam_skills');
+    }
 }
