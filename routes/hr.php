@@ -6,6 +6,7 @@ use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
 use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
 
 Route::middleware('auth:api')->group(function () {
@@ -98,6 +99,13 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/grades/{id}', 'deleteGrade');
     Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
     Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
+  });
+  Route::prefix('hr')->controller(InterviewController::class)->group(function () {
+    Route::get('/interviews_by_role/{roleId}', 'getInterviewsByRoleId');
+    Route::get('/interviews/{id}', 'getInterviewById');
+    // Route::post('/interviews', 'createInterview');
+    // Route::post('/interviews/{id}', 'updateInterview');
+    // Route::delete('/interviews/{id}', 'deleteInterview');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
