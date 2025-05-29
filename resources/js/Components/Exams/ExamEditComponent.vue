@@ -499,11 +499,18 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         async getDetail() {
-            let response = await getApiData({ url: `/api/hr/exams/${this.examId}`, token: this.getToken() });
-            if (response.data) {
-                this.detail = response.data;
-                this.addDetail(response.data);
-            }
+            let responsePromise = getApiData({ url: `/api/hr/exams/${this.examId}`, token: this.getToken() });
+            responsePromise.then(response => {
+                if (response.data) {
+                    this.detail = response.data;
+                    this.addDetail(response.data);
+                }
+            })
+            // let response = await getApiData({ url: `/api/hr/exams/${this.examId}`, token: this.getToken() });
+            // if (response.data) {
+            //     this.detail = response.data;
+            //     this.addDetail(response.data);
+            // }
         },
         addDetail(detail){
             this.name = detail.name
