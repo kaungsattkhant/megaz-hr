@@ -14,6 +14,7 @@ class ExamQuestion extends Model
     protected $fillable = [
         'exam_id',
         'question',
+        'type',
         'is_active',
     ];
     protected $casts = [

@@ -79,6 +79,7 @@ class ExamRepository implements ExamRepositoryInterface
         foreach ($exam_questions as $question) {
           $examQuestion = $exam->examQuestions()->create([
             'question' => $question['question'],
+            'type' => $question['type'] ?? null,
             'is_active' => 1,
           ]);
           if (isset($question['answers'])) {
@@ -172,6 +173,7 @@ class ExamRepository implements ExamRepositoryInterface
             ],
             [
               'question' => $question['question'],
+              'type' => $question['type'] ?? null,
               'is_active' => 1,
             ]
           );
