@@ -365,7 +365,9 @@ export default {
             let response = await getApiData({ url: `/api/hr/cvs/${this.cvId}`, token: this.getToken() });
             if (response.data) {
                 this.detail = response.data;
-                this.addDetail(response.data);
+                setTimeout(() => {
+                    this.addDetail(response.data);
+                }, 500);
             }
         },
         async addDetail(detail){
