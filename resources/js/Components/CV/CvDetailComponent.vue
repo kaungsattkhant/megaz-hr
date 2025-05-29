@@ -11,7 +11,7 @@
                 </button>
                 <button type="button" @click="btnClickedConfirmCV()"
                     class="add-btn focus:outline-none focus:ring-0 ">
-                    Create
+                    Confirm
                 </button>
             </div>
         </div>
@@ -267,7 +267,7 @@
                     <p class="text-sm">Choose a department and role to get started.</p>
                   </div>
             </div>
-            <div class="col-span-12 flex gap-x-8">
+            <div class="col-span-12 flex gap-x-8 mb-8">
                 <label class="inline-flex items-center space-x-2" v-for="skill in skillList">
                     <input
                       type="checkbox" :value="skill" v-model="selectedSkills"
@@ -278,12 +278,10 @@
             </div>
 
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-2 container-card">
-            
-        </div>
+        
         <div class="px-4 mb-8">
             <button class="add-btn" @click="btnClickedCreateCVForm">
-                Send CV
+                Edit CV
             </button>
         </div>
 
@@ -372,8 +370,10 @@ export default {
         },
         async addDetail(detail){
             this.selectedDepartment = this.departmentList.find(department => department.id == detail.department_id);
-            this.roleList = this.selectedDepartment.roles;
-            if(this.roleList){
+            if(this.selectedDepartment){
+                // this.roleList = this.selectedDepartment.roles;
+            }
+            if(this.roleList.length > 0){
                 this.selectedRoles = this.roleList.find(role => role.id == detail.roles[0].id);
             }
             this.selectedExp = detail.experience;
@@ -496,7 +496,6 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/cv`);
-                // this.getPrimaryList();
             }else {
                 this.$notify({
                     text: response.message,
