@@ -361,7 +361,7 @@ Route::middleware(['departments:check-in'])->group(function () {
 });
 
 //hr
-// Route::middleware(['departments:hr'])->group(function () {
+Route::middleware(['departments:hr'])->group(function () {
 
     Route::view('/contact', 'contact.index')->name('contact');
     Route::view('/meeting', 'meeting.index')->name('meeting');
@@ -395,10 +395,19 @@ Route::middleware(['departments:check-in'])->group(function () {
     Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
     Route::view('/salary_calculate', 'salary_calculate.index')->name('salary_calculate.index');
     Route::view('/pay_slip', 'salary_calculate.pay_slip')->name('salary_calculate.pay_slip');
-// });
+});
 
 Route::view('/resignation_categories', 'resignation_categories.index')->name('resignation_categories.index');
 Route::view('/resignations', 'resignations.index')->name('resignations.index');
+
+
+Route::view('/cv/form', 'CV.form')->name('CV.form');
+Route::view('/cv', 'CV.index')->name('CV.index');
+Route::view('/cv/{id}/detail', 'CV.detail');
+Route::view('/exams', 'exams.index');
+Route::view('/exam/create', 'exams.create')->name('exams.create');
+Route::view('/exam/{id}/edit', 'exams.edit');
+
 // =======
 // Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
 // Route::view('/meeting', 'meeting.index')->name('meeting');
