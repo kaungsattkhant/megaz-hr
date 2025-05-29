@@ -608,17 +608,18 @@ export default {
             }
         },
         async deleteSkillset(index,skillset){
-            let response = await deleteApiData({ url: `/api/hr/exam_skills/` + skillset.exam_skill_id, token: this.getToken() });
-            if (response.success) {
-                this.selectedSkillsetList.splice(index, 1);
-            }
-            else {
-                this.$notify({
-                    title: `Input validation`,
-                    text: response.message,
-                    type: "warn"
-                });
-            }
+            // let response = await deleteApiData({ url: `/api/hr/exam_skills/` + skillset.exam_skill_id, token: this.getToken() });
+            // if (response.success) {
+            //     this.selectedSkillsetList.splice(index, 1);
+            // }
+            // else {
+            //     this.$notify({
+            //         title: `Input validation`,
+            //         text: response.message,
+            //         type: "warn"
+            //     });
+            // }
+            this.selectedSkillsetList.splice(index, 1);
         },
 
         btnclickedAddGrade(){
@@ -644,24 +645,26 @@ export default {
             this.gradeDetail = detail;
         },
         async deleteGrade(){
-            if(this.gradeDetail.id){
-                let response = await deleteApiData({ url: `/api/hr/grades/` + this.gradeDetail.id, token: this.getToken() });
-                if (response.success) {
-                    document.getElementById("close_delete_grade_modal").click();
-                    this.selectedGradeList.splice(this.gradeIndex, 1);
-                }
-                else {
-                    this.$notify({
-                        title: `Input validation`,
-                        text: response.message,
-                        type: "warn"
-                    });
-                }
-            }
-            else{
-                document.getElementById("close_delete_grade_modal").click();
-                this.selectedGradeList.splice(this.gradeIndex, 1);
-            }
+            // if(this.gradeDetail.id){
+            //     let response = await deleteApiData({ url: `/api/hr/grades/` + this.gradeDetail.id, token: this.getToken() });
+            //     if (response.success) {
+            //         document.getElementById("close_delete_grade_modal").click();
+            //         this.selectedGradeList.splice(this.gradeIndex, 1);
+            //     }
+            //     else {
+            //         this.$notify({
+            //             title: `Input validation`,
+            //             text: response.message,
+            //             type: "warn"
+            //         });
+            //     }
+            // }
+            // else{
+            //     document.getElementById("close_delete_grade_modal").click();
+            //     this.selectedGradeList.splice(this.gradeIndex, 1);
+            // }
+            document.getElementById("close_delete_grade_modal").click();
+            this.selectedGradeList.splice(this.gradeIndex, 1);
         },
         btnclickedAddQuestion(){
             if(!this.question){
@@ -689,24 +692,26 @@ export default {
         },
 
         async deleteQuestion(){
-            if(this.questionDetail){
-                let response = await deleteApiData({ url: `/api/hr/exam_questions/` + this.questionDetail.id, token: this.getToken() });
-                if (response.success) {
-                    document.getElementById("close_delete_question_modal").click();
-                    this.selectedQuestionList.splice(this.questionIndex, 1);
-                }
-                else {
-                    this.$notify({
-                        title: `Input validation`,
-                        text: response.message,
-                        type: "warn"
-                    });
-                }
-            }
-            else{
-                document.getElementById("close_delete_question_modal").click();
-                this.selectedQuestionList.splice(this.questionIndex, 1);
-            }
+            // if(this.questionDetail){
+            //     let response = await deleteApiData({ url: `/api/hr/exam_questions/` + this.questionDetail.id, token: this.getToken() });
+            //     if (response.success) {
+            //         document.getElementById("close_delete_question_modal").click();
+            //         this.selectedQuestionList.splice(this.questionIndex, 1);
+            //     }
+            //     else {
+            //         this.$notify({
+            //             title: `Input validation`,
+            //             text: response.message,
+            //             type: "warn"
+            //         });
+            //     }
+            // }
+            // else{
+            //     document.getElementById("close_delete_question_modal").click();
+            //     this.selectedQuestionList.splice(this.questionIndex, 1);
+            // }
+            document.getElementById("close_delete_question_modal").click();
+            this.selectedQuestionList.splice(this.questionIndex, 1);
         },
         addAnswerBtnClicked(question,index){
             this.selectedQuestionIndex = index;
