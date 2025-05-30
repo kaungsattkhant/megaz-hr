@@ -315,8 +315,18 @@ export default {
         },
 
         async getSkillDetail(id) {
+            // let skillDetailData = await getApiData({ url: `/api/skills/${id}`, token: this.getToken() });
+            // this.edit_skill = skillDetailData.data.skill
             let skillDetailData = await getApiData({ url: `/api/skills/${id}`, token: this.getToken() });
-            this.edit_skill = skillDetailData.data.skill
+            if(skillDetailData.success){
+                this.edit_skill = skillDetailData.data.skill;
+            }else {
+                this.$notify({
+                    title: `Input validation`,
+                    text: skillDetailData.message,
+                    type: "warn"
+                });
+            }
             this.selectedDepartment = skillDetailData.data.role.department_id
             this.getRoleByDepartment(skillDetailData.data.role.department_id);
             this.edit_role = skillDetailData.data.role.id

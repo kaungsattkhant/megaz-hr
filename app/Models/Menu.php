@@ -101,16 +101,24 @@ class Menu extends BaseModel
             ->when($search, function ($q) use ($search) {
                 $q->where(function ($query) use ($search) {
                     $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('price', 'like', '%' . $search . '%')
-                        ->orWhere('category', 'like', '%' . $search . '%')
-                        ->orWhere('code', 'like', '%' . $search . '%');
+                        ->orWhereHas('menu_category', function ($catQuery) use ($search) {
+                            $catQuery->where('name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhere('code', 'like', '%' . $search . '%')
+                        ->orWhereHas('price', function ($subQuery) use ($search) {
+                            $subQuery->where('price', 'like', '%' . $search . '%');
+                        });
                 });
             })
             ->when($price, function ($q) use ($price) {
-                $q->where('price', $price);
+                $q->whereHas('price', function ($subQuery) use ($price) {
+                    $subQuery->where('price', $price);
+                });
             })
             ->when($category, function ($q) use ($category) {
-                $q->where('menu_category_id', $category);
+                $q->whereHas('menu_category', function ($catQuery) use ($category) {
+                    $catQuery->where('name', 'like', '%' . $category . '%');
+                });
             })
             ->when($code, function ($q) use ($code) {
                 $q->where('code', 'like', '%' . $code . '%');
