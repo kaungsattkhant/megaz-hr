@@ -27,21 +27,15 @@ class InterviewController extends Controller
         ResponseData($data);
     }
 
-    // public function createInterview(Request $request)
-    // {
-    //     $data = $this->interviewRepository->createInterview($request->all());
-    //     return response()->json($data);
-    // }
+    public function storeInterview(Request $request)
+    {
+        $data = $this->interviewRepository->storeInterview($request->all());
+        return response()->json($data);
+    }
 
-    // public function updateInterview(Request $request, $id)
-    // {
-    //     $data = $this->interviewRepository->updateInterview($request->all(), $id);
-    //     return response()->json($data);
-    // }
-
-    // public function deleteInterview($id)
-    // {
-    //     $data = $this->interviewRepository->deleteInterview($id);
-    //     return response()->json($data);
-    // }
+    public function getInterviewResults(Request $request)
+    {
+        $data = $this->interviewRepository->getInterviewResults($request);
+        ResponseData($data);
+    }
 }
