@@ -4,6 +4,7 @@ namespace App\Repositories\Exam;
 
 use App\Models\Exam;
 use App\Models\Grade;
+use App\Models\Skill;
 use App\Models\Answer;
 use App\Models\ExamSkill;
 use App\Models\ExamQuestion;
@@ -49,6 +50,13 @@ class ExamRepository implements ExamRepositoryInterface
         $skills = json_decode($data['exam_skills'], true);
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for Exam Skills.', 400);
+        }
+
+        foreach ($skills as $skillId) {
+          $skill = Skill::find($skillId);
+          if (!$skill || $skill->role_id != $exam->role_id) {
+            return ResponseMessage('Skill does not match the exam role_id.', 400);
+          }
         }
         if (is_array($skills)) {
           $exam->skills()->sync($skills);
@@ -126,6 +134,12 @@ class ExamRepository implements ExamRepositoryInterface
         $skills = json_decode($data['exam_skills'], true);
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for Exam Skills.', 400);
+        }
+        foreach ($skills as $skillId) {
+          $skill = Skill::find($skillId);
+          if (!$skill || $skill->role_id != $exam->role_id) {
+            return ResponseMessage('Skill does not match the exam role_id.', 400);
+          }
         }
         if (is_array($skills)) {
           $exam->skills()->sync($skills);
