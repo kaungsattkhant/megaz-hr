@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('date_time');
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('cash_account_id');
+            $table->unsignedBigInteger('cash_account_id')->nullable();
             $table->double('amount');
             $table->string('type');
             $table->unsignedBigInteger('created_by');
