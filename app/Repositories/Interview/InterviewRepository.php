@@ -29,8 +29,8 @@ class InterviewRepository implements InterviewRepositoryInterface
     if (!$exam) {
       return ResponseMessage('Interview not found.', 404);
     }
-    $groupedQuestions = $exam->examQuestions->groupBy('type');
-    $exam->grouped_exam_questions = $groupedQuestions;
+    $groupedQuestions = $exam->examQuestions->groupBy('type')->toArray();
+    $exam['grouped_exam_questions'] = array_values($groupedQuestions);
     unset($exam->examQuestions);
     return $exam;
   }
