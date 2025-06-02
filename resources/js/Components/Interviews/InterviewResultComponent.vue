@@ -87,6 +87,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ item.staff.name }}
                                     </td>
+                                    
                                     <td class="whitespace-nowrap">
                                         {{ item.staff.name }}
                                     </td>
