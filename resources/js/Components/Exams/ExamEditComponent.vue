@@ -268,7 +268,7 @@
                             id="add_question_modalLabel">
                             Question
                         </h5>
-                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_add_answer_modal"
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-4 w-4">
@@ -343,7 +343,7 @@
                             Cancel
                         </button>
                         <button type="button" @click="addAnswerToQuestion()"
-                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -725,6 +725,14 @@ export default {
             }
         },
         btnClickedAddAnswer(){
+            if(!this.answer){
+                this.alertValidationMessage(`Answer`);
+                return 1;
+            }
+            if(!this.answerMark){
+                this.alertValidationMessage(`Mark`);
+                return 1;
+            }
             this.selectedAnswerList.push({
                 answer: this.answer,
                 mark: this.answerMark,
@@ -733,7 +741,12 @@ export default {
             this.answerMark = null;
         },
         addAnswerToQuestion(){
-            this.selectedQuestionList[this.selectedQuestionIndex].answers = this.selectedAnswerList
+            if(this.selectedAnswerList.length < 1){
+                this.alertValidationMessage(`Answers`);
+                return 1;
+            }
+            this.selectedQuestionList[this.selectedQuestionIndex].answers = this.selectedAnswerList;
+            document.getElementById("close_add_answer_modal").click();
         },
         isActiveToggled(question) {
             let index = this.selectedQuestionList.findIndex(item => item == question);
@@ -791,6 +804,11 @@ export default {
             }
             if(this.selectedQuestionList.length < 1){
                 this.alertValidationMessage(`Question`);
+                return 1;
+            }
+            const allAnswered = this.selectedQuestionList.every(q => Array.isArray(q.answers) && q.answers.length > 0);;
+            if (!allAnswered) {
+                this.alertValidationMessage(`Answer`);
                 return 1;
             }
 

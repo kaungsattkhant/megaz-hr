@@ -232,6 +232,8 @@ import ExamEditComponent from './Components/Exams/ExamEditComponent.vue';
 import InterviewListComponent from './Components/Interviews/InterviewListComponent.vue';
 import InterviewCreateComponent from './Components/Interviews/InterviewCreateComponent.vue';
 import InterviewResultComponent from './Components/Interviews/InterviewResultComponent.vue';
+import LocationListComponent from './Components/Locations/LocationListComponent.vue';
+import LocationDetailComponent from './Components/Locations/LocationDetailComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -444,6 +446,8 @@ app.component('ExamEditComponent',ExamEditComponent);
 app.component('InterviewListComponent',InterviewListComponent);
 app.component('InterviewCreateComponent',InterviewCreateComponent);
 app.component('InterviewResultComponent',InterviewResultComponent);
+app.component('LocationListComponent',LocationListComponent);
+app.component('LocationDetailComponent',LocationDetailComponent);
 
 
 app.use(store);

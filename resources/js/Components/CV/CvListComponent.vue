@@ -80,7 +80,7 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        cv date ??
+                                        
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}

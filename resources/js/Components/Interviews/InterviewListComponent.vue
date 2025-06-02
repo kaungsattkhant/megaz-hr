@@ -70,7 +70,7 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        cv date ??
+                                        
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
@@ -258,9 +258,15 @@ export default {
 
         async createInterviewBtnClicked(item){
             this.selectedItem = item;
+            this.selectedInterview = null;
             let response = await getApiData({ url: '/api/hr/interviews-by-role/' + item.roles[0].id, token: this.getToken() });
             if (response.data) {
                 this.interviewList = response.data.data;
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
         interviewSelectedChange(){
