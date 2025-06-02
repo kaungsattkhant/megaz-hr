@@ -2,33 +2,30 @@
     <div class="px-0">
         <div class="mb-4 flex justify-between">
             <p class="text-lg font-semibold font-inter text-left">
-                CV Detail
+                Create New Interview
             </p>
             <div class="flex justify-end gap-x-4 px-6">
-                <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
-                    @click="btnClickedCancelledCV">
-                        Cancel
-                </button>
-                <button type="button" @click="btnClickedConfirmCV()"
-                    class="add-btn focus:outline-none focus:ring-0 ">
-                    Confirm
-                </button>
+                <p>
+                    Total Marks : {{ total_mark + total_custom_mark }}
+                </p>
             </div>
         </div>
         <div class="grid !grid-cols-12 gap-x-4 mb-4 container-card">
 
             <div class=" col-span-12 mb-6">
                 <p class=" text-xl text-black">
-                    Proposed Position
+                    Custom Question
                 </p>
             </div>
             
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Question
                 </label>
-                <input type="text" v-model="customQuestion" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <textarea name="" v-model="customQuestion" class="input-ui w-full bg-transparent rounded-lg" id="" cols="30"
+                    rows="5"></textarea>
+                <!-- <input type="text" v-model="customQuestion" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
             <div class="mb-6 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -43,75 +40,108 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-4 col-span-1 pb-0 rounded-md">
+            <div class="mb-4 col-span-2 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Mark
                 </label>
                 <input type="number" v-model="customMark" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-3"></div>
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    &nbsp;
+                </label>
+                <button class="add-btn" @click="btnAddCustomQuestion">
+                    Add
+                </button>
+            </div>
         </div>
         
-        <div class=" mb-6 container-card !pt-0 !mt-0">
-            <div class="contents" v-for="(question,groupName,questionIndex) in questionList">
-                <div class="  mb-6">
-                    <p class=" text-xl text-black">
-                        {{ groupName }}
+        <div class=" mb-6 container-card py-4 px-7">
+            <div class="mb-8" v-for="(question,questionIndex) in questionList">
+                <div class="  mb-4">
+                    <p class=" text-lg text-black">
+                        {{ question[0].type }}
                     </p>
                 </div>
                 <div class="contents" v-for="(q,qIndex) in question">
                     <div class="  mb-6">
-                        <p class=" text-xl text-black">
+                        <p class=" text-base text-black">
                             {{ q.question }}
                         </p>
                     </div>
-                    <div class="flex gap-x-8 mb-8">
+                    <div class="flex flex-wrap gap-y-4 gap-x-8 mb-8">
                         <label
-                          class="inline-flex items-center space-x-2"
+                          class="inline-flex flex-grow-0 items-start space-x-2"
                           v-for="(answer, aIndex) in q.answers"
                           :key="aIndex"
                         >
                           <input
                             type="radio"
+                            :name="'question-' + q.id"
+                            :value="answer"
+                            v-model="q.selected"
                             :checked="answer.checked"
                             @change="handleRadioChange(answer,q)"
-                            class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none"
+                            class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none mt-1"
                           />
-                          <span class="text-gray-600">{{ answer.answer }}</span>
+                          <p class="text-gray-600">{{ answer.answer }}</p>
                         </label>
                     </div>
-
-                    <!-- <div class="flex gap-x-8 mb-8">
-                        <div class="mb-[0.125rem] me-4 inline-block min-h-[1.5rem] ps-[1.5rem]">
-                            <input
-                              class="relative float-left -ms-[1.5rem] me-1 mt-0.5 h-5 w-5 appearance-none rounded-full border-2 border-solid border-secondary-500 before:pointer-events-none before:absolute before:h-4 before:w-4 before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] after:absolute after:z-[1] after:block after:h-4 after:w-4 after:rounded-full after:content-[''] checked:border-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:h-[0.625rem] checked:after:w-[0.625rem] checked:after:rounded-full checked:after:border-primary checked:after:bg-primary checked:after:content-[''] checked:after:[transform:translate(-50%,-50%)] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:border-primary checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] rtl:float-right dark:border-neutral-400 dark:checked:border-primary"
-                              type="radio"
-                              name="inlineRadioOptions"
-                              id="inlineRadio1"
-                              value="option1" />
-                            <label
-                              class="mt-px inline-block ps-[0.15rem] hover:cursor-pointer"
-                              for="inlineRadio1"
-                              >1</label
-                            >
-                        </div>
-                        <label class="inline-flex items-center space-x-2" v-for="answer in q.answers">
-                            <input
-                              type="radio" @change="isActiveToggled(answer)"
-                              class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0"
-                            />
-                            <span class="text-gray-600">{{ answer.answer }}</span>
-                        </label>
-                    </div> -->
                 </div>
             </div>
+
+            <!-- <table class="primary-table !border-0 text-left">
+                <tbody>
+                    <div class="contents" v-for="(item, index) in customQuestionList" :key="index">
+                        <tr class=" !border-0">
+                            <td class="whitespace-nowrap !border-0">
+                                {{ item.question }}
+                            </td>
+                            <td class="whitespace-nowrap !border-0">
+                                {{ item.type.name }}
+                            </td>
+                            <td class="whitespace-nowrap !border-0">
+                                {{ item.mark }}
+                            </td>
+                            <td class="whitespace-nowrap !border-0">
+                                <button  class="mx-4">
+                                    <i class="fal fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </div>
+                </tbody>
+            </table> -->
+            <div class="contents" v-for="(question,questionIndex) in customQuestionList">
+                <div class="  mb-4">
+                    <p class=" text-lg text-black">
+                        {{ question.type }}
+                    </p>
+                </div>
+                
+                <div class="flex gap-x-4 mb-8">
+                    <div class=" min-w-[30%] max-w-[80%]"> 
+                        <p  class="text-gray-600">{{ question.question }}</p>
+                    </div>
+                    <div class=" w-[10%] text-center">
+                        <p>{{ question.mark }}</p>
+                    </div>
+                    <div class="w-[10%]">
+                        <button  class="mx-4">
+                            <i class="fal fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
 
         </div>
         
         <div class="px-4 mb-8">
-            <button class="add-btn" @click="btnClickedCreateCVForm">
-                Edit CV
+            <button class="add-btn" @click="btnClickedCreateInterview">
+                Done
             </button>
         </div>
 
@@ -134,7 +164,7 @@ export default {
     components: {
         Multiselect
     },
-    props: ["interviewId"],
+    props: ["interviewId","cvId"],
     data() {
         return {
             typeList: [
@@ -149,7 +179,8 @@ export default {
             customMark: null,
 
             detail: null,
-            
+            total_mark: 0,
+            total_custom_mark: 0,
         };
     },
 
@@ -165,31 +196,51 @@ export default {
                 }, 500);
             }
         },
-        async addDetail(detail){
-
-        },
         handleRadioChange(answer,q){
             // this.questionList[first].questions[second].answers.forEach((a, i) => {
             //     a.checked = i === third
             // })
             // answer.checked = 'yellow';
             q.answer_id = answer.id
+            this.total_mark = this.totalMark
         },
-
+        btnAddCustomQuestion(){
+            if(!this.customQuestion){
+                this.alertValidationMessage(`Question`);
+                return 1;
+            }
+            if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            if(this.customMark < 1){
+                this.alertValidationMessage(`Mark`);
+                return 1;
+            }
+            this.customQuestionList.push({
+                question: this.customQuestion,
+                type: this.selectedType.value,
+                mark: this.customMark
+            })
+            this.total_custom_mark += this.customMark
+            this.customQuestion = null;
+            this.selectedType = null;
+            this.customMark = 0;
+        },
        
         
         
 
 
 
-        alertValiationMessage(field) {
+        alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
         },
-        btnClickedCreateCVForm() {
+        btnClickedCreateInterview() {
             // this.roleIds = [];
 
             // if(!this.questionList){
@@ -197,11 +248,10 @@ export default {
             //     return 1;
             // }
             
-            this.createCVForm();
+            this.createInterview();
         },
 
-        async createCVForm() {
-            let formData = new FormData();
+        async createInterview() {
             // formData.append('department_id', this.selectedDepartment.id);
             // formData.append('skills', JSON.stringify(this.selectedSkills));
             let interview_answers = [];
@@ -214,13 +264,18 @@ export default {
                         })
                     });
                 });
-                console.log('qqqq');
             }
-            console.log(this.questionList.length)
-            formData.append('skills[]', interview_answers);
-            let response = await postApiData({ url: '/api/hr/cvs/wwwwwww' + this.cvId, form_data: formData, token: this.getToken() });
+            let total = 0;
+            total = this.total_mark + this.total_custom_mark;
+            let formData = new FormData();
+            formData.append('staff_id', this.cvId);
+            formData.append('exam_id', this.interviewId);
+            formData.append('total_mark', total);
+            formData.append('interview_answers', JSON.stringify(interview_answers));
+            formData.append('custom_questions', JSON.stringify(this.customQuestionList));
+            let response = await postApiData({ url: '/api/hr/interviews', form_data: formData, token: this.getToken() });
             if (response.success) {
-                window.location.replace('/cv');
+                window.location.replace('/interview/result');
             }
             else {
                 this.$notify({
@@ -230,7 +285,26 @@ export default {
             }
         },
     },
-
+    computed: {
+        selectedAnswers() {
+            return this.questionList
+            .flat() // Flatten the 2D array into a 1D list of questions
+            .filter(q => q.selected) // Only include questions that have a selected answer
+            .map(q => ({
+                question_id: q.id,
+                answer_id: q.selected.id,
+                mark: q.selected.mark
+            }));
+        },
+        totalMark() {
+            // Flatten the 2D array
+            const flatQuestions = this.questionList.flat()
+            // Sum up the selected marks
+            return flatQuestions.reduce((sum, q) => {
+                return sum + (q.selected?.mark || 0)
+            }, 0)
+        }
+    },
     created() {
         this.getDetail();
     },

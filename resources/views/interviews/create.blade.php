@@ -4,6 +4,8 @@
 
 @section('interview', 'active-link')
 @section('content')
-    <interview-create-component interview-id={{$id}} />
+
+<interview-create-component interview-id={{ $id }} cv-id={{$cvId}} />
+    
     
 @endsection

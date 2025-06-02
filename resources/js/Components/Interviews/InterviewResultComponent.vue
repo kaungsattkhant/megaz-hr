@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Interviews
+            Interview Results
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -46,9 +46,6 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Date
-                                </th>
-                                <th scope="col" class="">
                                     Name
                                 </th>
                                 <th scope="col" class="">
@@ -58,7 +55,16 @@
                                     Role
                                 </th>
                                 <th scope="col" class="">
-
+                                    Interview
+                                </th>
+                                <th scope="col" class="">
+                                    Psychology Test
+                                </th>
+                                <th scope="col" class="">
+                                    Hard Skill
+                                </th>
+                                <th scope="col" class="">
+                                    Total
                                 </th>
                             </tr>
                         </thead>
@@ -70,23 +76,32 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        cv date ??
+                                        {{ item.staff.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.name }}
+                                        {{ item.staff.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.department.name }}
+                                        {{ item.staff.roles[0] ? item.staff.roles[0].name : '' }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.roles[0] ? item.roles[0].name : '' }}
+                                        {{ item.staff.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        {{ item.staff.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.staff.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.total_mark }}
+                                    </td>
+                                    <!-- <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#create_interview_modal" class="mx-4"
                                             @click="createInterviewBtnClicked(item)">
                                             <i class="fal fa-plus"></i>
                                         </button>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             </div>
                         </tbody>
@@ -206,7 +221,7 @@ export default {
             selectedItem: null,
 
 
-            url: '/api/hr/cvs?status=confirmed',
+            url: '/api/hr/interviews-results',
             url_search: '',
             url_department: '',
             url_role: '',

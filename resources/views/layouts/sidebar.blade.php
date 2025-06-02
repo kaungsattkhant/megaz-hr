@@ -1001,7 +1001,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/interviews/result" class="flex items-center @yield('interview_result') sidebar-gap-x">
+                            <a href="/interview/result" class="flex items-center @yield('interview_result') sidebar-gap-x">
                                 <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
                                 Interview Result
                             </a>
