@@ -44,6 +44,8 @@ use App\Models\InvoiceSession;
 use App\Models\AreaType;
 
 use App\Http\Action\Common\AccountFetcher;
+use App\Models\AccountReceivable;
+use App\Models\Transaction;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -344,26 +346,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $cash_account_id = $data['cash_account_id'];
             $data['date'] = now();
             $data['created_by'] = $userId;
-            // $transaction = (new StoreTransactionLedger())->createTransaction($data);
-            // $debitLedger = (new StoreTransactionLedger())->storeLedger([
-            //     'date' => now(),
-            //     'value' => $data['deposit'],
-            //     'personable_id' => $data['customer_id'],
-            //     'personable_type' => 'customer',
-            //     'transaction_id' => $transaction->id,
-            //     'account_id' => $cash_account_id,
-            //     'action' => 'debit',
-            // ]);
-            // #store credit ledger
-            // $creditLedger = (new StoreTransactionLedger())->storeLedger([
-            //     'date' => now(),
-            //     'value' => $data['deposit'],
-            //     'personable_id' => $data['customer_id'],
-            //     'personable_type' => 'customer',
-            //     'transaction_id' => $transaction->id,
-            //     'account_id' => $data['account_id'],
-            //     'action' => 'credit',
-            // ]);
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $data['deposit'],
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $cash_account_id,
+                'action' => 'debit',
+            ]);
+            #store credit ledger
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $data['deposit'],
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'credit',
+            ]);
             return $customerDeposit;
         }
     }
@@ -957,6 +959,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $invoice = Invoice::find($request->id);
         $customer = $invoice->customer;
+        $paidAmount=$request->paid_amount;
+        $authUser=UserData();
         $depositBalance = $this->getCustomerDepositBalance($customer->id);
         try {
             DB::beginTransaction();
@@ -964,6 +968,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Paid amout must be entered', 400);
             }
 
+            $transaction = Transaction::create([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'transactionable_id' => $invoice->id,
+                'transactionable_type' => 'invoice',
+                'is_confirmed' => 1,
+            ]);
+            $withdrawalAmt=0;
             if ($depositBalance > 0) {
                 $withdrawalAmt = $invoice->sub_total;
                 $updatedCustomerDepositBalance = $depositBalance - $invoice->sub_total;
@@ -980,7 +992,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $withdrawalAmt = $depositBalance;
                     }
                 }
-
+              
+                // dd('does not have ar amunt '.$invoiceCost);
                 // ဖြတ်ရမယ့် အမောင့်က
                 // ကျသင့်ငွေက balance ထက်များနေရင် ရှိသလောက် balance အကုန်ဖြတ်
                 // ကျသင့်ငွေက balance ထက်နည်းနေရင်တော့ ရှင်းရမယ့် အမောင့်တိုင်း ဖြတ်
@@ -992,8 +1005,34 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'cash_account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->cash_account_id,
                     'customer_id' => $customer->id,
                 ]);
+                $debitDepositLeder =  (new StoreTransactionLedger())->storeLedger([
+                    'value' => $withdrawalAmt,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $customer->account_id, //deposit amount
+                    'action' => 'debit',
+                    'is_cashier_confirmed' => 0
+                ]);
             }
-
+            $invoiceCost=$invoice->sub_total-$withdrawalAmt; // included with deposit amount
+            $arAmount=$invoiceCost-$paidAmount;
+            if($arAmount>0){
+                // dd('Have ar amount '.$arAmount);
+                // $this->createAR($customer,$authUser,$arAmount);
+                $accountReceivable=AccountReceivable::create([
+                    'type'=>'ar',
+                    'date_time'=>now(),
+                    'account_id'=>$customer->account_receivable_id,
+                    'amount'=>$arAmount,
+                    'created_by'=>$authUser->id,
+                ]);
+                $debitReceivableLedger =  (new StoreTransactionLedger())->storeLedger([
+                    'value' => $arAmount,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $customer->account_receivable_id,
+                    'action' => 'debit',
+                    'is_cashier_confirmed' => 0
+                ]);
+            }
             // debit cash bank
             // credit menu (inv food)
 
@@ -1012,20 +1051,19 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $cashAccount = ($request->payment_type == 'bank') ? $accountFetcher->getAccountByName('POS Bank') : $accountFetcher->getAccountByName('POS Cash');
 
             $ledgerTransactionWriter = new StoreTransactionLedger();
-            $transaction = $ledgerTransactionWriter->createTransaction([
-                'date' => now(),
-                'created_by' => UserData()->id,
-                'transactionable_id' => $invoice->id,
-                'transactionable_type' => 'invoice',
-                'is_confirmed' => 1,
-            ]);
+            // $transaction = Transaction::create([
+            //     'date' => now(),
+            //     'created_by' => UserData()->id,
+            //     'transactionable_id' => $invoice->id,
+            //     'transactionable_type' => 'invoice',
+            //     'is_confirmed' => 1,
+            // ]);
 
             $ledgerTransactionWriter->storeLedger([
                 'value' => $request->paid_amount,
                 'action' => 'debit',
                 'account_id' => $cashAccount->id
             ], $transaction->id);
-
             if ($invoice->total_session_price > 0) {
                 $ledgerTransactionWriter->storeLedger([
                     'value' => $invoice->total_session_price,
@@ -1243,7 +1281,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity = $activeInvoiceSession->entity;
             $activeInvoiceSession->is_active = 0;
             $activeInvoiceSession->save();
-
             $totalInvoiceSession = $this->invoiceService->getTotalInvoiceSession($invoice->id);
             $total_session_price = $totalInvoiceSession->total_session_value;
             $roomSessionsByInvoice = $activeInvoiceSession->roomSessions;

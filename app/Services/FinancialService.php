@@ -47,7 +47,7 @@ class FinancialService
         return $prepaidBalances;
     }
 
-    public function     getReceivableBalances($account_code, $year, $month)
+    public function getReceivableBalances($account_code, $year, $month)
     {
         $year = Carbon::now()->year;
         $currentMonth = Carbon::now()->month;
