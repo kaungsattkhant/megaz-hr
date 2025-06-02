@@ -177,7 +177,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedQuestionType" class="input-ui !text-black"
-                        data-te-select-filter="true" >
+                        data-te-select-filter="true" @change="typeChange">
                             <option :value="type" v-for="(type, typeIndex) in questionTypeList" :key="typeIndex">
                                 {{ type.name }}
                             </option>
@@ -466,6 +466,7 @@ export default {
             if(this.selectedDepartment){
                 this.roleList = this.selectedDepartment.roles;
             }
+            this.selectedSkillsetList = [];
             // let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             // if (rolesResponse.data) {
             //     this.roleList = rolesResponse.data;
@@ -476,6 +477,13 @@ export default {
             if(response.data){
                 this.skillsetList = response.data.data;
             }
+            this.selectedSkillsetList = [];
+        },
+        typeChange(){
+            this.selectedSkillsetList = [];
+            // if(this.selectedType === 'exam'){
+
+            // }
         },
 
         alertValidationMessage(field) {

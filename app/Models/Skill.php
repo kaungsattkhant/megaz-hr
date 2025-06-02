@@ -29,4 +29,9 @@ class Skill extends Model
     {
         return $this->belongsToMany(Staff::class, 'skill_staff');
     }
+
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class, 'exam_skills');
+    }
 }

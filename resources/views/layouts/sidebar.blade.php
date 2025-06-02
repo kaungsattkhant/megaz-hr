@@ -994,6 +994,18 @@
                                 Exam
                             </a>
                         </li>
+                        <li>
+                            <a href="/interviews" class="flex items-center @yield('interview') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Interview
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/interview/result" class="flex items-center @yield('interview_result') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Interview Result
+                            </a>
+                        </li>
 
 
                 </ul>

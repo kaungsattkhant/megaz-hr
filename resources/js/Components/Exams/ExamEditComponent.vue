@@ -18,8 +18,8 @@
                     Department
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true"
-                        name="" id="" v-model="selectedDepartment" class="input-ui"
+                    <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true" disabled
+                        name="" id="" v-model="selectedDepartment" class="input-ui  cursor-not-allowed"
                         @change="departmentSelectChanged">
                         <option :value="department" v-for="(department, departmentIndex) in departmentList"
                         :key="departmentIndex"> {{ department.name }} </option>
@@ -30,8 +30,8 @@
             <div class="col-span-3 rounded-md mb-8">
                 <label class="label-form mb-3">Roles</label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
-                        name="" id="" v-model="selectedRoles" @change="roleChange()" class="input-ui">
+                    <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true" disabled
+                        name="" id="" v-model="selectedRoles" @change="roleChange()" class="input-ui cursor-not-allowed">
                         <option :value="role" v-for="(role, roleIndex) in roleList"
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
@@ -45,7 +45,7 @@
                     Type
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedType" class="input-ui !text-black"
+                    <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedType" class="input-ui !text-black cursor-not-allowed" disabled
                     data-te-select-filter="true" >
                         <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
                             {{ type.name }}
@@ -215,7 +215,7 @@
                                     {{ question.type }}
                                 </td>
                                 <td class=" px-6 py-3 font-medium relative">
-                                    <input :checked="question.is_active == 1" @change="isActiveToggled(question)"
+                                    <input :checked="question.is_active" @change="isActiveToggled(question)"
                                             class="mt-[0.1rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white before:pointer-events-none before:absolute before:h-3.5 relative mx-3
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:-mt-[0.2875rem] after:h-5 after:-left-1
                                             after:w-5 after:rounded-full after:border-none after:bg-black after:transition-[background-color_0.2s,transform_0.2s]
@@ -242,9 +242,10 @@
                 </div>
             </div>
         </div>
-        <div>
+        <p>{{ test }} </p>
+        <div class="mb-12">
             <button class="add-btn" @click="createBtnClicked">
-                Edit 
+                Edit Exam
             </button>
         </div>
     </div>
@@ -483,8 +484,6 @@ export default {
             selectedQuestionDetail: null,
             selectedAnswerList: [],
 
-
-            
             name: null,
 
             gradeIndex: null,
@@ -608,17 +607,18 @@ export default {
             }
         },
         async deleteSkillset(index,skillset){
-            let response = await deleteApiData({ url: `/api/hr/exam_skills/` + skillset.exam_skill_id, token: this.getToken() });
-            if (response.success) {
-                this.selectedSkillsetList.splice(index, 1);
-            }
-            else {
-                this.$notify({
-                    title: `Input validation`,
-                    text: response.message,
-                    type: "warn"
-                });
-            }
+            // let response = await deleteApiData({ url: `/api/hr/exam_skills/` + skillset.exam_skill_id, token: this.getToken() });
+            // if (response.success) {
+            //     this.selectedSkillsetList.splice(index, 1);
+            // }
+            // else {
+            //     this.$notify({
+            //         title: `Input validation`,
+            //         text: response.message,
+            //         type: "warn"
+            //     });
+            // }
+            this.selectedSkillsetList.splice(index, 1);
         },
 
         btnclickedAddGrade(){
@@ -644,24 +644,26 @@ export default {
             this.gradeDetail = detail;
         },
         async deleteGrade(){
-            if(this.gradeDetail.id){
-                let response = await deleteApiData({ url: `/api/hr/grades/` + this.gradeDetail.id, token: this.getToken() });
-                if (response.success) {
-                    document.getElementById("close_delete_grade_modal").click();
-                    this.selectedGradeList.splice(this.gradeIndex, 1);
-                }
-                else {
-                    this.$notify({
-                        title: `Input validation`,
-                        text: response.message,
-                        type: "warn"
-                    });
-                }
-            }
-            else{
-                document.getElementById("close_delete_grade_modal").click();
-                this.selectedGradeList.splice(this.gradeIndex, 1);
-            }
+            // if(this.gradeDetail.id){
+            //     let response = await deleteApiData({ url: `/api/hr/grades/` + this.gradeDetail.id, token: this.getToken() });
+            //     if (response.success) {
+            //         document.getElementById("close_delete_grade_modal").click();
+            //         this.selectedGradeList.splice(this.gradeIndex, 1);
+            //     }
+            //     else {
+            //         this.$notify({
+            //             title: `Input validation`,
+            //             text: response.message,
+            //             type: "warn"
+            //         });
+            //     }
+            // }
+            // else{
+            //     document.getElementById("close_delete_grade_modal").click();
+            //     this.selectedGradeList.splice(this.gradeIndex, 1);
+            // }
+            document.getElementById("close_delete_grade_modal").click();
+            this.selectedGradeList.splice(this.gradeIndex, 1);
         },
         btnclickedAddQuestion(){
             if(!this.question){
@@ -677,7 +679,7 @@ export default {
                     question: this.question,
                     type: this.selectedQuestionType,
                     answers: [],
-                    is_active: 1,
+                    is_active: true,
                 });
                 this.question = null;
                 this.selectedQuestionType = null;
@@ -689,24 +691,26 @@ export default {
         },
 
         async deleteQuestion(){
-            if(this.questionDetail){
-                let response = await deleteApiData({ url: `/api/hr/exam_questions/` + this.questionDetail.id, token: this.getToken() });
-                if (response.success) {
-                    document.getElementById("close_delete_question_modal").click();
-                    this.selectedQuestionList.splice(this.questionIndex, 1);
-                }
-                else {
-                    this.$notify({
-                        title: `Input validation`,
-                        text: response.message,
-                        type: "warn"
-                    });
-                }
-            }
-            else{
-                document.getElementById("close_delete_question_modal").click();
-                this.selectedQuestionList.splice(this.questionIndex, 1);
-            }
+            // if(this.questionDetail){
+            //     let response = await deleteApiData({ url: `/api/hr/exam_questions/` + this.questionDetail.id, token: this.getToken() });
+            //     if (response.success) {
+            //         document.getElementById("close_delete_question_modal").click();
+            //         this.selectedQuestionList.splice(this.questionIndex, 1);
+            //     }
+            //     else {
+            //         this.$notify({
+            //             title: `Input validation`,
+            //             text: response.message,
+            //             type: "warn"
+            //         });
+            //     }
+            // }
+            // else{
+            //     document.getElementById("close_delete_question_modal").click();
+            //     this.selectedQuestionList.splice(this.questionIndex, 1);
+            // }
+            document.getElementById("close_delete_question_modal").click();
+            this.selectedQuestionList.splice(this.questionIndex, 1);
         },
         addAnswerBtnClicked(question,index){
             this.selectedQuestionIndex = index;
@@ -734,12 +738,28 @@ export default {
         isActiveToggled(question) {
             let index = this.selectedQuestionList.findIndex(item => item == question);
             if (index != -1) {
-                if (this.selectedQuestionList[index].is_active == 1) {
-                    this.selectedQuestionList[index].is_active = 0;
+                if(question.id){
+                    let url = `/api/hr/toggle/exam_questions/` + question.id;
+                    let formData = new FormData();
+                    let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+                    if (response) {
+                        if (this.selectedQuestionList[index].is_active === true) {
+                            this.selectedQuestionList[index].is_active = false;
+                        }
+                        else {
+                            this.selectedQuestionList[index].is_active = true;
+                        }
+                    }
                 }
-                else {
-                    this.selectedQuestionList[index].is_active = 1;
+                else{
+                    if (this.selectedQuestionList[index].is_active === true) {
+                        this.selectedQuestionList[index].is_active = false;
+                    }
+                    else {
+                        this.selectedQuestionList[index].is_active = true;
+                    }
                 }
+                
 
                 // let url = `/api/is_active`;
                 // let formData = new FormData();

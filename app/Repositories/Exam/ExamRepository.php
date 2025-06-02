@@ -4,6 +4,7 @@ namespace App\Repositories\Exam;
 
 use App\Models\Exam;
 use App\Models\Grade;
+use App\Models\Skill;
 use App\Models\Answer;
 use App\Models\ExamSkill;
 use App\Models\ExamQuestion;
@@ -50,10 +51,15 @@ class ExamRepository implements ExamRepositoryInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for Exam Skills.', 400);
         }
-        foreach ($skills as $skill) {
-          $exam->examSkills()->create([
-            'skill_id' => $skill,
-          ]);
+
+        foreach ($skills as $skillId) {
+          $skill = Skill::find($skillId);
+          if (!$skill || $skill->role_id != $exam->role_id) {
+            return ResponseMessage('Skill does not match the exam role_id.', 400);
+          }
+        }
+        if (is_array($skills)) {
+          $exam->skills()->sync($skills);
         }
       }
 
@@ -129,11 +135,14 @@ class ExamRepository implements ExamRepositoryInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for Exam Skills.', 400);
         }
-        foreach ($skills as $skill) {
-          $exam->examSkills()->updateOrCreate(
-            ['skill_id' => $skill],
-            ['skill_id' => $skill]
-          );
+        foreach ($skills as $skillId) {
+          $skill = Skill::find($skillId);
+          if (!$skill || $skill->role_id != $exam->role_id) {
+            return ResponseMessage('Skill does not match the exam role_id.', 400);
+          }
+        }
+        if (is_array($skills)) {
+          $exam->skills()->sync($skills);
         }
       }
       if (isset($data['grades'])) {
@@ -141,6 +150,8 @@ class ExamRepository implements ExamRepositoryInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for grades.', 400);
         }
+        $gradeIds = array_column($grades, 'id');
+        $exam->grades()->whereNotIn('id', $gradeIds)->delete();
         foreach ($grades as $grade) {
           if (isset($grade['id'])) {
             $exam->grades()->updateOrCreate(
@@ -166,6 +177,11 @@ class ExamRepository implements ExamRepositoryInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for Exam Questions.', 400);
         }
+        $incomingQuestionIds = array_column($exam_questions, 'id');
+        $exam->examQuestions()->whereNotIn('id', $incomingQuestionIds)->each(function ($question) {
+          $question->answers()->delete();
+          $question->delete();
+        });
         foreach ($exam_questions as $question) {
           $examQuestion = $exam->examQuestions()->updateOrCreate(
             [
@@ -178,6 +194,8 @@ class ExamRepository implements ExamRepositoryInterface
             ]
           );
           if (isset($question['answers'])) {
+            $incomingAnswerIds = array_column($question['answers'], 'id');
+            $examQuestion->answers()->whereNotIn('id', $incomingAnswerIds)->delete();
             foreach ($question['answers'] as $answer) {
               $examQuestion->answers()->updateOrCreate(
                 [
