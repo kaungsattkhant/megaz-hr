@@ -197,10 +197,10 @@
                                 <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Question Name
                                 </th>
-                                <th scope="col" class=" pr-6 pl-2 py-4 ">
+                                <th scope="col" class=" pr-6 pl-2 py-4 whitespace-nowrap">
                                     Question Type
                                 </th>
-                                <th scope="col" class=" px-6 py-4 ">
+                                <th scope="col" class=" px-6 py-4 whitespace-nowrap">
                                     Action
                                 </th>
                             </tr>
@@ -210,10 +210,10 @@
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ question.question }}
                                 </td>
-                                <td class=" pr-6 pl-2 py-3 font-medium ">
+                                <td class=" pr-6 pl-2 py-3 font-medium whitespace-nowrap">
                                     {{ question.type }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium relative">
+                                <td class=" px-6 py-3 font-medium relative whitespace-nowrap">
                                     <input :checked="question.is_active == 1" @change="isActiveToggled(question)"
                                             class="mt-[0.1rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white before:pointer-events-none before:absolute before:h-3.5 relative mx-3
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:-mt-[0.2875rem] after:h-5 after:-left-1
