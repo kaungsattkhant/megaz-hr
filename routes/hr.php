@@ -5,6 +5,7 @@ use App\Http\Controllers\API\CvController;
 use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
+use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
@@ -105,6 +106,12 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/interviews/{id}', 'getInterviewById');
     Route::post('/interviews', 'storeInterview');
     Route::get('/interviews-results', 'getInterviewResults');
+  });
+  Route::prefix('hr')->controller(LocationController::class)->group(function () {
+    Route::get('/locations', 'getAllLocations');
+    Route::post('/locations', 'createLocation');
+    Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
+    Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

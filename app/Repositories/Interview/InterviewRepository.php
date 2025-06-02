@@ -40,6 +40,13 @@ class InterviewRepository implements InterviewRepositoryInterface
     DB::beginTransaction();
     try {
       $data['created_by'] = UserData()->id;
+      $existInterviews = Interview::where('staff_id', $data['staff_id'])
+        ->where('exam_id', $data['exam_id'])
+        ->exists();
+      if ($existInterviews) {
+        return ResponseMessage('Staff already took this exam. Retake is not allowed.', 400);
+      }
+
       $interview = Interview::create($data);
       if (isset($data['interview_answers'])) {
         $interviewAnswers = json_decode($data['interview_answers'], true);
@@ -76,49 +83,84 @@ class InterviewRepository implements InterviewRepositoryInterface
       throw $e;
     }
   }
+
   public function getInterviewResults($request)
   {
-    $interviews = Interview::with(['staff.department', 'staff.roles', 'exam', 'interviewAnswers.examQuestion', 'interviewAnswers.answer', 'customQuestions'])
+    $query = DB::table('interviews')
+      ->select([
+        'staff.id as staff_id',
+        'staff.name',
+        'staff.department_id',
+        'departments.name as department_name',
+        DB::raw('
+            GROUP_CONCAT(DISTINCT staff_roles.role_id) as role_ids
+        '),
+        DB::raw('
+            GROUP_CONCAT(DISTINCT roles.name) as role_names
+        '),
+        DB::raw('count(interviews.id) as interview_count'),
+        // Total mark for all interviews (custom questions +  answers)
+        DB::raw('
+                COALESCE(SUM(
+                    (SELECT COALESCE(SUM(a.mark),0) FROM interview_answers ia
+                    JOIN answers a ON ia.answer_id = a.id
+                    JOIN exam_questions eq ON ia.exam_question_id = eq.id
+                    WHERE ia.interview_id = interviews.id
+                    ) +
+                    (SELECT COALESCE(SUM(cq.mark),0) FROM custom_questions cq
+                    WHERE cq.interview_id = interviews.id
+                    )
+                ),0)
+                as total_mark
+            '),
+        // EQ total
+        DB::raw('
+                COALESCE(SUM(
+                    (SELECT COALESCE(SUM(a.mark),0) FROM interview_answers ia
+                    JOIN answers a ON ia.answer_id = a.id
+                    JOIN exam_questions eq ON ia.exam_question_id = eq.id
+                    WHERE ia.interview_id = interviews.id AND eq.type = "EQ"
+                    ) +
+                    (SELECT COALESCE(SUM(cq.mark),0) FROM custom_questions cq
+                    WHERE cq.interview_id = interviews.id AND cq.type = "EQ"
+                    )
+                ),0)
+                as eq_mark
+            '),
+        // IT total
+        DB::raw('
+                COALESCE(SUM(
+                    (SELECT COALESCE(SUM(a.mark),0) FROM interview_answers ia
+                    JOIN answers a ON ia.answer_id = a.id
+                    JOIN exam_questions eq ON ia.exam_question_id = eq.id
+                    WHERE ia.interview_id = interviews.id AND eq.type = "IT"
+                    ) +
+                    (SELECT COALESCE(SUM(cq.mark),0) FROM custom_questions cq
+                    WHERE cq.interview_id = interviews.id AND cq.type = "IT"
+                    )
+                ),0)
+                as it_mark
+            ')
+      ])
+      ->join('staff', 'interviews.staff_id', '=', 'staff.id')
+      ->leftJoin('departments', 'staff.department_id', '=', 'departments.id')
+      ->leftJoin('role_staff as staff_roles', 'staff.id', '=', 'staff_roles.staff_id')
+      ->leftJoin('roles', 'staff_roles.role_id', '=', 'roles.id')
+      // add filter conditions
       ->when($request->has('exam_id'), function ($query) use ($request) {
-        $query->where('exam_id', $request->exam_id);
+        $query->where('interviews.exam_id', $request->exam_id);
       })
       ->when($request->has('staff_id'), function ($query) use ($request) {
-        $query->where('staff_id', $request->staff_id);
+        $query->where('interviews.staff_id', $request->staff_id);
       })
       ->when($request->has('role_id'), function ($query) use ($request) {
-        $query->whereHas('staff.roles', function ($roleQuery) use ($request) {
-          $roleQuery->where('id', $request->role_id);
-        });
+        $query->where('staff_roles.role_id', $request->role_id);
       })
       ->when($request->has('department_id'), function ($query) use ($request) {
-        $query->whereHas('staff.department', function ($deptQuery) use ($request) {
-          $deptQuery->where('id', $request->department_id);
-        });
+        $query->where('staff.department_id', $request->department_id);
       })
-      ->orderBy('created_at', 'desc')
-      ->paginate(config('common.list_count'));
-    $interviews->getCollection()->transform(function ($interview) {
-      $marksByType = [];
-
-      $interviewAnswersGrouped = $interview->interviewAnswers->groupBy(function ($interviewAnswer) {
-        return $interviewAnswer->examQuestion->type;
-      });
-      foreach ($interviewAnswersGrouped as $type => $answers) {
-        $typeTotal = $answers->sum(function ($interviewAnswer) {
-          return $interviewAnswer->answer->mark;
-        });
-        $marksByType[$type] = ($marksByType[$type] ?? 0) + $typeTotal;
-      }
-      $customQuestionsGrouped = $interview->customQuestions->groupBy('type');
-      foreach ($customQuestionsGrouped as $type => $questions) {
-        $typeTotal = $questions->sum('mark');
-        $marksByType[$type] = ($marksByType[$type] ?? 0) + $typeTotal;
-      }
-      $totalMark = array_sum($marksByType);
-      $interview->marks_by_type = $marksByType;
-      $interview->total_mark = $totalMark;
-      return $interview;
-    });
-    return $interviews;
+      ->groupBy('staff.id', 'staff.name', 'staff.department_id', 'departments.name')
+      ->orderByDesc('interview_count');
+    return $query->paginate(config('common.list_count', 20));
   }
 }
