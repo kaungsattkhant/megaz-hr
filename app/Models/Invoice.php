@@ -45,6 +45,7 @@ class Invoice extends Model
         'total_discount',
         'total_service_value',
         'total_accessory_value',
+        'total_service_value',
     ];
 
     public function package()

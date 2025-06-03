@@ -213,6 +213,7 @@ class OrderService
             $cancelledMenu = array_filter($data['menuArray'], function ($menu) {
                 return isset($menu['is_package']) && in_array($menu['is_package'], [-1]);
             });
+            $detaultQuantity=1;
             foreach ($filteredMenu as $menuData) {
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
@@ -220,6 +221,7 @@ class OrderService
                 if (!isset($menuData['cooking_area_id'])) {
                     ResponseMessage('Cooking Area  is required', 419);
                 } elseif (isset($menuData['cooking_area_id']) && ($menuData['cooking_area_id'] == null || $menuData['cooking_area_id'] == "null")) {
+                
                     ResponseMessage('Cooking Area  is required', 419);
                 }
 
@@ -276,7 +278,6 @@ class OrderService
                         $totalDiscount += $discountAmount;
                     }
                 }
-                // dd($order);
                 if ($order) {
                     // $order->total_quantity += $menuData['quantity'];
                     // $order->total_discount_price += $discountAmount; // update total discount only for this order
@@ -287,7 +288,13 @@ class OrderService
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if (($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') || ($invoice->invoice_type == 'package' && !$menuData['is_package']) ) {
+                    if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') ) {
+                        $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
+                    if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
+                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     // }
@@ -296,16 +303,24 @@ class OrderService
                         ->first();
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
-                    $menuData['price'] = $menuData['original_price'];
+                    $menuData['quantity'] = $defaultQuantity;
+                    // $menuData['price'] = $menuData['original_price'];
                     $menuData['status'] = 'pos_confirmed';
                     $menuData['area_id'] = $cookingAreaId;
-                    $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                    $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                        ? 0
+                        : ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                    $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                        ? 0
+                        : $menuData['original_price']; //after
+                    // $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
                     $menuData['discount_value'] = $defaultDiscountAmont;
                     // $order_items = OrderItem::create($menuData);
                     // $orderItems = OrderItem::find($order_items->id);
                     // $orderItems->menu = $orderItems->menu;
                     // $orderItemsArray[] = $orderItems;
                 } else {
+                    // dd($menuData);
                     $orderData['invoice_id'] = $invoiceId;
                     $orderData['date'] = CurrentTime();
                     $orderData['total'] = (isset($menuData['is_package']) && $menuData['is_package'])
@@ -322,7 +337,7 @@ class OrderService
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if ($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') {
+                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     $menuData['order_id'] = $order->id;
@@ -353,6 +368,7 @@ class OrderService
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
+                    $menuData['quantity']=$defaultQuantity;
                     $order_item = OrderItem::create($menuData);
                     $insertData[] = $order_item;
                     if ($order_item->is_foc == 1) {
@@ -363,13 +379,16 @@ class OrderService
                     array_push($orderItemsArray, $order_item);
                 }
 
+
             }
             if (count($cancelledMenu) > 0) {
                 foreach ($cancelledMenu as $cancelData) {
                     $invoice = $this->updateOrderItemAmountToInvoice('subtract', $invoice, $cancelData['original_price'], $cancelData['quantity'], $discount = 0);
                 }
             }
-            broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
+            // temp command for checklist
+            // broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
+
             // broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
             $order->foc_total += $focTotal;
             $order->save();
@@ -586,10 +605,10 @@ class OrderService
     public function updateOrderItemAmountToOrder($action, $orderModel, $originalPrice, $quantity, $discountAmount)
     {
         if ($action == 'add') {
-            $orderModel->total_quantity += $quantity;
-            $orderModel->total_discount_price += $discountAmount;
-            $orderModel->total += $originalPrice * $quantity;
-            $orderModel->order_sub_total += ($originalPrice * $quantity) - $discountAmount;
+            $orderModel->total_quantity =$orderModel->total_quantity+ $quantity;
+            $orderModel->total_discount_price = $orderModel->total_discount_price+ $discountAmount;
+            $orderModel->total = $orderModel->total+ $originalPrice * $quantity;
+            $orderModel->order_sub_total = $orderModel->order_sub_total+ ( ($originalPrice * $quantity) - $discountAmount);
         } else if ($action == 'subtract') {
             $orderModel->total_quantity -= $quantity;
             $orderModel->total_discount_price -= $discountAmount;
@@ -623,6 +642,14 @@ class OrderService
         $invoiceModel->save();
         return $invoiceModel;
 
+    }
+
+    public function updateServiceAmountToInvoice($invoice,$serviceValue){
+        $invoice->total+=$serviceValue;
+        $invoice->sub_total+=$serviceValue;
+        $invoice->total_service_value+=$serviceValue;
+        $invoice->save();
+        return $invoice;
     }
 
     public function createAccessorty($invoice, $accessories)
