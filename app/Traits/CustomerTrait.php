@@ -56,6 +56,7 @@ trait CustomerTrait
                 DB::raw('COALESCE(SUM(CASE WHEN type = "withdrawal" THEN amount ELSE 0 END), 0) as total_withdrawal'),
                 DB::raw('COALESCE(SUM(CASE WHEN type = "deposit" THEN amount ELSE 0 END) - SUM(CASE WHEN type = "withdrawal" THEN amount ELSE 0 END), 0) as balance')
             )
+            ->where('is_cashier_confirmed',1)
             ->where('customer_id', $customerId)
             ->first();
         return $depositBalances->balance;

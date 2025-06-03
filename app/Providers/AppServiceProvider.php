@@ -57,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
             'training' => 'App\Models\Training',
             'orgNew' => 'App\Models\OrgNew',
             'warning' => 'App\Models\Warning',
+            'customer_deposit'=>'App\Models\CustomerDeposit'
         ]);
     }
 }
