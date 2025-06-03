@@ -979,6 +979,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
         $customer = $invoice->customer;
         $paidAmount = $request->paid_amount;
+        $entity=$invoice->entity;
         $authUser = UserData();
         $depositBalance = $this->getCustomerDepositBalance($customer->id);
         try {
@@ -1023,6 +1024,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->account_id,
                     'cash_account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->cash_account_id,
                     'customer_id' => $customer->id,
+                    'is_cashier_confirmed'=>1,
                 ]);
                 $debitDepositLeder = (new StoreTransactionLedger())->storeLedger([
                     'value' => $withdrawalAmt,
@@ -1131,55 +1133,61 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             if ($invoice->order) {
+
+                if(!$entity){
+                    ResponseMessage('Invoice Entity not found',419);
+                }
                 $RtAreaTypeId = AreaType::where('type', 'bar_and_restaurant')->first()->id;
                 $KtvAreaTypeId = AreaType::where('type', 'ktv')->first()->id;
 
-                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $KtvAreaTypeId);
-                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], $KtvAreaTypeId);
-
-                if (($foodMenusKTV)->count() > 0) {
-                    $foodTotal = $foodMenusKTV->sum('total_price');
-                    $ledgerTransactionWriter->storeLedger([
-                        'value' => $foodTotal,
-                        'action' => 'credit',
-                        'account_id' => $accountFetcher->getAccountByCode('5-0101')->id, // Income - Food (KTV)
-                    ], $transaction->id);
+                if($entity->entity_type=='room'){
+                    $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $KtvAreaTypeId);
+                    $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], $KtvAreaTypeId);
+    
+                    if (($foodMenusKTV)->count() > 0) {
+                        $foodTotal = $foodMenusKTV->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $foodTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0101')->id, // Income - Food (KTV)
+                        ], $transaction->id);
+                    }
+                    if (($beverageMenusKTV->count() > 0)) {
+                        $beverageTotal = $beverageMenusKTV->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $beverageTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0102')->id, // Income - Beverages (KTV)
+                        ], $transaction->id);
+                    }
                 }
-                if (($beverageMenusKTV->count() > 0)) {
-                    $beverageTotal = $beverageMenusKTV->sum('total_price');
-                    $ledgerTransactionWriter->storeLedger([
-                        'value' => $beverageTotal,
-                        'action' => 'credit',
-                        'account_id' => $accountFetcher->getAccountByCode('5-0102')->id, // Income - Beverages (KTV)
-                    ], $transaction->id);
-                }
-
-                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $RtAreaTypeId);
-                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $RtAreaTypeId);
-
-                if (($foodMenusRT)->count() > 0) {
-                    $foodTotal = $foodMenusRT->sum('total_price');
-                    $ledgerTransactionWriter->storeLedger([
-                        'value' => $foodTotal,
-                        'action' => 'credit',
-                        'account_id' => $accountFetcher->getAccountByCode('5-0001')->id, // Income - Food (RT)
-                    ], $transaction->id);
-                }
-                if (($beverageMenusRT->count() > 0)) {
-                    $beverageTotal = $beverageMenusRT->sum('total_price');
-                    $ledgerTransactionWriter->storeLedger([
-                        'value' => $beverageTotal,
-                        'action' => 'credit',
-                        'account_id' => $accountFetcher->getAccountByCode('5-0002')->id, // Income - Beverages (RT)
-                    ], $transaction->id);
+                if($entity->entity_type=='table'){
+                    $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $RtAreaTypeId);
+                    $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $RtAreaTypeId);
+    
+                    if (($foodMenusRT)->count() > 0) {
+                        $foodTotal = $foodMenusRT->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $foodTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0001')->id, // Income - Food (RT)
+                        ], $transaction->id);
+                    }
+                    if (($beverageMenusRT->count() > 0)) {
+                        $beverageTotal = $beverageMenusRT->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $beverageTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0002')->id, // Income - Beverages (RT)
+                        ], $transaction->id);
+                    }
                 }
             }
 
             $invoice->paid_amount = $request->paid_amount;
             $invoice->payment_status = 'paid';
             $invoice->payment_type = $request->payment_type;
-            $invoice->save();
-
+            $invoice->save();   
             DB::commit();
 
             ResponseData($invoice);
@@ -1533,7 +1541,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
         $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge']) - $data['total_discount'];
         $data['total'] = $data['total'] + $data['total_discount'];
-        $data['payment_status'] = 'received';
+        $data['payment_status'] = 'checkout';
         $data['complete_date'] = CurrentTime();
         $invoice->update($data);
         return $invoice;
