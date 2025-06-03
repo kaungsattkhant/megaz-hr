@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Resignations
+            Locations
         </p>
     </div>
     <div class="mt-4 bg-white">
