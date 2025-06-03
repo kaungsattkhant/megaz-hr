@@ -87,14 +87,14 @@
                     </a>
                 </li>
 
-                <li>
+                <!-- <li>
                     <a href="/pos_order_items" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('posOrder')">
                         <i class="fas fa-burger-soda mb-1.5 text-2xl"></i>
                         <span class="">
                             Pos Order
                         </span>
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <a href="/pos/ar" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('ar')">
                         <i class="fas fa-users mb-1.5 text-2xl"></i>
