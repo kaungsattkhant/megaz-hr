@@ -62,6 +62,12 @@ class LocationRepository implements LocationRepositoryInterface
   {
     DB::beginTransaction();
     try {
+      $existStaff = Place::where('staff_id', $data['staff_id'])
+        ->where('id', '!=', $placeId)
+        ->exists();
+      if ($existStaff) {
+        return ResponseMessage('This staff is already assigned to another place.', 400);
+      }
       $place = Place::findOrFail($placeId);
       $place->update(['staff_id' => $data['staff_id']]);
       DB::commit();
