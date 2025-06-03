@@ -172,7 +172,7 @@
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                 </div>
 
-                <div class="mb-6 col-span-3 pb-6 rounded-md">
+                <div class="mb-6 col-span-3 pb-0 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Type
                     </label>
@@ -198,10 +198,10 @@
                                 <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Question Name
                                 </th>
-                                <th scope="col" class=" pr-6 pl-2 py-4 ">
+                                <th scope="col" class=" pr-6 pl-2 py-4 whitespace-nowrap ">
                                     Question Type
                                 </th>
-                                <th scope="col" class=" px-6 py-4 ">
+                                <th scope="col" class=" px-6 py-4 whitespace-nowrap ">
                                     Action
                                 </th>
                             </tr>
@@ -211,10 +211,10 @@
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ question.question }}
                                 </td>
-                                <td class=" pr-6 pl-2 py-3 font-medium ">
+                                <td class=" pr-6 pl-2 py-3 font-medium whitespace-nowrap ">
                                     {{ question.type }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium relative">
+                                <td class=" px-6 py-3 font-medium relative whitespace-nowrap">
                                     <input :checked="question.is_active" @change="isActiveToggled(question)"
                                             class="mt-[0.1rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white before:pointer-events-none before:absolute before:h-3.5 relative mx-3
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:-mt-[0.2875rem] after:h-5 after:-left-1
@@ -268,7 +268,7 @@
                             id="add_question_modalLabel">
                             Question
                         </h5>
-                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_add_answer_modal"
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-4 w-4">
@@ -343,7 +343,7 @@
                             Cancel
                         </button>
                         <button type="button" @click="addAnswerToQuestion()"
-                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -725,6 +725,14 @@ export default {
             }
         },
         btnClickedAddAnswer(){
+            if(!this.answer){
+                this.alertValidationMessage(`Answer`);
+                return 1;
+            }
+            if(!this.answerMark){
+                this.alertValidationMessage(`Mark`);
+                return 1;
+            }
             this.selectedAnswerList.push({
                 answer: this.answer,
                 mark: this.answerMark,
@@ -733,7 +741,12 @@ export default {
             this.answerMark = null;
         },
         addAnswerToQuestion(){
-            this.selectedQuestionList[this.selectedQuestionIndex].answers = this.selectedAnswerList
+            if(this.selectedAnswerList.length < 1){
+                this.alertValidationMessage(`Answers`);
+                return 1;
+            }
+            this.selectedQuestionList[this.selectedQuestionIndex].answers = this.selectedAnswerList;
+            document.getElementById("close_add_answer_modal").click();
         },
         isActiveToggled(question) {
             let index = this.selectedQuestionList.findIndex(item => item == question);
@@ -791,6 +804,11 @@ export default {
             }
             if(this.selectedQuestionList.length < 1){
                 this.alertValidationMessage(`Question`);
+                return 1;
+            }
+            const allAnswered = this.selectedQuestionList.every(q => Array.isArray(q.answers) && q.answers.length > 0);;
+            if (!allAnswered) {
+                this.alertValidationMessage(`Answer`);
                 return 1;
             }
 

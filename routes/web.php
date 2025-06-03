@@ -411,6 +411,8 @@ Route::view('/interviews', 'interviews.index');
 Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
 // Route::view('/interviews/create', 'interviews.create')->name('interviews.create');
 Route::view('/interview/result', 'interviews.result');
+Route::view('/locations', 'locations.index');
+Route::view('/location/{id}/floor/{floorId}/detail', 'locations.detail');
 
 // =======
 // Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');

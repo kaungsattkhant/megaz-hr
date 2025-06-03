@@ -23,7 +23,7 @@
                     Question
                 </label>
                 <textarea name="" v-model="customQuestion" class="input-ui w-full bg-transparent rounded-lg" id="" cols="30"
-                    rows="5"></textarea>
+                    rows="1"></textarea>
                 <!-- <input type="text" v-model="customQuestion" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
@@ -57,36 +57,76 @@
             </div>
         </div>
         
-        <div class=" mb-6 container-card py-4 px-7">
-            <div class="mb-8" v-for="(question,questionIndex) in questionList">
-                <div class="  mb-4">
-                    <p class=" text-lg text-black">
-                        {{ question[0].type }}
-                    </p>
-                </div>
-                <div class="contents" v-for="(q,qIndex) in question">
+        <div class=" mb-6 container-card pb-0.5 pt-8 px-7">
+            <div class="mb-12" v-for="(question,questionIndex) in questionList">
+                <div v-if="question.length > 0">
                     <div class="  mb-6">
-                        <p class=" text-base text-black">
-                            {{ q.question }}
+                        <p class=" text-xl font-semibold text-black">
+                            {{ question[0].type }}
                         </p>
                     </div>
-                    <div class="flex flex-wrap gap-y-4 gap-x-8 mb-8">
-                        <label
-                          class="inline-flex flex-grow-0 items-start space-x-2"
-                          v-for="(answer, aIndex) in q.answers"
-                          :key="aIndex"
-                        >
-                          <input
-                            type="radio"
-                            :name="'question-' + q.id"
-                            :value="answer"
-                            v-model="q.selected"
-                            :checked="answer.checked"
-                            @change="handleRadioChange(answer,q)"
-                            class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none mt-1"
-                          />
-                          <p class="text-gray-600">{{ answer.answer }}</p>
-                        </label>
+                    <div class="contents" v-for="(q,qIndex) in question">
+                        <div v-if="!q.is_custom" class="mb-8 pl-2">
+                            <div class="  mb-3">
+                                <p class=" text-base text-black">
+                                    {{ q.question }}
+                                </p>
+                            </div>
+                            <div class="flex flex-wrap gap-y-4 gap-x-8 mb-6">
+                                <label
+                                class="inline-flex flex-grow-0 items-start space-x-2"
+                                v-for="(answer, aIndex) in q.answers"
+                                :key="aIndex"
+                                >
+                                <input
+                                    type="radio"
+                                    :name="'question-' + q.id"
+                                    :value="answer"
+                                    v-model="q.selected"
+                                    :checked="answer.checked"
+                                    @change="handleRadioChange(answer,q)"
+                                    class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none mt-0.5"
+                                />
+                                <p class="text-gray-600">{{ answer.answer }}</p>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="flex gap-x-4 mb-5 pl-2" v-if="q.is_custom">
+                            <div class=" min-w-[30%] max-w-[80%]"> 
+                                <p  class="text-gray-800">{{ q.question }}</p>
+                            </div>
+                            <div class=" w-[10%] text-center">
+                                <p>{{ q.mark }}</p>
+                            </div>
+                            <div class="w-[10%]">
+                                <button  class="mx-4" @click="deleteItem(qIndex,question,q)">
+                                    <i class="fal fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="contents" v-else>
+                    <div class="  mb-6">
+                        <p class=" text-lg text-black">
+                            {{ question.type_name }}
+                        </p>
+                    </div>
+                    
+                    <div class="flex gap-x-4 mb-5 pl-2" v-for="(q,cqIndex) in question.question">
+                        <div class=" min-w-[30%] max-w-[80%]"> 
+                            <p  class="text-gray-600">{{ q.question }}</p>
+                        </div>
+                        <div class=" w-[10%] text-center">
+                            <p>{{ q.mark }}</p>
+                        </div>
+                        <div class="w-[10%]">
+                            <button  class="mx-4" @click="deleteCustomQuestion(questionIndex,cqIndex,q)">
+                                <i class="fal fa-times"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,7 +153,7 @@
                     </div>
                 </tbody>
             </table> -->
-            <div class="contents" v-for="(question,questionIndex) in customQuestionList">
+            <!-- <div class="contents" v-for="(question,questionIndex) in customQuestionList">
                 <div class="  mb-4">
                     <p class=" text-lg text-black">
                         {{ question.type }}
@@ -133,23 +173,13 @@
                         </button>
                     </div>
                 </div>
-            </div>
-
-
-
+            </div> -->
         </div>
-        
         <div class="px-4 mb-8">
             <button class="add-btn" @click="btnClickedCreateInterview">
                 Done
             </button>
         </div>
-
-
-
-
-
-        
     </div>
 </template>
 
@@ -181,6 +211,7 @@ export default {
             detail: null,
             total_mark: 0,
             total_custom_mark: 0,
+            test:null,
         };
     },
 
@@ -217,17 +248,75 @@ export default {
                 this.alertValidationMessage(`Mark`);
                 return 1;
             }
-            this.customQuestionList.push({
-                question: this.customQuestion,
-                type: this.selectedType.value,
-                mark: this.customMark
-            })
+            let isSameType = false;
+            let isSameCustom = false;
+            let customIndex = null;
+            this.questionList.forEach((question,index) => {
+                if(question.length>0 && question[0].type === this.selectedType.value){
+                    console.log( '1 ' + question[0].type)
+                    question.push({
+                        question: this.customQuestion,
+                        type: this.selectedType.value,
+                        mark: this.customMark,
+                        is_custom: true,
+                    })
+                    isSameType = true;
+                }
+                if(question.type_name){
+                    isSameCustom = true;
+                    customIndex = index
+                }
+                
+            });
+            if(!isSameType && !isSameCustom){
+                this.questionList.push({
+                    type_name: this.selectedType.value,
+                    is_custom: true,
+                    question: [
+                        {
+                        question: this.customQuestion,
+                        type: this.selectedType.value,
+                        mark: this.customMark
+                    }
+                    ]
+                })
+            };
+            if(!isSameType && isSameCustom){
+                this.questionList[customIndex].question.push({
+                    question: this.customQuestion,
+                    type: this.selectedType.value,
+                    mark: this.customMark
+                })
+            };
+            // this.customQuestionList.push({
+            //     question: this.customQuestion,
+            //     type: this.selectedType.value,
+            //     mark: this.customMark
+            // })
             this.total_custom_mark += this.customMark
             this.customQuestion = null;
             this.selectedType = null;
             this.customMark = 0;
         },
-       
+        deleteItem(index,list,item){
+            this.total_custom_mark -= item.mark
+            if(index != -1){
+                list.splice(index, 1);
+            }
+        },
+        deleteCustomQuestion(questionIndex,customIndex,item){
+            this.total_custom_mark -= item.mark
+            if(questionIndex != -1){
+                if(this.questionList[questionIndex].question.length < 2){
+                    this.questionList.splice(questionIndex, 1);
+                }
+                else{
+                    if(customIndex != -1){
+                        this.questionList[questionIndex].question.splice(customIndex, 1);
+                    }
+                }
+            }
+        },
         
         
 
@@ -241,12 +330,21 @@ export default {
             });
         },
         btnClickedCreateInterview() {
-            // this.roleIds = [];
-
-            // if(!this.questionList){
-            //     this.alertValidationMessage(`Answer`);
-            //     return 1;
-            // }
+            let isValid = true;
+            this.questionList.forEach(question => {
+                if(Array.isArray(question)){
+                    question.forEach(q => {
+                        if (!q.is_custom && (!q.selected || !q.selected.id)) {
+                            isValid = false;
+                        }
+                    });
+                }
+            })
+            console.log(isValid)
+            if(!isValid){
+                this.alertValidationMessage(`Answer`);
+                return 1;
+            }
             
             this.createInterview();
         },
@@ -255,14 +353,35 @@ export default {
             // formData.append('department_id', this.selectedDepartment.id);
             // formData.append('skills', JSON.stringify(this.selectedSkills));
             let interview_answers = [];
-            if(this.questionList){
+            let custom_questions = [];
+            if(Array.isArray(this.questionList)){
                 this.questionList.forEach((question)=>{
-                    question.forEach(q => {
-                        interview_answers.push({
-                            exam_question_id: q.id,
-                            answer_id: q.answer_id
-                        })
-                    });
+                    if(question.is_custom && Array.isArray(question.question)){
+                        question.question.forEach(cus => {
+                            custom_questions.push({
+                                question: cus.question,
+                                type: cus.type,
+                                mark: cus.mark
+                            })
+                        });
+                    }
+                    else if (Array.isArray(question)){
+                        question.forEach(q => {
+                            if(q.is_custom){
+                                custom_questions.push({
+                                    question: q.question,
+                                    type: q.type,
+                                    mark: q.mark
+                                })
+                            }
+                            else{
+                                interview_answers.push({
+                                    exam_question_id: q.id,
+                                    answer_id: q.answer_id
+                                })
+                            }
+                        });
+                    }
                 });
             }
             let total = 0;
@@ -272,7 +391,7 @@ export default {
             formData.append('exam_id', this.interviewId);
             formData.append('total_mark', total);
             formData.append('interview_answers', JSON.stringify(interview_answers));
-            formData.append('custom_questions', JSON.stringify(this.customQuestionList));
+            formData.append('custom_questions', JSON.stringify(custom_questions));
             let response = await postApiData({ url: '/api/hr/interviews', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/interview/result');

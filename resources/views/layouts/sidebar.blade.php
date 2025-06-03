@@ -1006,6 +1006,12 @@
                                 Interview Result
                             </a>
                         </li>
+                        <li>
+                            <a href="/locations" class="flex items-center @yield('locations') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Locations
+                            </a>
+                        </li>
 
 
                 </ul>

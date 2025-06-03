@@ -76,22 +76,23 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff.name }}
+                                        {{ item.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff.department.name }}
+                                        {{ item.department_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff.roles[0] ? item.staff.roles[0].name : '' }}
+                                        {{ item.role_names }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff.name }}
+                                        {{ item.interview_count }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap">
+                                        {{ item.eq_mark }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ item.staff.name }}
+                                        {{ item.it_mark }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.total_mark }}
