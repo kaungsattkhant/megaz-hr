@@ -2,6 +2,7 @@
     <div>
         <p class=" text-lg font-semibold font-inter">
             Locations
+            
         </p>
     </div>
     <div class="mt-4 bg-white">
