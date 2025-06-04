@@ -134,14 +134,14 @@
             ...mapGetters(['getToken']),
 
             async getAreaList(){
-                const response = await getApiData({ url: '/api/areas' , token: this.getToken() });
+                const response = await getApiData({ url: '/api/sellings_areas' , token: this.getToken() });
                 if(response.data){
                     this.areaList = response.data;
                 }
             },
             async getMenuList()
             {   
-                const response = await getApiData({ url: `/api/menus`, token: this.getToken() });
+                const response = await getApiData({ url: '/api/menus?selling_area_id=' + this.selectedArea.id, token: this.getToken() });
                 if(response.data){
                     this.menuList = response.data;
                 }
