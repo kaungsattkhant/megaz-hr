@@ -8,6 +8,7 @@ use App\Models\SaleTargetMenu;
 use App\Models\TargetPosition;
 use App\Models\TargetMenuResult;
 use App\Models\SaleTargetPosition;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\TargetPositionResult;
 
@@ -58,14 +59,25 @@ class SaleTargetResultAPIController extends Controller
                 ->collapse()
                 ->keyBy('menu_id');
 
-            $soldMenus = TargetMenuResult::whereYear('date_time', $year)
+            // $soldMenus = TargetMenuResult::whereYear('date_time', $year)
+            //     ->whereMonth('date_time', $month)
+            //     ->when($request->area_id, function ($query) use ($request) {
+            //         return $query->where('area_id', $request->area_id);
+            //     })
+            //     ->with('menu')
+            //     ->get()
+            //     ->keyBy('menu_id');
+            $soldMenus = TargetMenuResult::select('menu_id', DB::raw('SUM(quantity) as quantity'))
+                ->whereYear('date_time', $year)
                 ->whereMonth('date_time', $month)
                 ->when($request->area_id, function ($query) use ($request) {
                     return $query->where('area_id', $request->area_id);
                 })
-                ->with('menu')
+                ->groupBy('menu_id')
+                ->with('menu') // optional: if you still want the related menu
                 ->get()
                 ->keyBy('menu_id');
+            // dd($soldMenus);
             $allMenus = $soldMenus->union($targetMenus)->map(function ($menu, $menuId) use ($targetMenus, $soldMenus) {
                 return [
                     'menu' => $soldMenus[$menuId]->menu ?? $targetMenus[$menuId]->menu,
