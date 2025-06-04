@@ -15,7 +15,7 @@ class TargetPosition extends Model
         'sale_target_position_id'
     ];
 
-    public function salteTargetPosition()
+    public function sale_target_position()
     {
         return $this->belongsTo(SaleTargetPosition::class);
 }
