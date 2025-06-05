@@ -12,6 +12,9 @@
                     Name
                 </label>
                 <input type="text" v-model="name" placeholder="Name (Required)" class="input-ui">
+                <div class="mt-1" v-if="nameInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ nameInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
@@ -28,6 +31,9 @@
                         {{ gender.name }}
                     </option>
                 </select>
+                <div class="mt-1" v-if="genderInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ genderInputError }} *</span>
+                </div>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -61,8 +67,10 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Joined Date
                 </label>
-                <input type="date" v-model="joinedDate"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="date" v-model="joinedDate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <div class="mt-1" v-if="joinedDateInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ joinedDateInputError }} *</span>
+                </div>
             </div>
 
             <!-- <div class="col-span-3"></div> -->
@@ -72,6 +80,9 @@
                     Ph Number
                 </label>
                 <input type="tel" v-model="phoneNumber" placeholder="Phone (Required)" class="input-ui">
+                <div class="mt-1" v-if="phoneNumberInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ phoneNumberInputError }} *</span>
+                </div>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -98,6 +109,9 @@
                         {{ department.name }}
                     </option>
                 </select>
+                <div class="mt-1" v-if="departmentInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ departmentInputError }} *</span>
+                </div>
             </div>
 
             <!-- <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -144,6 +158,9 @@
                             </option>
                         </select>
                     </div>
+                    <div class="mt-1" v-if="rolesInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ rolesInputError }} *</span>
+                    </div>
                 </div>
             </div>
 
@@ -188,15 +205,21 @@
                     <multiselect v-model="selectedState" :options="stateList" :close-on-select="true"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select State" label="name"
                         track-by="id" :preselect-first="true" @select="stateSelectChanged(selectedState)"></multiselect>
+                    <div class="mt-1" v-if="stateInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ stateInputError }} *</span>
+                    </div>
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
-                    <label class="label-form mb-3">State</label>
+                    <label class="label-form mb-3">City</label>
                     <multiselect v-model="selectedCity" :options="cityList" :close-on-select="true"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select City" label="name"
                         track-by="id" :preselect-first="true" @select="citySelectChanged(selectedCity)"></multiselect>
+                    <div class="mt-1" v-if="cityInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ cityInputError }} *</span>
+                    </div>
                 </div>
             </div>
 
@@ -242,6 +265,9 @@
                 <textarea name="" v-model="address"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
+                <div class="mt-1" v-if="addressInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ addressInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-6"></div>
 
@@ -492,7 +518,28 @@ export default {
             skillList:[],
             skillIds:[],
             selectedSkills:[],
-            selectedRole:null
+            selectedRole:null,
+
+            inventoryInputError: null,
+            nameInputError: null,
+            dateOfBirthInputError: null,
+            genderInputError: null,
+            nrcInputError: null,
+            phoneNumberInputError: null,
+            passwordInputError: null,
+            joinedDateInputError: null,
+            departmentInputError: null,
+            rolesInputError: null,
+            featuresInputError: null,
+            stateInputError: null,
+            cityInputError: null,
+            addressInputError: null,
+            primaryNameInputError: null,
+            primaryPhoneInputError: null,
+            primaryRelationshipInputError: null,
+            secondaryNameInputError: null,
+            secondaryPhoneInputError: null,
+            secondaryRelationshipInputError: null,
         };
     },
 
@@ -607,19 +654,27 @@ export default {
             // this.selectedInventories = [];
             this.areaList = [];
             this.selectedArea = null;
-            let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
-            if (rolesResponse.data) {
-                this.roleList = rolesResponse.data;
-            }
+            this.roleList = [];
+            this.inventories = [];
+            let rolesResponsePromise = getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+            rolesResponsePromise.then(response=>{
+                if(response.data){
+                    this.roleList = response.data;
+                }
+            });
+            // let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+            // if (rolesResponse.data) {
+            //     this.roleList = rolesResponse.data;
+            // }
             if (this.selectedDepartment.features.length > 0) {
                 this.featureList = this.selectedDepartment.features;
             }
 
             this.areaList = this.selectedDepartment.areas;
 
-            // if(this.selectedDepartment.inventory){
-            //     this.inventories.push(this.selectedDepartment.inventory.inventory);
-            // }
+            if(this.selectedDepartment.inventory){
+                this.inventories.push(this.selectedDepartment.inventory.inventory);
+            }
         },
 
         async getStateList() {
@@ -695,9 +750,24 @@ export default {
             this.featureIds = [];
             this.inventoryIds = [];
 
-            
 
-            // if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchent') && !this.selectedArea) {
+            if(!this.selectedDepartment){
+                this.alertValiationMessage('department');
+                this.departmentInputError = "Department must be selected";
+                return 1;
+            }
+            if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
+                this.alertValiationMessage('inventories');
+                this.inventoryInputError = "Inventory staff must select at least one inventory";
+                return 1;
+            }
+            console.log(this.selectedRole);
+            if(!this.selectedRole){
+                this.alertValiationMessage('role');
+                this.rolesInputError = "At least one role must be selected";
+                return 1;
+            }
+            // if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen') && !this.selectedArea) {
             //     this.alertValiationMessage('area');
             //     return 1;
             // }
@@ -745,6 +815,7 @@ export default {
 
             if (!this.name) {
                 this.alertValiationMessage('name');
+                this.nameInputError = "Name must be filled";
                 return 1;
             }
 
@@ -755,6 +826,7 @@ export default {
 
             if (!this.selectedGender) {
                 this.alertValiationMessage('gender');
+                this.genderInputError = "Gender must be selected";
                 return 1;
             }
 
@@ -765,12 +837,14 @@ export default {
 
             if (!this.phoneNumber) {
                 this.alertValiationMessage('phone number');
+                this.phoneNumberInputError = "Phone number must be filled";
                 return 1;
             }
 
 
             if (!this.joinedDate) {
                 this.alertValiationMessage('joined date');
+                this.joinedDateInputError = "Joined date must be filled";
                 return 1;
             }
 
@@ -781,16 +855,19 @@ export default {
 
             if (!this.state) {
                 this.alertValiationMessage('state');
+                this.stateInputError = "State/Division must be selected";
                 return 1;
             }
 
             if (!this.city) {
                 this.alertValiationMessage('city');
+                this.cityInputError = "City must be selected";
                 return 1;
             }
 
             if (!this.address) {
                 this.alertValiationMessage('address');
+                this.addressInputError = "Address must be filled";
                 return 1;
             }
 
@@ -882,7 +959,7 @@ export default {
             //     });
             // }
 
-            formData.append('roles', this.roleIds);
+            formData.append('roles', this.selectedRole);
 
             formData.append('skills',JSON.stringify(this.skillIds));
 
@@ -934,7 +1011,7 @@ export default {
         this.getDepartmentList();
         this.getStateList();
         this.getStaffDetail();
-        this.getInventoryList();
+        // this.getInventoryList();
     },
 
     mounted() {
