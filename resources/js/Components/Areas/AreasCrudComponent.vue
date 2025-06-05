@@ -70,10 +70,10 @@
                                         {{ area.area_category.name }}
                                     </td>
                                     <td class="whitespace-nowrap ">
-                                        <!-- <button @click="deleteBtnClicked(area.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
+                                        <button @click="editBtnClicked(area)"
+                                            data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-1">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
                                         <input :checked="area.is_active == 1" @change="isActiveToggled(area.id)"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
@@ -153,7 +153,6 @@
                             <div class="mb-4">
                                 <label class="label-form mb-3">Area Category</label>
                                 <multiselect v-model="selectedCategory" :options="categoryList" :close-on-select="true"
-                                    @select="categoryChange"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Area Category"
                                     label="name" track-by="id" :preselect-first="false"></multiselect>
                                 <!-- <div class="mt-2">
@@ -194,6 +193,52 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="edit_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="create_modalLabel">
+                                Edit Area
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_edit_modal"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Area Name
+                                </label>
+                                <input type="text" placeholder="Area Name" v-model="editName" class="input-ui">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button type="button" @click="editAreasBtnClicked"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
 
             <!--Delete Modal -->
             <div data-te-modal-init
@@ -272,6 +317,11 @@ export default {
             selectedType: null,
             selectedCategory: null,
             selectedDepartment: null,
+
+            editName: null,
+            editSelectedType: null,
+            editSelectedCategory: null,
+
             deleteId: null,
 
             currentPage: 0,
@@ -381,6 +431,66 @@ export default {
                 });
             }
         },
+
+
+        editBtnClicked(item){
+            this.selectedType = null;
+            // this.selectedCategory = null;
+            this.editName = item.name;
+            this.editSelectedCategory = this.categoryList.find(cat => cat.id === item.area_category_id);
+            if(this.editSelectedCategory.name === 'Selling Area'){
+                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
+            }
+        },
+        editAreasBtnClicked() {
+            if(!this.name){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(!this.editSelectedCategory){
+                this.alertValidationMessage(`Category`);
+                return 1;
+            }
+            else if(this.editSelectedCategory.name === 'Selling Area' && !this.editSelectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else{
+                this.editArea();
+            }
+        },
+
+        async editArea() {
+            let formData = new FormData();
+            formData.append('name', this.editName);
+            if(this.editSelectedCategory.name === 'Selling Area'){
+                formData.append('area_type_id', this.editSelectedType.id);
+            }
+            formData.append('area_category_id', this.editSelectedCategory.id);
+            // formData.append('department_id', this.selectedDepartment.id);
+            // if(this.isPos = true){
+            //     formData.append('is_pos', 1);
+            // }
+            // else{
+            //     formData.append('is_pos', 0);
+            // }
+            let response = await postApiData({ url: '/api/areas', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getAreasList(1);
+                this.editSelectedType = null;
+                this.editSelectedCategory = null;
+                this.editName = null;
+                document.getElementById('close_edit_modal').click();
+            }
+            else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
+        },
+
+
 
         isActiveToggled(id) {
             let index = this.areaList.findIndex(area => area.id == id);
