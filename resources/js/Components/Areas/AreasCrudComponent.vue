@@ -63,7 +63,6 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
                                     </td>
-
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_type ? area.area_type.name : '' }}
                                     </td>
