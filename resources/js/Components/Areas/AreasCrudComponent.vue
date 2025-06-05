@@ -443,7 +443,7 @@ export default {
             }
         },
         editAreasBtnClicked() {
-            if(!this.name){
+            if(!this.editName){
                 this.alertValidationMessage(`Name`);
                 return 1;
             }
