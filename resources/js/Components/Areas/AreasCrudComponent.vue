@@ -22,7 +22,7 @@
             <div class="flex justify-end flex-col">
 
                 <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addBtnClicked"
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
                 </button>
@@ -65,7 +65,7 @@
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        {{ area.area_type.name }}
+                                        {{ area.area_type ? area.area_type.name : '' }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_category.name }}
@@ -129,7 +129,7 @@
                                 id="create_modalLabel">
                                 Create Area
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_create_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -144,16 +144,17 @@
                                 </label>
                                 <input type="text" placeholder="Area Name" v-model="name" class="input-ui">
                             </div>
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label class="label-form mb-3">Department</label>
                                 <multiselect v-model="selectedDepartment" :options="departmentList"
                                     :close-on-select="true" :clear-on-select="false" :preserve-search="true"
                                     placeholder="Select Department" label="name" track-by="id" :preselect-first="false">
                                 </multiselect>
-                            </div>
+                            </div> -->
                             <div class="mb-4">
                                 <label class="label-form mb-3">Area Category</label>
                                 <multiselect v-model="selectedCategory" :options="categoryList" :close-on-select="true"
+                                    @select="categoryChange"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Area Category"
                                     label="name" track-by="id" :preselect-first="false"></multiselect>
                                 <!-- <div class="mt-2">
@@ -167,7 +168,7 @@
                                 </div> -->
                             </div>
                             
-                            <div class="mb-4">
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Selling Area'">
                                 <label for="" class="label-form mb-3">Area Type</label>
                                 <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Area Type"
@@ -186,7 +187,7 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button data-te-modal-dismiss type="button" @click="createAreasBtnClicked"
+                            <button type="button" @click="createAreasBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
                             </button>
@@ -327,18 +328,38 @@ export default {
                 this.typeList = response.data;
             }
         },
-
+        addBtnClicked(){
+            this.selectedType = null;
+            this.selectedCategory = null;
+            this.selectedDepartment = null;
+            this.name = null;
+        },
         createAreasBtnClicked() {
-
-            this.createArea();
+            if(!this.name){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(!this.selectedCategory){
+                this.alertValidationMessage(`Category`);
+                return 1;
+            }
+            else if(this.selectedCategory.name === 'Selling Area' && !this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else{
+                this.createArea();
+            }
         },
 
         async createArea() {
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('area_type_id', this.selectedType.id);
+            if(this.selectedCategory.name === 'Selling Area'){
+                formData.append('area_type_id', this.selectedType.id);
+            }
             formData.append('area_category_id', this.selectedCategory.id);
-            formData.append('department_id', this.selectedDepartment.id);
+            // formData.append('department_id', this.selectedDepartment.id);
             // if(this.isPos = true){
             //     formData.append('is_pos', 1);
             // }
@@ -352,9 +373,13 @@ export default {
                 this.selectedCategory = null;
                 this.selectedDepartment = null;
                 this.name = null;
+                document.getElementById('close_create_modal').click();
             }
             else {
-
+                this.$notify({
+                    text: `Menu create failed`,
+                    type: "error"
+                });
             }
         },
 
@@ -387,7 +412,14 @@ export default {
                 this.getAreasList(1);
                 console.log(`deleted`);
             }
-        }
+        },
+        alertValidationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
+        },
 
     },
     mounted() {
