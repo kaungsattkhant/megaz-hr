@@ -12,7 +12,6 @@ class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-
         $areasQuery = Area::with(['areaType', 'areaCategory'])->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
@@ -26,7 +25,7 @@ class AreaRepository implements AreaRepositoryInterface
         } elseif (isset($request->page)) {
             $areas = $areasQuery->paginate(config('common.list_count'));
         } else {
-            $areas = $areasQuery->get();
+            $areas = $areasQuery->where('is_active',1)->get();
         }
 
         return $areas;
