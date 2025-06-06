@@ -33,7 +33,6 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function createData(array $data)
     {
-        dd($data);
         DB::beginTransaction();
         try {
             if (!isset($data['id'])) {
