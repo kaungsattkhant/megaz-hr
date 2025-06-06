@@ -318,6 +318,7 @@ export default {
             selectedCategory: null,
             selectedDepartment: null,
 
+            selectedId: null,
             editName: null,
             editSelectedType: null,
             editSelectedCategory: null,
@@ -434,6 +435,7 @@ export default {
 
 
         editBtnClicked(item){
+            this.selectedId = item.id;
             this.selectedType = null;
             // this.selectedCategory = null;
             this.editName = item.name;
@@ -462,6 +464,7 @@ export default {
 
         async editArea() {
             let formData = new FormData();
+            formData.append('id', this.selectedId);
             formData.append('name', this.editName);
             if(this.editSelectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.editSelectedType.id);
