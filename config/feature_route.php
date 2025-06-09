@@ -91,6 +91,5 @@ return [
     'po-invoice'=>'purchase_order_invoices.index',   //purchase order invoice listc
     'hr'=>'meeting.index',   //
     'check-in'=>'check_in.index', 
-
     //end procurement
 ];
