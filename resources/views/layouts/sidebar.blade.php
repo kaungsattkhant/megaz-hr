@@ -236,8 +236,9 @@
 
                     @if(checkFeaturePermission('skill'))
                         <li>
-                            <a href="{{ route('skill') }}" class="flex items-center @yield('skill')">
-                                <i class="far fa-award"></i>
+                            <a href="{{ route('skill') }}" class="flex items-center @yield('skill') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/skill.png') }}" alt="">
+                                <!-- <i class="far fa-award"></i> -->
                                 Skill
                             </a>
                         </li>
@@ -448,23 +449,26 @@
                     @endif
                     @if (checkFeaturePermission('cashbook'))
                         <li>
-                            <a href="{{ route('accountings') }}" class="flex items-center @yield('accounting')">
-                                <i class="fal fa-tasks  pr-3"></i>
+                            <a href="{{ route('accountings') }}" class="flex items-center @yield('accounting') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/coa.png') }}" alt="">
+                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
                                 Chart of Accounts (COA)
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('financial_transactions') }}"
-                                class="flex items-center @yield('financial_transactions')">
-                                <i class="fal fa-tasks  pr-3"></i>
+                                class="flex items-center @yield('financial_transactions') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/financial_transaction.png') }}" alt="">
+                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
                                 Financial Transactions
                             </a>
                         </li>
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
+                            <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
                                 data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCashbooks"
                                 aria-expanded="false" aria-controls="collapseExample">
-                                <i class="fal fa-sack-dollar  pr-4"></i>
+                                <img class=" sidebar-img" src="{{ asset('img/cash_book.png') }}" alt="">
+                                <!-- <i class="fal fa-sack-dollar  pr-4"></i> -->
                                 Cash Book
                             </button>
 
@@ -520,10 +524,11 @@
                             </div>
                         </li>
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
+                            <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
                                 data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseBankbooks"
                                 aria-expanded="false" aria-controls="collapseExample">
-                                <i class="fal fa-money-check-alt  pr-3"></i>
+                                <img class=" sidebar-img" src="{{ asset('img/bank_book.png') }}" alt="">
+                                <!-- <i class="fal fa-money-check-alt  pr-3"></i> -->
                                 Bank Book
                             </button>
 
