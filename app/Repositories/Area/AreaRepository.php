@@ -12,7 +12,6 @@ class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-
         $areasQuery = Area::with(['areaType', 'areaCategory'])->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
@@ -26,7 +25,7 @@ class AreaRepository implements AreaRepositoryInterface
         } elseif (isset($request->page)) {
             $areas = $areasQuery->paginate(config('common.list_count'));
         } else {
-            $areas = $areasQuery->get();
+            $areas = $areasQuery->where('is_active', 1)->get();
         }
 
         return $areas;
@@ -36,15 +35,18 @@ class AreaRepository implements AreaRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
-            $area = Area::create($data);
-            $sellingAreaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])
-                ->first();
-            if (($area->areaCategory->id === $sellingAreaCategory->id) && ($area->areaCategory->name === $sellingAreaCategory->name)) {
-                $menuCategoryIds = MenuCategory::all()->pluck('id')->toArray();
-                $area->menuCategories()->sync($menuCategoryIds);
+            if (!isset($data['id'])) {
+                $data['id'] = null;
             }
-
+            $area = Area::updateOrCreate(['id'=>$data['id']],$data);
+            if (!isset($data['id'])) {
+                $sellingAreaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])
+                    ->first();
+                if (($area->areaCategory->id === $sellingAreaCategory->id) && ($area->areaCategory->name === $sellingAreaCategory->name)) {
+                    $menuCategoryIds = MenuCategory::all()->pluck('id')->toArray();
+                    $area->menuCategories()->sync($menuCategoryIds);
+                }
+            }
             DB::commit();
             return $area;
         } catch (\Exception $e) {

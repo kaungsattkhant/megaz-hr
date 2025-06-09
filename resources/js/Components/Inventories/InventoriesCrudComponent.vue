@@ -27,6 +27,7 @@
             <div class="flex justify-end flex-col">
 
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    @click="addBtnClicked"
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
                 </button>
@@ -470,6 +471,17 @@ export default {
                 // console.log(this.inventoryableListEdit);
                 // this.inventoryableIdsEdit = [];
             }
+        },
+        addBtnClicked(){
+            this.name = null;
+            this.start_time = null;
+            this.end_time = null;
+            this.selectedInventoryType = null;
+
+            this.inventoryableList = [];
+            this.selectedInventoryable = null;
+            this.inventoryableIds= [];
+            this.typeList = []
         },
 
         createBtnClicked() {

@@ -15,8 +15,10 @@ class FeatureSeeder extends Seeder
     {
         $features = [
             'staff',
+            'staff.create',
+            'staff.edit',
             'role',
-            'task',
+            'task', //remove
             'complaint',
             'department',
             'area',
@@ -73,7 +75,9 @@ class FeatureSeeder extends Seeder
             'hr',
         ];
         foreach ($features as $feature) {
-            Feature::create([
+            Feature::firstOrCreate(
+                ['slug' => Str::slug($feature, '-')],
+                [
                 'name' => Str::title($feature),
                 'slug' => Str::slug($feature, '-')
             ]);

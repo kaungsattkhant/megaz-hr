@@ -2,7 +2,7 @@
     <div>
         <div class="">
             <div class="w-full pt-9 px-6">
-                <div class="flex justify-between mb-4">
+                <!-- <div class="flex justify-between mb-4">
                     <div>
                         <button class="pos-add-btn">
                             Date
@@ -18,7 +18,7 @@
                             </a>
                         </button>
                     </div>
-                </div>
+                </div> -->
                 <div>
                     <div class="bg-white px-4">
                         <table class="min-w-full text-left text-sm font-light">

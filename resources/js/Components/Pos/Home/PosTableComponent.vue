@@ -105,11 +105,37 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
+                                        Pre Deposit?
+                                    </label>
+                                    <input type="checkbox" v-model="isPreDeposit" class="rounded" >
+                                </div>
+                                <div class="mb-4" v-if="isPreDeposit">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Deposit
+                                    </label>
+                                    <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                </div>
+                                <div class="mb-4" v-if="isPreDeposit">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Cash Account
+                                    </label>
+                                    <div class="relative">
+                                        <select name="" id="" v-model="selectedCashAccount" :disabled="!isPreDeposit"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                            <option disabled selected> Select Cash Account </option>
+                                            <option v-for="cashAccount in cashAccounts" :value="cashAccount" > {{ cashAccount.name }} </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
                                     <input type="text" placeholder="Deposit" v-model="deposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                </div>
+                                </div> -->
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Male
@@ -696,8 +722,8 @@
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
                             <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true"
-                                class=" h-10"
-                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name"
+                                class=" h-10"  @select="selectedMenuChange()"
+                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name" :custom-label="nameWithPrice"
                                 track-by="id" :preselect-first="false"></multiselect>
 
 
@@ -1071,6 +1097,7 @@
                 invoice_date:null,
                 type:'session',
                 selectedPackage:null,
+                isPreDeposit: false,
                 deposit:null,
                 duration:null,
                 male:null,
@@ -1173,6 +1200,8 @@
                 selectedAccessory:null,
                 selectedAccessoryQuantity:null,
 
+                cashAccounts: [],
+                selectedCashAccount: null,
 
                 currentTime: getCurretDateTime(),
                 isShowSidebar:false,
@@ -1234,7 +1263,9 @@
                 this.getCustomerList();
                 this.selectedCustomer = null;
                 this.type = null;
+                this.isPreDeposit = false;
                 this.deposit = null;
+                this.selectedCashAccount = null;
                 this.male = null;
                 this.female = null;
                 this.child = null;
@@ -1344,6 +1375,10 @@
             },
 
             async createRoom() {
+                if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
+                    this.alertValiationMessage(`deposit amount or cash account`);
+                    return;
+                }
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
                 formData.append('customer_id', this.selectedCustomer.id);
@@ -1352,7 +1387,15 @@
                     formData.append('orders', JSON.stringify(this.packageMenuList));
                 }
                 formData.append('type', this.type);
-                formData.append('deposit', this.deposit);
+                let isDeposit = (this.isPreDeposit)? 1: 0;
+                formData.append('is_deposit', isDeposit);
+                if(this.deposit){
+                    formData.append('deposit', this.deposit);
+                }
+                if(this.selectedCashAccount){
+                    formData.append('cash_account_id', this.selectedCashAccount.id);
+                    formData.append('account_id', this.selectedCustomer.account_id);
+                }
                 if (this.female > 0) {
                     formData.append('female', +this.female);
                 }
@@ -1744,13 +1787,14 @@
                     this.menuList = response.data;
                 }
             },
-            // async selectedMenuChange() {
+            async selectedMenuChange() {
             //     const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
             //     if (response.data) {
             //         this.menuAreaList = response.data.areas;
             //         this.menuQuantity = 1;
             //     }
-            // },
+                this.menuQuantity = 1;
+            },
             btnClickAddMenu() {
                 this.invoiceId = this.selectedRoom.invoice.id;
                 console.log('invoice id ' + this.invoiceId)
@@ -2034,6 +2078,16 @@
                     }
                 }
             },
+            async getCashAccounts(){
+                let response = await getApiData({url: `/api/get_cash_account`, token: this.getToken()});
+                if(response.success){
+                    this.cashAccounts = response.data;
+                }
+            },
+
+            nameWithPrice ({name, prices}) {
+                return `${name} (${prices[0].price}Ks)`
+            }
 
         },
         
@@ -2047,7 +2101,13 @@
             // },
             area(area){
                 this.getTableList(area);
-            }
+            },
+            isPreDeposit(){
+                if(!this.isPreDeposit){
+                    this.deposit = null;
+                    this.selectedCashAccount = null;
+                }
+            },
         },
         created(){
             // this.getCustomerList();
@@ -2055,7 +2115,7 @@
             // this.getMenuList();
             // this.getDivisionList();
             this.getPackageList(this.currentTime);
-
+            this.getCashAccounts();
             // this.getServiceCategoryList();
             // this.getLadyList();
 

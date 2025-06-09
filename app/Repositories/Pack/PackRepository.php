@@ -47,11 +47,11 @@ class PackRepository implements PackRepositoryInterface
             $data['created_by'] = UserData()->id;
             $menu = Menu::find($data['menu_id']);
             $menuId = $data['menu_id'];
-            $menuStepItemByMenu = MenuStepItem::join('items','menu_step_items.item_id','items.id')
-           ->whereHas('menuStep', function ($q) use ($menuId) {
-                $q->where('menu_id', $menuId);
-            })
-                ->select('items.uom_id',DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
+            $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
+                ->whereHas('menuStep', function ($q) use ($menuId) {
+                    $q->where('menu_id', $menuId);
+                })
+                ->select('items.uom_id', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
                 ->groupBy('item_id')
                 ->get();
             // $menuItems = $menu->items;
@@ -66,7 +66,7 @@ class PackRepository implements PackRepositoryInterface
                 //curent is here
                 // dd(UserData()->department->inventory->inventory_id);
                 $inventoryId = UserData()->department->inventory->inventory_id;
-                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
+                $inventoryLedger = (new StoStoreInventoryreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
                 foreach ($menuStepItemByMenu as $item) {
                     // $itemInventories = InventoryLedgerItem::where('item_id', $item->id)->get();
                     // $enterInventoryValue = 0;
@@ -100,7 +100,7 @@ class PackRepository implements PackRepositoryInterface
                         'uom_id' => $item->uom_id,
                         'quantity' => $item->total_quantity
                     ]);
-                    $a=$inventoryLedger->inventory_ledger_items()->create([
+                    $a = $inventoryLedger->inventory_ledger_items()->create([
                         'item_id' => $item->item_id,
                         'quantity' => $item->total_quantity,
                         'inventory_ledger_id' => $inventoryLedger->id,

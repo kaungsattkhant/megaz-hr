@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Events\PosRoomDoneNotification;
 use App\Events\RoomNotificationRequest;
+use App\Http\Requests\InvoicePaidRequest;
 use App\Events\RoomDoneNotificationRequest;
 use App\Http\Requests\Room\EntityValidationRequest;
 use App\Repositories\Order\OrderRepositoryInterface;
@@ -71,7 +72,7 @@ class InvoiceAPIController extends Controller
                         ResponseMessage('Reception Role Not found', 419);
                     }
                     broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
-                    ResponseMessage('Room has been requested to open',200);
+                    // ResponseMessage('Room has been requested to open',200);
                 }
             }
             // if (isset($data['type']) && $data['type'] == 'package') {
@@ -255,7 +256,7 @@ class InvoiceAPIController extends Controller
         ResponseData($data);
     }
 
-    public function settleInvoice(Request $request)
+    public function settleInvoice(InvoicePaidRequest $request)
     {
         $this->invoiceRepo->paidInvoice($request);
     }

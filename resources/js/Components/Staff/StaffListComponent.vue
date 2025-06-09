@@ -26,7 +26,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/staff/create" class="add-btn text-[13px] font-inter">
+                <a  v-if="feature.includes('staff.create')" href="/staff/create" class="add-btn text-[13px] font-inter">
                     Add New
                 </a>
 
@@ -90,7 +90,7 @@
                                         {{ staff.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap   relative">
-                                        <a :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
+                                        <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a>
                                         <input :checked="staff.is_active == 1" @change="isActiveToggled(staff.id)"
@@ -215,11 +215,14 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+
+            feature: this.getFeature(),
+            user: null,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getDepartmentList() {
             let url = `/api/departments`;
@@ -296,6 +299,8 @@ export default {
     },
 
     mounted() {
+        // this.feature = this.getFeature();
+        // this.user = this.getUser();
         initTE({ Modal, Ripple, Input, Select, Dropdown })
     }
 }
