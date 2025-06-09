@@ -18,7 +18,7 @@ class FeatureSeeder extends Seeder
             'staff.create',
             'staff.edit',
             'role',
-            'task',
+            'task', //remove
             'complaint',
             'department',
             'area',
