@@ -255,7 +255,7 @@ export default {
                         roles:department.roles
                     })
                 });
-                this.getStaffList();
+                // this.getStaffList();
             }
             else{
                 this.getRoleList();
@@ -297,7 +297,7 @@ export default {
             let url = '/api/staffs?' + url_department + url_joint + url_role ;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
         // async getStaffList(){
