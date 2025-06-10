@@ -402,7 +402,9 @@ class OrderRepository implements OrderRepositoryInterface
                         "group_order_id", order_items.group_order_id
                     )
                 ) as order_items_details')
-            )->groupBy('menus.id', 'menus.name', 'group_order_id');
+            )
+            ->whereNotIn('order_items.status',['placed'])
+            ->groupBy('menus.id', 'menus.name', 'group_order_id');
         if ($request->has('area_id') && $request->area_id) {
             $groupedOrderItem->where('order_items.area_id', $request->area_id);
         }
