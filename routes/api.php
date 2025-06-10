@@ -460,8 +460,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
     Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
 });
-Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
+Route::controller(FeatureAPIController::class)->group(function () {
+    Route::get('/features', 'getFeatureData');
+    Route::post('/feature_import', 'featureImport');
+});
 Route::controller(AdsAPIController::class)->group(function () {
     Route::get('/ads', 'getAds');
     Route::post('/ads', 'createAds');
