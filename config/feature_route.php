@@ -56,7 +56,6 @@ return [
     'po-order'=>'procurement_order_items.index',   //procurement order-item
     'arrival-item'=>'procurement_order_arrival.index',
     'po-invoice'=>'purchase_order_invoices.index',   //purchase order invoice listc
-    'hr'=>'meeting.index',   //
     'check-in'=>'check_in.index', 
     //end procurement
 
