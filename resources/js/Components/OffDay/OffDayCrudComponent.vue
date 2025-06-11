@@ -237,12 +237,15 @@
                             data-te-select-wrapper-ref>
                             <select data-te-select-init data-te-select-placeholder="Select Type"
                                 data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
-                                <option value="department"> Department </option>
-                                <option value="staff"> Staff </option>
+                                <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                                    {{ type.name }}
+                                </option>
+                                <!-- <option value="department"> Department </option>
+                                <option value="staff"> Staff </option> -->
                             </select>
                         </div> 
                     </div>
-                    <div class="mb-4" v-show="selectedType == 'department'">
+                    <div class="mb-4" v-show="selectedType && selectedType.value === 'department'">
                         <label for="" class="label-form mb-3">
                             Department
                         </label>
@@ -264,7 +267,7 @@
                             </template>
                         </multiselect>
                     </div>
-                    <div class="mb-4" v-show="selectedType == 'staff'">
+                    <div class="mb-4" v-show="selectedType && selectedType.value === 'staff'">
                         <label for="" class="label-form mb-3">
                             Staff
                         </label>
@@ -441,7 +444,7 @@ export default {
         async getStaffList(){
             let response = await getApiData({ url: '/api/staffs', token: this.getToken() });
             if (response.data) {
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
         btnCreateOffDay(){
@@ -495,6 +498,11 @@ export default {
             if(response.success){
                 this.getOffDayList();
                 document.getElementById("close_create_modal").click();
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
@@ -518,7 +526,7 @@ export default {
 
         addHolidayModalBtnClicked(){
             this.name = null;
-            this.selectedDate = [];
+            this.selectedDateRange = [];
         },
         btnCreateHoliday(){
             if(!this.name){
@@ -542,6 +550,11 @@ export default {
             if(response.success){
                 this.getOffDayList();
                 document.getElementById("close_create_holiday_modal").click();
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
         // async searchBtnClicked() {
