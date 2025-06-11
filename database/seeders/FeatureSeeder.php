@@ -74,13 +74,13 @@ class FeatureSeeder extends Seeder
             'check in',
             'hr',
         ];
-        foreach ($features as $feature) {
-            Feature::firstOrCreate(
-                ['slug' => Str::slug($feature, '-')],
-                [
-                'name' => Str::title($feature),
-                'slug' => Str::slug($feature, '-')
-            ]);
-        }
+        // foreach ($features as $feature) {
+        //     Feature::firstOrCreate(
+        //         ['slug' => Str::slug($feature, '-')],
+        //         [
+        //         'name' => Str::title($feature),
+        //         'slug' => Str::slug($feature, '-')
+        //     ]);
+        // }
     }
 }

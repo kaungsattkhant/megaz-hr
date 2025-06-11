@@ -52,10 +52,10 @@ return [
     'purchase-order' => 'purchase_orders',
     'purchase-order-confirmation' => 'purchase_orders.confirm_poitems',
     'inventory' => 'inventories',
+    'inventory-stock' => 'inventory_stocks.index',
     'inventory-transfer-list' => 'transfers.transfers',
     'inventory-receive-list' => 'transfers.receives',
     'supplier' => 'suppliers.index',
-    'cashbook' => 'cashbook',
     'customer' => 'pos.customers',
     'purchase-order-item-left' => 'purchase_orders.left_items_index',
     'purchase-order-item-left-confirmation' => 'purchase_orders.left_items_detail',
@@ -76,6 +76,7 @@ return [
     'staff-balance' => 'advanced.index',
     'prepaid' => 'prepaid.index',
     'ar' => 'AR.index',
+    'cashbook'=>'pos.cashbook.index',
     //financial
 
     'skill' => 'skill.index',

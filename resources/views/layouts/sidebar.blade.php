@@ -66,7 +66,7 @@
                             </div>
                         </li>
                     @endif
-                    @if(checkFeaturePermission('sale-target'))
+                    @if(checkFeaturePermission('sale-target-menu') || checkFeaturePermission('sale-target-position'))
                         <li>
                             <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
                                 data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseSaleTargetReport"
@@ -76,21 +76,27 @@
                             </button>
                             <div class="!visible @yield('sale_target')hidden text-center" id="collapseSaleTargetReport"
                                 data-te-collapse-item>
+
                                 <ul>
-                                    <li>
-                                        <a href="/sale_target_menu"
-                                            class="flex items-center text-left @yield('sale_target_menu')">
-                                            <i class="fal fa-tasks  pr-3"></i>
-                                            Menu
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="/sale_target_position"
-                                            class="flex items-center text-left @yield('sale_target_position')">
-                                            <i class="fal fa-tasks  pr-3"></i>
-                                            Position
-                                        </a>
-                                    </li>
+                                    @if(checkFeaturePermission('sale-target-position'))
+
+                                        <li>
+                                            <a href="/sale_target_menu"
+                                                class="flex items-center text-left @yield('sale_target_menu')">
+                                                <i class="fal fa-tasks  pr-3"></i>
+                                                Menu
+                                            </a>
+                                        </li>
+                                    @endif
+                                    @if(checkFeaturePermission('sale-target-position'))
+                                        <li>
+                                            <a href="/sale_target_position"
+                                                class="flex items-center text-left @yield('sale_target_position')">
+                                                <i class="fal fa-tasks  pr-3"></i>
+                                                Position
+                                            </a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </div>
                         </li>
@@ -141,7 +147,7 @@
                             </a>
                         </li>
                     @endif -->
-                    @if (checkFeaturePermission('mrp'))
+                    @if (checkFeaturePermission('menu-category'))
                         <li>
                             <a href="{{ route('menu_categories') }}"
                                 class="flex items-center @yield('menu_categories') sidebar-gap-x">
@@ -150,12 +156,16 @@
                                 Menu Categories
                             </a>
                         </li>
-                        <!-- <li>
-                                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
-                                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                                Selling Menus
-                                            </a>
-                                        </li> -->
+                    @endif
+
+                    <!-- <li>
+                                                        <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                                                            <i class="fal fa-clipboard-list  pr-3"></i>
+                                                            Selling Menus
+                                                        </a>
+                                                    </li> -->
+                    @if (checkFeaturePermission('menu-sale-report'))
+
                         <li>
                             <a href="{{ route('menu_sale_report.index') }}"
                                 class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
@@ -164,6 +174,9 @@
                                 Menu Sale Report
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('menu-costing'))
+
                         <li>
                             <a href="{{ route('menu_costing.index') }}"
                                 class="flex items-center @yield('menu_costing') sidebar-gap-x">
@@ -172,6 +185,9 @@
                                 Menu Costing
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('menu'))
+
                         <li>
                             <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-mrp-50.png') }}" alt="">
@@ -179,6 +195,9 @@
                                 MRP
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('menu-area'))
+
                         <li>
                             <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
                                 <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
@@ -311,7 +330,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('item'))
+                    @if (checkFeaturePermission('brand'))
                         <li>
                             <a href="{{ route('brands') }}" class="flex items-center @yield('brands') sidebar-gap-x">
                                 <!-- <i class="fal fa-copyright  pr-3"></i> -->
@@ -319,6 +338,10 @@
                                 Brands
                             </a>
                         </li>
+
+                    @endif
+                    @if (checkFeaturePermission('item'))
+
                         <li>
                             <a href="{{ route('items') }}" class="flex items-center @yield('items') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-item-48.png') }}" alt="">
@@ -354,7 +377,7 @@
                         </li>
                     @endif
 
-                    @if (checkFeaturePermission('menu'))
+                    <!-- @if (checkFeaturePermission('menu'))
                         <li>
                             <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
                                 <i class="fal fa-clipboard-list  pr-3"></i>
@@ -377,7 +400,6 @@
                             <a href="{{ route('menu_sale_report.index') }}"
                                 class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-report-50.png') }}" alt="">
-                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Sale Report
                             </a>
                         </li>
@@ -385,11 +407,10 @@
                             <a href="{{ route('menu_costing.index') }}"
                                 class="flex items-center @yield('menu_costing') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}" alt="">
-                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Costing
                             </a>
                         </li>
-                    @endif
+                    @endif -->
                     @if (checkFeaturePermission('room'))
                         <li>
                             <a href="{{ route('room') }}" class="flex items-center @yield('room') sidebar-gap-x">
@@ -418,7 +439,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('complaint'))
+                    @if (checkFeaturePermission('complain'))
                         <li>
                             <a href="{{ route('complains') }}" class="flex items-center @yield('complains') sidebar-gap-x">
                                 <!-- <i class="fal fa-envelope-open-text  pr-3"></i> -->
@@ -447,14 +468,18 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('cashbook'))
+                    @if (checkFeaturePermission('account'))
                         <li>
-                            <a href="{{ route('accountings') }}" class="flex items-center @yield('accounting') sidebar-gap-x">
+                            <a href="{{ route('accountings') }}"
+                                class="flex items-center @yield('accounting') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/coa.png') }}" alt="">
                                 <!-- <i class="fal fa-tasks  pr-3"></i> -->
                                 Chart of Accounts (COA)
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('financial-transaction'))
+
                         <li>
                             <a href="{{ route('financial_transactions') }}"
                                 class="flex items-center @yield('financial_transactions') sidebar-gap-x">
@@ -463,10 +488,13 @@
                                 Financial Transactions
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('cashbook'))
+
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCashbooks"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button"
+                                data-te-collapse-init data-te-ripple-init data-te-ripple-color="light"
+                                data-te-target="#collapseCashbooks" aria-expanded="false" aria-controls="collapseExample">
                                 <img class=" sidebar-img" src="{{ asset('img/cash_book.png') }}" alt="">
                                 <!-- <i class="fal fa-sack-dollar  pr-4"></i> -->
                                 Cash Book
@@ -524,9 +552,9 @@
                             </div>
                         </li>
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseBankbooks"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button"
+                                data-te-collapse-init data-te-ripple-init data-te-ripple-color="light"
+                                data-te-target="#collapseBankbooks" aria-expanded="false" aria-controls="collapseExample">
                                 <img class=" sidebar-img" src="{{ asset('img/bank_book.png') }}" alt="">
                                 <!-- <i class="fal fa-money-check-alt  pr-3"></i> -->
                                 Bank Book
@@ -558,6 +586,7 @@
                             </div>
                         </li>
                     @endif
+
                     @if (checkFeaturePermission('purchase-order'))
                         <li>
                             <a href="{{ route('purchase_orders') }}"
@@ -629,19 +658,25 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('fixed-asset'))
+                    @if (checkFeaturePermission('asset-item'))
                         <li>
                             <a href="{{ route('assetItemList') }}" class="flex items-center @yield('asset_items')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Asset Items
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('asset'))
+
                         <li>
                             <a href="{{ route('assetList') }}" class="flex items-center @yield('assets')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Assets
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('fixed-asset'))
+
                         <li>
                             <a href="{{ route('fixed_assets.index') }}" class="flex items-center @yield('fixed_asset')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
@@ -649,7 +684,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('account-payables'))
+                    @if (checkFeaturePermission('account-payable'))
                         <li>
                             <a href="{{ route('AP.index') }}" class="flex items-center @yield('account_payables')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
@@ -663,7 +698,7 @@
                             </a>
                         </li> --}}
                     @endif
-                    @if (checkFeaturePermission('inventory-stocks'))
+                    @if (checkFeaturePermission('inventory-stock'))
                         <li>
                             <a href="{{ route('inventory_stocks.index') }}"
                                 class="flex items-center @yield('inventory_stocks') sidebar-gap-x">
@@ -673,7 +708,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('inventory-transfer-list'))
+                    @if (checkFeaturePermission('inventory-transfer-history'))
                         <li>
                             <a href="{{ route('transfers.index') }}"
                                 class="flex items-center @yield('inventory_histories') sidebar-gap-x">
@@ -682,6 +717,9 @@
                                 Inventory Transfer Histories
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('inventory-transfer-receive'))
+
                         <li>
                             <a href="{{ route('transfers.receives') }}"
                                 class="flex items-center @yield('inventory_receives') sidebar-gap-x">
@@ -690,6 +728,9 @@
                                 Inventory Receives List
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('inventory-transfer'))
+
                         <li>
                             <a href="{{ route('transfers.transfers') }}"
                                 class="flex items-center @yield('inventory_transfers') sidebar-gap-x">
@@ -698,6 +739,9 @@
                                 Inventory Transfers List
                             </a>
                         </li>
+                    @endif
+                    @if (checkFeaturePermission('defect-item'))
+
                         <li>
                             <a href="{{ route('used_defected_items.index') }}"
                                 class="flex items-center @yield('used_defected_items')">
@@ -736,16 +780,18 @@
                             </a>
                         </li>
                     @endif
-                    @if(checkFeaturePermission('crm'))
-                        <li>
-                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
-                                aria-expanded="false" aria-controls="collapseExample">
-                                <i class="fal fa-sack-dollar  pr-3"></i>
-                                CRM
-                            </button>
-                            <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
-                                <ul>
+                    <!-- @if(checkFeaturePermission('crm')) -->
+                    <li>
+                        <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
+                            data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
+                            aria-expanded="false" aria-controls="collapseExample">
+                            <i class="fal fa-sack-dollar  pr-3"></i>
+                            CRM
+                        </button>
+                        <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
+                            <ul>
+                                @if(checkFeaturePermission('customer'))
+
                                     <li>
                                         <a href="{{ route('crm.customers.index') }}"
                                             class="flex items-center @yield('crm_customer_list')">
@@ -753,31 +799,32 @@
                                             Customers
                                         </a>
                                     </li>
-                                    <li>
-                                        <a href="{{ route('crm.customers.birthdays') }}"
-                                            class="flex items-center @yield('customer_birthdays')">
-                                            <i class="fal fa-tasks  pr-3"></i>
-                                            Customer Birthdays
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('crm.level_discounts.index') }}"
-                                            class="flex items-center @yield('customer_level_discounts')">
-                                            <i class="fal fa-tasks  pr-3"></i>
-                                            Customer Level Discounts
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('crm.birthday_discounts.index') }}"
-                                            class="flex items-center @yield('birthday_promotions')">
-                                            <i class="fal fa-tasks  pr-3"></i>
-                                            Birthday Promotions
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endif
+                                @endif
+                                <li>
+                                    <a href="{{ route('crm.customers.birthdays') }}"
+                                        class="flex items-center @yield('customer_birthdays')">
+                                        <i class="fal fa-tasks  pr-3"></i>
+                                        Customer Birthdays
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('crm.level_discounts.index') }}"
+                                        class="flex items-center @yield('customer_level_discounts')">
+                                        <i class="fal fa-tasks  pr-3"></i>
+                                        Customer Level Discounts
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('crm.birthday_discounts.index') }}"
+                                        class="flex items-center @yield('birthday_promotions')">
+                                        <i class="fal fa-tasks  pr-3"></i>
+                                        Birthday Promotions
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!-- @endif -->
                     @if(checkFeaturePermission('accessory'))
                         <li>
                             <a href="/accessories" class="flex items-center @yield('accessories')">
@@ -787,26 +834,31 @@
                         </li>
                     @endif
 
-                    @if(checkFeaturePermission('objective'))
+                    @if(checkFeaturePermission('okr'))
                         <li>
                             <a href="/OKR" class="flex items-center @yield('OKR')">
                                 <i class="fal fa-braille pr-3"></i>
                                 OKR
                             </a>
                         </li>
+                    @endif
+                    @if(checkFeaturePermission('okr-duty'))
+
                         <li>
                             <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
                                 <!-- <i class="fal fa-braille pr-3"></i> -->
                                 <img class="sidebar-img " src="{{ asset('img/icons8-career-64.png') }}" alt="">
                                 OKR Duty
                             </a>
+                        </li>
+                    @endif
+                    @if(checkFeaturePermission('okr-dashboard'))
                         <li>
                             <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
                                 <!-- <i class="fal fa-braille pr-3"></i> -->
                                 <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
                                 OKR Dashboard
                             </a>
-                        </li>
                         </li>
                     @endif
 
@@ -899,7 +951,7 @@
                                 Warning
                             </a>
                         </li>
-                      
+
                         <li>
                             <a href="/off_day" class="flex items-center @yield('off_day') sidebar-gap-x">
                                 <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
@@ -973,20 +1025,21 @@
                                 Pay Slip
                             </a>
                         </li>
-                        
+
                     @endif
-                        <li>
-                            <a href="/resignation_categories" class="flex items-center @yield('resignation_categories') sidebar-gap-x">
-                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                                Resignation Categories
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/resignations" class="flex items-center @yield('resignations') sidebar-gap-x">
-                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                                Resignation
-                            </a>
-                        </li>
+                    <li>
+                        <a href="/resignation_categories"
+                            class="flex items-center @yield('resignation_categories') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Resignation Categories
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/resignations" class="flex items-center @yield('resignations') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Resignation
+                        </a>
+                    </li>
 
 
                 </ul>
