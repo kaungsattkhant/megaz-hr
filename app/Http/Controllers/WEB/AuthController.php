@@ -17,12 +17,15 @@ class AuthController extends Controller
         if (isset($request->remember)) {
             $remember = true;
         }
-        if(Auth::attempt(['phone_number'=>$request->phone_number,'password' => $request->password], $remember)){
+        if (Auth::attempt(['phone_number' => $request->phone_number, 'password' => $request->password], $remember)) {
             // $this->storeFcmToken($request->fcm_token);
-            $firstFeaturePermission=UserData()->features->first();
-            if($firstFeaturePermission){
-                $routeName=config('feature_route.'.$firstFeaturePermission->slug);
-                return redirect()->route($routeName);
+            $firstFeaturePermission = UserData()->features->first();
+            if ($firstFeaturePermission) {
+                $routeName = config('feature_route.' . $firstFeaturePermission->slug);
+                if ($routeName) {
+                    return redirect()->route($routeName);
+                }
+                return redirect()->back();
                 // if(checkDepartmentPermission(['HR'])){
                 //     return redirect()->route($routeName);
                 // }
@@ -43,18 +46,22 @@ class AuthController extends Controller
                 // }
             }
             return redirect()->back();
-        }else{
+        } else {
             return redirect()->back();
         }
     }
-    public function storeFcmToken($token){
-        if($token){
+    public function storeFcmToken($token)
+    {
+        if ($token) {
             $staff = StaffFcmToken::firstOrCreate(
-                ['fcm_token' =>$token,
-                'user_id'=>UserData()->id,
-            ],
-                ['fcm_token' =>$token,
-                 'user_id'=>UserData()->id]
+                [
+                    'fcm_token' => $token,
+                    'user_id' => UserData()->id,
+                ],
+                [
+                    'fcm_token' => $token,
+                    'user_id' => UserData()->id
+                ]
             );
             return $staff;
         }
