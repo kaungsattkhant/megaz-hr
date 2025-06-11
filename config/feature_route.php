@@ -43,7 +43,8 @@ return [
     'staff-balance' => 'advanced.index',
     'prepaid' => 'prepaid.index',
     'ar' => 'AR.index',
-    'cashbook'=>'pos.cashbook.index',
+    'cashbook'=>'cashbook',
+    'pos_cashbook'=>'pos.cashbooks',
     //financial
 
     'skill' => 'skill.index',

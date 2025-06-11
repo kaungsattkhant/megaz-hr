@@ -36,7 +36,12 @@ Route::middleware(['departments:role'])->group(function () {
 
 Route::middleware(['departments:staff'])->group(function () {
     Route::view('/staff', 'staff.index')->name('staff');
+
+});
+Route::middleware(['departments:staff.create'])->group(function () {
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
+});
+Route::middleware(['departments:staff.edit'])->group(function () {
     Route::view('/staff/{id}/edit', 'staff.edit')->name('staff.edit');
 });
 
@@ -102,8 +107,11 @@ Route::middleware(['departments:menu'])->group(function () {
     Route::view('/menus/create', 'menus.create')->name('menus.create');
     Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
 });
-Route::middleware(['departments:mrp'])->group(function () {
+Route::middleware(['departments:menu-category'])->group(function () {
     Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
+});
+Route::middleware(['departments:mrp'])->group(function () {
+
     Route::view('/mrp', 'MRP.index')->name('MRP');
     Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
     Route::view('/mrp/{id}/edit', 'MRP.edit');
