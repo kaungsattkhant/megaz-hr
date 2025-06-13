@@ -464,7 +464,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('complain'))
+                    @if (checkFeaturePermission('complaint'))
                         <li>
                             <a href="{{ route('complains') }}"
                                 class="flex items-center @yield('complains') sidebar-gap-x">

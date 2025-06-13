@@ -57,7 +57,7 @@
                                 <th scope="col" class=" ">
                                     Department
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['staff.toggle', 'staff.edit'].some(f => feature.includes(f))">
 
                                 </th>
 
@@ -89,11 +89,11 @@
                                     <td class="whitespace-nowrap   ">
                                         {{ staff.department.name }}
                                     </td>
-                                    <td class="whitespace-nowrap   relative">
+                                    <td class="whitespace-nowrap   relative" v-show="['staff.toggle', 'staff.edit'].some(f => feature.includes(f))">
                                         <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <input :checked="staff.is_active == 1" @change="isActiveToggled(staff.id)"
+                                        <input v-show="feature.includes('staff.toggle')" :checked="staff.is_active == 1" @change="isActiveToggled(staff.id)"
                                             class="mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white before:pointer-events-none before:absolute before:h-3.5
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:-mt-[0.1875rem] after:h-5
                                             after:w-5 after:rounded-full after:border-none after:bg-black after:transition-[background-color_0.2s,transform_0.2s]
@@ -216,8 +216,8 @@ export default {
             lastPage: 0,
             totalData:0,
 
-            feature: this.getFeature(),
             user: null,
+            feature: this.getFeature(),
         };
     },
 

@@ -16,7 +16,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-if="feature.includes('menu-category.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -39,7 +39,7 @@
                                 <th scope="col" class="">
                                     Image
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['menu-category.update', 'menu-category.toggle', 'menu-category.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -64,16 +64,16 @@
                                                 :src="category.image_url" alt="Menu image">
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <!-- <button @click="deleteBtnClicked(category.id)"
+                                    <td class="whitespace-nowrap "  v-show="['menu-category.update', 'menu-category.toggle', 'menu-category.delete'].some(f => feature.includes(f))">
+                                        <!-- <button @click="deleteBtnClicked(category.id)" v-if="feature.includes('menu-category.delete')"
                                         data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <button @click="editBtnClicked(category.id)" data-te-toggle="modal"
+                                        <button @click="editBtnClicked(category.id)" data-te-toggle="modal"  v-if="feature.includes('menu-category.update')"
                                             data-te-target="#edit_modal" id="edit-btn" class="pr-2">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <input :checked="category.is_active == 1" @change="isActiveToggled(category.id)"
+                                        <input :checked="category.is_active == 1" @change="isActiveToggled(category.id)"  v-if="feature.includes('menu-category.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                             after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -296,11 +296,12 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

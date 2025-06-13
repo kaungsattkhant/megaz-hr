@@ -34,9 +34,14 @@ Route::middleware(['departments:role'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
 });
 
+// staff
 Route::middleware(['departments:staff'])->group(function () {
     Route::view('/staff', 'staff.index')->name('staff');
-    Route::view('/staff/create', 'staff.create')->name('staff.crate');
+});
+Route::middleware(['departments:staff.create'])->group(function () {
+    Route::view('/staff/create', 'staff.create')->name('staff.create');
+});
+Route::middleware(['departments:staff.edit'])->group(function () {
     Route::view('/staff/{id}/edit', 'staff.edit')->name('staff.edit');
 });
 
@@ -99,15 +104,23 @@ Route::middleware(['departments:uom-conversion'])->group(function () {
 
 Route::middleware(['departments:menu'])->group(function () {
     Route::view('/menus', 'menus.index')->name('menus');
+});
+Route::middleware(['departments:menu.create'])->group(function () {
     Route::view('/menus/create', 'menus.create')->name('menus.create');
+});
+Route::middleware(['departments:menu.edit'])->group(function () {
     Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
 });
 Route::middleware(['departments:mrp'])->group(function () {
-    Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
     Route::view('/mrp', 'MRP.index')->name('MRP');
     Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
     Route::view('/mrp/{id}/edit', 'MRP.edit');
+});
+Route::middleware(['departments:menu-area'])->group(function () {
     Route::view('/menu_area', 'menu_area.index')->name('menu_area.index');
+});
+Route::middleware(['departments:menu-category'])->group(function () {
+    Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
 });
 Route::middleware(['departments:table'])->group(function () {
     Route::view('/tables', 'tables&rooms.table')->name('table');
@@ -277,9 +290,14 @@ Route::middleware(['departments:cooking-place'])->group(function () {
 Route::view('/cooking_places/create', 'cookingPlace.create')->name('cookingPlaceCreate');
 Route::view('/cooking_places/{id}/edit', 'cookingPlace.edit')->name('cookingPlaceCreate');
 
+// duty
 Route::middleware(['departments:duty'])->group(function () {
     Route::view('/duty', 'duty.index')->name('duty');
+});
+Route::middleware(['departments:duty.create'])->group(function () {
     Route::view('/duty/create', 'duty.create')->name('dutyCreate');
+});
+Route::middleware(['departments:duty.edit'])->group(function () {
     Route::view('/duty/{id}/edit', 'duty.edit')->name('dutyEdit');
 });
 
@@ -293,18 +311,28 @@ Route::middleware(['departments:sale-target'])->group(function () {
 });
 
 
-Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
-Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
+Route::middleware(['departments:menu-sale-report'])->group(function () {
+    Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
+});
+Route::middleware(['departments:menu-costing'])->group(function () {
+    Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
+});
 
 Route::view('/pos_order_items', 'pos.orderItem.index');
 
 
 Route::view('/menu_position', 'menu_position.index')->name('menu_position');
 Route::view('/menu_position/create', 'menu_position.create')->name('menu_position.create');
+
+// accessory
 Route::middleware(['departments:accessory'])->group(function () {
-    Route::view('/accessories/create', 'accessories.create');
-    Route::view('/accessories/{id}/edit', 'accessories.edit');
     Route::view('/accessories', 'accessories.index');
+});
+Route::middleware(['departments:accessory.store'])->group(function () {
+    Route::view('/accessories/create', 'accessories.create');
+});
+Route::middleware(['departments:accessory.show'])->group(function () {
+    Route::view('/accessories/{id}/edit', 'accessories.edit');
 });
 
 
