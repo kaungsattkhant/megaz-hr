@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             // InventorySeeder::class,
             FeatureSeeder::class,
             DepartmentSeeder::class,
+            DepartmentFeatureSeeder::class,
             AreaSeeder::class,
             RoleSeeder::class,
             GenderSeeder::class,
