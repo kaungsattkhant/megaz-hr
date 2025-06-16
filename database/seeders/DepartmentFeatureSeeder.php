@@ -18,12 +18,10 @@ class DepartmentFeatureSeeder extends Seeder
     {
         //
         $departments = Department::whereIn('name', ['HR'])->get();
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-        DB::table('department_feature')->truncate();
-        DB::table('feature_staff')->truncate();
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // DB::table('department_feature')->truncate();
+        // DB::table('feature_staff')->truncate();
+        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         $hr_features = config('common.hr_feature_slug');
         $inventory_features = config('common.inventory_feature_slug');
         $finance_features = config('common.finance_feature_slug');
