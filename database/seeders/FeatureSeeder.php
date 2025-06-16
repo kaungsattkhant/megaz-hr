@@ -58,7 +58,7 @@ class FeatureSeeder extends Seeder
             'staff balance',
             'prepaid',
             'ar',
-            'financial report', 
+            'financial report',
             //financial
             'skill',
             'cooking place',
