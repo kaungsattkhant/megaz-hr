@@ -501,7 +501,7 @@
                     @endif
                     @if (checkFeaturePermission('account'))
                         <li>
-                            <a href="{{ route('accountings') }}"
+                            <a href="{{ route('accounting') }}"
                                 class="flex items-center @yield('accounting') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/coa.png') }}" alt="">
                                 <!-- <i class="fal fa-tasks  pr-3"></i> -->
