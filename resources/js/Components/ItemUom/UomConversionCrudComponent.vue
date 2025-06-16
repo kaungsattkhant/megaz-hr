@@ -31,7 +31,7 @@
                         Add Conversion
                     </button>
 
-                    <button type="button" @click="createUomBtnClicked"
+                    <button type="button" @click="createUomBtnClicked" v-if="feature.includes('uom-conversion.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#uom">
                         Create Uom

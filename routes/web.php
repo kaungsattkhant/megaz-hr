@@ -46,7 +46,7 @@ Route::middleware(['departments:staff.edit'])->group(function () {
     Route::view('/staff/{id}/edit', 'staff.edit')->name('staff.edit');
 });
 
-Route::middleware(['departments:uom'])->group(function () {
+Route::middleware(['departments:uom-conversion'])->group(function () {
     Route::view('/uoms', 'item_uoms.index')->name('uoms');
 });
 
