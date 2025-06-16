@@ -35,7 +35,6 @@ class DatabaseSeeder extends Seeder
             // InventorySeeder::class,
             FeatureSeeder::class,
             DepartmentSeeder::class,
-            DepartmentFeatureSeeder::class,
             AreaSeeder::class,
             RoleSeeder::class,
             GenderSeeder::class,
@@ -51,7 +50,9 @@ class DatabaseSeeder extends Seeder
             // RoomAndTableSeeder::class,
             InventorySeeder::class,
             StaffSeeder::class,
-            GpsSeeder::class
+            GpsSeeder::class,
+            DepartmentFeatureSeeder::class,
+
         ]);
     }
 }
