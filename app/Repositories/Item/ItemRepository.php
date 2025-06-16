@@ -95,9 +95,26 @@ class ItemRepository implements ItemRepositoryInterface
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
 
-            // $item = Item::firstOrCreate(['name' => $data['name'], 'code' => $data['code']], $data);
+            if (!isset($data['limitation_type']) || !in_array($data['limitation_type'], ['uom', 'finance'])) {
+                return ResponseMessage('Invalid limitation_type. It must be either "uom" or "finance".', 422);
+            }
+
+            if ($data['limitation_type'] === "uom") {
+                if (!isset($data['max_limit_base_uom_quantity']) || !is_numeric($data['max_limit_base_uom_quantity']) || $data['max_limit_base_uom_quantity'] <= 0) {
+                    return ResponseMessage('For limitation_type "uom", max_limit_base_uom_quantity must be a positive number.', 422);
+                }
+                if (!isset($data['max_limit_uom_quantity']) || !is_numeric($data['max_limit_uom_quantity']) || $data['max_limit_uom_quantity'] <= 0) {
+                    return ResponseMessage('For limitation_type "uom", max_limit_uom_quantity must be a positive number.', 422);
+                }
+            }
+
+            if ($data['limitation_type'] === "finance") {
+                if (!isset($data['amount']) || !is_numeric($data['amount']) || $data['amount'] <= 0) {
+                    return ResponseMessage('For limitation_type "finance", amount must be a positive number.', 422);
+                }
+            }
+
             $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
-            // $item = Item::create($data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
@@ -136,6 +153,24 @@ class ItemRepository implements ItemRepositoryInterface
                             $conversionRate
                         );
                         $data['minimum_holding_amount'] = $minimumHoldingAmount;
+                    }
+                }
+                if (!isset($data['limitation_type']) || !in_array($data['limitation_type'], ['uom', 'finance'])) {
+                    return ResponseMessage('Invalid limitation_type. It must be either "uom" or "finance".', 422);
+                }
+    
+                if ($data['limitation_type'] === "uom") {
+                    if (!isset($data['max_limit_base_uom_quantity']) || !is_numeric($data['max_limit_base_uom_quantity']) || $data['max_limit_base_uom_quantity'] <= 0) {
+                        return ResponseMessage('For limitation_type "uom", max_limit_base_uom_quantity must be a positive number.', 422);
+                    }
+                    if (!isset($data['max_limit_uom_quantity']) || !is_numeric($data['max_limit_uom_quantity']) || $data['max_limit_uom_quantity'] <= 0) {
+                        return ResponseMessage('For limitation_type "uom", max_limit_uom_quantity must be a positive number.', 422);
+                    }
+                }
+    
+                if ($data['limitation_type'] === "finance") {
+                    if (!isset($data['amount']) || !is_numeric($data['amount']) || $data['amount'] <= 0) {
+                        return ResponseMessage('For limitation_type "finance", amount must be a positive number.', 422);
                     }
                 }
                 $item->update($data);

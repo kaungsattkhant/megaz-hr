@@ -28,6 +28,10 @@ class Item extends BaseModel
         'min_holding_base_uom_quantity',
         'min_holding_uom_quantity',
         'minimum_holding_amount',
+        'limitation_type',
+        'amount',
+        'max_limit_base_uom_quantity',
+        'max_limit_uom_quantity',
     ];
 
 

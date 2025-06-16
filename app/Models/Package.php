@@ -10,7 +10,23 @@ class Package extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name','from_date','to_date','price','pay_session','free_session','session','session_price','package_discount','is_ktv','is_active','created_by','image_url','image_path','is_changeable'
+        'name',
+        'from_date',
+        'to_date',
+        'price',
+        'pay_session',
+        'free_session',
+        'session',
+        'session_price',
+        'package_discount',
+        'is_ktv',
+        'is_active',
+        'created_by',
+        'image_url',
+        'image_path',
+        'is_changeable',
+        'type',
+        'event_date'
     ];
 
     public function rooms()
@@ -18,7 +34,8 @@ class Package extends Model
         return $this->belongsToMany(Entity::class, 'package_room', 'package_id', 'room_id');
     }
 
-    public function accessories(){
+    public function accessories()
+    {
         return $this->hasMany(AccessoryPackage::class);
     }
     public function menuPackages()
