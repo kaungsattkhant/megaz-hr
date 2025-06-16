@@ -371,7 +371,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('uom'))
+                    @if (checkFeaturePermission('uom-conversion'))
                         <li>
                             <a href="{{ route('uoms') }}" class="flex items-center @yield('uom_conversions') sidebar-gap-x">
                                 <!-- <i class="fal fa-balance-scale  pr-3"></i> -->

@@ -109,6 +109,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         DB::beginTransaction();
         try {
+
             $data['created_by'] = UserData()->id;
             // $isValid = false;
             // if(isset($data['roomIds'])){
@@ -118,6 +119,9 @@ class PackageRepository implements PackageRepositoryInterface
             // if ($isValid) {
             //     ResponseMessage('Package dates overlap with existing packages for the specified rooms.', 422);
             // }
+            if(isset($data['type']) && $data['type'] === "event" && empty($data['event_date'])) {
+                ResponseMessage('Event date is required for event type packages', 422);
+            }
             $imageData = $data['image'];
             $extension = $imageData->getClientOriginalExtension();
             $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
@@ -129,8 +133,6 @@ class PackageRepository implements PackageRepositoryInterface
             } else {
                 ResponseMessage('Room Ids must be array format', 422);
             }
-
-
             $data['image_path'] = $imageData->storeAs('images/package_images', $hashedName, 'public');
             $data['image_url'] = Storage::url($data['image_path']);
 
@@ -146,7 +148,7 @@ class PackageRepository implements PackageRepositoryInterface
                 foreach ($menuIds as $menu) {
                     $foodMenu = Menu::find($menu->menu_id);
                     $menuPrice += $foodMenu->price->price * $menu->quantity;
-                    $menu_package = MenuPackage::create([
+                    MenuPackage::create([
                         'menu_id' => $menu->menu_id,
                         'quantity' => $menu->quantity,
                         'package_id' => $package->id
@@ -163,7 +165,7 @@ class PackageRepository implements PackageRepositoryInterface
                 foreach ($accessories as $accessory_array) {
                     $accessory = Accessory::find($accessory_array['accessory_id']);
                     $accessoryPrice += $accessory->accessory_price->price * $accessory_array['quantity'];
-                    $accessoryPackage = AccessoryPackage::create([
+                    AccessoryPackage::create([
                         'accessory_id' => $accessory->id,
                         'quantity' => $accessory_array['quantity'],
                         'package_id' => $package->id
@@ -171,7 +173,6 @@ class PackageRepository implements PackageRepositoryInterface
                 }
             }
             $package_original_price = $menuPrice + $sessionPrice + $accessoryPrice;
-            // dd($package_original_price);
             if ($package_original_price > $data['price']) {
                 $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
@@ -220,6 +221,9 @@ class PackageRepository implements PackageRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            if(isset($data['type']) && $data['type'] === "event" && empty($data['event_date'])) {
+                ResponseMessage('Event date is required for event type packages', 422);
+            }
             if (isset($data['image'])) {
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();

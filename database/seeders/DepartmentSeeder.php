@@ -36,42 +36,42 @@ class DepartmentSeeder extends Seeder
                 'name' => $name,
                 'slug' => Str::slug($name, '-')
             ]);
-            switch ($name) {
-                case 'HR':
-                    $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                case 'Finance':
-                    $featureIds = Feature::whereIn('slug', $finance_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                case 'Management':
-                    $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                // case 'Inventory':
-                //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
-                //     $department->features()->sync($featureIds);
-                case 'Catering':
-                    $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                case 'Canteen':
-                    $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                case 'Entertainement':
-                    $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                case 'Procurement':
-                    $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-                    break;
-                default:
-                    $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
-            }
+            // switch ($name) {
+            //     case 'HR':
+            //         $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     case 'Finance':
+            //         $featureIds = Feature::whereIn('slug', $finance_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     case 'Management':
+            //         $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     // case 'Inventory':
+            //     //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
+            //     //     $department->features()->sync($featureIds);
+            //     case 'Catering':
+            //         $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     case 'Canteen':
+            //         $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     case 'Entertainement':
+            //         $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     case 'Procurement':
+            //         $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            //         break;
+            //     default:
+            //         $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
+            //         $department->features()->sync($featureIds);
+            // }
         }
     }
 }

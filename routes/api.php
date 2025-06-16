@@ -138,7 +138,9 @@ Route::get('/divisions', function () {
 // Route::post('/customer_login',[CustomerAuthController::class,'customerLogin']);
 
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::controller(FeatureAPIController::class)->group(function () {
+    Route::post('/feature_import', 'featureImport');
+});
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     // Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
