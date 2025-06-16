@@ -208,6 +208,7 @@ export default {
             selectedOkrPoint:null,
             selectedDate:null,
             duration:null,
+            objName: null,
 
             objective_List:[],
             selected_obj_keys:[],
@@ -249,6 +250,7 @@ export default {
                     duration: this.duration
                 });  // Add a new input box
                 this.selectedDepartment = null;
+                this.roleList = [];
                 this.selectedRole = null;
                 this.key_result = null;
                 this.selectedOkrPoint = null;
@@ -268,7 +270,8 @@ export default {
             }
         },
         selectedDepartmentChange(){
-            this.getRoleList();
+            this.roleList = this.selectedDepartment.roles;
+            // this.getRoleList();
         },
         async getRoleList(){
             let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
