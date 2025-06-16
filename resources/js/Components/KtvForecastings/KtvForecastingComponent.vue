@@ -23,7 +23,7 @@
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div> -->
-                <a href="/ktv_forecasting/create"
+                <a href="/ktv_forecasting/create" v-if="feature.includes('ktv-forecasting.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -64,10 +64,10 @@
                                         {{ roomForecasting.amount }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/ktv_forecasting/' + roomForecasting.id + '/edit'">
+                                        <a :href="'/ktv_forecasting/' + roomForecasting.id + '/edit'"  v-if="feature.includes('ktv-forecasting.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(roomForecasting.id)"
+                                        <button @click="deleteBtnClicked(roomForecasting.id)" v-show="feature.includes('ktv-forecasting.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -177,11 +177,13 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getMenuForecastingList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;

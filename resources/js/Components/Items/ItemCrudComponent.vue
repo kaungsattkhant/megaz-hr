@@ -28,15 +28,15 @@
 
             </div>
             <div class="flex justify-end gap-x-4">
-                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer">
+                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
                     Import Type
                     <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
                 </label>
-                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer">
+                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-category.import')">
                     Import Category
                     <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
                 </label>
-                <label for="excel_import" class="add-btn h-8 cursor-pointer">
+                <label for="excel_import" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
                     Import Item
                     <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                 </label>
@@ -45,7 +45,7 @@
                     data-te-toggle="modal" data-te-target="#import_modal">
                     Excel Import
                 </button> -->
-                <button type="button"
+                <button type="button" v-if="feature.includes('item.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
                     data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                     Add New
@@ -76,7 +76,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
-                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Detail] </a>
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" v-show="feature.includes('item-supplier.detail')"> [Detail] </a>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.code }}
@@ -651,11 +651,13 @@ export default {
             // brandsList: [],
             // selectedBrands: [],
             selectedFile:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

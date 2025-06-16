@@ -1,3 +1,4 @@
+
 <template>
     <div class="px-0">
         <div class="mb-4">
@@ -358,7 +359,7 @@ export default {
             // let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
         async getTrainByList(){
@@ -366,7 +367,7 @@ export default {
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.trainedByList = response.data.data;
+                this.trainedByList = response.data;
             }
         },
         async getTypeList(){

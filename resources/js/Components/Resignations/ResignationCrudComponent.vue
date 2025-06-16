@@ -31,7 +31,7 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 
-                <button  data-te-toggle="modal" data-te-target="#add_modal" @click="btnClickedAddModal"
+                <button  data-te-toggle="modal" data-te-target="#add_modal" @click="btnClickedAddModal" v-show="feature.includes('resignation.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
             </button>
@@ -94,7 +94,7 @@
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="far fa-trash-alt"></i>
                                         </button> -->
-                                        <div class="contents" v-if="item.status === 'received'">
+                                        <div class="contents" v-if="item.status === 'received' && feature.includes('resignation.status')">
                                             <button @click="confirmedItem(item)">
                                                 <i class="far fa-check text-sm mr-3 p-1"></i>
                                             </button>
@@ -342,11 +342,13 @@ export default {
             url:'/api/hr/resignations',
             url_search:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
             let url = this.url + this.url_search;

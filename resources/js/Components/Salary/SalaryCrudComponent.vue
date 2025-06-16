@@ -30,11 +30,11 @@
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-                <button type="button"
+                <!-- <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
-                </button>
+                </button> -->
             </div>
         </div>
         <div class="box-container-table">
@@ -64,7 +64,7 @@
                                 <th scope="col" class="">
                                     Net Salary
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['salary.edit', 'salary.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -94,12 +94,12 @@
                                     <td class="whitespace-nowrap">
                                         {{ salary.net_salary }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['salary.edit', 'salary.delete'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(salary, index)">
+                                            class="pr-3" @click="editBtnClicked(salary, index)" v-show="feature.includes('salary.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(salary.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(salary.id)" data-te-toggle="modal" v-show="feature.includes('salary.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -273,11 +273,13 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getSalaryList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

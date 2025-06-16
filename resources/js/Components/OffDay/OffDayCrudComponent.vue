@@ -28,7 +28,7 @@
                     data-te-toggle="modal" data-te-target="#create_holiday_modal" @click="addHolidayModalBtnClicked">
                     Add Holiday
                 </button>
-                <button type="button"
+                <button type="button" v-show="feature.includes('off-day.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add Off Day
@@ -53,7 +53,7 @@
                                 <th scope="col" class="">
                                     Repetition
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['off-day.edit', 'off-day.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -76,12 +76,12 @@
                                     <td class="whitespace-nowrap">
                                         {{ offDay.off_day.repetition }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['off-day.edit', 'off-day.delete'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(offDay, index)">
+                                            class="pr-3" @click="editBtnClicked(offDay, index)"  v-show="feature.includes('off-day.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(offDay.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(offDay.id)" data-te-toggle="modal" v-show="feature.includes('off-day.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -235,7 +235,7 @@
                         </label>
                         <div class="bg-white mb-0 w-full inline-block h-[34px] !text-black !text-sm"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Type"
+                            <select data-te-select-init data-te-select-placeholder="Select Type" @change="typeChange"
                                 data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
                                 <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
                                     {{ type.name }}
@@ -428,13 +428,12 @@ export default {
 
             selectedDateRange: null,
 
-            
-
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -447,6 +446,10 @@ export default {
                 this.staffList = response.data;
             }
         },
+        typeChange(){
+            this.selectedStaff = [];
+            this.selectedDepartment = [];
+        },
         btnCreateOffDay(){
             if(this.selectedDay.length < 1){
                 this.alertValidationMessage(`Day`);
@@ -456,11 +459,11 @@ export default {
                 this.alertValidationMessage(`Repetition`);
                 return 1;
             }
-            else if(this.selectedType == 'department' && this.selectedDepartment.length < 1){
+            else if(this.selectedType.value == 'department' && this.selectedDepartment.length < 1){
                 this.alertValidationMessage(`Department`);
                 return 1;
             }
-            else if(this.selectedType == 'staff' && this.selectedStaff.length < 1){
+            else if(this.selectedType.value == 'staff' && this.selectedStaff.length < 1){
                 this.alertValidationMessage(`Staff`);
                 return 1;
             }
@@ -478,16 +481,16 @@ export default {
             let formData = new FormData();
             formData.append('repetition', this.selectedRepetition.value);
             formData.append('days', JSON.stringify(selectedDayList));
-            formData.append('offdayable_type',this.selectedType);
+            formData.append('offdayable_type',this.selectedType.value);
             
-            if(this.selectedType == 'department'){
+            if(this.selectedType.value === 'department'){
                 let offdayable_id = [];
                 this.selectedDepartment.forEach((department) => {
                     offdayable_id.push(String(department.id))
                 })
                 formData.append('offdayable_id', JSON.stringify(offdayable_id));
             }
-            if(this.selectedType == 'staff'){
+            if(this.selectedType.value === 'staff'){
                 let offdayable_id = [];
                 this.selectedStaff.forEach((staff) => {
                     offdayable_id.push(String(staff.id))

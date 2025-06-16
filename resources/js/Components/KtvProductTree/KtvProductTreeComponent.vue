@@ -25,7 +25,7 @@
 
             <div class="flex pr-0 gap-x-4">
                 
-                <a href="/ktv_product_tree/create"
+                <a href="/ktv_product_tree/create" v-if="feature.includes('ktv-product-tree.create')"
                     class="add-btn whitespace-nowrap h-8 focus:outline-none focus:ring-0 ">
                     Add New
                 </a>
@@ -60,10 +60,10 @@
                                         <!-- {{ roomList.find(room=>room.id = productTree.entity_id)?.name }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/ktv_product_tree/' + productTree.id + '/edit'">
+                                        <a :href="'/ktv_product_tree/' + productTree.id + '/edit'" v-if="feature.includes('ktv-product-tree.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <i class="far fa-trash-alt cursor-pointer"
+                                        <i class="far fa-trash-alt cursor-pointer" v-if="feature.includes('ktv-product-tree.delete')"
                                             @click="deleteqkr(qkr.id)"></i>
                                     </td>
                                 </tr>
@@ -118,11 +118,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getRoomList(){
             let response = await getApiData({url: `/api/ktv/entity_room`, token: this.getToken()});

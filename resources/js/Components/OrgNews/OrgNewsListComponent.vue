@@ -16,7 +16,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/org_news/create" class="add-btn ">
+                <a href="/org_news/create" class="add-btn " v-if="feature.includes('org-new.create')">
                     Add New
                 </a>
 
@@ -46,7 +46,7 @@
                                 <th scope="col" class=" ">
                                     Role
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['org-new.edit', 'org-new.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -78,13 +78,13 @@
                                             {{ role.role ? role.role.name : ''}} 
                                         </span>
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/org_news/' + news.id + '/edit'">
+                                    <td class="whitespace-nowrap " v-show="['org-new.edit', 'org-new.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/org_news/' + news.id + '/edit'" v-if="feature.includes('org-new.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(news.id)"
+                                            @click="deleteBtnClicked(news.id)" v-show="feature.includes('org-new.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -185,11 +185,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getNewsList(pageNumber) {
             let url = `/api/org_news`;

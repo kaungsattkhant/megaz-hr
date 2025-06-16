@@ -315,7 +315,8 @@
                                 Tasks
                             </a>
                         </li>
-
+                    @endif
+                    @if (checkFeaturePermission('custom-task'))
                         <li>
                             <a href="{{ route('custom_tasks') }}"
                                 class="flex items-center @yield('custom_tasks') sidebar-gap-x">
@@ -325,7 +326,8 @@
                                 Custom Tasks
                             </a>
                         </li>
-
+                    @endif
+                    @if (checkFeaturePermission('report-task'))
                         <li>
                             <a href="{{ route('task_report') }}"
                                 class="flex items-center @yield('tasks_reports') sidebar-gap-x">
@@ -336,7 +338,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('area'))
+                    @if (checkFeaturePermission('area.list'))
                         <li>
                             <a href="{{ route('areas') }}"
                                 class="flex items-center @yield('areas') sidebar-gap-x">
@@ -632,7 +634,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('purchase-order-confirmation'))
+                    @if (checkFeaturePermission('confirm-purchase-order-item.list'))
                         <li>
                             <a href="{{ route('purchase_orders.confirm_poitems') }}"
                                 class="flex items-center @yield('confirm_purchase_order_items') sidebar-gap-x">
@@ -777,7 +779,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('defect-item'))
+                    @if (checkFeaturePermission('used-defected-item'))
                         <li>
                             <a href="{{ route('used_defected_items.index') }}"
                                 class="flex items-center @yield('used_defected_items')">

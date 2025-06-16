@@ -37,7 +37,7 @@
                         <option v-for="(date,index) in dateList" :key="index" :value="date"> {{ date }} </option>
                     </select>
                 </div>
-                <a href="/OKR/create"
+                <a href="/OKR/create" v-if="feature.includes('okr.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -86,10 +86,10 @@
                                     </td> -->
 
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/OKR/' + okr.id + '/edit'">
+                                        <a :href="'/OKR/' + okr.id + '/edit'" v-if="feature.includes('okr.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(okr.id)"
+                                        <button @click="deleteBtnClicked(okr.id)" v-show="feature.includes('okr.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -199,11 +199,13 @@ export default {
             url_date:'',
 
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         
 
         async getOkrList(pageNumber) {

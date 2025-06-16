@@ -16,7 +16,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/warning/create" class="add-btn ">
+                <a href="/warning/create" class="add-btn " v-if="feature.includes('warning.create')">
                     Add New
                 </a>
 
@@ -46,7 +46,7 @@
                                 <th scope="col" class=" ">
                                     Staff
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['warning.edit', 'warning.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -80,13 +80,13 @@
                                             {{ staff.staff ? staff.staff.name : ''}} 
                                         </span>
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/warning/' + warning.id + '/edit'">
+                                    <td class="whitespace-nowrap " v-show="['warning.edit', 'warning.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/warning/' + warning.id + '/edit'" v-if="feature.includes('warning.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(warning.id)"
+                                            @click="deleteBtnClicked(warning.id)" v-show="feature.includes('warning.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -187,11 +187,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getWarningList(pageNumber) {
             let url = `/api/warnings`;

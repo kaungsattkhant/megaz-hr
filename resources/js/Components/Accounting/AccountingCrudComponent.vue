@@ -19,7 +19,7 @@
             <div class="flex justify-end flex-col">
 
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('account.create')">
                     Add New
                 </button>
             </div>
@@ -66,7 +66,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3"
-                                        @click="editBtnClicked(account.id, index)">
+                                        @click="editBtnClicked(account.id, index)"  v-show="feature.includes('account.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <!-- <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
@@ -396,11 +396,13 @@
                 currentGroup: 0,
                 isFirstGroup: true,
                 isLastGroup: false,
+
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getHeadAccountList(){
                 let url = `/api/head_accounts`;

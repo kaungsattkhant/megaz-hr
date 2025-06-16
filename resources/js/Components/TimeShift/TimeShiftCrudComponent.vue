@@ -23,7 +23,7 @@
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div> -->
-                <button type="button"
+                <button type="button"  v-show="feature.includes('time-shift.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
@@ -72,10 +72,10 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(shift, index)">
+                                            @click="editBtnClicked(shift, index)" v-show="feature.includes('time-shift.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(shift.id)"
+                                        <button @click="deleteBtnClicked(shift.id)" v-show="feature.includes('time-shift.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -371,11 +371,12 @@ export default {
             url_role:'',
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getShiftList(){
             let response = await getApiData({ url: '/api/shifts', token: this.getToken() });
             if (response.data) {

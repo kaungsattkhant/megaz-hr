@@ -96,7 +96,7 @@
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                        @click="checkBtnClicked(arrival)">
+                                        @click="checkBtnClicked(arrival)" v-show="feature.includes('arrival-item.confirm')">
                                             <i class="fal fa-check"></i>
                                         </button>
                                     </td>
@@ -317,11 +317,13 @@ export default {
             totalPrice: 0,
             uomUpperLimit: 0,
             isLoading:true,
+
+            feature: this.getFeature(),
         }
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         showInput() {
             this.isShowInput = true;

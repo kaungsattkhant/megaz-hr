@@ -23,7 +23,7 @@
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div> -->
-                <a href="/okr_duty/create"
+                <a href="/okr_duty/create" v-if="feature.includes('okr-duty.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -58,10 +58,10 @@
                                         {{ duty.assign_date }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/okr_duty/' + duty.id + '/edit'">
+                                        <a :href="'/okr_duty/' + duty.id + '/edit'" v-if="feature.includes('okr-duty.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(duty.id)"
+                                        <button @click="deleteBtnClicked(duty.id)" v-show="feature.includes('okr-duty.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -165,11 +165,13 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getDutyList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;

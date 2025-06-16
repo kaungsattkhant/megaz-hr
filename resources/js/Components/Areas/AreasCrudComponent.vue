@@ -21,7 +21,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-if="feature.includes('area.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addBtnClicked"
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -47,7 +47,7 @@
                                 <th scope="col" class="">
                                     Category
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['area.edit', 'area.toggle'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -69,12 +69,12 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_category.name }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <button @click="editBtnClicked(area)"
+                                    <td class="whitespace-nowrap " v-show="['area.edit', 'area.toggle'].some(f => feature.includes(f))">
+                                        <button @click="editBtnClicked(area)" v-if="feature.includes('area.edit')"
                                             data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </button>
-                                        <input :checked="area.is_active == 1" @change="isActiveToggled(area.id)"
+                                        <input :checked="area.is_active == 1" @change="isActiveToggled(area.id)" v-if="feature.includes('area.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -332,11 +332,12 @@ export default {
             
             filterCategory:null,
             category_url:'',
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async filterCategoryChange(){
             this.category_url = 'area_category_id='+this.filterCategory.id+'&'
             this.getAreasList(1);

@@ -297,14 +297,14 @@ export default {
             let url = '/api/staffs?' + url_department + url_joint + url_role ;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
         // async getStaffList(){
         //     let url = `/api/staffs`;
         //     let response = await getApiData({url: url, token: this.getToken()});
         //     if(response.data){
-        //         this.staffList = response.data.data;
+        //         this.staffList = response.data;
         //     }
         // },
         async getTypeList(){
