@@ -37,6 +37,7 @@ class DepartmentFeatureSeeder extends Seeder
             $name = $department->name;
             $staff = Staff::where('department_id', $department->id)->get();
             switch ($name) {
+
                 case 'HR':
                     $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
 
@@ -45,7 +46,7 @@ class DepartmentFeatureSeeder extends Seeder
             if (in_array($department->name, ['HR'])) {
                 $department->features()->sync($featureIds);
                 foreach ($staff as $s) {
-                    $staff->features()->sync($featureIds);
+                    $s->features()->sync($featureIds);
                 }
             }
         }

@@ -28,7 +28,6 @@ class FeatureAPIController extends Controller
     public function featureImport(Request $request)
     {
         $file = $request->file('feature_import');
-
         $headings = (new HeadingRowImport)->toArray($file);
         $expectedHeadings = [
             'module',
