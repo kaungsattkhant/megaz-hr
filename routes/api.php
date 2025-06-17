@@ -21,6 +21,7 @@ use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\AssetController;
 use App\Http\Controllers\API\BrandController;
+use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\AssetItemController;
 use App\Http\Controllers\API\AdsAPIController;
 use App\Http\Controllers\API\CommonController;
@@ -32,6 +33,7 @@ use App\Http\Controllers\API\DutyAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\PackAPIController;
+use App\Http\Controllers\API\PoOrderController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\CashbookController;
@@ -39,9 +41,9 @@ use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAPIController;
+// use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AccessoryController;
-// use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\ObjectiveController;
 use App\Http\Controllers\API\BookingAPIController;
@@ -88,7 +90,6 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
-use App\Http\Controllers\API\PoOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -199,6 +200,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
         Route::get('/items/{itemId}/brands/{brandId}', 'getAvgPriceByBrand');
+    });
+    Route::controller(EventController::class)->group(function () {
+        Route::get('/events', 'eventLists');
+        Route::post('/events', 'createOrUpdateEvent');
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);

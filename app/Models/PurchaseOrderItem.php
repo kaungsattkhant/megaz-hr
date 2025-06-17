@@ -30,7 +30,8 @@ class PurchaseOrderItem extends BaseModel
         'is_md_checked',
         'is_procurement_manager_checked',
         'is_confirmed',
-        'remark'
+        'remark',
+        'is_exceed_max_limitation'
     ];
 
     public function getCreatedAt()
