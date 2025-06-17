@@ -93,5 +93,5 @@ return [
     'customer-birthday'=>'CRM.customers.birthdays',
     'birthday-promotion'=>'CRM.birthday_discounts.index',
     'used-defected-item'=>'used_defected_items.index',
-
+    'purchase-order.create'=>'purchase-order.create', //slugname => routename
 ];

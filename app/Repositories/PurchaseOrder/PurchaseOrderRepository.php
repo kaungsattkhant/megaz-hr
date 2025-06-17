@@ -36,7 +36,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         'updated_at',
         'purchased_date_time',
         'procurement_manager_check_id',
-        'procurement_manager_check_time'
+        'procurement_manager_check_time',
+        'type',
+        'event_id',
     ];
     use SendNotification;
     private $morphMapName;
@@ -132,10 +134,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $data['status'] = 'manager_checked';
                 }
             }
+            if (isset($data['type']) && $data['type'] === "event") {
+                if (empty($data['event_id'])) {
+                    return ResponseMessage('event_id is required when type is event', 422);
+                }
+            }
             $po = PurchaseOrder::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );
+            $validationMessages = [];
             foreach ($items as $item) {
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
@@ -160,6 +168,35 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['base_uom_quantity'] = $item->base_uom_quantity;
                 $item_data['uom_quantity'] = $item->uom_quantity;
                 $item_data['remark'] = $item->remark ?? null;
+                //add limitaion validation
+                $isExceed = false;
+                $validationMessage = null;
+                $relatedItem = Item::find($item->item_id);
+                if ($relatedItem) {
+                    if ($relatedItem->limitation_type === "uom") {
+                        if (
+                            (isset($relatedItem->max_limit_uom_quantity) && $item->uom_quantity > $relatedItem->max_limit_uom_quantity) ||
+                            (isset($relatedItem->max_limit_base_uom_quantity) && $item->base_uom_quantity > $relatedItem->max_limit_base_uom_quantity)
+                        ) {
+                            $isExceed = true;
+                            $validationMessage = "Maximum allowed quantity for this item is {$relatedItem->max_limit_uom_quantity} (uom) or {$relatedItem->max_limit_base_uom_quantity} (base uom).";
+                        }
+                    } elseif ($relatedItem->limitation_type === "amount") {
+                        if (isset($relatedItem->amount) && $item->amount > $relatedItem->amount) {
+                            $isExceed = true;
+                            $validationMessage = "Maximum allowed amount for this item is {$relatedItem->amount}.";
+                        }
+                    }
+                }
+
+                $item_data['is_exceed_max_limitation'] = $isExceed;
+                if ($validationMessage) {
+                    $validationMessages[] = [
+                        'item_id' => $item->item_id,
+                        'message' => $validationMessage
+                    ];
+                }
+
                 if (isset($item->later_buy) && $item->later_buy) {
 
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
@@ -220,7 +257,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 }
             }
             DB::commit();
-            return $po;
+            return [
+                'purchase_order' => $po,
+                'validation_messages' => $validationMessages
+            ];
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
