@@ -203,9 +203,9 @@ Route::middleware(['departments:cashbook'])->group(function () {
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
 });
 
-Route::middleware(['departments:financial-transaction'])->group(function () {
+// Route::middleware(['departments:financial-transaction'])->group(function () {
     Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
-});
+// });
 // chart of account (coa)
 Route::middleware(['departments:account'])->group(function () {
     Route::view('/accounting', 'accounting.index')->name('accounting');
@@ -573,9 +573,9 @@ Route::middleware(['departments:salary-setup.edit'])->group(function () {
     Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
 });
 
-Route::middleware(['departments:salary'])->group(function () {
+// Route::middleware(['departments:salary'])->group(function () {
     Route::view('/salary', 'salary.index')->name('salary.index');
-});
+// });
 
 Route::middleware(['departments:allowance'])->group(function () {
     Route::view('/allowance', 'allowance.index')->name('allowance.index');
