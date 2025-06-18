@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
             InventorySeeder::class,
             StaffSeeder::class,
             GpsSeeder::class,
-            // DepartmentFeatureSeeder::class,
+            DepartmentFeatureSeeder::class,
 
         ]);
     }
