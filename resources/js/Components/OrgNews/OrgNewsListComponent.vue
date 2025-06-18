@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { Modal, Ripple, initTE, Input } from "tw-elements";
+// import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
 

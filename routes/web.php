@@ -54,10 +54,12 @@ Route::middleware(['departments:uom-conversion'])->group(function () {
 Route::middleware(['departments:item'])->group(function () {
     Route::view('/items', 'items.index')->name('items');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
-    Route::view('/items/{id}/suppliers/{supplierId}/brands', 'items.supplier_brands')->name('items.supplier_brands');
+});
+Route::middleware(['departments:item.detail'])->group(function () {
+    Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
 });
 Route::middleware(['departments:item-supplier.detail'])->group(function () {
-    Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
+    Route::view('/items/{id}/suppliers/{supplierId}/brands', 'items.supplier_brands')->name('items.supplier_brands');
 });
 
 Route::middleware(['departments:brand'])->group(function () {
@@ -71,7 +73,7 @@ Route::middleware(['departments:task'])->group(function () {
 Route::middleware(['departments:custom-task'])->group(function () {
     Route::view('/custom_tasks', 'tasks.customtask')->name('custom_tasks');
 });
-Route::middleware(['departments:report-task.create'])->group(function () {
+Route::middleware(['departments:report-task'])->group(function () {
     Route::view('/task_reports', 'tasks.tasks')->name('task_report');
 });
 
@@ -203,9 +205,9 @@ Route::middleware(['departments:cashbook'])->group(function () {
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
 });
 
-// Route::middleware(['departments:financial-transaction'])->group(function () {
+Route::middleware(['departments:financial-transaction'])->group(function () {
     Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
-// });
+});
 // chart of account (coa)
 Route::middleware(['departments:account'])->group(function () {
     Route::view('/accounting', 'accounting.index')->name('accounting');
@@ -252,6 +254,38 @@ Route::group(['prefix' => 'pos'], function () {
     // });
 });
 
+Route::middleware(['departments:pos-home'])->group(function () {
+    Route::view('/home', 'pos.home.home')->name('pos.index');
+});
+Route::middleware(['departments:pos-customer'])->group(function () {
+    Route::view('/customer', 'pos.customers.index')->name('pos.customers');
+});
+// Route::middleware(['departments:pos-customer'])->group(function () {
+//     Route::view('/customer/create', 'pos.customers.create')->name('pos.customers.create');
+// });
+Route::middleware(['departments:pos-customer-deposit'])->group(function () {
+    Route::view('/customer_deposit', 'pos.customer_deposit.index')->name('pos.customer_deposit');
+});
+Route::middleware(['departments:pos-ar'])->group(function () {
+    Route::view('/ar', 'pos.AR.index')->name('pos.ar');
+});
+Route::middleware(['departments:pos-cashbook'])->group(function () {
+    Route::view('/cashbook', 'pos.cashbook.index')->name('pos.cashbooks');
+});
+Route::middleware(['departments:pos-booking'])->group(function () {
+    Route::view('/booking', 'pos.booking.index');
+    Route::view('/booking/create', 'pos.booking.create');
+});
+Route::middleware(['departments:pos-food-order'])->group(function () {
+    Route::view('/food_orders', 'pos.menu_order.index');
+    Route::view('/food_orders/create', 'pos.menu_order.create');
+    
+});
+Route::middleware(['departments:pos-ar'])->group(function () {
+    Route::view('/ar', 'pos.AR.index')->name('pos.ar');
+});
+
+
 
 Route::middleware(['departments:inventory-stock'])->group(function () {
     Route::view('/inventory_stocks', 'inventory_stocks.index')->name('inventory_stocks.index');
@@ -287,10 +321,7 @@ Route::view('/crm/customers/{id}/detail', 'CRM.customers.detail')->name('crm.cus
 Route::view('/crm/birthday_promotions', 'CRM.birthday_discounts.index')->name('crm.birthday_discounts.index');
 
 
-Route::view('/booking', 'pos.booking.index');
-Route::view('/booking/create', 'pos.booking.create');
-Route::view('/food_orders', 'pos.menu_order.index');
-Route::view('/food_orders/create', 'pos.menu_order.create');
+
 Route::view('/delivery_charges', 'delivery_charges.index');
 
 Route::middleware(['departments:journal'])->group(function () {
@@ -573,9 +604,9 @@ Route::middleware(['departments:salary-setup.edit'])->group(function () {
     Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
 });
 
-// Route::middleware(['departments:salary'])->group(function () {
+Route::middleware(['departments:salary'])->group(function () {
     Route::view('/salary', 'salary.index')->name('salary.index');
-// });
+});
 
 Route::middleware(['departments:allowance'])->group(function () {
     Route::view('/allowance', 'allowance.index')->name('allowance.index');

@@ -4,7 +4,7 @@
 
         <div class="relative w-[11vw] pt-8 px-7">
             <ul class=" mb-4">
-                @if (checkFeaturePermission('home'))
+                @if (checkFeaturePermission('pos-home'))
                     <li class="mb-4">
                         <a href="/pos/home" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('home')">
                             <i class="fas fa-house mb-1.5 text-2xl"></i>
