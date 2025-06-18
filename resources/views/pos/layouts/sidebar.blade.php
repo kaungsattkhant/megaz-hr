@@ -4,7 +4,7 @@
 
         <div class="relative w-[11vw] pt-8 px-7">
             <ul class=" mb-4">
-                @if (checkFeaturePermission('home'))
+                @if (checkFeaturePermission('pos-home'))
                     <li class="mb-4">
                         <a href="/pos/home" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('home')">
                             <i class="fas fa-house mb-1.5 text-2xl"></i>
@@ -14,7 +14,7 @@
                         </a>
                     </li>
                 @endif
-                @if (checkFeaturePermission('customer'))
+                @if (checkFeaturePermission('pos-customer'))
                     <li>
                         <a href="/pos/customer"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('customers')">
@@ -25,7 +25,7 @@
                         </a>
                     </li>
                 @endif
-                @if (checkFeaturePermission('customer-deposit'))
+                @if (checkFeaturePermission('pos-customer-deposit'))
                     <li>
                         <a href="/pos/customer_deposit"
                             class="flex items-center flex-col  rounded-lg px-0 py-12 @yield('customer_deposit')">
@@ -60,7 +60,7 @@
                         </span>
                     </a>
                 </li> -->
-                @if (checkFeaturePermission('invoice'))
+                @if (checkFeaturePermission('pos-invoice'))
                     <li>
                         <a href="/pos/invoices"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('invoices')">
@@ -71,7 +71,7 @@
                         </a>
                     </li>
                 @endif
-                @if (checkFeaturePermission('cashbook'))
+                @if (checkFeaturePermission('pos-cashbook'))
                     <li>
                         <a href="/pos/cashbook"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('cashbook')">
@@ -82,7 +82,7 @@
                         </a>
                     </li>
                 @endif
-                @if (checkFeaturePermission('booking'))
+                @if (checkFeaturePermission('pos-booking'))
                     <li>
                         <a href="/booking" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('booking')">
                             <i class="fas fa-book mb-1.5 text-2xl"></i>
@@ -92,7 +92,7 @@
                         </a>
                     </li>
                 @endif
-                @if (checkFeaturePermission('food-order'))
+                @if (checkFeaturePermission('pos-food-order'))
                     <li>
                         <a href="/food_orders"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('foodOrders')">
@@ -111,7 +111,7 @@
                         </span>
                     </a>
                 </li> -->
-                @if (checkFeaturePermission('ar'))
+                @if (checkFeaturePermission('pos-ar'))
                     <li>
                         <a href="/pos/ar" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('ar')">
                             <i class="fas fa-users mb-1.5 text-2xl"></i>

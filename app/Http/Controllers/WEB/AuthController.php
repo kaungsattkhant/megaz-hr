@@ -21,7 +21,7 @@ class AuthController extends Controller
             // $this->storeFcmToken($request->fcm_token);
             $firstFeaturePermission = UserData()->features->first();    
             if ($firstFeaturePermission) {
-                $routeName = config('feature_route.' . $firstFeaturePermission->slug);
+                $routeName = config('feature_route.' . $firstFeaturePermission->module);
                 if ($routeName) {
                     return redirect()->route($routeName);
                 }

@@ -20,8 +20,8 @@ class FeatureSeeder extends Seeder
         $items = [];
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('features')->truncate();
-        DB::table('department_feature')->truncate();
-        DB::table('feature_staff')->truncate();
+        // DB::table('department_feature')->truncate();
+        // DB::table('feature_staff')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         foreach ($modules as $i => $module) {
             $feature = Feature::firstOrCreate(
