@@ -114,6 +114,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $data = $request->all();
         $staff = UserData();
         $items = json_decode($request->items);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ResponseMessage('Invalid JSON data provided for purchase order items.', 400);
+        }
         DB::beginTransaction();
         try {
             if (!isset($request->id)) {
@@ -143,7 +146,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 ['id' => $data['id']],
                 $data
             );
-            $validationMessages = [];
             foreach ($items as $item) {
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
@@ -168,34 +170,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['base_uom_quantity'] = $item->base_uom_quantity;
                 $item_data['uom_quantity'] = $item->uom_quantity;
                 $item_data['remark'] = $item->remark ?? null;
-                //add limitaion validation
-                $isExceed = false;
-                $validationMessage = null;
-                $relatedItem = Item::find($item->item_id);
-                if ($relatedItem) {
-                    if ($relatedItem->limitation_type === "uom") {
-                        if (
-                            (isset($relatedItem->max_limit_uom_quantity) && $item->uom_quantity > $relatedItem->max_limit_uom_quantity) ||
-                            (isset($relatedItem->max_limit_base_uom_quantity) && $item->base_uom_quantity > $relatedItem->max_limit_base_uom_quantity)
-                        ) {
-                            $isExceed = true;
-                            $validationMessage = "Maximum allowed quantity for this item is {$relatedItem->max_limit_uom_quantity} (uom) or {$relatedItem->max_limit_base_uom_quantity} (base uom).";
-                        }
-                    } elseif ($relatedItem->limitation_type === "amount") {
-                        if (isset($relatedItem->amount) && $item->amount > $relatedItem->amount) {
-                            $isExceed = true;
-                            $validationMessage = "Maximum allowed amount for this item is {$relatedItem->amount}.";
-                        }
-                    }
-                }
-
-                $item_data['is_exceed_max_limitation'] = $isExceed;
-                if ($validationMessage) {
-                    $validationMessages[] = [
-                        'item_id' => $item->item_id,
-                        'message' => $validationMessage
-                    ];
-                }
+                $item_data['is_exceed_max_limitation'] = $item->is_exceed_max_limitation ?? 0;
 
                 if (isset($item->later_buy) && $item->later_buy) {
 
@@ -257,17 +232,32 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 }
             }
             DB::commit();
-            return [
-                'purchase_order' => $po,
-                'validation_messages' => $validationMessages
-            ];
+            return $po;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
     }
-
+    public function checkLimitation($request)
+    {
+        $item = Item::find($request['item_id']);
+        if (!$item) {
+            ResponseMessage("Item not found", 404);
+        }
+        if ($item->limitation_type === "uom") {
+            if (
+                (isset($item->max_limit_uom_quantity) && $request['uom_quantity'] > $item->max_limit_uom_quantity) ||
+                (isset($item->max_limit_base_uom_quantity) && $request['base_uom_quantity'] > $item->max_limit_base_uom_quantity)
+            ) {
+                ResponseMessage("Quantity exceeds the allowed limit.", 422);
+            }
+        } elseif ($item->limitation_type === "amount") {
+            if (isset($item->amount) && $request['amount'] > $item->amount) {
+                ResponseMessage("Amount exceeds the allowed limit.", 422);
+            }
+        }
+    }
     public function storeGRN($item)
     {
         if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {

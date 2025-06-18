@@ -95,7 +95,7 @@ class ItemRepository implements ItemRepositoryInterface
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
 
-            if (!isset($data['limitation_type']) || !in_array($data['limitation_type'], ['uom', 'finance'])) {
+            if (!isset($data['limitation_type']) || !in_array($data['limitation_type'], ["uom", "finance"])) {
                 return ResponseMessage('Invalid limitation_type. It must be either "uom" or "finance".', 422);
             }
 
@@ -158,7 +158,7 @@ class ItemRepository implements ItemRepositoryInterface
                 if (!isset($data['limitation_type']) || !in_array($data['limitation_type'], ['uom', 'finance'])) {
                     return ResponseMessage('Invalid limitation_type. It must be either "uom" or "finance".', 422);
                 }
-    
+
                 if ($data['limitation_type'] === "uom") {
                     if (!isset($data['max_limit_base_uom_quantity']) || !is_numeric($data['max_limit_base_uom_quantity']) || $data['max_limit_base_uom_quantity'] <= 0) {
                         return ResponseMessage('For limitation_type "uom", max_limit_base_uom_quantity must be a positive number.', 422);
@@ -167,7 +167,7 @@ class ItemRepository implements ItemRepositoryInterface
                         return ResponseMessage('For limitation_type "uom", max_limit_uom_quantity must be a positive number.', 422);
                     }
                 }
-    
+
                 if ($data['limitation_type'] === "finance") {
                     if (!isset($data['amount']) || !is_numeric($data['amount']) || $data['amount'] <= 0) {
                         return ResponseMessage('For limitation_type "finance", amount must be a positive number.', 422);

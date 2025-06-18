@@ -186,6 +186,7 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/tasks_images/{id}', 'deleteTaskImage');
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
+        Route::post('/purchase_orders_items/check_limitation', 'checkLimitation');
         Route::get('/purchase_orders', 'getPurchaseOrder');
         Route::post('/purchase_orders', 'createPurchaseOrder');
         // below the route perform update, and kitchen data update and financial update and it depends on condition,
