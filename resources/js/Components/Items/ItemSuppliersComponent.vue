@@ -28,7 +28,8 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ itemSupplier.supplier.name }}
-                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline" > [Detail] </a>
+                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline" 
+                                        v-show="feature.includes('item-supplier.detail')"> [Detail] </a>
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
                                         {{ itemSupplier.brand.name }}
@@ -192,11 +193,13 @@ export default {
             price: null,
             supplierItemId: null,
             baseUomId: null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

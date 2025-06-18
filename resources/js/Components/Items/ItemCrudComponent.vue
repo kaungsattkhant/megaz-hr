@@ -76,7 +76,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
-                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" v-show="feature.includes('item-supplier.detail')"> [Detail] </a>
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" v-show="feature.includes('item.detail')"> [Detail] </a>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.code }}
