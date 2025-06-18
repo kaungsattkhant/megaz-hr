@@ -1,6 +1,6 @@
 <?php
 return [
-    'modules'=>[
+    'modules' => [
         "staff",
         "staff",
         "staff",
@@ -81,6 +81,10 @@ return [
         "table",
         "table",
         "table",
+        "cash-flow",
+        "indirect-cash-flow",
+        "ap-balance",
+        "creditor-balance",
         "journal",
         "journal",
         "staff-balance",
@@ -259,7 +263,7 @@ return [
         "package",
         "package"
     ],
-    'names'=>[
+    'names' => [
         "Staff List",
         "Staff Create",
         "Staff Edit",
@@ -340,6 +344,10 @@ return [
         "Table List",
         "Table Create",
         "Table Active On/Off",
+        "Cash Flow List",
+        "Indirect Cash Flow List",
+        "Ap Balance",
+        "creditor-balance",
         "journal create",
         "journal list",
         "Staff Balance List",
@@ -518,7 +526,7 @@ return [
         "package list",
         "package create",
     ],
-    'slug'=>[
+    'slug' => [
         "staff",
         "staff.create",
         "staff.edit",
@@ -599,6 +607,10 @@ return [
         "table",
         "table.create",
         "table.toggle",
+        "cash-flow",
+        "indirect-cash-flow",
+        "ap-balance",
+        "creditor-balance",
         "journal.create",
         "journal",
         "staff-balance",
@@ -776,5 +788,5 @@ return [
         "event.create",
         "package",
         "package.create",
-    ],        
+    ],
 ];
