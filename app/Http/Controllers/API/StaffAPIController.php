@@ -90,6 +90,11 @@ class StaffAPIController extends Controller
         }
         ResponseData($staff);
     }
+    public function changePassword(Request $request, int $staffId)
+    {
+        $staff = $this->staffRepo->changePassword($request->all(), $staffId);
+        ResponseData($staff);
+    }
 
     public function deleteStaff($id)
     {

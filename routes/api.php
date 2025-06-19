@@ -544,7 +544,7 @@ Route::get('/staff_by_department_slug/{slug}', [StaffAPIController::class, 'getS
 Route::get('/staff_balances', [StaffAPIController::class, 'staffBalanceList']);
 Route::get('/staff_balances/{id}', [StaffAPIController::class, 'detailStaffBalance']);
 Route::get('/staff/{id}/duties', [StaffAPIController::class, 'getStaffWithDuties']);
-
+Route::post('/staffs/{staffId}/change_password', [StaffAPIController::class, 'changePassword']);
 
 
 

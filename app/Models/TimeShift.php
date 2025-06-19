@@ -16,6 +16,7 @@ class TimeShift extends Model
         'shift_id',
         'from_time',
         'to_time',
+        'is_active',
     ];
 
     public function shift()

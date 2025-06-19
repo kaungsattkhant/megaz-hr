@@ -454,6 +454,10 @@ class ObjectiveRepository implements ObjectiveInterface
             $updateData['approved_at'] = now();
             $updateData['okr_point'] = $data['okr_point'];
             $updateData['approved_by'] = $userId;
+            if (isset($data['remark'])) {
+                $updateData['remark'] = $data['remark'];
+            }
+
         }
 
         if ($data['status'] === 'cancelled') {
@@ -473,11 +477,13 @@ class ObjectiveRepository implements ObjectiveInterface
             $updateData['manager_checked_at'] = now();
             $updateData['okr_point'] = $data['okr_point'];
             $updateData['manager_checked_by'] = $userId;
+            if (isset($data['remark'])) {
+                $updateData['remark'] = $data['remark'];
+            }
         }
 
         if ($data['status'] === 'cancelled') {
             $updateData['cancelled_at'] = now();
-            // $updateData['okr_point'] = $data['okr_point'];
             $updateData['cancelled_by'] = $userId;
         }
 
@@ -496,6 +502,9 @@ class ObjectiveRepository implements ObjectiveInterface
         if ($data['status'] === 'completed') {
             $updateData['completed_at'] = now();
             $updateData['completed_by'] = $userId;
+            if (isset($data['remark'])) {
+                $updateData['remark'] = $data['remark'];
+            }
         }
 
         return $updateData;

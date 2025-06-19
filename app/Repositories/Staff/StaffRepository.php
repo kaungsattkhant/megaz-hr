@@ -2,15 +2,16 @@
 
 namespace App\Repositories\Staff;
 
-use App\Models\Feature;
-use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
+use App\Models\Feature;
+use App\Models\Inventory;
 use App\Models\StaffAdvance;
 use App\Models\StaffBalance;
-use App\Models\StaffEmergencyContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\StaffEmergencyContact;
 
 class StaffRepository implements StaffRepositoryInterface
 {
@@ -36,39 +37,6 @@ class StaffRepository implements StaffRepositoryInterface
             });
         $staff = isset($request->page) ? $staffQuery->paginate(config('common.list_count')) : $staffQuery->get();
         return $staff;
-
-        // if ($request->per_page || $request->page) {
-        //     return Staff::orderByDesc('id')
-        //         ->with(['department', 'roles'])
-        //         ->when($request->search_input, function ($q) use ($request) {
-        //             $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-        //         })
-        //         ->when($departmentIds, function ($query) use ($departmentIds) {
-        //             $query->whereIn('department_id', $departmentIds);
-        //         })
-        //         ->when($roleIds, function ($query) use ($roleIds) {
-        //             $query->whereHas('roles', function ($q) use ($roleIds) {
-        //                 $q->whereIn('id', $roleIds);
-        //             });
-        //         })
-        //         ->where('is_active', 1)
-        //         ->paginate(config('common.list_count'));
-        // } else {
-        //     return Staff::orderByDesc('id')
-        //         ->with(['department', 'roles'])
-        //         ->when($request->search_input, function ($q) use ($request) {
-        //             $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-        //         })
-        //         ->when($departmentIds, function ($query) use ($departmentIds) {
-        //             $query->whereIn('department_id', $departmentIds);
-        //         })
-        //         ->when($roleIds, function ($query) use ($roleIds) {
-        //             $query->whereHas('roles', function ($q) use ($roleIds) {
-        //                 $q->whereIn('id', $roleIds);
-        //             });
-        //         })
-        //         ->where('is_active', 1)->get();
-        // }
     }
 
     public function staffBalanceList(Request $request)
@@ -316,6 +284,39 @@ class StaffRepository implements StaffRepositoryInterface
             ->where('is_active', 1)
             ->get();
         return $staffs;
+    }
+
+    public function changePassword(array $data, int $staffId){
+        if (
+            !isset($data['old_password']) ||
+            !isset($data['new_password']) ||
+            !isset($data['confirm_new_password'])
+        ) {
+            ResponseMessage('All password fields are required.', 422);
+        }
+        
+        $staff = Staff::find($staffId);
+        if (!$staff) {
+            ResponseMessage('Staff not found', 404);
+        }
+        DB::beginTransaction();
+        try {
+            if (!Hash::check($data['old_password'], $staff->password)) {
+                ResponseMessage('Old password is incorrect.', 422);
+            }
+            if (isset($data['new_password']) && $data['new_password'] !== $data['confirm_new_password']) {
+                ResponseMessage('New Password and confirm password do not match', 402);
+            }
+            $staff->update([
+                'password' => ($data['new_password']),
+            ]);
+            DB::commit();
+            ResponseMessage('Password changed successfully', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
 

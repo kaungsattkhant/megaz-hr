@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/time_shifts', 'storeTimeShift');
     Route::post('/time_shifts/{id}', 'updateTimeShift');
     Route::delete('/time_shifts/{id}', 'deleteTimeShiftById');
+    Route::post('/time_shifts/{id}/toggle', 'toggleTimeShift');
 
     //mobile check in out
     Route::get('/current_time_shifts', 'getCurrentTimeShift');

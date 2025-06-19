@@ -18,6 +18,8 @@ interface StaffRepositoryInterface
 
     public function updateData(array $data, int $id);
 
+    public function changePassword(array $data, int $staffId);
+
     public function deleteData($id);
 
     public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null);
