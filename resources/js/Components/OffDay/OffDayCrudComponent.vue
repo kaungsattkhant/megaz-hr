@@ -23,7 +23,7 @@
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div> -->
-                <button type="button"
+                <button type="button" v-show="feature.includes('off-day.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_holiday_modal" @click="addHolidayModalBtnClicked">
                     Add Holiday

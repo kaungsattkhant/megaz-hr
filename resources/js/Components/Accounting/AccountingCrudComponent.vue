@@ -72,7 +72,7 @@
                                         <!-- <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <input
+                                        <input v-show="feature.includes('account.toggle')"
                                         :checked="account.is_active == 1"
                                         @change="isActiveToggled(account.id)"
                                         class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
