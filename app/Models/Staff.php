@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Bank;
 use App\Models\Role;
 use App\Models\Leave;
 use App\Models\Gender;
@@ -12,6 +13,7 @@ use App\Models\Department;
 use App\Models\TaskDetail;
 use App\Models\SalaryBatchStaff;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\StaffCertification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,7 +29,11 @@ class Staff extends Authenticatable
         'alt_phone_number',
         'email',
         'joined_date',
+        'nrc_code',
+        'nrc_township_code',
+        'nrc_type',
         'nrc_number',
+        'bank_id',
         'birthdate',
         'father_name',
         'mother_name',
@@ -250,5 +256,15 @@ class Staff extends Authenticatable
     public function leaves()
     {
         return $this->hasMany(Leave::class);
+    }
+
+    public function staffCertifications()
+    {
+        return $this->hasMany(StaffCertification::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
     }
 }

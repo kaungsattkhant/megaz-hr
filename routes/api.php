@@ -17,6 +17,7 @@ use App\Models\PurchaseOrderItemLeft;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BankController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\AssetController;
@@ -40,8 +41,8 @@ use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\SkillAPIController;
-use App\Http\Controllers\API\StaffAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
+use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AccessoryController;
 use App\Http\Controllers\API\EntityAPIController;
@@ -545,7 +546,11 @@ Route::get('/staff_balances', [StaffAPIController::class, 'staffBalanceList']);
 Route::get('/staff_balances/{id}', [StaffAPIController::class, 'detailStaffBalance']);
 Route::get('/staff/{id}/duties', [StaffAPIController::class, 'getStaffWithDuties']);
 Route::post('/staffs/{staffId}/change_password', [StaffAPIController::class, 'changePassword']);
-
+Route::get('/nrcs', [StaffAPIController::class, 'nrcLists']);
+Route::controller(BankController::class)->group(function () {
+    Route::get('/banks', 'getAllBanks');
+    Route::post('/banks', 'createBank');
+});
 
 
 // Route::get('/tasks', [TaskController::class, 'getTaskData']);

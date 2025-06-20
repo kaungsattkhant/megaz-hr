@@ -173,4 +173,9 @@ class StaffAPIController extends Controller
     {
         $this->staffRepo->staffDuty($request, $id);
     }
+
+    public function nrcLists(Request $request)
+    {
+        $staff = $this->staffRepo->nrcLists($request);
+    }
 }

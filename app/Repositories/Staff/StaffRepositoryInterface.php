@@ -37,4 +37,6 @@ interface StaffRepositoryInterface
     public function staffReport(Request $request);
 
     public function staffDuty(Request $request, int $id);
+
+    public function nrcLists(Request $request);
 }

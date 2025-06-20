@@ -5,15 +5,16 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use Database\Seeders\ComplaintCategorySeeder;
-use Database\Seeders\DepartmentSeeder;
-use Database\Seeders\DivisionSeeder;
-use Database\Seeders\TownshipSeeder;
-use Database\Seeders\FeatureSeeder;
-use Database\Seeders\InventorySeeder;
-use Database\Seeders\GenderSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\StaffSeeder;
+use Database\Seeders\GenderSeeder;
+use Database\Seeders\FeatureSeeder;
+use Database\Seeders\DivisionSeeder;
+use Database\Seeders\TownshipSeeder;
+use Database\Seeders\InventorySeeder;
+use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\NrcTownshipSeeder;
+use Database\Seeders\ComplaintCategorySeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -52,7 +53,7 @@ class DatabaseSeeder extends Seeder
             StaffSeeder::class,
             GpsSeeder::class,
             DepartmentFeatureSeeder::class,
-
+            NrcTownshipSeeder::class,
         ]);
     }
 }
