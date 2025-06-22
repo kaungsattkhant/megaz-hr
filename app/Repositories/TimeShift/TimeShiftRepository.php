@@ -69,6 +69,14 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     $timeShift->update($data);
     return $timeShift;
   }
+  public function toggleTimeShift($timeShiftId)
+  {
+    $timeShift = TimeShift::find($timeShiftId);
+    $timeShift->update([
+      'is_active' => !$timeShift->is_active
+    ]);
+    return $timeShift;
+  }
 
   public function deleteTimeShiftById($timeShiftId)
   {

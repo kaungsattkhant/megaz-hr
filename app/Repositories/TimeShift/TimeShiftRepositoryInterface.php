@@ -27,6 +27,8 @@ interface TimeShiftRepositoryInterface
 
   public function updateTimeShift($data, $timeShiftId);
 
+  public function toggleTimeShift($timeShiftId);
+
   public function deleteTimeShiftById($timeShiftId);
 
   public function getCurrentTimeShift($request);

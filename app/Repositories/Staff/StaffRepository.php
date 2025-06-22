@@ -2,15 +2,18 @@
 
 namespace App\Repositories\Staff;
 
-use App\Models\Feature;
-use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
+use App\Models\Feature;
+use App\Models\Inventory;
+use App\Models\NrcTownship;
 use App\Models\StaffAdvance;
 use App\Models\StaffBalance;
-use App\Models\StaffEmergencyContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\StaffEmergencyContact;
+use Illuminate\Support\Facades\Storage;
 
 class StaffRepository implements StaffRepositoryInterface
 {
@@ -19,10 +22,10 @@ class StaffRepository implements StaffRepositoryInterface
         $departmentIds = $request->department_id;
         $roleIds = $request->role_id;
         $staffQuery = Staff::orderByDesc('id')
-            ->with(['department', 'roles'])
+            ->with(['department', 'roles',  'bank','staffCertifications'])
             ->when($request->search_input, function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-            })  
+            })
             ->when($departmentIds, function ($query) use ($departmentIds) {
                 $query->whereIn('department_id', $departmentIds);
             })
@@ -36,39 +39,6 @@ class StaffRepository implements StaffRepositoryInterface
             });
         $staff = isset($request->page) ? $staffQuery->paginate(config('common.list_count')) : $staffQuery->get();
         return $staff;
-
-        // if ($request->per_page || $request->page) {
-        //     return Staff::orderByDesc('id')
-        //         ->with(['department', 'roles'])
-        //         ->when($request->search_input, function ($q) use ($request) {
-        //             $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-        //         })
-        //         ->when($departmentIds, function ($query) use ($departmentIds) {
-        //             $query->whereIn('department_id', $departmentIds);
-        //         })
-        //         ->when($roleIds, function ($query) use ($roleIds) {
-        //             $query->whereHas('roles', function ($q) use ($roleIds) {
-        //                 $q->whereIn('id', $roleIds);
-        //             });
-        //         })
-        //         ->where('is_active', 1)
-        //         ->paginate(config('common.list_count'));
-        // } else {
-        //     return Staff::orderByDesc('id')
-        //         ->with(['department', 'roles'])
-        //         ->when($request->search_input, function ($q) use ($request) {
-        //             $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-        //         })
-        //         ->when($departmentIds, function ($query) use ($departmentIds) {
-        //             $query->whereIn('department_id', $departmentIds);
-        //         })
-        //         ->when($roleIds, function ($query) use ($roleIds) {
-        //             $query->whereHas('roles', function ($q) use ($roleIds) {
-        //                 $q->whereIn('id', $roleIds);
-        //             });
-        //         })
-        //         ->where('is_active', 1)->get();
-        // }
     }
 
     public function staffBalanceList(Request $request)
@@ -128,6 +98,21 @@ class StaffRepository implements StaffRepositoryInterface
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
 
+            if (isset($data['certificate_images']) && is_array($data['certificate_images'])) {
+                foreach ($data['certificate_images'] as $certificateImage) {
+                    if ($certificateImage instanceof \Illuminate\Http\UploadedFile) {
+                        $extension = $certificateImage->getClientOriginalExtension();
+                        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                        $path = $certificateImage->storeAs('staff_images', $hashedName, 'public');
+                        $url = Storage::url($path);
+
+                        $staff->staffCertifications()->create([
+                            'certificate_file_url' => $url,
+                            'certificate_file_path' => $path,
+                        ]);
+                    }
+                }
+            }
             if (isset($data['inventoryIds'])) {
                 $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
                 if (is_array($inventoryIds)) {
@@ -202,6 +187,30 @@ class StaffRepository implements StaffRepositoryInterface
                     }
                 }
 
+                if (isset($data['certificate_images']) && is_array($data['certificate_images'])) {
+                    foreach ($staff->staffCertifications as $oldCertification) {
+                        if ($oldCertification->certificate_file_path) {
+                            DeleteFileFromServer($oldCertification->certificate_file_path);
+                        }
+                        $oldCertification->delete();
+                    }
+                }
+                if (isset($data['certificate_images']) && is_array($data['certificate_images'])) {
+                    foreach ($data['certificate_images'] as $certificateImage) {
+                        if ($certificateImage instanceof \Illuminate\Http\UploadedFile) {
+                            $extension = $certificateImage->getClientOriginalExtension();
+                            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                            $path = $certificateImage->storeAs('staff_images', $hashedName, 'public');
+                            $url = Storage::url($path);
+
+                            $staff->staffCertifications()->create([
+                                'certificate_file_url' => $url,
+                                'certificate_file_path' => $path,
+                            ]);
+                        }
+                    }
+                }
+
                 $staff->update($data);
 
                 if (isset($data['roles']) && $data['roles'] !== null) {
@@ -236,7 +245,9 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks', 'features', 'skills')->find($id);
+        $staff = Staff::with('department', 'roles', 'inventories', 
+        'emergencyContacts', 'gender', 'completed_tasks', 
+        'features', 'skills', 'bank','staffCertifications')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }
@@ -316,6 +327,40 @@ class StaffRepository implements StaffRepositoryInterface
             ->where('is_active', 1)
             ->get();
         return $staffs;
+    }
+
+    public function changePassword(array $data, int $staffId)
+    {
+        if (
+            !isset($data['old_password']) ||
+            !isset($data['new_password']) ||
+            !isset($data['confirm_new_password'])
+        ) {
+            ResponseMessage('All password fields are required.', 422);
+        }
+
+        $staff = Staff::find($staffId);
+        if (!$staff) {
+            ResponseMessage('Staff not found', 404);
+        }
+        DB::beginTransaction();
+        try {
+            if (!Hash::check($data['old_password'], $staff->password)) {
+                ResponseMessage('Old password is incorrect.', 422);
+            }
+            if (isset($data['new_password']) && $data['new_password'] !== $data['confirm_new_password']) {
+                ResponseMessage('New Password and confirm password do not match', 402);
+            }
+            $staff->update([
+                'password' => ($data['new_password']),
+            ]);
+            DB::commit();
+            ResponseMessage('Password changed successfully', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
 
@@ -437,5 +482,17 @@ class StaffRepository implements StaffRepositoryInterface
         ])->find($id);
 
         ResponseData($staff);
+    }
+
+    public function nrcLists($request)
+    {
+        $nrc_code = $request->nrc_code;
+
+        $nrcLists = NrcTownship::orderBy('nrc_code', 'asc')
+            ->when($nrc_code, function ($q) use ($nrc_code) {
+                $q->where('nrc_code', $nrc_code);
+            })
+            ->get();
+        ResponseData($nrcLists);
     }
 }

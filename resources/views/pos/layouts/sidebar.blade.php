@@ -60,7 +60,7 @@
                         </span>
                     </a>
                 </li> -->
-                @if (checkFeaturePermission('invoice'))
+                @if (checkFeaturePermission('pos-invoice'))
                     <li>
                         <a href="/pos/invoices"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('invoices')">
