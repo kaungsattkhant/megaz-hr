@@ -639,6 +639,10 @@ Route::middleware(['departments:pay-slip'])->group(function () {
 Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/resignations', 'resignations.index')->name('resignations.index');
 });
+
+Route::middleware(['departments:event'])->group(function () {
+    Route::view('/events', 'event.index')->name('event.index');
+});
 // });
 
 // =======

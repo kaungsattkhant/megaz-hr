@@ -1144,6 +1144,15 @@
                             </a>
                         </li>
                     @endif
+                    @if (checkFeaturePermission('event'))
+                        <li>
+                            <a href="/events" class="flex items-center @yield('event') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}"
+                                    alt="">
+                                Event
+                            </a>
+                        </li>
+                    @endif
 
                 </ul>
 

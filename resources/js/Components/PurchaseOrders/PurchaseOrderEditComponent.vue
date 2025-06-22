@@ -13,7 +13,35 @@
                     </label>
                     <input type="date" v-model="date" class="input-ui">
                 </div>
-                <div class="col-span-8"></div>
+                <div class="col-span-4">
+                    <label for="" class="label-form mb-3">
+                        Type
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Item"
+                            data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                            <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                                {{ type.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-span-4" v-if="selectedType && selectedType.value === 'event'">
+                    <label for="" class="label-form mb-3">
+                        Event
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Item"
+                            data-te-select-filter="true" name="" id="" v-model="selectedEvent" class="input-ui">
+                            <option :value="event" v-for="(event, eventIndex) in eventList" :key="eventIndex">
+                                {{ event.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-span-4" v-else></div>
 
                 <div class="col-span-4">
                     <label for="" class="label-form mb-3">
@@ -394,6 +422,7 @@
                 selectedBaseUom: null,
                 baseQuantity: 0,
                 purchaseOrderItems: [],
+                remark: null,
 
                 unitPrice:null,
                 totalPrice: 0,
@@ -410,23 +439,40 @@
 
                 deleteId:null,
                 deleteIndex:null,
+
+                typeList:[
+                    {'name': 'KTV', 'value': 'ktv'},
+                    {'name': 'Restaurant', 'value': 'restaurant'},
+                    {'name': 'Event', 'value': 'event'},
+                ],
+                selectedType: null,
+                eventList: [],
+                selectedEvent: null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
+            async getEventList(){
+                let response = await getApiData({url: `/api/events`, token: this.getToken()});
+                if(response.data){
+                    this.eventList = response.data;
+                }
+            },
             async getPoDetail(){
                 let response = await getApiData({url: `/api/purchase_orders/${this.poId}`, token: this.getToken()});
                 if(response.data){
                     this.poDetail = response.data;
-                    this.addDetail();
+                    this.addDetail(response.data);
                     // this.date = this.purchaseOrder.date;
                     // this.purchaseOrderItems = this.purchaseOrder.items;
                     // this.updateTotalPrice(this.purchaseOrderItems);
                 }
             },
-            addDetail(){
+            addDetail(detail){
                 this.date = this.poDetail.date;
+                this.selectedType = this.typeList.find(type => type.value === detail.type);
+                this.selectedEvent = this.eventList.find(event => event.id = detail.event_id)
                 this.poDetail.items.forEach(po => {
                     // let quantity = (po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity
                     // let price = ((po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity) * po.item.average_price
@@ -449,6 +495,7 @@
                         base_uom_quantity: po.base_uom_quantity,
                         base_uom_name: po.base_uom.name,
                         name: po.item.name,
+                        remark: po.remark,
                         // small_quantity: small_uom_quantity,
                         // big_quantity: big_uom_quantity
                     });
@@ -547,6 +594,7 @@
                         base_uom_quantity: this.baseQuantity,
                         base_uom_name: this.selectedBaseUom.name,
                         name: this.selectedItem.name,
+                        remark: this.remark,
                     });
                 }
                 
@@ -623,6 +671,14 @@
                     this.alertValidationMessage('Date');
                     return 1;
                 }
+                if(!this.selectedType){
+                    this.alertValidationMessage('Type');
+                    return 1;
+                }
+                if(this.selectedType.value === 'event' && !this.selectedEvent){
+                    this.alertValidationMessage('Event');
+                    return 1;
+                }
                 if(this.purchaseOrderItems.length<1){
                     this.alertValidationMessage('Items');
                     return 1;
@@ -634,6 +690,10 @@
                 let formData = new FormData();
                 formData.append('id', this.poId);
                 formData.append('date', this.date);
+                formData.append('type', this.selectedType.value);
+                if(this.selectedType.value === 'event'){
+                    formData.append('event_id', this.selectedEvent.id);
+                }
                 formData.append('total_price', priceTotal);
                 formData.append('items', JSON.stringify(this.purchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
@@ -666,6 +726,7 @@
 
         created(){
             this.getItemList();
+            this.getEventList();
             this.getUomList();
             this.getPoDetail();
         },
