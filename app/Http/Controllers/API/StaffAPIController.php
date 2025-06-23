@@ -90,6 +90,11 @@ class StaffAPIController extends Controller
         }
         ResponseData($staff);
     }
+    public function changePassword(Request $request, int $staffId)
+    {
+        $staff = $this->staffRepo->changePassword($request->all(), $staffId);
+        ResponseData($staff);
+    }
 
     public function deleteStaff($id)
     {
@@ -167,5 +172,10 @@ class StaffAPIController extends Controller
     public function getStaffWithDuties(Request $request, int $id)
     {
         $this->staffRepo->staffDuty($request, $id);
+    }
+
+    public function nrcLists(Request $request)
+    {
+        $staff = $this->staffRepo->nrcLists($request);
     }
 }

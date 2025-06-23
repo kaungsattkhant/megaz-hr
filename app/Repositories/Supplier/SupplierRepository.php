@@ -46,6 +46,30 @@ class SupplierRepository implements SupplierInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            
+            if (isset($data['credit_term_type'])) {
+                switch ($data['credit_term_type']) {
+                    case "day":
+                        $data['amount_limitation'] = null;
+                        $data['exact_date'] = null;
+                        break;
+                    case "amount_limitation":
+                        $data['day'] = null;
+                        $data['exact_date'] = null;
+                        break;
+                    case "exact_date":
+                        $data['day'] = null;
+                        $data['amount_limitation'] = null;
+                        if (isset($data['exact_date']) && $data['exact_date'] !== 'null') {
+                            $decodedExactDate = json_decode($data['exact_date'], true);
+                            if (json_last_error() !== JSON_ERROR_NONE) {
+                                return ResponseMessage('Invalid JSON data provided for exact_date.', 400);
+                            }
+                            $data['exact_date'] = json_encode($decodedExactDate);
+                        }
+                        break;
+                }
+            }
             $supplier = Supplier::updateOrCreate(
                 ['id' => $data['id']],
                 $data
