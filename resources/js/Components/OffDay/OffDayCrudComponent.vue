@@ -243,7 +243,7 @@
                                 <!-- <option value="department"> Department </option>
                                 <option value="staff"> Staff </option> -->
                             </select>
-                        </div> 
+                        </div>
                     </div>
                     <div class="mb-4" v-show="selectedType && selectedType.value === 'department'">
                         <label for="" class="label-form mb-3">
@@ -339,7 +339,7 @@
                         </label>
                         <input type="text" id="daterange" v-model="selectedDateRange" class="form-control input-ui" />
                     </div>
-                    
+
                 </div>
 
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -410,7 +410,7 @@ export default {
 
             name: null,
             selectedDate: [],
-            
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -418,7 +418,7 @@ export default {
 
             searchInput: null,
 
-            
+
 
             url:'/api/hr/off_days?off_day',
             url_search:'',
@@ -428,7 +428,8 @@ export default {
 
             selectedDateRange: null,
 
-            feature: this.getFeature(),
+
+
         };
     },
 
@@ -481,9 +482,9 @@ export default {
             let formData = new FormData();
             formData.append('repetition', this.selectedRepetition.value);
             formData.append('days', JSON.stringify(selectedDayList));
-            formData.append('offdayable_type',this.selectedType.value);
-            
-            if(this.selectedType.value === 'department'){
+            formData.append('offdayable_type',this.selectedType);
+
+            if(this.selectedType == 'department'){
                 let offdayable_id = [];
                 this.selectedDepartment.forEach((department) => {
                     offdayable_id.push(String(department.id))
@@ -509,7 +510,7 @@ export default {
             }
         },
 
-        
+
 
         async getOffDayList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
@@ -548,7 +549,7 @@ export default {
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('date', JSON.stringify(this.selectedDate));
-            
+
             let response = await postApiData({url:`/api/hr/public_holidays`, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getOffDayList();
@@ -608,7 +609,7 @@ export default {
                 $('#daterange').daterangepicker({
                     opens: 'left',
                     locale: { format: 'YYYY-MM-DD' }
-                }, 
+                },
                 function(start, end) {
                     const allDates = [];
                     let currentDate = start.clone();
