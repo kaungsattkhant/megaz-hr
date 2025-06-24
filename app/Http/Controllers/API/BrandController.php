@@ -47,7 +47,7 @@ class BrandController extends Controller
     {
         $itemIds = $request->item_ids;
         $brands = Brand::whereHas('items', function ($query) use ($itemIds) {
-            $query->whereIn('item_id', $itemIds);
+            $query->whereIn('items.id', $itemIds);
         })->get();
         return ResponseData($brands);
     }
