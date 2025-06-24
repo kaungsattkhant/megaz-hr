@@ -78,7 +78,7 @@ class ItemRepository implements ItemRepositoryInterface
 
             $baseUomId = $data['base_uom_id'];
             $uomId = $data['uom_id'];
-            $conversionRate=$data['conversion'];
+            $conversionRate = $data['conversion'];
             // $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
             //     ->where('conversion_unit_id', $uomId)
             //     ->where('is_active', 1)
@@ -120,7 +120,7 @@ class ItemRepository implements ItemRepositoryInterface
                 $item->brands()->sync($data['brand_id']);
             }
             //create uom converion 
-            $uomConversion=$this->createUomConversion($item,$data);
+            $uomConversion = $this->createUomConversion($item, $data);
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
@@ -206,7 +206,7 @@ class ItemRepository implements ItemRepositoryInterface
 
         DB::beginTransaction();
         try {
-            if ((isset($data['type']) &&  $data['type'] === 'uom')) {
+            if ((isset($data['type']) && $data['type'] === 'uom')) {
                 $data['price'] = $data['uom_conversion'] * $data['uom_price'];
             } else if ((isset($data['type']) && $data['type'] === 'base_uom')) {
                 $data['price'] = $data['uom_price'];
@@ -244,13 +244,23 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function supplierByItem($itemId)
     {
-        // $supplierByItem = SupplierItem::with('supplier', 'item','brand')
-        //     ->where('item_id',  $itemId)
-        //     // ->groupBy('supplier_id')
+      
+        // $supplierByItem = SupplierItem::join('items', 'supplier_items.item_id', '=', 'items.id')
+        //     ->join('suppliers', 'supplier_items.supplier_id', '=', 'suppliers.id') // optional if you need supplier data
+        //     ->join('brands', 'supplier_items.brand_id', '=', 'brands.id')         // optional if you need brand data
+        //     ->where('supplier_items.item_id', $itemId)
+        //     ->select(
+        //         'supplier_items.supplier_id',
+        //         'items.name as item_name',
+        //         'suppliers.name as supplier_name',
+        //         DB::raw('MAX(supplier_items.id) as id')
+        //     )
+        //     ->groupBy('supplier_items.supplier_id', 'items.name')
         //     ->get();
-        $supplierByItem = SupplierItem::with('supplier', 'item', 'brand')
-            ->where('item_id', $itemId)
-            ->select('supplier_id', DB::raw('MAX(id) as id')) // Use MAX(id) to pick a unique row per supplier_id
+        $supplierByItem = SupplierItem::with('supplier', 'brand')
+        ->join('items','supplier_items.item_id','items.id')
+            ->where('items.id', $itemId)
+            ->select('supplier_id','items.name as item_name', DB::raw('MAX(supplier_items.id) as id')) // Use MAX(id) to pick a unique row per supplier_id
             ->groupBy('supplier_id')
             ->get();
         return $supplierByItem;
@@ -406,19 +416,20 @@ class ItemRepository implements ItemRepositoryInterface
         ResponseMessage('Import UOM Import Successfully', 200);
     }
 
-    public function createUomConversion($item,$data){
-        $existConversion=UomConversion::where('item_id',$item->id)
-        ->where('base_unit_id',$data['base_uom_id'])
-        ->where('conversion_unit_id',$data['uom_id'])
-        ->first();
-        if($existConversion){
-            ResponseMessage('Uom Conversion is already exist',419);
+    public function createUomConversion($item, $data)
+    {
+        $existConversion = UomConversion::where('item_id', $item->id)
+            ->where('base_unit_id', $data['base_uom_id'])
+            ->where('conversion_unit_id', $data['uom_id'])
+            ->first();
+        if ($existConversion) {
+            ResponseMessage('Uom Conversion is already exist', 419);
         }
-        $uomConversion=UomConversion::create([
-            'item_id'=>$item->id,
-            'base_unit_id'=>$data['base_uom_id'],
-            'conversion_unit_id'=>$data['uom_id'],
-            'conversion'=>$data['conversion'],
+        $uomConversion = UomConversion::create([
+            'item_id' => $item->id,
+            'base_unit_id' => $data['base_uom_id'],
+            'conversion_unit_id' => $data['uom_id'],
+            'conversion' => $data['conversion'],
         ]);
         return $uomConversion;
     }
