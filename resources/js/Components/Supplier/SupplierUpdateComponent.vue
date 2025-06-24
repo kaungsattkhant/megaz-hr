@@ -182,7 +182,7 @@
                 <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addItemBtnClicked()" >
                     Add
                 </button>
-            </div>
+            </div><div class="col-span-3"></div>
             <div class=" col-span-12 mb-8" v-show="selectedItemList.length > 0">
                 <table class="min-w-[50%] text-sm font-light ml-2">
                     <thead class="font-medium text-left ">
@@ -644,7 +644,17 @@ export default {
                 this.lead_time_day = this.supplier.lead_time_day;
                 this.lead_time_hour = this.supplier.lead_time_hour;
                 this.lead_time_min = this.supplier.lead_time_minutes;
-                this.credit_terms = this.supplier.credit_terms;
+                this.selectedTermType = this.supplier.credit_term_type;
+                if(this.supplier.credit_term_type === 'day'){
+                    this.term_day = this.supplier.day;
+                }
+                if(this.supplier.credit_term_type === 'exact_date'){
+                    this.term_day = this.supplier.exact_date;
+                }
+                if(this.supplier.credit_term_type === 'amount_limitation'){
+                    this.term_day = this.supplier.amount_limitation;
+                }
+                // this.credit_terms = this.supplier.credit_terms;
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
                 this.selectedCreditAccount = this.creditAccList.find(crd => crd.id === this.supplier.creditor_account_id )

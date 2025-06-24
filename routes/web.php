@@ -272,10 +272,10 @@ Route::middleware(['departments:pos-ar'])->group(function () {
 Route::middleware(['departments:pos-cashbook'])->group(function () {
     Route::view('/cashbook', 'pos.cashbook.index')->name('pos.cashbooks');
 });
-Route::middleware(['departments:pos-booking'])->group(function () {
+// Route::middleware(['departments:pos-booking'])->group(function () {
     Route::view('/booking', 'pos.booking.index');
     Route::view('/booking/create', 'pos.booking.create');
-});
+// });
 Route::middleware(['departments:pos-food-order'])->group(function () {
     Route::view('/food_orders', 'pos.menu_order.index');
     Route::view('/food_orders/create', 'pos.menu_order.create');

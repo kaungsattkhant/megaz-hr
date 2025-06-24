@@ -151,7 +151,7 @@
                             placeholder="Base UOM Qty"
                             v-model="baseUomQty"
                             min="0"
-                            class="input-ui"
+                            class="input-ui !w-20"
                             @change="baseUomQtyChanged">
                         </div>
                         <div>
@@ -167,7 +167,7 @@
                             v-model="uomQty"
                             min="0"
                             :max="uomUpperLimit"
-                            class="input-ui"
+                            class="input-ui !w-20"
                             @change="uomQtyChanged">
                         </div>
                         <div>
@@ -210,6 +210,18 @@
                             for="checkboxDefault">
                             Later Arrival
                         </label>
+                    </div>
+                    <div class="mb-4">
+                        <label for="invoice" class="text-sm">Quality</label>
+                        <select id="invoice" v-model="selectedQuality" @change="invoiceSelectChanged()"
+                            class="text-sm border border-gray-300 input-ui w-12
+                            bg-transparent rounded-lg focus:ring-0">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select>
                     </div>
                     <div class="mb-4">
                         <label for="invoice" class="text-sm">Invoice</label>
@@ -319,6 +331,8 @@ export default {
             isLoading:true,
 
             feature: this.getFeature(),
+
+            selectedQuality: null,
         }
     },
 
@@ -446,6 +460,10 @@ export default {
                 this.alertValidationMessage(`new invoice number`);
                 return;
             }
+            if(!this.selectedQuality){
+                this.alertValidationMessage(`Quality`);
+                return;
+            }
             if(!this.isCreateNewInvoice && !this.selectedInvoice){
                 this.alertValidationMessage(`existing invoice number`);
                 return;
@@ -461,6 +479,7 @@ export default {
             formData.append('quantity', this.confirmArrivalTotalQty);
             formData.append('amount', this.totalPrice);
             formData.append('item_id', this.confirmArrivalItem.item_id);
+            formData.append('quality', this.selectedQuality);
 
 
             formData.append('purchase_order_id', this.confirmArrivalItem.purchase_order_id);

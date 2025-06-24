@@ -12,13 +12,18 @@
                     <i class="fal fa-search"></i>
                 </label>
 
-                <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter by department"
-                        data-te-select-filter="true" v-model="searchCategory" class="h-full">
-                        <option :value="department" v-for="department in departmentList" :key="department.id">
-                            {{ department.name }}
-                        </option>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                            :key="departmentIndex"> {{ department.name }} </option>
+                    </select>
+                </div>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                        <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                            :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
 
@@ -208,13 +213,21 @@ export default {
             editDepartment: null,
             deleteId: null,
 
+            searchRoleList: [],
+
             searchInput: null,
-            searchCategory: null,
+            searchDepartment: null,
+            searchRole: null,
 
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData:0,
+
+            url:'/api/staffs',
+            url_search:'',
+            url_department:'',
+            url_role:'',
 
             user: null,
             feature: this.getFeature(),
@@ -233,17 +246,24 @@ export default {
         },
 
         async getStaffsList(pageNumber) {
-
-            let url = `/api/staffs?page=${pageNumber}`;
-            if (this.searchInput && this.searchCategory) {
-                url = `/api/staffs?search_input=${this.searchInput}&department_id=${this.searchCategory.id}&page=${pageNumber}`;
+            let url_page_number = '';
+            if(this.url_search || this.url_department || this.url_role){
+                url_page_number = '&page=' + pageNumber
             }
-            if (this.searchInput && !this.searchCategory) {
-                url = `/api/staffs?search_input=${this.searchInput}&page=${pageNumber}`;
+            else{
+                url_page_number = '?page=' + pageNumber
             }
-            if ((!this.searchInput) && this.searchCategory) {
-                url = `/api/staffs?department_id=${this.searchCategory.id}&page=${pageNumber}`;
-            }
+            // let url = `/api/staffs?page=${pageNumber}`;
+            // if (this.searchInput && this.searchCategory) {
+            //     url = `/api/staffs?search_input=${this.searchInput}&department_id=${this.searchCategory.id}&page=${pageNumber}`;
+            // }
+            // if (this.searchInput && !this.searchCategory) {
+            //     url = `/api/staffs?search_input=${this.searchInput}&page=${pageNumber}`;
+            // }
+            // if ((!this.searchInput) && this.searchCategory) {
+            //     url = `/api/staffs?department_id=${this.searchCategory.id}&page=${pageNumber}`;
+            // }
+            let url = this.url + this.url_search + this.url_department + this.url_role + url_page_number;
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data != null) {
 
@@ -281,15 +301,45 @@ export default {
             }
         },
 
+
+
+        searchDepartmentChange(){
+            if(this.searchInput){
+                this.url_department = '&department_id[]='+this.searchDepartment.id;
+            }
+            else{
+                this.url_department = '?department_id[]='+this.searchDepartment.id;
+            }
+            this.searchRoleList = this.searchDepartment.roles;
+            this.searchRole = null;
+            this.getStaffsList(1);
+        },
+        searchRoleChange(){
+            this.url_role = '&role_id[]='+this.searchRole.id;
+            this.getStaffsList(1);
+        },
         async searchBtnClicked() {
+            this.url_search = '?search_input=' + this.searchInput
+            this.getStaffsList(1);
+        },
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.url_search = '';
+            this.searchDepartment = null;
+            this.searchRoleList = [];
+            this.searchRole = null;
             this.getStaffsList(1);
         },
 
-        clearSearchBtnClicked() {
-            this.searchInput = null;
-            this.searchCategory = null;
-            this.getStaffsList(1);
-        },
+        // async searchBtnClicked() {
+        //     this.getStaffsList(1);
+        // },
+
+        // clearSearchBtnClicked() {
+        //     this.searchInput = null;
+        //     this.searchCategory = null;
+        //     this.getStaffsList(1);
+        // },
 
     },
 

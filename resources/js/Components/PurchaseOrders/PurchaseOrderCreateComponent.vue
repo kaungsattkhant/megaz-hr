@@ -392,21 +392,19 @@ import { find } from "lodash";
                 if (response.success) {
                     isLimitExceed = 0;
                     // document.getElementById('close_create_modal').click();
-                    this.limitWarning = null;
+                    // this.limitWarning = null;
                 }
                 else {
                     isLimitExceed = 1;
-                    // this.$notify({
-                    //     title: `Input validation`,
-                    //     text: response.message,
-                    //     type: "warn"
-                    // });
-                    this.limitWarning = response.message;
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "error"
+                    });
+                    // this.limitWarning = response.message;
                 }
 
 
-                if(!this.limitWarning){
-                    alert(this.limitWarning)
                     if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
                         let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
                         // alert('item brand match' + index)
@@ -449,11 +447,7 @@ import { find } from "lodash";
                     this.selectedBrand = null;
                     this.remark = null;
                     // this.unitPrice = null;
-                }
-                else{
-
-                    alert(this.limitWarning)
-                }
+                
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){

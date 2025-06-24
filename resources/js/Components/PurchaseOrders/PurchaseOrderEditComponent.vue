@@ -571,6 +571,28 @@
                 let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
                 // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
                 let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
+                let isLimitExceed = 0;
+                let formData = new FormData();
+                formData.append('item_id', this.selectedItem.id);
+                formData.append('base_uom_quantity', this.baseQuantity);
+                formData.append('uom_quantity', this.quantity);
+                formData.append('amount', price);
+                let response = await postApiData({ url: '/api/purchase_orders_items/check_limitation', form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    isLimitExceed = 0;
+                    // document.getElementById('close_create_modal').click();
+                    // this.limitWarning = null;
+                }
+                else {
+                    isLimitExceed = 1;
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "error"
+                    });
+                    // this.limitWarning = response.message;
+                }
+
                 if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
                     let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
                     this.purchaseOrderItems[index].quantity += quantity;
@@ -595,6 +617,7 @@
                         base_uom_name: this.selectedBaseUom.name,
                         name: this.selectedItem.name,
                         remark: this.remark,
+                        is_exceed_max_limitation: isLimitExceed
                     });
                 }
                 
