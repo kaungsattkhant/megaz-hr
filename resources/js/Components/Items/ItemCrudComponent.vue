@@ -353,6 +353,12 @@
                                 </option>
                             </select>
                         </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Conversion
+                            </label>
+                            <input type="number" step="0.01" placeholder="Conversion" v-model="conversion" class="input-ui">
+                        </div>
                         <!-- <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 Lead Time
@@ -695,6 +701,7 @@ export default {
             maxBaseUomLimit: null,
             maxUomLimit: null,
             limit_amount: null,
+            conversion: null,
 
             feature: this.getFeature(),
         };
@@ -851,6 +858,7 @@ export default {
             // formData.append('brand_id',this.selectedBrand.id);
             formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             formData.append('min_holding_uom_quantity',this.min_amount);
+            formData.append('conversion',this.conversion);
             formData.append('limitation_type',this.selectedLimitType);
             if(this.selectedLimitType === 'uom'){
                 formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
