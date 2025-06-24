@@ -435,6 +435,7 @@ export default {
             selectedDateRange: null,
 
             feature: this.getFeature(),
+            test: null,
         };
     },
 
