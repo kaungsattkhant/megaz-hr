@@ -20,7 +20,13 @@
                 <label for="" class="label-form mb-3">
                     Date of Birth
                 </label>
-                <input type="date" v-model="dob" class="input-ui">
+                <!-- <input type="date" v-model="dob" class="input-ui"> -->
+                 <flat-pickr
+                    v-model="dob"
+                    :config="{ dateFormat: 'd/m/Y' }"
+                    class="input-ui"
+                    placeholder="dd/mm/yyyy"
+                />
                 <div class="mt-1" v-if="dateOfBirthInputError">
                     <span class="px-1 text-red-600 text-sm">{{ dateOfBirthInputError }} *</span>
                 </div>
@@ -48,6 +54,79 @@
                 </select> -->
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
+                &nbsp;
+                <!-- <label for="" class="label-form mb-3">
+                    NRC Number
+                </label>
+                <input type="text" v-model="nrcNumber" placeholder="NRC (Required)" class="input-ui">
+                <div class="mt-1" v-if="nrcInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcInputError }} *</span>
+                </div> -->
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Code
+                </label>
+                <div class="flex">
+                    <multiselect v-model="selectedNrcCode"
+                    :options="[1,2,3,4,5,6,7,8,9,10,11,12,13,14]"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Select NRC Code"
+                    :preselect-first="false"
+                    @select="getNrcTownships">
+                    </multiselect>
+                    <div class="mx-2 text-lg text-4xl text-gray-500">
+                        /
+                    </div>
+                </div>
+                <div class="mt-1" v-if="nrcCodeError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcCodeError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Townships
+                </label>
+                <multiselect v-model="selectedNrcTownship"
+                :options="nrcTownships"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select NRC Township"
+                track-by="id"
+                label="name_en"
+                :preselect-first="false">
+                </multiselect>
+                <div class="mt-1" v-if="nrcTownshipError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcTownshipError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Type
+                </label>
+                <multiselect v-model="selectedNrcType"
+                :options="['N','E','P']"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select NRC Type"
+                :preselect-first="false">
+                </multiselect>
+                <div class="mt-1" v-if="nrcTypeError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcTypeError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     NRC Number
                 </label>
@@ -82,7 +161,13 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Joined Date
                 </label>
-                <input type="date" v-model="joinedDate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <!-- <input type="date" v-model="joinedDate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                 <flat-pickr
+                    v-model="joinedDate"
+                    :config="{ dateFormat: 'd/m/Y' }"
+                    class="input-ui"
+                    placeholder="dd/mm/yyyy"
+                />
                 <div class="mt-1" v-if="joinedDateInputError">
                     <span class="px-1 text-red-600 text-sm">{{ joinedDateInputError }} *</span>
                 </div>
@@ -288,7 +373,12 @@
                 </label>
                 <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-front" ref="nrc_front_image"
                 class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
-                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onNrcFrontChange">
+                <img v-if="nrcFrontPreview" :src="nrcFrontPreview" alt="NRC Front Preview" class="mt-2 h-24" />
+                <div class="mt-1" v-if="nrcFrontFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcFrontFileError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -297,7 +387,12 @@
                 </label>
                 <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-back" ref="nrc_back_image"
                 class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
-                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onNrcBackChange">
+                <img v-if="nrcBackPreview" :src="nrcBackPreview" alt="NRC Back Preview" class="mt-2 h-24" />
+                <div class="mt-1" v-if="nrcBackFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcBackFileError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -306,19 +401,47 @@
                 </label>
                 <input type="file" accept="image/png, image/gif, image/jpeg" id="household-registration" ref="household_registration_image"
                 class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
-                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onHouseHoldRegistrationChange">
+                <img v-if="houseHoldRegistrationPreview" :src="houseHoldRegistrationPreview" alt="Household Registration Preview" class="mt-2 h-24" />
+                <div class="mt-1" v-if="houseHoldRegistrationFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ houseHoldRegistrationFileError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3"></div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
+                    Bank Name
+                </label>
+                <multiselect v-model="selectedBank"
+                :options="banksList"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select Bank"
+                track-by="id"
+                label="name"
+                :preselect-first="false">
+                </multiselect>
+                <div class="mt-1" v-if="bankSelectError">
+                    <span class="px-1 text-red-600 text-sm">{{ bankSelectError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
                     Bank Account Number
                 </label>
                 <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
+                <div class="mt-1" v-if="bankAccountNumberError">
+                    <span class="px-1 text-red-600 text-sm">{{ bankAccountNumberError }} *</span>
+                </div>
             </div>
 
-            <div class="col-span-9"></div>
+            <div class="col-span-6"></div>
 
             <hr class="col-span-12 mb-4">
 
@@ -495,10 +618,13 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { getCurrentDate } from "../../utilities/datetime-helpers";
+import FlatPickr from 'vue-flatpickr-component'
+import 'flatpickr/dist/flatpickr.css'
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        FlatPickr
     },
     data() {
         return {
@@ -534,16 +660,22 @@ export default {
             motherName: null,
             joinedDate: getCurrentDate(),
             password: null,
-            nrcNumber: null,
+
             state: null,
             city: null,
             address: null,
             zipCode: null,
 
             nrcFrontFile: null,
+            nrcFrontPreview: null,
             nrcBackFile: null,
+            nrcBackPreview: null,
             houseHoldRegistrationFile: null,
-            bankAccountNumber: null,
+            houseHoldRegistrationPreview: null,
+
+            nrcFrontFileError: null,
+            nrcBackFileError: null,
+            houseHoldRegistrationFileError: null,
 
             primaryName: null,
             primaryPhone: null,
@@ -560,7 +692,7 @@ export default {
             nameInputError: null,
             dateOfBirthInputError: null,
             genderInputError: null,
-            nrcInputError: null,
+
             phoneNumberInputError: null,
             passwordInputError: null,
             joinedDateInputError: null,
@@ -576,11 +708,45 @@ export default {
             secondaryNameInputError: null,
             secondaryPhoneInputError: null,
             secondaryRelationshipInputError: null,
+
+            selectedNrcCode: null,
+            nrcTownships: [],
+            selectedNrcTownship: null,
+            selectedNrcType: 'N',
+            nrcNumber: null,
+
+            nrcCodeError: null,
+            nrcTownshipError: null,
+            nrcTypeError: null,
+            nrcInputError: null,
+
+            banksList: [],
+            selectedBank: null,
+            bankAccountNumber: null,
+
+            bankSelectError: null,
+            bankAccountNumberError: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        onNrcFrontChange(e) {
+            const file = e.target.files[0];
+            this.nrcFrontFile = file;
+            this.nrcFrontPreview = file ? URL.createObjectURL(file) : null;
+        },
+        onNrcBackChange(e) {
+            const file = e.target.files[0];
+            this.nrcBackFile = file;
+            this.nrcBackPreview = file ? URL.createObjectURL(file) : null;
+        },
+        onHouseHoldRegistrationChange(e) {
+            const file = e.target.files[0];
+            this.houseHoldRegistrationFile = file;
+            this.houseHoldRegistrationPreview = file ? URL.createObjectURL(file) : null;
+        },
 
         async getStateList() {
             let response = await getApiData({ url: `/api/mmrc/regions` });
@@ -677,17 +843,17 @@ export default {
             this.featureIds = [];
             this.inventoryIds = [];
 
-            if(this.$refs.nrc_front_image.files[0]){
-                this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
-            }
+            // if(this.$refs.nrc_front_image.files[0]){
+            //     this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
+            // }
 
-            if(this.$refs.nrc_back_image.files[0]){
-                this.nrcBackFile = this.$refs.nrc_back_image.files[0];
-            }
+            // if(this.$refs.nrc_back_image.files[0]){
+            //     this.nrcBackFile = this.$refs.nrc_back_image.files[0];
+            // }
 
-            if(this.$refs.household_registration_image.files[0]){
-                this.houseHoldRegistrationFile = this.$refs.household_registration_image.files[0];
-            }
+            // if(this.$refs.household_registration_image.files[0]){
+            //     this.houseHoldRegistrationFile = this.$refs.household_registration_image.files[0];
+            // }
 
             if(!this.selectedDepartment){
                 this.alertValiationMessage('department');
@@ -714,9 +880,6 @@ export default {
                     this.inventoryIds.push(inventory.id);
                 });
             }
-            // this.selectedRoles.forEach((role) => {
-            //     this.roleIds.push(role.id);
-            // });
 
             this.selectedSkills.forEach((skill) => {
                 this.skillIds.push(skill.id);
@@ -746,18 +909,41 @@ export default {
                 return 1;
             }
 
-            if (!this.nrcNumber) {
-                this.alertValiationMessage('Nrc');
-                this.nrcInputError = "NRC must be filled";
+            if(!this.selectedNrcCode){
+                this.alertValiationMessage('NRC Code');
+                this.nrcCodeError = "NRC Code must be selected";
                 return 1;
             }
 
-            if (!this.phoneNumber) {
+            if(!this.selectedNrcTownship){
+                this.alertValiationMessage('NRC Township');
+                this.nrcTownshipError = "NRC Township must be selected";
+                return 1;
+            }
+
+            if(!this.selectedNrcType){
+                this.alertValiationMessage('NRC Type');
+                this.nrcTypeError = "NRC Type must be selected";
+                return 1;
+            }
+
+            if (!this.nrcNumber || !this.nrcNumber.match(/^\d{6,8}$/)) {
+                this.alertValiationMessage('NRC Number');
+                this.nrcInputError = "NRC Number must be filled and valid (6 to 8 digits)";
+                return 1;
+            }
+
+            if (!this.phoneNumber || !this.phoneNumber.match(/^09\d{7}(\d{2})?$/)) {
                 this.alertValiationMessage('phone number');
-                this.phoneNumberInputError = "Phone number must be filled";
+                this.phoneNumberInputError = "Phone number must be filled and valid (09XXXXXXXX or 09XXXXXXXXXX)";
                 return 1;
             }
 
+            // if (!this.password || !this.password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)) {
+            //     this.alertValiationMessage('password');
+            //     this.passwordInputError = "Password must be filled and valid (at least 8 characters, at least one letter and one number)";
+            //     return 1;
+            // }
             if (!this.password) {
                 this.alertValiationMessage('password');
                 this.passwordInputError = "Password must be filled";
@@ -805,6 +991,36 @@ export default {
                 return 1;
             }
 
+            if(!this.nrcFrontFile){
+                this.alertValiationMessage('NRC front image');
+                this.nrcFrontFileError = 'NRC front image must be uploaded';
+                return;
+            }
+
+            if(!this.nrcBackFile){
+                this.alertValiationMessage('NRC back image');
+                this.nrcBackFileError = 'NRC back image must be uploaded';
+                return;
+            }
+
+            if(!this.houseHoldRegistrationFile){
+                this.alertValiationMessage('Household registration image');
+                this.houseHoldRegistrationFileError = 'Household registration image must be uploaded';
+                return;
+            }
+
+            if(!this.selectedBank){
+                this.alertValiationMessage('bank name');
+                this.bankSelectError = 'Bank name must be selected';
+                return;
+            }
+
+            if(!this.bankAccountNumber || !this.bankAccountNumber.match(/^\d{4,20}$/)){
+                this.alertValiationMessage('bank account number');
+                this.bankAccountNumberError = 'Bank account number must be filled and valid (4 to 20 digits)';
+                return;
+            }
+
             if (!this.primaryName) {
                 this.alertValiationMessage('primary name');
                 this.primaryNameInputError = "Primary contact name must be filled";
@@ -837,7 +1053,7 @@ export default {
 
             if (!this.secondaryRelationship) {
                 this.alertValiationMessage('secondary relationship');
-                this.secondaryRelationshipInputError = "Relationship with the Secondary contact must be filled";
+                this.secondaryRelationshipInputError = "Relationship with the secondary contact must be filled";
                 return 1;
             }
 
@@ -848,10 +1064,10 @@ export default {
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('phone_number', this.phoneNumber);
-            if (this.nrcNumber) {
-                formData.append('nrc_number', this.nrcNumber);
-            }
-
+            formData.append('nrc_code', this.selectedNrcCode);
+            formData.append('nrc_township_code', this.selectedNrcTownship.name_en);
+            formData.append('nrc_type', this.selectedNrcType);
+            formData.append('nrc_number', this.nrcNumber);
 
             if (this.fatherName) {
                 formData.append('father_name', this.fatherName);
@@ -873,9 +1089,8 @@ export default {
                 formData.append('zip_code', this.zipCode);
             }
 
-            if (this.bankAccountNumber) {
-                formData.append('bank_account_number', this.bankAccountNumber);
-            }
+            formData.append('bank_id', this.selectedBank.id);
+            formData.append('bank_account_number', this.bankAccountNumber);
 
             formData.append('birthdate', this.dob);
             formData.append('state', this.state);
@@ -894,16 +1109,14 @@ export default {
             formData.append('featureIds', JSON.stringify(this.featureIds));
             formData.append('joined_date', this.joinedDate);
 
-            if(this.nrcFrontFile){
-                formData.append('nrc_front_image', this.nrcFrontFile);
+            if (this.nrcFrontFile) {
+                formData.append('certificate_images[]', this.nrcFrontFile);
             }
-
-            if(this.nrcBackFile){
-                formData.append('nrc_back_image', this.nrcBackFile);
+            if (this.nrcBackFile) {
+                formData.append('certificate_images[]', this.nrcBackFile);
             }
-
-            if(this.houseHoldRegistrationFile){
-                formData.append('household_registration_image', this.houseHoldRegistrationFile);
+            if (this.houseHoldRegistrationFile) {
+                formData.append('certificate_images[]', this.houseHoldRegistrationFile);
             }
 
             // for emegercy
@@ -930,6 +1143,29 @@ export default {
                 });
             }
         },
+
+        getNrcTownships(){
+            if(!this.selectedNrcCode){
+                this.alertValiationMessage('NRC Code');
+                this.nrcTownships = [];
+                return;
+            }
+            this.selectedNrcTownship = null;
+            this.nrcTownships = [];
+            getApiData({ url: `/api/nrcs?nrc_code=${this.selectedNrcCode}`, token: this.getToken() }).then(response => {
+                if (response.data) {
+                    this.nrcTownships = response.data;
+                }
+            });
+        },
+
+        getBanksList() {
+            getApiData({ url: `/api/banks`, token: this.getToken() }).then(response => {
+                if (response.data) {
+                    this.banksList = response.data;
+                }
+            });
+        },
     },
 
     created() {
@@ -938,6 +1174,7 @@ export default {
         // this.getRoleList();
         // this.getInventoryList();
         this.getStateList();
+        this.getBanksList();
         // this.getInventoryList();
     },
 
