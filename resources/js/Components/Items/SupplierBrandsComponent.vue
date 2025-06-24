@@ -13,6 +13,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Supplier</th>
+                                <th>Item</th>
                                 <th>Brand</th>
                                 <th>Price</th>
                                 <th>UOM</th>
@@ -25,6 +27,12 @@
                                 <tr class="">
                                     <td class="">
                                         {{ index + 1 }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ brand.supplier.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ brand.item.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ brand.brand.name }}
