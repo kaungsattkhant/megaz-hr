@@ -29,7 +29,7 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ brand.item.name }}
+                                        {{ brand.supplier.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ brand.item.name }}
