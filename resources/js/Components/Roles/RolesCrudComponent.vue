@@ -363,7 +363,10 @@ export default {
                 console.log("success")
             }
             else {
-                alert('some errors occur');
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
         editRolesBtnClicked(role) {

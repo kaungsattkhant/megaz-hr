@@ -100,13 +100,19 @@
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true"
-                        name="" id="" v-model="selectedDepartment" class="input-ui h-[34px]"
-                        @change="departmentSelectChanged">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                        :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+                <div class=" flex w-full gap-x-4">
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true"
+                            name="" id="" v-model="selectedDepartment" class="input-ui h-[34px]"
+                            @change="departmentSelectChanged">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                            :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                        
+                    </div>
+                    <button data-te-toggle="modal" data-te-target="#add_department_modal" @click="createDepartmentModalClicked" class="inline-block py-2">
+                        <i class="fal fa-plus  pr-3"></i>
+                    </button>
                 </div>
             </div>
 
@@ -124,13 +130,18 @@
                     <div class="flex gap-x-2 flex-wrap mt-1">
                         <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
                     </div> -->
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
-                        name="" id="" v-model="selectedRoles" @change="getSkillByRole(selectedRoles.id)" class="input-ui h-[34px]">
-                        <option :value="role" v-for="(role, roleIndex) in roleList"
-                        :key="roleIndex"> {{ role.name }} </option>
-                    </select>
-                </div>
+                    <div class="flex w-full gap-x-4">
+                        <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
+                                name="" id="" v-model="selectedRoles" @change="getSkillByRole(selectedRoles.id)" class="input-ui h-[34px]">
+                                <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                            </select>
+                        </div>
+                        <button data-te-toggle="modal" data-te-target="#add_role_modal" @click="createRoleModalClicked" class="inline-block py-2">
+                            <i class="fal fa-plus  pr-3"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -338,16 +349,24 @@
 
 
         <!-- Department Modal -->
+        <!-- Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_department_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            id="add_department_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
             <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                 <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <!--Modal title-->
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create Department
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -355,23 +374,40 @@
                         </button>
                     </div>
 
+                    <!--Modal body-->
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
-                                Department
+                                Department Name
                             </label>
-                            <input type="text" placeholder="Department" class="input-ui">
+                            <input type="text" placeholder="Department Name" v-model="department_name" class="input-ui">
+                        </div>
+
+                        <div class="mb-4">
+                            <div>
+                                <label class="block text-sm text-black mb-3">Department Features</label>
+                                <multiselect v-model="selectedDepartmentFeature" :options="department_feature" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
+                                    <template #selection="{ values, search, isOpen }">
+                                        <span class="multiselect__single"
+                                            v-if="values.length"
+                                            v-show="!isOpen">{{ values.length }} features selected</span>
+                                    </template>
+                                </multiselect>
+                                <!-- <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre> -->
+                            </div>
                         </div>
                     </div>
 
+                    <!--Modal footer-->
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                         <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
-                            Add
+                        <button type="button" @click="confirmCreateDepartmentBtnClicked"
+                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            Create
                         </button>
                     </div>
                 </div>
@@ -383,45 +419,52 @@
         <!-- Role Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_role_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            id="add_role_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
             <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                 <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create Role
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
-
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Role
+                            <label for="" class="label-form mb-3">
+                                Role Name
                             </label>
-                            <input type="text" placeholder="Role"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <input type="text" placeholder="Role Name" v-model="role_name" class="input-ui">
                         </div>
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
+                            <label for="" class="label-form mb-3">
                                 Department
                             </label>
-                            <input type="text" placeholder="Department"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <select name="" id="" v-model="selectedDepartmentForRole" class="input-ui">
+                                <option :value="department.id"
+                                    v-for="(department, departmentIndex) in departmentList" :key="departmentIndex">
+                                    {{ department.name }} </option>
+                            </select>
                         </div>
-                    </div>
 
+                    </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                         <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
-                            Add
+                        <button type="button" @click="createRolesBtnClicked"
+                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            Create
                         </button>
                     </div>
                 </div>
@@ -495,7 +538,16 @@ export default {
 
             skillList:[],
             skillIds:[],
-            selectedSkills:[]
+            selectedSkills:[],
+
+            // create department
+            department_name: null,
+            department_feature: [],
+            selectedDepartmentFeature: [],
+
+            // create role
+            role_name: null,
+            selectedDepartmentForRole: null,
         };
     },
 
@@ -814,6 +866,85 @@ export default {
                 });
             }
         },
+
+        async getDepartmentFeatureList(){
+                let response = await getApiData({ url: `/api/features`, token: this.getToken() });
+                if(response.data){
+                    this.department_feature = response.data;
+                }
+        },
+        createDepartmentModalClicked(){
+            this.department_name = null;
+            this.selectedDepartmentFeature = [];
+        },
+        confirmCreateDepartmentBtnClicked() {
+            if (!this.department_name) {
+                this.alertValiationMessage('name');
+                return 1;
+            }
+            if (this.selectedDepartmentFeature.length < 1) {
+                this.alertValiationMessage('department features');
+                return 1;
+            }
+
+            this.createDepartment();
+        },
+
+        async createDepartment() {
+            let featureIds = [];
+            this.selectedDepartmentFeature.forEach((selectedFeature) => {
+                featureIds.push(selectedFeature.id);
+            });
+            let formData = new FormData();
+            formData.append('name', this.department_name);
+            formData.append('featureIds', JSON.stringify(featureIds));
+
+            let response = await postApiData({ url: '/api/departments', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getDepartmentList(1);
+                this.selectedDepartmentFeature = [];
+            }
+            else {
+                this.$notify({
+                    text: `Some errors occur`,
+                    type: 'error'
+                });
+            }
+
+        },
+        createRoleModalClicked(){
+            this.role_name = null;
+            this.selectedDepartmentForRole = null;
+        },
+        createRolesBtnClicked() {
+            if (!this.role_name) {
+                this.alertValiationMessage('name');
+                return 1;
+            }
+            if (!this.selectedDepartmentForRole) {
+                this.alertValiationMessage('department');
+                return 1;
+            }
+            this.createRole();
+        },
+
+        async createRole() {
+            let formData = new FormData();
+            formData.append('name', this.role_name);
+            formData.append('department_id', this.selectedDepartmentForRole);
+            let response = await postApiData({ url: '/api/roles', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                
+            }
+            else {
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
+            }
+        },
+
+
     },
 
     created() {
@@ -823,6 +954,7 @@ export default {
         // this.getInventoryList();
         this.getStateList();
         this.getInventoryList();
+        this.getDepartmentFeatureList();
     },
 
     mounted() {
