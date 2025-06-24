@@ -212,8 +212,9 @@
                         </label>
                     </div>
                     <div class="mb-4">
-                        <label for="invoice" class="text-sm">Quality</label>
-                        <select id="invoice" v-model="selectedQuality" @change="invoiceSelectChanged()"
+                        <label for="invoice" class="text-sm">Quality (%)</label>
+                        <input type="number" placeholder="Quality" v-model="selectedQuality" class="input-ui" min="0" max="100">
+                        <!-- <select id="invoice" v-model="selectedQuality" @change="invoiceSelectChanged()"
                             class="text-sm border border-gray-300 input-ui w-12
                             bg-transparent rounded-lg focus:ring-0">
                             <option value="A">A</option>
@@ -221,7 +222,7 @@
                             <option value="C">C</option>
                             <option value="D">D</option>
                             <option value="E">E</option>
-                        </select>
+                        </select> -->
                     </div>
                     <div class="mb-4">
                         <label for="invoice" class="text-sm">Invoice</label>
