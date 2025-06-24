@@ -30,14 +30,27 @@
 
                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" 
+                    <select data-te-select-init data-te-select-placeholder="Select Role"  @change="selectedRoleChange"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                         <option :value="role" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
             </div>
-            <div class="col-span-6"></div>
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Staff
+                </label>
+                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Staff" 
+                        data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui !text-black text-sm">
+                        <option :value="staff" v-for="(staff, index) in staffList"
+                            :key="index"> {{ staff.name }} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-span-3"></div>
             <div class="mb-8 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Day
@@ -189,12 +202,14 @@ export default {
         return {
             departmentList:[],
             roleList:[],
+            staffList: [],
             leaveTypeList:[],
 
             leaveList:[],
 
             selectedDepartment:null,
             selectedRole:null,
+            selectedStaff: null,
             selectedDay:null,
             selectedLeaveType:null,
 
@@ -214,6 +229,15 @@ export default {
         },
         changeDepartment(){
             this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = null;
+            this.staffList = [];
+            this.selectedStaff = null;
+        },
+        async selectedRoleChange(){
+            let response = await getApiData({ url: '/api/hr/staff_lists_by_role/' + this.selectedRole.id + '/department/' + this.selectedDepartment.id, token: this.getToken() });
+            if (response.data) {
+                this.staffList = response.data.data;
+            }
         },
         async getLeaveType(){
             let response = await getApiData({ url: '/api/hr/leave_categories', token: this.getToken() });
@@ -252,6 +276,10 @@ export default {
             }
             else if(!this.selectedRole){
                 this.alertValidationMessage(`Role`);
+                return 1;
+            }
+            else if(!this.selectedStaff){
+                this.alertValidationMessage(`Staff`);
                 return 1;
             }
             else if(!this.selectedDay){

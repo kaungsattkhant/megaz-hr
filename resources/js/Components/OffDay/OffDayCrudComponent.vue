@@ -195,14 +195,20 @@
                             </select>
                         </div> -->
                         <multiselect v-model="selectedDay" :options="dayList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                        :preserve-search="true" placeholder="Select Day" label="name" track-by="name" :preselect-first="false">
-                            <template #selection="{ values, search, isOpen }">
+                        :preserve-search="true" placeholder="Select Day" label="name" track-by="name" :preselect-first="false"
+                        :taggable="true" @tag="addTag" id="tagging">
+                            <!-- <template #selection="{ values, search, isOpen }">
                                 <span class="multiselect__single"
                                     v-if="values.length"
                                     v-show="!isOpen">{{ values.length }} Day selected</span>
-                            </template>
+                            </template> -->
                         </multiselect>
                     </div>
+                    <!-- <div><label class="typo__label">Tagging</label>
+                        <multiselect id="tagging" v-model="selectedDay" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="name"
+                                     track-by="value" :options="dayList" :multiple="true" :taggable="true" @tag="addTag"></multiselect>
+                        <pre class="language-json"><code>{{ value }}</code></pre>
+                      </div> -->
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Repetition
@@ -589,6 +595,14 @@ export default {
             }
         },
 
+        addTag (newTag) {
+            const tag = {
+                name: newTag,
+                code: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+            }
+            this.dayList.push(tag)
+            this.selectedDay.push(tag)
+        },
 
 
         alertValidationMessage(field) {

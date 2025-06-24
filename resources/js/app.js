@@ -217,6 +217,7 @@ import SalaryCalculateComponent from './Components/SalaryCalculate/SalaryCalcula
 import PaySlipComponent from './Components/SalaryCalculate/PaySlipComponent.vue';
 import ResignationCategoriesCrudComponent from './Components/ResignationCategories/ResignationCategoriesCrudComponent.vue';
 import ResignationCrudComponent from './Components/Resignations/ResignationCrudComponent.vue';
+import EventCrudComponent from './Components/Events/EventCrudComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
@@ -417,6 +418,7 @@ app.component('SalaryCalculateComponent',SalaryCalculateComponent);
 app.component('PaySlipComponent',PaySlipComponent);
 app.component('ResignationCategoriesCrudComponent',ResignationCategoriesCrudComponent);
 app.component('ResignationCrudComponent',ResignationCrudComponent);
+app.component('EventCrudComponent',EventCrudComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);

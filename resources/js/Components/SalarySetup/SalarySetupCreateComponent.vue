@@ -102,7 +102,7 @@
                         <tr class="" v-for="(allowance, allowanceIndex) in allowanceList"
                             :key="allowanceIndex">
                             <td class="">
-                                {{ allowance.allowance_name }}
+                                {{ allowance.allowance_name ? allowance.allowance_name : '--' }}
                             </td>
                             <td class="">
                                 {{ allowance.amount }}
@@ -323,11 +323,11 @@ export default {
 
 
         btnClickedAddAllowance(){
-            if(!this.selectedAllowanceType){
-                this.alertValidationMessage(`Allowance Type`);
-                return 1;
-            }
-            else if(!this.amount){
+            // if(!this.selectedAllowanceType){
+            //     this.alertValidationMessage(`Allowance Type`);
+            //     return 1;
+            // }
+            if(!this.amount){
                 this.alertValidationMessage(`Amount`);
                 return 1;
             }
@@ -337,8 +337,8 @@ export default {
         },
         async addAllowance(){
             this.allowanceList.push({
-                allowance_name: this.selectedAllowanceType.name,
-                allowance_id: this.selectedAllowanceType.id,
+                allowance_name: this.selectedAllowanceType ? this.selectedAllowanceType.name : null,
+                allowance_id: this.selectedAllowanceType ? this.selectedAllowanceType.id : null,
                 amount: this.amount,
             })
             this.selectedAllowanceType = null;

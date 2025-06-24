@@ -44,34 +44,28 @@
                 <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg"
                     ref="image">
             </div>
-
             <div class="mb-3 col-span-3 rounded-md">
-                <div class="block ps-[1.5rem]">
-                    <label for="" class="label-from mb-3 block relative">&nbsp;</label>
-                    <input
-                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
-                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
-                        type="checkbox" v-model="isKTVPackage" id="checkboxDefault" />
-                    <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
-                        Package for KTV
-                    </label>
+                <label class="label-form mb-3">Package Type </label>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedPackageTypeChanged"
+                        data-te-select-filter="true" name="" id="" v-model="selectedPackageType" class="input-ui">
+                        <option value="ktv"> KTV </option>
+                        <option value="restaurant"> Restaurant </option>
+                        <option value="event"> Event </option>
+                    </select>
                 </div>
             </div>
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <div class="block ps-[1.5rem]">
-                    <label for="" class="label-from mb-3 block relative">&nbsp;</label>
-                    <input
-                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
-                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
-                        type="checkbox" v-model="isChangeable" id="checkboxDefault2" />
-                    <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
-                        Can changeable?
-                    </label>
+            <div class="mb-3 col-span-3 rounded-md" v-if="selectedPackageType === 'event'">
+                <label for="" class="label-form mb-3">
+                    Event Date
+                </label>
+                <div class="relative">
+                    <input type="date" class="input-ui" :min="today" v-model="eventdate">
                 </div>
             </div>
-
-            <div class="mb-3 col-span-3"></div>
+            <div class="col-span-6" v-if="selectedPackageType != 'event'">
+            </div>
+            <div class="col-span-3" v-else></div>
 
             <!-- <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -80,22 +74,25 @@
                 <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
             </div> -->
 
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Paid Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession"
-                    placeholder="Paid Sessions">
-            </div>
+            <div class="contents" v-show="selectedPackageType === 'ktv'">
+                <div class="mb-3 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Paid Sessions
+                    </label>
+                    <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession"
+                        placeholder="Paid Sessions">
+                </div>
 
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Free Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession"
-                    placeholder="Free Sessions">
+                <div class="mb-3 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Free Sessions
+                    </label>
+                    <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession"
+                        placeholder="Free Sessions">
+                </div>
+                <div class="col-span-6"></div>
             </div>
-
+            
             <!-- <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Session Price
@@ -104,7 +101,6 @@
                     placeholder="Session Price">
             </div> -->
             
-            <div class="mb-3 col-span-6"></div>
             <div class="mb-0 col-span-3 rounded-md">
                 <label class="label-form mb-3"> Room </label>
                 <multiselect v-model="selectedRoom" :options="roomList" :close-on-select="false"
@@ -126,7 +122,32 @@
                         <option value="accessory"> Accessory </option>
                     </select>
                 </div>
-            </div><div class="col-span-6"></div>
+            </div>
+            <!-- <div class="mb-3 col-span-3 rounded-md">
+                <div class="block ps-[1.5rem]">
+                    <label for="" class="label-from mb-3 block relative">&nbsp;</label>
+                    <input
+                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
+                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
+                        type="checkbox" v-model="isKTVPackage" id="checkboxDefault" />
+                    <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
+                        Package for KTV
+                    </label>
+                </div>
+            </div> -->
+
+            <div class="mb-3 col-span-3 rounded-md">
+                <div class="block ps-[1.5rem]">
+                    <label for="" class="label-from mb-3 block relative">&nbsp;</label>
+                    <input
+                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
+                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
+                        type="checkbox" v-model="isChangeable" id="checkboxDefault2" />
+                    <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
+                        Can changeable?
+                    </label>
+                </div>
+            </div><div class="col-span-3"></div>
             <div v-show="selectedType == 'menu'" class="contents">
                 <div class="mb-0 col-span-3 rounded-md" v-show="selectedType == 'menu'">
                     <div>
@@ -359,7 +380,7 @@ export default {
         return {
             today: getCurrentDate(),
 
-            isKTVPackage: false,
+            // isKTVPackage: false,
             isChangeable: false,
 
             menuCategoryList: [],
@@ -369,6 +390,8 @@ export default {
             selectedMenus: [],
             roomList:[],
 
+            selectedPackageType: null,
+            eventdate: null,
             sessionDuration: null,
             paySession: null,
             freeSession: null,
@@ -506,12 +529,20 @@ export default {
                 this.alertValiationMessage(`package name`);
                 return 1;
             }
+            if (!this.selectedPackageType) {
+                this.alertValiationMessage(`package Type`);
+                return 1;
+            }
             if (!this.startDate) {
                 this.alertValiationMessage(`from date`);
                 return 1;
             }
             if (!this.endDate) {
                 this.alertValiationMessage(`to date`);
+                return 1;
+            }
+            if (this.selectedPackageType === 'event' && !this.eventdate) {
+                this.alertValiationMessage(`Event date`);
                 return 1;
             }
             if (!this.price) {
@@ -528,17 +559,17 @@ export default {
             }
 
             formData.append('name', this.name);
+            formData.append('type', this.selectedPackageType);
+            if (this.selectedPackageType === 'event') {
+                formData.append('event_date', this.eventdate);
+            }
             formData.append('from_date', this.startDate);
             formData.append('to_date', this.endDate);
             formData.append('price', this.price);
-            formData.append('is_ktv', (this.isKTVPackage) ? 1 : 0);
+            // formData.append('is_ktv', (this.isKTVPackage) ? 1 : 0);
             formData.append('is_changeable', (this.isChangeable) ? 1 : 0);
             formData.append('image', this.selectedImage);
-            if (this.isKTVPackage) {
-                // if(!this.sessionDuration){
-                //     this.alertValiationMessage(`session`);
-                //     return 1;
-                // }
+            if (this.selectedPackageType === 'ktv') {
                 if (!this.paySession) {
                     this.alertValiationMessage(`paid session`);
                     return 1;
@@ -547,15 +578,8 @@ export default {
                     this.alertValiationMessage(`free sessions`);
                     return 1;
                 }
-                // if (!this.sessionPrice) {
-                //     this.alertValiationMessage(`session price`);
-                //     return 1;
-                // }
-
-                // formData.append('session', this.sessionDuration);
                 formData.append('pay_session', this.paySession);
                 formData.append('free_session', this.freeSession);
-                // formData.append('session_price', this.sessionPrice);
             }
 
             let menuIds = [];
