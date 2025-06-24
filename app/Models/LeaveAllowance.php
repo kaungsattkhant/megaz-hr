@@ -14,20 +14,21 @@ class LeaveAllowance extends Model
 {
     use HasFactory, SoftDeletes;
     protected $fillable = [
-        'role_id',
+        'allowanceable_type',
+        'allowanceable_id',
         'leave_category_id',
         'day',
         'created_by'
     ];
     protected $hidden = ['created_at', 'updated_at'];
 
+    public function allowanceable()
+    {
+        return $this->morphTo();
+    }
     public function leaveCategory(): BelongsTo
     {
         return $this->belongsTo(LeaveCategory::class, 'leave_category_id');
-    }
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class, 'role_id');
     }
     public function created_by()
     {

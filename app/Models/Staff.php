@@ -11,6 +11,7 @@ use App\Models\Overtime;
 use App\Models\Inventory;
 use App\Models\Department;
 use App\Models\TaskDetail;
+use App\Models\LeaveAllowance;
 use App\Models\SalaryBatchStaff;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\StaffCertification;
@@ -266,5 +267,10 @@ class Staff extends Authenticatable
     public function bank()
     {
         return $this->belongsTo(Bank::class);
+    }
+
+    public function leaveAllowances()
+    {
+        return $this->morphMany(LeaveAllowance::class, 'allowanceable');
     }
 }

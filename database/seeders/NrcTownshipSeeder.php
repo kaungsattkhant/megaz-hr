@@ -16,8 +16,16 @@ class NrcTownshipSeeder extends Seeder
         $townshipJson = file_get_contents(database_path('data/nrc_townships.json'));
         $townships = json_decode($townshipJson, true);
 
-        foreach ($townships['data'] as $township) {
-            NrcTownship::create($township);
-        }
+        $townshipData = array_map(function ($t) {
+            return [
+                'id'         => $t['id'],
+                'name_en'    => $t['name_en'],
+                'name_mm'    => $t['name_mm'],
+                'nrc_code'   => $t['nrc_code'],
+                'created_at' => $t['created_at'],
+                'updated_at' => $t['updated_at'],
+            ];
+        }, $townships['data']);
+        NrcTownship::insert($townshipData);
     }
 }
