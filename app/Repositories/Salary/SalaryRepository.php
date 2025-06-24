@@ -300,6 +300,12 @@ class SalaryRepository implements SalaryRepositoryInterface
   {
     DB::beginTransaction();
     try {
+      $exits = OvertimeFee::where('role_id', $data['role_id'])
+        ->first();
+      if ($exits) {
+        DB::rollback();
+        ResponseMessage('Overtime fee already exists for this role.', 409);
+      }
       $overtimeFee = OvertimeFee::updateOrCreate(
         [
           'id' => $data['id'] ?? null,
