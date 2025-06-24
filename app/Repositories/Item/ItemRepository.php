@@ -78,16 +78,17 @@ class ItemRepository implements ItemRepositoryInterface
 
             $baseUomId = $data['base_uom_id'];
             $uomId = $data['uom_id'];
-            $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
-                ->where('conversion_unit_id', $uomId)
-                ->where('is_active', 1)
-                ->first();
+            $conversionRate=$data['conversion'];
+            // $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
+            //     ->where('conversion_unit_id', $uomId)
+            //     ->where('is_active', 1)
+            //     ->first();
 
-            if (!$uomConversion) {
-                return ResponseMessage('No UOM conversion found for the given units.', 404);
-            }
+            // if (!$uomConversion) {
+            //     return ResponseMessage('No UOM conversion found for the given units.', 404);
+            // }
 
-            $conversionRate = $uomConversion->conversion;
+            // $conversionRate = $uomConversion->conversion;
             $minimumHoldingAmount = $this->itemService->calculateMinimumHoldingAmount(
                 $data['min_holding_base_uom_quantity'],
                 $data['min_holding_uom_quantity'],
@@ -118,6 +119,8 @@ class ItemRepository implements ItemRepositoryInterface
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
+            //create uom converion 
+            $uomConversion=$this->createUomConversion($item,$data);
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
@@ -401,5 +404,22 @@ class ItemRepository implements ItemRepositoryInterface
         $uom_import = new UomsImport();
         $uom_import->import($file);
         ResponseMessage('Import UOM Import Successfully', 200);
+    }
+
+    public function createUomConversion($item,$data){
+        $existConversion=UomConversion::where('item_id',$item->id)
+        ->where('base_unit_id',$data['base_uom_id'])
+        ->where('conversion_unit_id',$data['uom_id'])
+        ->first();
+        if($existConversion){
+            ResponseMessage('Uom Conversion is already exist',419);
+        }
+        $uomConversion=UomConversion::create([
+            'item_id'=>$item->id,
+            'base_unit_id'=>$data['base_uom_id'],
+            'conversion_unit_id'=>$data['uom_id'],
+            'conversion'=>$data['conversion'],
+        ]);
+        return $uomConversion;
     }
 }
