@@ -23,6 +23,7 @@ class ArrivalItemRequest extends APIRequest
     public function rules(): array
     {
         return [
+            'quality' => 'required|integer',
             'base_uom_id' => 'required|integer|exists:uoms,id',
             'base_uom_quantity' => 'required|numeric',
             'uom_id' => 'required|integer|exists:uoms,id',
