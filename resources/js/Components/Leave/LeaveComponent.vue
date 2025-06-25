@@ -679,7 +679,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/leave_allowances/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/leaves/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getLeaveList(1);
             }

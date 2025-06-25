@@ -13,7 +13,7 @@
             onmouseout="this.style.overflowY='hidden'">
 
 
-            <div class="relative w-[15rem] pt-12">
+            <div class="relative w-[256px] pt-12">
                 <ul class=" mb-4">
                     @if (checkFeaturePermission('financial-report'))
                         <li>
@@ -125,8 +125,8 @@
                     @if (checkFeaturePermission('duty'))
                         <li>
                             <a href="{{ route('duty') }}" class="flex items-center @yield('duty') sidebar-gap-x">
-                                <!-- <i class="fal fa-clipboard-list pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-list-50.png') }}" alt="">
+                                <i class="far fa-clipboard-list"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-list-50.png') }}" alt=""> -->
                                 Duty
                             </a>
                         </li>
@@ -135,8 +135,8 @@
                     @if (checkFeaturePermission('staff'))
                         <li>
                             <a href="{{ route('staff') }}" class="flex items-center @yield('staffs') sidebar-gap-x">
-                                <!-- <i class="fal fa-user  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-staff-16.png') }}" alt="">
+                                <i class="far fa-user"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-staff-16.png') }}" alt=""> -->
                                 Staff
                             </a>
                         </li>
@@ -149,13 +149,19 @@
                             </a>
                         </li>
 @endif -->
+
+                    <li>
+                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                            MENU
+                        </p>
+                    </li>
                     @if (checkFeaturePermission('menu-category'))
                         <li>
                             <a href="{{ route('menu_categories') }}"
                                 class="flex items-center @yield('menu_categories') sidebar-gap-x">
-                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-menu-50 (2).png') }}"
-                                    alt="">
+                                <i class="fal fa-clipboard-list"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-menu-50 (2).png') }}"
+                                    alt=""> -->
                                 Menu Categories
                             </a>
                         </li>
@@ -171,8 +177,8 @@
                         <li>
                             <a href="{{ route('menu_sale_report.index') }}"
                                 class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-report-50.png') }}" alt="">
-                                <!-- <i class="fal fa-file-chart-line  pr-3"></i> -->
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-report-50.png') }}" alt=""> -->
+                                <i class="fal fa-file-chart-line"></i>
                                 Menu Sale Report
                             </a>
                         </li>
@@ -181,9 +187,9 @@
                         <li>
                             <a href="{{ route('menu_costing.index') }}"
                                 class="flex items-center @yield('menu_costing') sidebar-gap-x">
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}"
-                                    alt="">
-                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}"
+                                    alt=""> -->
+                                <i class="fal fa-file-signature"></i>
                                 Menu Costing
                             </a>
                         </li>
@@ -191,8 +197,8 @@
                     @if (checkFeaturePermission('menu'))
                         <li>
                             <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp') sidebar-gap-x">
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-mrp-50.png') }}" alt="">
-                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-mrp-50.png') }}" alt=""> -->
+                                <i class="fal fa-salad"></i>
                                 MRP
                             </a>
                         </li>
@@ -200,8 +206,9 @@
                     @if (checkFeaturePermission('menu-area'))
                         <li>
                             <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
-                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}"
-                                    alt="">
+                                <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}"
+                                    alt=""> -->
+                                <i class="fal fa-utensils-alt"></i>
                                 Menu Area
                             </a>
                         </li>
@@ -214,14 +221,18 @@
                             </a>
                         </li>
 @endif -->
-
+                    <li>
+                        <p class="text-[#2a3547] text-xs font-semibold ml-1 pt-2">
+                            JOURNAL
+                        </p>
+                    </li>
                     @if (checkFeaturePermission('journal'))
                         <li>
                             <a href="{{ route('journal') }}"
                                 class="flex items-center @yield('journals') sidebar-gap-x">
-                                <!-- <i class="fal fa-books pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-journal-48.png') }}"
-                                    alt="">
+                                <i class="fal fa-books"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-journal-48.png') }}"
+                                    alt=""> -->
                                 Journal
                             </a>
                         </li>
@@ -231,9 +242,9 @@
                         <li>
                             <a href="{{ route('advance') }}"
                                 class="flex items-center @yield('advanced') sidebar-gap-x">
-                                <!-- <i class="fal fa-balance-scale-right pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-balance-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-balance-scale-right"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-balance-50.png') }}"
+                                    alt=""> -->
                                 Staff Balance
                             </a>
                         </li>
@@ -243,17 +254,21 @@
                         <li>
                             <a href="{{ route('prepaid') }}"
                                 class="flex items-center @yield('prepaid') sidebar-gap-x">
-                                <!-- <i class="fas fa-dollar-sign"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-prepaid-50.png') }}"
-                                    alt="">
+                                <i class="fas fa-dollar-sign"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-prepaid-50.png') }}"
+                                    alt=""> -->
                                 Prepaid
                             </a>
                         </li>
                     @endif
-
+                    <li>
+                        <p class="text-[#2a3547] text-xs font-semibold ml-1 pt-2">
+                            WORLD
+                        </p>
+                    </li>
                     @if (checkFeaturePermission('ar'))
                         <li>
-                            <a href="{{ route('account_receivable') }}" class="flex items-center @yield('ar')">
+                            <a href="{{ route('account_receivable') }}" class="flex items-center @yield('ar') sidebar-gap-x">
                                 <i class="fas fa-coins"></i>
                                 AR
                             </a>

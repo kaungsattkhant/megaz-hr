@@ -93,7 +93,7 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 'item_id' => $item->id,
                 'base_unit_id' => $baseUomId,
                 'conversion_unit_id' => $uomId,
-                'conversion' => $uomId,
+                'conversion' =>  $conversionRate,
             ]);
             DB::commit();
 
@@ -106,50 +106,7 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
 
     public function rules(): array
     {
-        return [
-            // '*.name' => ['required', 'string'],
-            // '*.code' => [
-            //     'required',
-            //     'string',
-            //     'unique:items,code',
-            //     Rule::notIn($this->importedCodes),
-            // ],
-            // '*.category_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('categories', 'category_code'),
-            // ],
-            // '*.item_type_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('item_types', 'item_type_code'),
-            // ],
-            // '*.base_uom_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('uoms', 'uom_code'),
-            // ],
-            // '*.uom_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('uoms', 'uom_code'),
-            // ],
-            // '*.min_holding_base_uom_quantity' => [
-            //     'required',
-            //     'numeric',
-            //     'min:0',
-            // ],
-            // '*.min_holding_uom_quantity' => [
-            //     'required',
-            //     'numeric',
-            //     'min:0',
-            // ],
-            // '*.minimum_holding_amount' => [
-            //     'required',
-            //     'numeric',
-            //     'min:0',
-            // ],
-        ];
+        return [];
     }
 
 

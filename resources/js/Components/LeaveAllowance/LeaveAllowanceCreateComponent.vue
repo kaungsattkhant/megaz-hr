@@ -11,46 +11,63 @@
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Department
+                    Type
                 </label>
 
                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
-                        <option :value="department" v-for="(department, index) in departmentList"
-                            :key="index"> {{ department.name }} </option>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="typeChanged()"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
+                        <option :value="type" v-for="(type, index) in typeList"
+                            :key="index"> {{ type.name }} </option>
                     </select>
                 </div>
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Role
-                </label>
+            <div class="col-span-12"></div>
+            <div v-show="selectedType" class="contents">
+                <div class="mb-4 col-span-3 pb-6 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Department
+                    </label>
 
-                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"  @change="selectedRoleChange"
-                        data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
-                        <option :value="role" v-for="(role, index) in roleList"
-                            :key="index"> {{ role.name }} </option>
-                    </select>
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
+                            <option :value="department" v-for="(department, index) in departmentList"
+                                :key="index"> {{ department.name }} </option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Staff
-                </label>
-                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Staff" 
-                        data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui !text-black text-sm">
-                        <option :value="staff" v-for="(staff, index) in staffList"
-                            :key="index"> {{ staff.name }} </option>
-                    </select>
+                <div class="mb-4 col-span-3 pb-6 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Role
+                    </label>
+
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role"  @change="selectedRoleChange"
+                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
+                            <option :value="role" v-for="(role, index) in roleList"
+                                :key="index"> {{ role.name }} </option>
+                        </select>
+                    </div>
                 </div>
+                <div class="mb-4 col-span-3" v-show="selectedType && selectedType.value === 'staff'">
+                    <label for="" class="label-form mb-3">
+                        Staff
+                    </label>
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Staff" 
+                            data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui !text-black text-sm">
+                            <option :value="staff" v-for="(staff, index) in staffList"
+                                :key="index"> {{ staff.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-span-12"></div>
             </div>
-            <div class="col-span-3"></div>
             <div class="mb-8 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Day
@@ -109,6 +126,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="leaveList.length < 1">
+                            <td colspan="5">
+                                <span class="text-gray-600 font-semibold">
+                                    No Data!
+                                </span>
+                            </td>
+                        </tr>
                         <tr class="" v-for="(leave, leaveIndex) in leaveList"
                             :key="leaveIndex">
                             <td class="">
@@ -215,6 +239,11 @@ export default {
 
             modalLeaveType: null,
 
+            selectedType: null,
+            typeList: [
+                {value: 'role', name: 'Role'},
+                {value: 'staff', name: 'Staff'}
+            ]
         };
     },
 
@@ -278,7 +307,11 @@ export default {
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if(!this.selectedStaff){
+            else if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else if(this.selectedType.value === 'staff' && !this.selectedStaff){
                 this.alertValidationMessage(`Staff`);
                 return 1;
             }
@@ -295,9 +328,19 @@ export default {
             }
         },
         async addLeave(){
+            let allowanceable_id = null;
+            if(this.selectedType.value === 'staff'){
+                allowanceable_id = this.selectedStaff.id
+            }
+            if(this.selectedType.value === 'role'){
+                allowanceable_id = this.selectedRole.id
+            }
             this.leaveList.push({
+                allowance_type: this.selectedType.value,
+                allowanceable_id: allowanceable_id,
                 department_name: this.selectedDepartment.name,
                 role_name: this.selectedRole.name,
+                staff_name: this.selectedStaff ? this.selectedStaff.name : null,
                 leave_category_name: this.selectedLeaveType.name,
                 role_id: this.selectedRole.id,
                 leave_category_id: this.selectedLeaveType.id,
