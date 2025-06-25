@@ -128,12 +128,12 @@ Route::middleware(['departments:menu.edit'])->group(function () {
 Route::middleware(['departments:menu-category'])->group(function () {
     Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
 });
-Route::middleware(['departments:mrp'])->group(function () {
+// Route::middleware(['departments:mrp'])->group(function () {
 
     Route::view('/mrp', 'MRP.index')->name('MRP');
     Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
     Route::view('/mrp/{id}/edit', 'MRP.edit');
-});
+// });
 Route::middleware(['departments:menu-area'])->group(function () {
     Route::view('/menu_area', 'menu_area.index')->name('menu_area.index');
 });
@@ -383,10 +383,12 @@ Route::middleware(['departments:duty.edit'])->group(function () {
     Route::view('/duty/{id}/edit', 'duty.edit')->name('dutyEdit');
 });
 
-Route::middleware(['departments:sale-target'])->group(function () {
+Route::middleware(['departments:sale-target-position'])->group(function () {
     Route::view('/sale_target_position', 'sale_target_position.index')->name('sale_target_position');
     Route::view('/sale_target_position/create', 'sale_target_position.create')->name('sale_target_position/create');
     Route::view('/sale_target_position/{id}/edit', 'sale_target_position.edit')->name('sale_target_position/edit');
+});
+Route::middleware(['departments:sale-target-menu'])->group(function () {
     Route::view('/sale_target_menu', 'sale_target_menu.index')->name('sale_target_menu');
     Route::view('/sale_target_menu/create', 'sale_target_menu.create')->name('sale_target_menu/create');
     Route::view('/sale_target_menu/{id}/edit', 'sale_target_menu.edit')->name('sale_target_menu/edit');

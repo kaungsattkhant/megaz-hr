@@ -96,7 +96,7 @@
                 </div>
             </div>
             
-            <div class="contents" v-if="selectedMenuType == 'menu'">
+            <div class="contents" v-show="selectedMenuType == 'menu'">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Menu Category
@@ -125,7 +125,7 @@
                     </div>
                 </div><div class="col-span-3"></div>
             </div>
-            <div class="contents" v-if="selectedMenuType == 'custom'">
+            <div class="contents" v-show="selectedMenuType == 'custom'">
                 <div class="col-span-9"></div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
@@ -347,6 +347,7 @@
                         </tr>
                     </thead>
                     <tbody v-if="menuLevel">
+                        
                         <tr v-if="menuLevel.item_menu.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item_menu"
                             :key="menuIndex">
                             <td class="">
@@ -364,10 +365,17 @@
                                 </button>
                             </td>
                         </tr>
+                        <tr v-else>
+                            <td colspan="4">
+                                <span class="text-gray-600 font-semibold">
+                                    No Data!
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="flex gap-x-4">
+            <div class="flex gap-x-4 mt-8 mb-4">
                 <button class="add-btn" @click="clearMenuLevel()">
                     Clear 
                 </button>
@@ -381,7 +389,7 @@
         </div>
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
             <div class="table-container">
-                <table class="primary-table">
+                <table class="primary-table mb-4">
                     <thead class="">
                         <tr>
                             <th scope="col" class="">
@@ -401,7 +409,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="levelTable.length > 0">
                         <tr class="" v-for="(level, levelIndex) in levelTable"
                             :key="levelIndex">
                             <td class="">
@@ -431,6 +439,15 @@
                                 <button @click="removeSubMenu(submenuIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="5">
+                                <span class="text-gray-600 font-semibold">
+                                    No Data!
+                                </span>
                             </td>
                         </tr>
                     </tbody>
