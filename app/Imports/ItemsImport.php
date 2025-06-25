@@ -89,6 +89,12 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 $item['max_limit_uom_quantity'] = $row['max_limit_uom_quantity'] ?? 0;
             }
             $item->save();
+            $uomConversion = UomConversion::create([
+                'item_id' => $item->id,
+                'base_unit_id' => $baseUomId,
+                'conversion_unit_id' => $uomId,
+                'conversion' => $uomId,
+            ]);
             DB::commit();
 
             return $item;
