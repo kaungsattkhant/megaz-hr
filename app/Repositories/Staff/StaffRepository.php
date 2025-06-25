@@ -92,6 +92,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function createData(array $data)
     {
+        // dd($data);
         DB::beginTransaction();
         try {
             $data['is_active'] = 1;
@@ -113,30 +114,20 @@ class StaffRepository implements StaffRepositoryInterface
                     }
                 }
             }
-            if (isset($data['inventoryIds'])) {
-                $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
-                if (is_array($inventoryIds)) {
-                    foreach ($inventoryIds as $inventoryId) {
-                        $staff->inventories()->attach($inventoryId);
-                    }
-                }
-            }
-            if (isset($data['roles']) && is_array($data['roles'])) {
-                $staff->roles()->attach($data['roles']);
+            if (isset($data['role_id'])) {
+                $staff->roles()->attach($data['role_id']);
             }
 
-            if (isset($data['featureIds'])) {
-                $featureIds = json_decode($data['featureIds']);
-                foreach ($featureIds as $featureId) {
-                    $staff->features()->attach($featureId);
-                }
+            foreach($data['feature_ids'] as $featureId){
+                $staff->features()->attach($featureId);
             }
 
-            if (isset($data['skills'])) {
-                $skills = json_decode($data['skills']);
-                foreach ($skills as $skill) {
-                    $staff->skills()->attach($skill);
-                }
+            foreach($data['inventory_ids'] as $inventoryId){
+                $staff->inventories()->attach($inventoryId);
+            }
+
+            foreach($data['skill_ids'] as $skillId){
+                $staff->skills()->attach($skillId);
             }
 
             $data['staff_id'] = $staff->id;
@@ -213,25 +204,20 @@ class StaffRepository implements StaffRepositoryInterface
 
                 $staff->update($data);
 
-                if (isset($data['roles']) && $data['roles'] !== null) {
-                    $rolesToAttach = $data['roles'];
-                    $staff->roles()->sync($rolesToAttach);
-                }
-                if (isset($data['inventoryIds']) && $data['inventoryIds'] !== null) {
-                    $inventoryIds = json_decode($data['inventoryIds'], true);
-                    $staff->inventories()->sync($inventoryIds);
-                } else {
-                    $staff->inventories()->detach();
+                if (isset($data['role_id'])) {
+                    $staff->roles()->sync($data['role_id']);
                 }
 
-                if (isset($data['featureIds']) && $data['featureIds'] !== null) {
-                    $featureIds = json_decode($data['featureIds'], true);
-                    $staff->features()->sync($featureIds);
+                if(isset($data['feature_ids']) && is_array($data['feature_ids'])){
+                    $staff->features()->sync($data['feature_ids']);
                 }
 
-                if (isset($data['skills']) && $data['skills'] !== null) {
-                    $skills = json_decode($data['skills'], true);
-                    $staff->skills()->sync($skills);
+                if(isset($data['inventory_ids']) && is_array($data['inventory_ids'])){
+                    $staff->inventories()->sync($data['inventory_ids']);
+                }
+
+                if(isset($data['skill_ids']) && is_array($data['skill_ids'])){
+                    $staff->skills()->sync($data['skill_ids']);
                 }
             }
             DB::commit();
@@ -245,8 +231,8 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 
-        'emergencyContacts', 'gender', 'completed_tasks', 
+        $staff = Staff::with('department', 'roles', 'inventories',
+        'emergencyContacts', 'gender', 'completed_tasks',
         'features', 'skills', 'bank','staffCertifications')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);

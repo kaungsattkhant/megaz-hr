@@ -59,7 +59,11 @@ class StaffAPIController extends Controller
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
-        $data['roles'] = explode(',', $request->roles);
+        // $data['roles'] = explode(',', $request->roles);
+        $data['role_id'] = $request->role_id;
+        $data['feature_ids'] = json_decode($request->feature_ids);
+        $data['inventory_ids'] = ($request->inventory_ids)? json_decode($request->inventory_ids): [];
+        $data['skill_ids'] = ($request->skill_ids)? json_decode($request->skill_ids): [];
         $staff = $this->staffRepo->createData($data);
 
         ResponseData($staff);
@@ -83,6 +87,10 @@ class StaffAPIController extends Controller
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
+        $data['role_id'] = $request->role_id;
+        $data['feature_ids'] = json_decode($request->feature_ids);
+        $data['inventory_ids'] = ($request->inventory_ids)? json_decode($request->inventory_ids): [];
+        $data['skill_ids'] = ($request->skill_ids)? json_decode($request->skill_ids): [];
         $staff = $this->staffRepo->updateData($data, $id);
 
         if (!$staff) {

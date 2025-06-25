@@ -220,23 +220,13 @@
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
-                    <label class="label-form mb-3">Roles</label>
-                    <!-- <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                    :preserve-search="true" placeholder="Select Roles" label="name" track-by="id" :preselect-first="true">
-                        <template #selection="{ values, search, isOpen }">
-                            <span class="multiselect__single"
-                                v-if="values.length"
-                                v-show="!isOpen">{{ values.length }} roles selected</span>
-                        </template>
-                    </multiselect>
-                    <div class="flex gap-x-2 flex-wrap mt-1">
-                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
-                    </div> -->
+                    <label class="label-form mb-3">Role</label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
-                            name="" id="" v-model="selectedRoles" @change="getSkillByRole(selectedRoles.id)" class="input-ui h-[34px]">
-                            <option :value="role" v-for="(role, roleIndex) in roleList"
-                            :key="roleIndex"> {{ role.name }} </option>
+                            name="" id="" v-model="selectedRole" @change="getSkillByRole(selectedRole.id)" class="input-ui h-[34px]">
+                            <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
+                                {{ role.name }}
+                            </option>
                         </select>
                     </div>
                     <div class="mt-1" v-if="rolesInputError">
@@ -244,8 +234,6 @@
                     </div>
                 </div>
             </div>
-
-
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
@@ -332,25 +320,16 @@
                 </label>
 
                 <multiselect v-model="selectedSkills" :options="skillList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                    :preserve-search="true" placeholder="Select Skill" label="skill" track-by="id" :preselect-first="true">
-                        <template #selection="{ values, search, isOpen }">
-                            <span class="multiselect__single"
-                                v-if="values.length"
-                                v-show="!isOpen">{{ values.length }} skills selected</span>
-                        </template>
-                    </multiselect>
-                    <div class="flex gap-x-2 flex-wrap mt-1">
-                        <span class="font-inter after-coma" v-for="skill in selectedSkills">{{ skill.skill }}</span>
-                    </div>
-
-                <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Skill" data-te-select-filter="true"
-                        name="" id="" v-model="selectedSkill" class="input-ui h-[34px]"
-                        >
-                        <option :value="skill" v-for="(skill, skillIndex) in skillList"
-                        :key="skillIndex"> {{ skill.skill }} </option>
-                    </select>
-                </div> -->
+                :preserve-search="true" placeholder="Select Skill" label="skill" track-by="id" :preselect-first="true">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">
+                            {{ values.length }} skills selected
+                        </span>
+                    </template>
+                </multiselect>
+                <div class="flex gap-x-2 flex-wrap mt-1">
+                    <span class="font-inter after-coma" v-for="skill in selectedSkills">{{ skill.skill }}</span>
+                </div>
             </div>
 
 
@@ -409,7 +388,24 @@
                 </div>
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="col-span-3  rounded-md mb-4 pb-6">
+                <label for="household-registration" class="label-form mb-3">
+                    Certifications
+                </label>
+                <input type="file" multiple accept="image/png, image/gif, image/jpeg" id="household-registration" ref="certificateInput"
+                class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="certificationFilesChange">
+                <div v-for="(preview, index) in certificateFilePreviews">
+                    <div class="flex items-center">
+                        <div class="contents">
+                            <img v-if="preview" :src="preview" alt="Certification Preview" class="mt-2 h-24" />
+                            <button @click="removeCertificateBtnClicked(index)"> <i class="fas fa-times"></i> </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -431,6 +427,13 @@
                 </div>
             </div>
 
+            <div class="col-span-1 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-5">
+                    &nbsp;
+                </label>
+                <button data-te-toggle="modal" data-te-target="#add_bank_modal" > <i class="fas fa-plus"></i> </button>
+            </div>
+
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Bank Account Number
@@ -441,7 +444,7 @@
                 </div>
             </div>
 
-            <div class="col-span-6"></div>
+            <div class="col-span-5"></div>
 
             <hr class="col-span-12 mb-4">
 
@@ -609,6 +612,52 @@
                 </div>
             </div>
         </div>
+
+        <!-- Bank Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_bank_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create Bank
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            id="close_create_bank_modal" aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Name
+                            </label>
+                            <input type="text" v-model="bankName" placeholder="Bank Name" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss
+                        @click="createBankBtnClicked">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -618,8 +667,9 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { getCurrentDate } from "../../utilities/datetime-helpers";
-import FlatPickr from 'vue-flatpickr-component'
-import 'flatpickr/dist/flatpickr.css'
+import FlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
+import { formatDate } from '../../utilities/datetime-helpers';
 
 export default {
     components: {
@@ -635,7 +685,7 @@ export default {
             selectedDepartment: null,
 
             roleList: [],
-            selectedRoles: [],
+            selectedRole: null,
             roleIds: [],
 
             featureList: [],
@@ -676,6 +726,9 @@ export default {
             nrcFrontFileError: null,
             nrcBackFileError: null,
             houseHoldRegistrationFileError: null,
+
+            certificateFiles: [],
+            certificateFilePreviews: [],
 
             primaryName: null,
             primaryPhone: null,
@@ -724,6 +777,7 @@ export default {
             selectedBank: null,
             bankAccountNumber: null,
 
+            bankName: null,
             bankSelectError: null,
             bankAccountNumberError: null,
         };
@@ -746,6 +800,24 @@ export default {
             const file = e.target.files[0];
             this.houseHoldRegistrationFile = file;
             this.houseHoldRegistrationPreview = file ? URL.createObjectURL(file) : null;
+        },
+
+        certificationFilesChange(e){
+            const files = Array.from(e.target.files);
+            // Clear previous selections if you want to replace, or remove this line to allow accumulating
+            this.certificateFiles = [];
+            this.certificateFilePreviews = [];
+            files.forEach(file => {
+                this.certificateFiles.push(file);
+                this.certificateFilePreviews.push(URL.createObjectURL(file));
+            });
+        },
+
+        removeCertificateBtnClicked(index){
+            this.certificateFiles.splice(index,1);
+            this.certificateFilePreviews.splice(index,1);
+            // Reset the file input so user can re-select files
+            this.$refs.certificateInput.value = '';
         },
 
         async getStateList() {
@@ -783,14 +855,14 @@ export default {
 
         async departmentSelectChanged() {
             this.featureList = [];
-            // this.inventories = [];
-            this.selectedRoles = null;
+            this.selectedRole = null;
             this.selectedFeatures = [];
+            this.featureList = [];
             this.selectedInventories = [];
-            this.roleList = [];
             this.inventories = [];
-            let rolesResponsePromise = getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
-            rolesResponsePromise.then(response=>{
+            this.skillList = [];
+            this.selectedSkills = [];
+            getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() }).then(response=>{
                 if(response.data){
                     this.roleList = response.data;
                 }
@@ -830,66 +902,19 @@ export default {
             });
         },
 
-        async getSkillByRole(id)
-            {
-                let response = await getApiData({ url: `/api/roles/${id}/skills`, token: this.getToken() });
-                if (response.data) {
-                    this.skillList = response.data;
-                }
-            },
+        async getSkillByRole(id){
+            this.selectedSkills = [];
+            this.selectedFeatures = [];
+            let response = await getApiData({ url: `/api/roles/${id}/skills`, token: this.getToken() });
+            if (response.data) {
+                this.skillList = response.data;
+            }
+        },
 
         createStaffBtnClicked() {
-            this.roleIds = [];
             this.featureIds = [];
             this.inventoryIds = [];
-
-            // if(this.$refs.nrc_front_image.files[0]){
-            //     this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
-            // }
-
-            // if(this.$refs.nrc_back_image.files[0]){
-            //     this.nrcBackFile = this.$refs.nrc_back_image.files[0];
-            // }
-
-            // if(this.$refs.household_registration_image.files[0]){
-            //     this.houseHoldRegistrationFile = this.$refs.household_registration_image.files[0];
-            // }
-
-            if(!this.selectedDepartment){
-                this.alertValiationMessage('department');
-                this.departmentInputError = "Department must be selected";
-                return 1;
-            }
-            if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
-                this.alertValiationMessage('inventories');
-                this.inventoryInputError = "Inventory staff must select at least one inventory";
-                return 1;
-            }
-            if(!this.selectedRoles || this.selectedRoles.length < 1){
-                this.alertValiationMessage('roles');
-                this.rolesInputError = "At least one role must be selected";
-                return 1;
-            }
-            // if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen') && !this.selectedArea) {
-            //     this.alertValiationMessage('area');
-            //     return 1;
-            // }
-
-            if (this.selectedInventories.length > 0) {
-                this.selectedInventories.forEach((inventory) => {
-                    this.inventoryIds.push(inventory.id);
-                });
-            }
-
-            this.selectedSkills.forEach((skill) => {
-                this.skillIds.push(skill.id);
-            });
-
-            this.roleIds = [this.selectedRoles.id];
-
-            this.selectedFeatures.forEach((feature) => {
-                this.featureIds.push(feature.id);
-            });
+            this.skillIds = [];
 
             if (!this.name) {
                 this.alertValiationMessage('name');
@@ -933,45 +958,60 @@ export default {
                 return 1;
             }
 
-            if (!this.phoneNumber || !this.phoneNumber.match(/^09\d{7}(\d{2})?$/)) {
+            if (!this.joinedDate) {
+                this.alertValiationMessage('joined date');
+                this.joinedDateInputError = "Joined date must be filled";
+                return 1;
+            }
+
+            // phone number format = !this.phoneNumber.match(/^09\d{7}(\d{2})?$/)
+            if (!this.phoneNumber) {
                 this.alertValiationMessage('phone number');
                 this.phoneNumberInputError = "Phone number must be filled and valid (09XXXXXXXX or 09XXXXXXXXXX)";
                 return 1;
             }
 
-            // if (!this.password || !this.password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)) {
-            //     this.alertValiationMessage('password');
-            //     this.passwordInputError = "Password must be filled and valid (at least 8 characters, at least one letter and one number)";
-            //     return 1;
-            // }
+            // password format = !this.password.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)
             if (!this.password) {
                 this.alertValiationMessage('password');
                 this.passwordInputError = "Password must be filled";
                 return 1;
             }
 
-            if (!this.joinedDate) {
-                this.alertValiationMessage('joined date');
-                this.joinedDateInputError = "Joined date must be filled";
-                return 1;
-            }
-            if (!this.selectedDepartment) {
+            if(!this.selectedDepartment){
                 this.alertValiationMessage('department');
                 this.departmentInputError = "Department must be selected";
                 return 1;
             }
-
-            if (this.roleIds.length < 1) {
-                this.alertValiationMessage('roles');
-                this.rolesInputError = "At least one role must be selected";
+            if(!this.selectedRole){
+                this.alertValiationMessage('role');
+                this.rolesInputError = "Staff role must be selected";
                 return 1;
             }
-
-            if (this.featureIds.length < 1) {
+            if (this.selectedFeatures.length < 1) {
                 this.alertValiationMessage('authorized features');
                 this.featuresInputError = "At least one feature must be authroized";
                 return 1;
             }
+            if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
+                this.alertValiationMessage('inventories');
+                this.inventoryInputError = "Inventory staff must select at least one inventory";
+                return 1;
+            }
+
+            if (this.selectedInventories.length > 0) {
+                this.selectedInventories.forEach((inventory) => {
+                    this.inventoryIds.push(inventory.id);
+                });
+            }
+
+            this.selectedSkills.forEach((skill) => {
+                this.skillIds.push(skill.id);
+            });
+
+            this.selectedFeatures.forEach((feature) => {
+                this.featureIds.push(feature.id);
+            });
 
             if (!this.state) {
                 this.alertValiationMessage('state');
@@ -1062,6 +1102,14 @@ export default {
 
         async createStaff() {
             let formData = new FormData();
+            formData.append('department_id', this.selectedDepartment.id);
+            formData.append('role_id', this.selectedRole.id);
+            formData.append('skill_ids',JSON.stringify(this.skillIds));
+            formData.append('feature_ids', JSON.stringify(this.featureIds));
+            if (this.inventoryIds.length > 0) {
+                formData.append('inventory_ids', JSON.stringify(this.inventoryIds));
+            }
+
             formData.append('name', this.name);
             formData.append('phone_number', this.phoneNumber);
             formData.append('nrc_code', this.selectedNrcCode);
@@ -1072,19 +1120,15 @@ export default {
             if (this.fatherName) {
                 formData.append('father_name', this.fatherName);
             }
-
             if (this.motherName) {
                 formData.append('mother_name', this.motherName);
             }
-
             if (this.email) {
                 formData.append('email', this.email);
             }
-
             if (this.altPhoneNumber) {
                 formData.append('alt_phone_number', this.altPhoneNumber);
             }
-
             if (this.zipCode) {
                 formData.append('zip_code', this.zipCode);
             }
@@ -1092,31 +1136,30 @@ export default {
             formData.append('bank_id', this.selectedBank.id);
             formData.append('bank_account_number', this.bankAccountNumber);
 
-            formData.append('birthdate', this.dob);
+            formData.append('birthdate', this.formatDate(this.dob, '/', 'yyyy-mm-dd', '-', ['day','month','year']));
             formData.append('state', this.state);
             formData.append('address', this.address);
             formData.append('city', this.city);
             formData.append('gender_id', this.selectedGender.id);
-            formData.append('department_id', this.selectedDepartment.id);
-            if (this.inventoryIds.length > 0) {
-                formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
-            }
 
             formData.append('password', this.password);
-            formData.append('roles', this.roleIds);
-            console.log(this.skillIds);
-            formData.append('skills',JSON.stringify(this.skillIds));
-            formData.append('featureIds', JSON.stringify(this.featureIds));
-            formData.append('joined_date', this.joinedDate);
+
+            formData.append('joined_date', this.formatDate(this.joinedDate, '/', 'yyyy-mm-dd', '-', ['day','month','year']));
 
             if (this.nrcFrontFile) {
-                formData.append('certificate_images[]', this.nrcFrontFile);
+                formData.append('nrc_front_image', this.nrcFrontFile);
             }
             if (this.nrcBackFile) {
-                formData.append('certificate_images[]', this.nrcBackFile);
+                formData.append('nrc_back_image', this.nrcBackFile);
             }
             if (this.houseHoldRegistrationFile) {
-                formData.append('certificate_images[]', this.houseHoldRegistrationFile);
+                formData.append('household_registration_image', this.houseHoldRegistrationFile);
+            }
+            // Append each certification file
+            if (this.certificateFiles.length > 0) {
+                this.certificateFiles.forEach(file => {
+                    formData.append('certificate_images[]', file);
+                });
             }
 
             // for emegercy
@@ -1165,6 +1208,26 @@ export default {
                     this.banksList = response.data;
                 }
             });
+        },
+
+        createBankBtnClicked(){
+            if(!this.bankName){
+                this.alertValiationMessage('bank name');
+                return;
+            }
+            let formData = new FormData();
+            formData.append('name', this.bankName);
+            postApiData({url: `/api/banks`, form_data: formData, token: this.getToken()}).then(response=>{
+                if(response.data){
+                    this.banksList.push(response.data);
+                    this.selectedBank = response.data;
+                    this.bankName = null;
+                }
+            });
+        },
+
+        formatDate(date, dateSplitter='-', format='dd/mm/yyyy', separator='/', ordering = ['year', 'month', 'day']){
+            return formatDate(date, dateSplitter, format, separator, ordering);
         },
     },
 
