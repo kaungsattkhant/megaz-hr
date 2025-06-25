@@ -52,7 +52,7 @@
                         <select data-te-select-init data-te-select-placeholder="Select Category"
                             data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
                             <option :value="item" v-for="(item, itemIndex) in itemList" :key="item.code">
-                                {{ item.code }}
+                                {{ item.name }}
                             </option>
                         </select>
                     </div>
