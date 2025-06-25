@@ -596,7 +596,7 @@ import { find } from "lodash";
         },
 
         created(){
-            // this.getItemList();
+            this.getItemList();
             this.getUomList();
             this.getEventList();
         },
