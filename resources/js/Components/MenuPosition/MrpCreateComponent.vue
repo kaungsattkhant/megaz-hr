@@ -160,7 +160,7 @@
                         <label for="" class="block text-sm text-black mb-3">
                             Expire Date
                         </label>
-                        <input type='date' v-model="expireDate" class="input-ui w-full !p-1 text-xs" />
+                        <input type='number' v-model="expireDate" class="input-ui w-full !p-1 text-xs" min="0"/>
                     </div>
                     <div class="col-span-3"  v-show="isReadyToSale"></div>
                 </div>
