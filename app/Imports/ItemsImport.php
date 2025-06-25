@@ -44,19 +44,20 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         try {
             $itemCode = Item::where('code',  $row['code'])->first();
             if ($itemCode) {
-                return ResponseMessage('Duplicate itemcode.',  419);
+                return ResponseMessage($itemCode.' is duplicate itemcode.',  419);
             }
             $categoryId = Category::where('category_code', $row['category_code'])->value('id');
             $itemTypeId = ItemType::where('item_type_code', $row['item_type_code'])->value('id');
             $baseUomId = Uom::where('uom_code', $row['base_uom_code'])->value('id');
+            $conversionRate=$row['conversion'];
             $uomId = Uom::where('uom_code', $row['uom_code'])->value('id');
             $minHoldingBaseUomQuantity = $row['min_holding_base_uom_quantity'] ?? 0;
             $minHoldingUomQuantity = $row['min_holding_uom_quantity'] ?? 0;
-            $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
-            if (!$uomConversion) {
-                return ResponseMessage('No UOM conversion found for the given units.', 404);
-            }
-            $conversionRate = $uomConversion->conversion;
+            // $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
+            // if (!$uomConversion) {
+            //     return ResponseMessage('No UOM conversion found for the given units.', 404);
+            // }
+            // $conversionRate = $uomConversion->conversion;
             if ($conversionRate <= 0) {
                 return ResponseMessage('Invalid conversion rate.', 404);
             }

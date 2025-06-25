@@ -36,20 +36,20 @@ class UomsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErro
             ]
         );
 
-        UomConversion::firstOrCreate(
-            [
-                'base_unit_id' => $uom->id,
-                'conversion_unit_id' => $uom->id,
-                'conversion' => 1,
-            ],
-            [
-                'base_unit_id' => $uom->id,
-                'conversion_unit_id' => $uom->id,
-                'conversion' => 1, // Default conversion rate
-                'created_by' => UserData()->id,
-                'is_show' => 0
-            ]
-        );
+        // UomConversion::firstOrCreate(
+        //     [
+        //         'base_unit_id' => $uom->id,
+        //         'conversion_unit_id' => $uom->id,
+        //         'conversion' => 1,
+        //     ],
+        //     [
+        //         'base_unit_id' => $uom->id,
+        //         'conversion_unit_id' => $uom->id,
+        //         'conversion' => 1, // Default conversion rate
+        //         'created_by' => UserData()->id,
+        //         'is_show' => 0
+        //     ]
+        // );
         return $uom;
     }
 
