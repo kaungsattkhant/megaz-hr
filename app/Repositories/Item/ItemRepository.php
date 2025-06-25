@@ -244,7 +244,7 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function supplierByItem($itemId)
     {
-      
+
         // $supplierByItem = SupplierItem::join('items', 'supplier_items.item_id', '=', 'items.id')
         //     ->join('suppliers', 'supplier_items.supplier_id', '=', 'suppliers.id') // optional if you need supplier data
         //     ->join('brands', 'supplier_items.brand_id', '=', 'brands.id')         // optional if you need brand data
@@ -258,9 +258,9 @@ class ItemRepository implements ItemRepositoryInterface
         //     ->groupBy('supplier_items.supplier_id', 'items.name')
         //     ->get();
         $supplierByItem = SupplierItem::with('supplier', 'brand')
-        ->join('items','supplier_items.item_id','items.id')
+            ->join('items', 'supplier_items.item_id', 'items.id')
             ->where('items.id', $itemId)
-            ->select('supplier_id','items.name as item_name', DB::raw('MAX(supplier_items.id) as id')) // Use MAX(id) to pick a unique row per supplier_id
+            ->select('supplier_id', 'items.name as item_name', DB::raw('MAX(supplier_items.id) as id')) // Use MAX(id) to pick a unique row per supplier_id
             ->groupBy('supplier_id')
             ->get();
         return $supplierByItem;
@@ -271,7 +271,7 @@ class ItemRepository implements ItemRepositoryInterface
 
         $itemId = $request->item_id;
         $supplierId = $request->supplier_id;
-        $supplierByItem = SupplierItem::with('brand','supplier', 'item', 'item_price.uom')
+        $supplierByItem = SupplierItem::with('brand', 'supplier', 'item', 'item_price.uom')
             ->where('item_id', $itemId)
             ->where('supplier_id', $supplierId)->get();
         return $supplierByItem;
@@ -291,6 +291,10 @@ class ItemRepository implements ItemRepositoryInterface
             'uom_code',
             'min_holding_base_uom_quantity',
             'min_holding_uom_quantity',
+            'limitation_type',
+            'amount',
+            'max_limit_base_uom_quantity',
+            'max_limit_uom_quantity',
         ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {

@@ -118,3 +118,22 @@ export function convertMinutesToHoursMinutes(minutes) {
     const remainingMinutes = minutes % 60;
     return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`;
 }
+
+export function formatDate(dateStr, format = 'dd/mm/yyyy', separator = '/') {
+    if (!dateStr || typeof dateStr !== 'string') return '';
+
+    const [year, month, day] = dateStr.split('-');
+
+    const map = {
+        dd: day.padStart(2, '0'),
+        mm: month.padStart(2, '0'),
+        yyyy: year
+    };
+
+    const formatParts = format.split(separator);
+    const formattedDate = formatParts
+        .map(part => map[part])
+        .join(separator);
+
+    return formattedDate;
+}

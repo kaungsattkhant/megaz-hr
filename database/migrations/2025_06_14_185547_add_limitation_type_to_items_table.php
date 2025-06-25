@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('items', function (Blueprint $table) {
+            $table->double('conversion')->default(0);
             $table->enum('limitation_type', ['uom', 'finance'])->after('minimum_holding_amount');
             $table->unsignedInteger('amount')->nullable()->after('limitation_type');
             $table->unsignedInteger('max_limit_base_uom_quantity')->nullable()->after('amount');

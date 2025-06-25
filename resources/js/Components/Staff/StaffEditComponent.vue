@@ -12,28 +12,119 @@
                     Name
                 </label>
                 <input type="text" v-model="name" placeholder="Name (Required)" class="input-ui">
+                <div class="mt-1" v-if="nameInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ nameInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Date of Birth
                 </label>
-                <input type="date" v-model="dob" class="input-ui">
+                <!-- <input type="date" v-model="dob" class="input-ui"> -->
+                 <flat-pickr
+                    v-model="dob"
+                    :config="{ dateFormat: 'd/m/Y' }"
+                    class="input-ui"
+                    placeholder="dd/mm/yyyy"
+                />
+                <div class="mt-1" v-if="dateOfBirthInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ dateOfBirthInputError }} *</span>
+                </div>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Gender
                 </label>
-                <select name="" id="" v-model="selectedGender" class="input-ui">
-                    <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
-                        {{ gender.name }}
-                    </option>
-                </select>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Gender" data-te-select-filter="true"
+                        name="" id="" v-model="selectedGender" class="input-ui">
+                        <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
+                            {{ gender.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="mt-1" v-if="genderInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ genderInputError }} *</span>
+                </div>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
+                &nbsp;
+                <!-- <label for="" class="label-form mb-3">
+                    NRC Number
+                </label>
+                <input type="text" v-model="nrcNumber" placeholder="NRC (Required)" class="input-ui"> -->
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Code
+                </label>
+                <div class="flex">
+                    <multiselect v-model="selectedNrcCode"
+                    :options="[1,2,3,4,5,6,7,8,9,10,11,12,13,14]"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Select NRC Code"
+                    :preselect-first="false"
+                    @select="getNrcTownships">
+                    </multiselect>
+                    <div class="mx-2 text-lg text-4xl text-gray-500">
+                        /
+                    </div>
+                </div>
+                <div class="mt-1" v-if="nrcCodeError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcCodeError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Townships
+                </label>
+                <multiselect v-model="selectedNrcTownship"
+                :options="nrcTownships"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select NRC Township"
+                track-by="id"
+                label="name_en"
+                :preselect-first="false">
+                </multiselect>
+                <div class="mt-1" v-if="nrcTownshipError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcTownshipError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Type
+                </label>
+                <multiselect v-model="selectedNrcType"
+                :options="['N','E','P']"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select NRC Type"
+                :preselect-first="false">
+                </multiselect>
+                <div class="mt-1" v-if="nrcTypeError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcTypeError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     NRC Number
                 </label>
                 <input type="text" v-model="nrcNumber" placeholder="NRC (Required)" class="input-ui">
+                <div class="mt-1" v-if="nrcInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcInputError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3 mb-4 pb-6">
@@ -61,8 +152,16 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Joined Date
                 </label>
-                <input type="date" v-model="joinedDate"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <!-- <input type="date" v-model="joinedDate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                 <flat-pickr
+                    v-model="joinedDate"
+                    :config="{ dateFormat: 'd/m/Y' }"
+                    class="input-ui"
+                    placeholder="dd/mm/yyyy"
+                />
+                <div class="mt-1" v-if="joinedDateInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ joinedDateInputError }} *</span>
+                </div>
             </div>
 
             <!-- <div class="col-span-3"></div> -->
@@ -72,6 +171,9 @@
                     Ph Number
                 </label>
                 <input type="tel" v-model="phoneNumber" placeholder="Phone (Required)" class="input-ui">
+                <div class="mt-1" v-if="phoneNumberInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ phoneNumberInputError }} *</span>
+                </div>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -98,6 +200,9 @@
                         {{ department.name }}
                     </option>
                 </select>
+                <div class="mt-1" v-if="departmentInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ departmentInputError }} *</span>
+                </div>
             </div>
 
             <!-- <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -131,18 +236,15 @@
                         <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
                     </div> -->
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
-                    <!-- <select data-te-select-init data-te-select-placeholder="Select Rolsdfdafe" data-te-select-filter="true"
-                        name="" id="" v-model="selectedRoles" @change="getSkillByRole(selectedRoles.id)" class="input-ui h-[34px]">
-                        <option :value="role" v-for="(role, roleIndex) in roleList"
-                        :key="roleIndex"> {{ role.name }} </option>
-                    </select> -->
-
                         <select name="" id="" v-model="selectedRole" class="input-ui" @change="getSkillByRole(selectedRole)">
                             <option :value="role.id" v-for="(role, roleIndex) in roleList"
                                 :key="roleIndex">
                                 {{ role.name }}
                             </option>
                         </select>
+                    </div>
+                    <div class="mt-1" v-if="rolesInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ rolesInputError }} *</span>
                     </div>
                 </div>
             </div>
@@ -159,7 +261,10 @@
                         </template>
                     </multiselect>
                     <div class="flex gap-x-2 flex-wrap mt-1">
-                    <span class="font-inter after-coma text-sm" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
+                        <span class="font-inter after-coma text-sm" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
+                    </div>
+                    <div class="mt-1" v-if="featuresInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ featuresInputError }} *</span>
                     </div>
                 </div>
             </div>
@@ -188,15 +293,21 @@
                     <multiselect v-model="selectedState" :options="stateList" :close-on-select="true"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select State" label="name"
                         track-by="id" :preselect-first="true" @select="stateSelectChanged(selectedState)"></multiselect>
+                    <div class="mt-1" v-if="stateInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ stateInputError }} *</span>
+                    </div>
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
-                    <label class="label-form mb-3">State</label>
+                    <label class="label-form mb-3">City</label>
                     <multiselect v-model="selectedCity" :options="cityList" :close-on-select="true"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select City" label="name"
                         track-by="id" :preselect-first="true" @select="citySelectChanged(selectedCity)"></multiselect>
+                    <div class="mt-1" v-if="cityInputError">
+                        <span class="px-1 text-red-600 text-sm">{{ cityInputError }} *</span>
+                    </div>
                 </div>
             </div>
 
@@ -242,8 +353,39 @@
                 <textarea name="" v-model="address"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
+                <div class="mt-1" v-if="addressInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ addressInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-6"></div>
+
+            <div v-if="staff" class="contents">
+                <div class="contents" v-if="staff.staff_certifications.length > 0">
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
+                        <label for="nrc-front" class="label-form mb-3">
+                            Certification 1
+                        </label>
+                        <img v-if="staff.staff_certifications[0]" :src="staff.staff_certifications[0].certificate_file_url" alt="Old Certification 1 Preview" class="mt-2 h-24" />
+                    </div>
+
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
+                        <label for="nrc-front" class="label-form mb-3">
+                            Certification 2
+                        </label>
+                        <img v-if="staff.staff_certifications[1]" :src="staff.staff_certifications[1].certificate_file_url" alt="Old Certification 2 Preview" class="mt-2 h-24" />
+                    </div>
+
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
+                        <label for="nrc-front" class="label-form mb-3">
+                            Certification 3
+                        </label>
+                        <img v-if="staff.staff_certifications[2]" :src="staff.staff_certifications[2].certificate_file_url" alt="Old Certification 3 Preview" class="mt-2 h-24" />
+                    </div>
+                </div>
+
+                <div class="col-span-3"></div>
+            </div>
+
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="nrc-front" class="label-form mb-3">
@@ -251,7 +393,12 @@
                 </label>
                 <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-front" ref="nrc_front_image"
                 class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
-                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onNrcFrontChange"/>
+                <img v-if="nrcFrontPreview" :src="nrcFrontPreview" alt="NRC Front Preview" class="mt-2 h-24" />
+                <div class="mt-1" v-if="nrcFrontFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcFrontFileError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -260,7 +407,12 @@
                 </label>
                 <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-back" ref="nrc_back_image"
                 class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
-                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onNrcBackChange"/>
+                <img v-if="nrcBackPreview" :src="nrcBackPreview" alt="NRC Back Preview" class="mt-2 h-24"/>
+                <div class="mt-1" v-if="nrcBackFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcBackFileError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -269,10 +421,35 @@
                 </label>
                 <input type="file" accept="image/png, image/gif, image/jpeg" id="household-registration" ref="household_registration_image"
                 class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
-                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onHouseHoldRegistrationChange"/>
+                <img v-if="houseHoldRegistrationPreview" :src="houseHoldRegistrationPreview" alt="Household Registration Preview" class="mt-2 h-24"/>
+                <div class="mt-1" v-if="houseHoldRegistrationFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ houseHoldRegistrationFileError }} *</span>
+                </div>
             </div>
 
             <div class="col-span-3"></div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Bank Name
+                </label>
+                <multiselect v-model="selectedBank"
+                :options="banksList"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select Bank"
+                track-by="id"
+                label="name"
+                :preselect-first="false">
+                </multiselect>
+                <div class="mt-1" v-if="bankSelectError">
+                    <span class="px-1 text-red-600 text-sm">{{ bankSelectError }} *</span>
+                </div>
+            </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -280,6 +457,8 @@
                 </label>
                 <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
             </div>
+
+            <div class="col-span-6"></div>
 
             <hr class="col-span-12 mb-4">
 
@@ -293,18 +472,27 @@
                     Primary Contact
                 </label>
                 <input type="text" v-model="primaryName" placeholder="Primary Contact (Required)" class="input-ui">
+                <div class="mt-1" v-if="primaryNameInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ primaryNameInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
                 <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)" class="input-ui">
+                <div class="mt-1" v-if="primaryPhoneInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ primaryPhoneInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Relationship
                 </label>
                 <input type="text" v-model="primaryRelationship" placeholder="Relationship (Required)" class="input-ui">
+                <div class="mt-1" v-if="primaryRelationshipInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ primaryRelationshipInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3"></div>
 
@@ -313,12 +501,18 @@
                     Secondary Contact
                 </label>
                 <input type="text" v-model="secondaryName" placeholder="Secondary Contact (Required)" class="input-ui">
+                <div class="mt-1" v-if="secondaryNameInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ secondaryNameInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
                 <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)" class="input-ui">
+                <div class="mt-1" v-if="secondaryPhoneInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ secondaryPhoneInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -326,6 +520,9 @@
                 </label>
                 <input type="text" v-model="secondaryRelationship" placeholder="Relationship (Required)"
                     class="input-ui">
+                <div class="mt-1" v-if="secondaryRelationshipInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ secondaryRelationshipInputError }} *</span>
+                </div>
             </div>
             <div class="col-span-3"></div>
 
@@ -426,12 +623,15 @@ import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
 import { getApiData, postApiData, deleteApiData, putApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
-import { getCurrentDate } from "../../utilities/datetime-helpers";
+import { getCurrentDate, formatDate } from "../../utilities/datetime-helpers";
+import FlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 
 export default {
     props: ["staffId"],
     components: {
-        Multiselect
+        Multiselect,
+        FlatPickr
     },
     data() {
         return {
@@ -478,9 +678,15 @@ export default {
             zipCode: null,
 
             nrcFrontFile: null,
+            nrcFrontPreview: null,
             nrcBackFile: null,
+            nrcBackPreview: null,
             houseHoldRegistrationFile: null,
-            bankAccountNumber: null,
+            houseHoldRegistrationPreview: null,
+
+            nrcFrontFileError: null,
+            nrcBackFileError: null,
+            houseHoldRegistrationFileError: null,
 
             primaryName: null,
             primaryPhone: null,
@@ -492,12 +698,67 @@ export default {
             skillList:[],
             skillIds:[],
             selectedSkills:[],
-            selectedRole:null
+            selectedRole:null,
+
+            inventoryInputError: null,
+            nameInputError: null,
+            dateOfBirthInputError: null,
+            genderInputError: null,
+            nrcInputError: null,
+            phoneNumberInputError: null,
+            passwordInputError: null,
+            joinedDateInputError: null,
+            departmentInputError: null,
+            rolesInputError: null,
+            featuresInputError: null,
+            stateInputError: null,
+            cityInputError: null,
+            addressInputError: null,
+            primaryNameInputError: null,
+            primaryPhoneInputError: null,
+            primaryRelationshipInputError: null,
+            secondaryNameInputError: null,
+            secondaryPhoneInputError: null,
+            secondaryRelationshipInputError: null,
+
+            selectedNrcCode: null,
+            nrcTownships: [],
+            selectedNrcTownship: null,
+            selectedNrcType: 'N',
+            nrcNumber: null,
+
+            nrcCodeError: null,
+            nrcTownshipError: null,
+            nrcTypeError: null,
+            nrcInputError: null,
+
+            banksList: [],
+            selectedBank: null,
+            bankAccountNumber: null,
+
+            bankSelectError: null,
+            bankAccountNumberError: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        onNrcFrontChange(e) {
+            const file = e.target.files[0];
+            this.nrcFrontFile = file;
+            this.nrcFrontPreview = file ? URL.createObjectURL(file) : null;
+        },
+        onNrcBackChange(e) {
+            const file = e.target.files[0];
+            this.nrcBackFile = file;
+            this.nrcBackPreview = file ? URL.createObjectURL(file) : null;
+        },
+        onHouseHoldRegistrationChange(e) {
+            const file = e.target.files[0];
+            this.houseHoldRegistrationFile = file;
+            this.houseHoldRegistrationPreview = file ? URL.createObjectURL(file) : null;
+        },
 
         async getSkillByRole(id)
             {
@@ -515,7 +776,7 @@ export default {
             if (response.success == true) {
                 this.staff = response.data;
                 this.name = this.staff.name;
-                this.dob = this.staff.birthdate;
+                this.dob = this.formatDate(this.staff.birthdate);
                 this.selectedGender = this.staff.gender;
                 this.nrcNumber = this.staff.nrc_number
                 this.fatherName = this.staff.father_name;
@@ -523,7 +784,7 @@ export default {
                 this.email = this.staff.email;
                 this.phoneNumber = this.staff.phone_number;
                 this.altPhoneNumber = this.staff.alt_phone_number;
-                this.joinedDate = this.staff.joined_date;
+                this.joinedDate = this.formatDate(this.staff.joined_date);
                 this.zipCode = this.staff.zip_code;
                 this.address = this.staff.address;
                 this.bankAccountNumber = this.staff.bank_account_number;
@@ -540,7 +801,7 @@ export default {
 
                 setTimeout(() => {
                     this.reconstructStaffData();
-                }, 1300);
+                }, 200);
             }
         },
 
@@ -596,6 +857,12 @@ export default {
                         }
                     }
                 }
+                this.selectedNrcCode = this.staff.nrc_code;
+                this.selectedNrcType = this.staff.nrc_type;
+                this.getNrcTownships();
+
+                this.selectedBank = this.staff.bank;
+                this.getBanksList();
             }
         },
 
@@ -607,19 +874,27 @@ export default {
             // this.selectedInventories = [];
             this.areaList = [];
             this.selectedArea = null;
-            let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
-            if (rolesResponse.data) {
-                this.roleList = rolesResponse.data;
-            }
+            this.roleList = [];
+            this.inventories = [];
+            let rolesResponsePromise = getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+            rolesResponsePromise.then(response=>{
+                if(response.data){
+                    this.roleList = response.data;
+                }
+            });
+            // let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+            // if (rolesResponse.data) {
+            //     this.roleList = rolesResponse.data;
+            // }
             if (this.selectedDepartment.features.length > 0) {
                 this.featureList = this.selectedDepartment.features;
             }
 
             this.areaList = this.selectedDepartment.areas;
 
-            // if(this.selectedDepartment.inventory){
-            //     this.inventories.push(this.selectedDepartment.inventory.inventory);
-            // }
+            if(this.selectedDepartment.inventory){
+                this.inventories.push(this.selectedDepartment.inventory.inventory);
+            }
         },
 
         async getStateList() {
@@ -695,9 +970,34 @@ export default {
             this.featureIds = [];
             this.inventoryIds = [];
 
-            
+            // if(this.$refs.nrc_front_image.files[0]){
+            //     this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
+            // }
 
-            // if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchent') && !this.selectedArea) {
+            // if(this.$refs.nrc_back_image.files[0]){
+            //     this.nrcBackFile = this.$refs.nrc_back_image.files[0];
+            // }
+
+            // if(this.$refs.household_registration_image.files[0]){
+            //     this.houseHoldRegistrationFile = this.$refs.household_registration_image.files[0];
+            // }
+
+            if(!this.selectedDepartment){
+                this.alertValiationMessage('department');
+                this.departmentInputError = "Department must be selected";
+                return 1;
+            }
+            if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
+                this.alertValiationMessage('inventories');
+                this.inventoryInputError = "Inventory staff must select at least one inventory";
+                return 1;
+            }
+            if(!this.selectedRole || this.selectedRoles.length < 1){
+                this.alertValiationMessage('role');
+                this.rolesInputError = "At least one role must be selected";
+                return 1;
+            }
+            // if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen') && !this.selectedArea) {
             //     this.alertValiationMessage('area');
             //     return 1;
             // }
@@ -712,18 +1012,8 @@ export default {
                 this.skillIds.push(skill.id);
             });
 
-            console.log(this.skillIds);
-
-
-            // if (this.selectedRoles.length > 0) {
-            //     this.selectedRoles.forEach((item) => {
-            //         this.roleIds.push(item.id);
-            //     });
-            // }
             this.roleIds = [this.selectedRoles.id];
             // this.roleIds = [this.selectedRole];
-
-            console.log(this.selectedRoles);
 
             if (this.selectedFeatures.length > 0) {
                 this.selectedFeatures.forEach((feature) => {
@@ -731,98 +1021,131 @@ export default {
                 });
             }
 
-            if(this.$refs.nrc_front_image.files[0]){
-                this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
-            }
-
-            if(this.$refs.nrc_back_image.files[0]){
-                this.nrcBackFile = this.$refs.nrc_back_image.files[0];
-            }
-
-            if(this.$refs.household_registration_image.files[0]){
-                this.houseHoldRegistrationFile = this.$refs.household_registration_image.files[0];
-            }
-
             if (!this.name) {
                 this.alertValiationMessage('name');
+                this.nameInputError = "Name must be filled";
                 return 1;
             }
 
-            // if (!this.dob) {
-            //     this.alertValiationMessage('Date of Birth');
-            //     return 1;
-            // }
+            if (!this.dob) {
+                this.alertValiationMessage('Date of Birth');
+                this.dateOfBirthInputError = "Date of birth must be filled";
+                return 1;
+            }
 
             if (!this.selectedGender) {
                 this.alertValiationMessage('gender');
+                this.genderInputError = "Gender must be selected";
                 return 1;
             }
 
-            // if (!this.nrcNumber) {
-            //     this.alertValiationMessage('Nrc');
-            //     return 1;
-            // }
+            if(!this.selectedNrcCode){
+                this.alertValiationMessage('NRC Code');
+                this.nrcCodeError = "NRC Code must be selected";
+                return 1;
+            }
 
-            if (!this.phoneNumber) {
+            if(!this.selectedNrcTownship){
+                this.alertValiationMessage('NRC Township');
+                this.nrcTownshipError = "NRC Township must be selected";
+                return 1;
+            }
+
+            if(!this.selectedNrcType){
+                this.alertValiationMessage('NRC Type');
+                this.nrcTypeError = "NRC Type must be selected";
+                return 1;
+            }
+
+            if (!this.nrcNumber || !this.nrcNumber.match(/^\d{6,8}$/)) {
+                this.alertValiationMessage('NRC Number');
+                this.nrcInputError = "NRC Number must be filled and valid (6 to 8 digits)";
+                return 1;
+            }
+
+            if (!this.phoneNumber || !this.phoneNumber.match(/^09\d{7}(\d{2})?$/)) {
                 this.alertValiationMessage('phone number');
+                this.phoneNumberInputError = "Phone number must be filled and valid (09XXXXXXXX or 09XXXXXXXXXX)";
                 return 1;
             }
-
 
             if (!this.joinedDate) {
                 this.alertValiationMessage('joined date');
+                this.joinedDateInputError = "Joined date must be filled";
                 return 1;
             }
 
             if (!this.selectedDepartment) {
                 this.alertValiationMessage('department');
+                this.departmentInputError = "Department must be selected";
+                return 1;
+            }
+
+            if (this.roleIds.length < 1) {
+                this.alertValiationMessage('roles');
+                this.rolesInputError = "At least one role must be selected";
+                return 1;
+            }
+
+            if (this.featureIds.length < 1) {
+                this.alertValiationMessage('authorized features');
+                this.featuresInputError = "At least one feature must be authroized";
                 return 1;
             }
 
             if (!this.state) {
                 this.alertValiationMessage('state');
+                this.stateInputError = "State/Division must be selected";
                 return 1;
             }
 
             if (!this.city) {
                 this.alertValiationMessage('city');
+                this.cityInputError = "City must be selected";
                 return 1;
             }
 
             if (!this.address) {
                 this.alertValiationMessage('address');
+                this.addressInputError = "Address must be filled";
                 return 1;
             }
 
-            // if (!this.primaryName) {
-            //     this.alertValiationMessage('primary name');
-            //     return 1;
-            // }
+            if (!this.primaryName) {
+                this.alertValiationMessage('primary name');
+                this.primaryNameInputError = "Primary contact name must be filled";
+                return 1;
+            }
 
-            // if (!this.primaryPhone) {
-            //     this.alertValiationMessage('primary phone');
-            //     return 1;
-            // }
+            if (!this.primaryPhone) {
+                this.alertValiationMessage('primary phone');
+                this.primaryPhoneInputError = "Primary contatct phone number must be filled";
+                return 1;
+            }
 
-            // if (!this.primaryRelationship) {
-            //     this.alertValiationMessage('primary relationship');
-            //     return 1;
-            // }
+            if (!this.primaryRelationship) {
+                this.alertValiationMessage('primary relationship');
+                this.primaryRelationshipInputError = "Relationship with the primary contact must be filled";
+                return 1;
+            }
 
-            // if (!this.secondaryName) {
-            //     this.alertValiationMessage('secondary name');
-            //     return 1;
-            // }
+            if (!this.secondaryName) {
+                this.alertValiationMessage('secondary name');
+                this.secondaryNameInputError = "Secondary contact name must be filled";
+                return 1;
+            }
 
-            // if (!this.secondaryPhone) {
-            //     this.alertValiationMessage('secondary phone');
-            //     return 1;
-            // }
+            if (!this.secondaryPhone) {
+                this.alertValiationMessage('secondary phone');
+                this.secondaryPhoneInputError = "Secondary contatct phone number must be filled";
+                return 1;
+            }
 
-            // if (!this.secondaryRelationship) {
-            //     this.alertValiationMessage('secondary relationship');
-            //     return 1;
-            // }
+            if (!this.secondaryRelationship) {
+                this.alertValiationMessage('secondary relationship');
+                this.secondaryRelationshipInputError = "Relationship with the secondary contact must be filled";
+                return 1;
+            }
 
             this.updateStaff();
         },
@@ -855,9 +1178,8 @@ export default {
                 formData.append('zip_code', this.zipCode);
             }
 
-            if (this.bankAccountNumber) {
-                formData.append('bank_account_number', this.bankAccountNumber);
-            }
+            formData.append('bank_id', this.selectedBank.id);
+            formData.append('bank_account_number', this.bankAccountNumber);
 
             if(this.password){
                 formData.append('password', this.password);
@@ -882,7 +1204,7 @@ export default {
             //     });
             // }
 
-            formData.append('roles', this.roleIds);
+            formData.append('roles', this.selectedRole);
 
             formData.append('skills',JSON.stringify(this.skillIds));
 
@@ -891,16 +1213,14 @@ export default {
             }
             formData.append('joined_date', this.joinedDate);
 
-            if(this.nrcFrontFile){
-                formData.append('nrc_front_image', this.nrcFrontFile);
+            if (this.nrcFrontFile) {
+                formData.append('certificate_images[]', this.nrcFrontFile);
             }
-
-            if(this.nrcBackFile){
-                formData.append('nrc_back_image', this.nrcBackFile);
+            if (this.nrcBackFile) {
+                formData.append('certificate_images[]', this.nrcBackFile);
             }
-
-            if(this.houseHoldRegistrationFile){
-                formData.append('household_registration_image', this.houseHoldRegistrationFile);
+            if (this.houseHoldRegistrationFile) {
+                formData.append('certificate_images[]', this.houseHoldRegistrationFile);
             }
 
             // for emegercy
@@ -927,6 +1247,36 @@ export default {
                 });
             }
         },
+
+        getNrcTownships(){
+            if(!this.selectedNrcCode){
+                this.alertValiationMessage('NRC Code');
+                this.nrcTownships = [];
+                return;
+            }
+            this.selectedNrcTownship = null;
+            this.nrcTownships = [];
+            getApiData({ url: `/api/nrcs?nrc_code=${this.selectedNrcCode}`, token: this.getToken() }).then(response => {
+                if (response.data) {
+                    this.nrcTownships = response.data;
+                    if(this.staff){
+                        this.selectedNrcTownship = this.nrcTownships.find(nrcTownship => nrcTownship.name_en == this.staff.nrc_township_code);
+                    }
+                }
+            });
+        },
+
+        getBanksList() {
+            getApiData({ url: `/api/banks`, token: this.getToken() }).then(response => {
+                if (response.data) {
+                    this.banksList = response.data;
+                }
+            });
+        },
+
+        formatDate(date){
+            return formatDate(date, 'dd/mm/yyyy', '/');
+        },
     },
 
     created() {
@@ -934,7 +1284,7 @@ export default {
         this.getDepartmentList();
         this.getStateList();
         this.getStaffDetail();
-        this.getInventoryList();
+        // this.getInventoryList();
     },
 
     mounted() {
