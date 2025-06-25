@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedInteger('item_type_id');
             $table->unsignedBigInteger('base_uom_id'); //base uom mean large unit
             $table->unsignedBigInteger('uom_id'); //inventory store unit
-            $table->double('conversion')->default(0);
             $table->boolean('is_active')->default(1);
             $table->double('min_holding_base_uom_quantity');
             $table->double('min_holding_uom_quantity');
