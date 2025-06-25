@@ -138,9 +138,6 @@ class Item extends BaseModel
             );
     }
 
-
-
-
     public function getItemPriceWithConversionAttribute()
     {
         // Calculate the item price with conversion
@@ -226,7 +223,7 @@ class Item extends BaseModel
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) -
-                     SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
+                    SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
             )
             ->groupBy('inventory_ledger_items.item_id');
     }

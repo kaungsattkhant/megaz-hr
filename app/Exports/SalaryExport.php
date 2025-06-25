@@ -6,7 +6,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class SalaryExport implements FromCollection, WithHeadings,WithMapping
+class SalaryExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $calculatedSalaryData;
 

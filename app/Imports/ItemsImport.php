@@ -44,12 +44,12 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         try {
             $itemCode = Item::where('code',  $row['code'])->first();
             if ($itemCode) {
-                return ResponseMessage($itemCode.' is duplicate itemcode.',  419);
+                return ResponseMessage($itemCode . ' is duplicate itemcode.',  419);
             }
             $categoryId = Category::where('category_code', $row['category_code'])->value('id');
             $itemTypeId = ItemType::where('item_type_code', $row['item_type_code'])->value('id');
             $baseUomId = Uom::where('uom_code', $row['base_uom_code'])->value('id');
-            $conversionRate=$row['conversion'];
+            $conversionRate = $row['conversion'];
             $uomId = Uom::where('uom_code', $row['uom_code'])->value('id');
             $minHoldingBaseUomQuantity = $row['min_holding_base_uom_quantity'] ?? 0;
             $minHoldingUomQuantity = $row['min_holding_uom_quantity'] ?? 0;
@@ -76,8 +76,18 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 'min_holding_base_uom_quantity' => $minHoldingBaseUomQuantity ?? 0,
                 'min_holding_uom_quantity' => $minHoldingUomQuantity ?? 0,
                 'minimum_holding_amount' =>  $minimumHoldingAmount  ?? 0,
+                'limitation_type' => $row['limitation_type'] ?? null,
+                'amount' => $row['amount'] ?? 0,
+                'max_limit_base_uom_quantity' => $row['max_limit_base_uom_quantity'] ?? 0,
+                'max_limit_uom_quantity' => $row['max_limit_uom_quantity'] ?? 0,
             ]);
 
+            if ($row['limitation_type'] === "finance") {
+                $item['amount'] = $row['amount'] ?? 0;
+            } elseif ($row['limitation_type'] === "uom") {
+                $item['max_limit_base_uom_quantity'] = $row['max_limit_base_uom_quantity'] ?? 0;
+                $item['max_limit_uom_quantity'] = $row['max_limit_uom_quantity'] ?? 0;
+            }
             $item->save();
             DB::commit();
 
