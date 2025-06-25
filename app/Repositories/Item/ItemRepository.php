@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
 use App\Imports\UomsImport;
+use App\Models\ArrivalItem;
 use App\Imports\ItemsImport;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
@@ -19,15 +20,18 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\HeadingRowImport;
 use App\Services\AveragePriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
+use App\Repositories\PoOrder\PoOrderRepository;
 
 class ItemRepository implements ItemRepositoryInterface
 {
     protected $averagePriceCalculator;
     protected $itemService;
-    public function __construct(AveragePriceCalculator $repo, ItemService $itemService)
+    protected $poOrderRepository;
+    public function __construct(AveragePriceCalculator $repo, ItemService $itemService, PoOrderRepository $poOrderRepository)
     {
         $this->averagePriceCalculator = $repo;
         $this->itemService = $itemService;
+        $this->poOrderRepository = $poOrderRepository;
     }
 
     public function listAllData(Request $request)
@@ -244,7 +248,6 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function supplierByItem($itemId)
     {
-
         // $supplierByItem = SupplierItem::join('items', 'supplier_items.item_id', '=', 'items.id')
         //     ->join('suppliers', 'supplier_items.supplier_id', '=', 'suppliers.id') // optional if you need supplier data
         //     ->join('brands', 'supplier_items.brand_id', '=', 'brands.id')         // optional if you need brand data
@@ -263,6 +266,25 @@ class ItemRepository implements ItemRepositoryInterface
             ->select('supplier_id', 'items.name as item_name', DB::raw('MAX(supplier_items.id) as id')) // Use MAX(id) to pick a unique row per supplier_id
             ->groupBy('supplier_id')
             ->get();
+//         foreach($supplierByItem as $supplier){
+//   // Calculate Average Quality
+//             $averageQuality = ArrivalItem::where('item_id', $itemId)
+//                 ->where('supplier_id', $supplier->supplier_id)
+//                 ->avg('quality');
+//             $supplier->average_quality = $averageQuality ? round($averageQuality, 2) : null;
+//             // Get Lead Time
+//             $leadTimeData = $this->poOrderRepository->getSupplierLeadTime($supplier->supplier_id);
+//             $leadTime = null;
+//             if (isset($leadTimeData['details'])) {
+//                 foreach ($leadTimeData['details'] as $detail) {
+//                     if ($detail['item_id'] == $itemId) {
+//                         $leadTime = $detail['average_order_time'];
+//                         break;
+//                     }
+//                 }
+//             }
+//             $supplier->lead_time = $leadTime;
+//         }
         return $supplierByItem;
     }
 
