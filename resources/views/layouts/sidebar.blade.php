@@ -1158,6 +1158,37 @@
                                 Resignation
                             </a>
                         </li>
+                        <li>
+                            <a href="/cv" class="flex items-center @yield('cv') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                CV
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/exams" class="flex items-center @yield('exam') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Exam
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/interviews" class="flex items-center @yield('interview') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Interview
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/interview/result" class="flex items-center @yield('interview_result') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Interview Result
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/locations" class="flex items-center @yield('locations') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Locations
+                            </a>
+                        </li>
+
                     @endif
                     @if (checkFeaturePermission('event'))
                         <li>

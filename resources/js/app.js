@@ -223,6 +223,20 @@ import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComp
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
 
+
+import CvFormComponent from './Components/CV/CvFormComponent.vue';
+import CvListComponent from './Components/CV/CvListComponent.vue';
+import CvDetailComponent from './Components/CV/CvDetailComponent.vue';
+import ExamListComponent from './Components/Exams/ExamListComponent.vue';
+import ExamCreateComponent from './Components/Exams/ExamCreateComponent.vue';
+import ExamEditComponent from './Components/Exams/ExamEditComponent.vue';
+import InterviewListComponent from './Components/Interviews/InterviewListComponent.vue';
+import InterviewCreateComponent from './Components/Interviews/InterviewCreateComponent.vue';
+import InterviewResultComponent from './Components/Interviews/InterviewResultComponent.vue';
+import LocationListComponent from './Components/Locations/LocationListComponent.vue';
+import LocationDetailComponent from './Components/Locations/LocationDetailComponent.vue';
+
+
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
@@ -423,6 +437,20 @@ app.component('EventCrudComponent',EventCrudComponent);
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
+
+
+app.component('CvFormComponent',CvFormComponent);
+app.component('CvListComponent',CvListComponent);
+app.component('CvDetailComponent',CvDetailComponent);
+app.component('ExamListComponent',ExamListComponent);
+app.component('ExamCreateComponent',ExamCreateComponent);
+app.component('ExamEditComponent',ExamEditComponent);
+app.component('InterviewListComponent',InterviewListComponent);
+app.component('InterviewCreateComponent',InterviewCreateComponent);
+app.component('InterviewResultComponent',InterviewResultComponent);
+app.component('LocationListComponent',LocationListComponent);
+app.component('LocationDetailComponent',LocationDetailComponent);
+
 
 app.use(store);
 app.use(Notifications);

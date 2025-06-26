@@ -53,6 +53,13 @@ class Staff extends Authenticatable
         'nrc_back_path',
         'household_registration_url',
         'household_registration_path',
+        'experience',
+        'status',
+        'confirmed_at',
+        'confirmed_by',
+        'cancelled_at',
+        'cancelled_by',
+        'is_cv'
     ];
 
     protected $hidden = [
@@ -184,7 +191,7 @@ class Staff extends Authenticatable
 
     public function skills()
     {
-        return $this->belongsToMany(Skill::class);
+        return $this->belongsToMany(Skill::class, 'skill_staff');
     }
 
     public function staffAdvances()

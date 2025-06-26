@@ -21,6 +21,7 @@ class StaffRepository implements StaffRepositoryInterface
     {
         $departmentIds = $request->department_id;
         $roleIds = $request->role_id;
+
         $staffQuery = Staff::orderByDesc('id')
             ->with(['department', 'roles',  'bank','staffCertifications'])
             ->when($request->search_input, function ($q) use ($request) {

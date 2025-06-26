@@ -265,7 +265,7 @@ if (!function_exists('JsonDecode')) {
     function JsonDecode($raw_data)
     {
         $input_items = stripslashes(str_replace(array('\"', '&quot;', '\n'), '', $raw_data));
-        $json_data = json_decode($input_items);
+        $json_data = json_decode($input_items, true);
         if ($json_data == null) {
             ResponseMessage('input data is not corrected', 402);
         }
@@ -352,11 +352,11 @@ if (!function_exists('InventoryIds')) {
 }
 
 if (!function_exists('existOrderItemByStatus')) {
-    function existOrderItemByStatus($orderItems,$status)
+    function existOrderItemByStatus($orderItems, $status)
     {
         // return UserData()->inventories->pluck('id')->toArray();
-        $existOrderItems=$orderItems->whereIn('status',$status);
-        if($existOrderItems->isEmpty()){
+        $existOrderItems = $orderItems->whereIn('status', $status);
+        if ($existOrderItems->isEmpty()) {
             return false;
         }
         return true;

@@ -391,4 +391,7 @@ body {
 .multiselect-fontsize div div input {
   font-size: 14px; }
 
+.capitalize .multiselect__option {
+  text-transform: capitalize; }
+
 /*# sourceMappingURL=style_web.css.map */
