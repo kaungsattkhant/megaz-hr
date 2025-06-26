@@ -12,11 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('staff', function (Blueprint $table) {
-            $table->dropColumn('nrc_number');
             $table->string('nrc_code')->nullable()->after('email');
             $table->string('nrc_township_code')->nullable()->after('nrc_code');
             $table->string('nrc_type')->nullable()->after('nrc_township_code');
-            $table->string('nrc_number')->nullable()->after('nrc_type');
             $table->string('bank_id')->nullable()->after('nrc_number');
         });
     }
