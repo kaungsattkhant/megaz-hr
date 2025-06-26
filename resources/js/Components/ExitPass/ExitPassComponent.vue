@@ -106,10 +106,12 @@
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(exit.id)" v-if="exit.status == 'confirmed' || exit.status == 'arrival_confirmed'"
-                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="far fa-trash-alt"></i>
-                                        </button>
+                                        <div class="contents" v-show="feature.includes('exit-pass.delete')">
+                                            <button @click="deleteBtnClicked(exit.id)" v-if="exit.status == 'confirmed' || exit.status == 'arrival_confirmed'"
+                                                data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                                <i class="far fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                         <div class="contents" v-if="exit.status != 'confirmed' && exit.status != 'arrival_confirmed'">
                                             <button @click="confirmedExit(exit)">
                                                 <i class="far fa-check text-sm mr-3 p-1"></i>
@@ -380,11 +382,12 @@ export default {
             deleteId:null,
 
             testdata: null,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getExitList(pageNumber) {
             let url = this.url + this.url_department + this.url_role;
@@ -562,7 +565,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/leave_allowances/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/exit_passes/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getExitList(1);
             }

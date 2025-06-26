@@ -16,7 +16,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/meeting/create" class="add-btn ">
+                <a href="/meeting/create" class="add-btn " v-if="feature.includes('meeting.create')">
                     Add New
                 </a>
 
@@ -52,7 +52,7 @@
                                 <th scope="col" class=" ">
                                     Chaired By
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['meeting.edit', 'meeting.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -91,13 +91,13 @@
                                         
                                         {{ meeting.chaired_by.name }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'">
+                                    <td class="whitespace-nowrap " v-show="['meeting.edit', 'meeting.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'" v-if="feature.includes('meeting.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(meeting.id)"
+                                            @click="deleteBtnClicked(meeting.id)" v-show="feature.includes('meeting.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -198,11 +198,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getMeetingList(pageNumber) {
             let url = `/api/meetings`;

@@ -1111,6 +1111,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $newPoInvoice = PoInvoice::create($invoiceData);
 
         $arrivalItemData = [
+          'quality' => $validatedData['quality'],
           'base_uom_id' => $validatedData['base_uom_id'],
           'base_uom_quantity' => $validatedData['base_uom_quantity'],
           'uom_id' => $validatedData['uom_id'],
@@ -1138,6 +1139,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           $poInvoice->total_invoice_amount += $validatedData['amount'];
           $poInvoice->save();
           $arrivalItemData = [
+            'quality' => $validatedData['quality'],
             'base_uom_id' => $validatedData['base_uom_id'],
             'base_uom_quantity' => $validatedData['base_uom_quantity'],
             'uom_id' => $validatedData['uom_id'],
@@ -1233,8 +1235,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   private function storeInventoryLedger($validatedData, $arrivalItem)
   {
-
-    // $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
     $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
     if (!$inventoryId) {
       ResponseMessage('Main Inventory not found.', 404);
@@ -1465,11 +1465,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function updateArrivalList($arrivalId, $validatedData)
   {
-
     DB::beginTransaction();
-
     try {
-
       $arrivalItem = ArrivalItem::findOrFail($arrivalId);
       if (!$arrivalItem) {
         return ResponseMessage('No arrival items found for this item', 404);
@@ -1480,7 +1477,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $arrivalItem->amount = $validatedData['unit_price'] * $arrivalItem->quantity;
         $arrivalItem->save();
       }
-
       $poInvoice = $arrivalItem->poInvoice;
       if ($poInvoice) {
         $totalAmount = $poInvoice->arrivalItems->sum('amount');

@@ -18,6 +18,7 @@ class WithAveragePriceScope implements Scope
         $builder->from('items')->leftJoin('uom_conversions', function ($join) {
             $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
                 ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+                ->whereColumn('uom_conversions.item_id','items.id')
                 ->where('uom_conversions.is_active', '=', 1);
         })
         ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')

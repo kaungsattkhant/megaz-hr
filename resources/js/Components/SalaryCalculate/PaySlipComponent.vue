@@ -102,6 +102,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
+                                            v-show="feature.includes('pay-slip.edit')"
                                             class="pr-3" @click="btnClickedAddAllowanceAndDeduction(salary, index)">
                                             <i class="fal fa-pen"></i>
                                         </button>
@@ -145,11 +146,12 @@ export default {
             selectedDepartment:null,
             selectedRole: null,
             
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getPaySlipList() {
             let url = '/api/hr/pay_slips';

@@ -16,7 +16,7 @@
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex pr-0 gap-x-4">
-                <button type="button"
+                <button type="button" v-show="feature.includes('resignation-categories.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
@@ -264,11 +264,13 @@ export default {
             url:'/api/hr/resignation_categories',
             url_search:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
             let url = this.url + this.url_search;

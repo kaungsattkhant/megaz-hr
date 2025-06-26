@@ -71,6 +71,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
+
+    Route::get('/export-salary', 'exportSalary');
   });
   Route::prefix('hr')->controller(ResignationController::class)->group(function () {
     Route::get('/resignation_categories', 'getResignationCategoryLists');

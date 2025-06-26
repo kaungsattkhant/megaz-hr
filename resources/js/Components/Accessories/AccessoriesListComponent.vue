@@ -27,7 +27,7 @@
             </div>
 
             <div class="flex justify-end flex-col">
-                <a href="/accessories/create" class="add-btn ">
+                <a href="/accessories/create" class="add-btn " v-if="feature.includes('accessory.store')">
                     Add New
                 </a>
 
@@ -59,7 +59,7 @@
                                 <!-- <th scope="col" class="  ">
                                     Is featured?
                                 </th> -->
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-if="feature.includes('accessory.show')">
 
                                 </th>
                             </tr>
@@ -92,7 +92,7 @@
                                     <!-- <td class="  ">
                                         {{ (accessories.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td> -->
-                                    <td class="whitespace-nowrap align-middle">
+                                    <td class="whitespace-nowrap align-middle" v-if="feature.includes('accessory.show')">
                                         <a :href="`/accessories/${accessories.id}/edit`" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </a>
@@ -156,11 +156,12 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getAccessoriesCategoryList() {
             let url = `/api/get_accessory_category`;

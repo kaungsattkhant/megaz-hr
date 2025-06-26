@@ -25,7 +25,7 @@
                 </div> -->
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked"  v-show="feature.includes('contact.create')">
                     Add New
                 </button>
             </div>
@@ -42,7 +42,7 @@
                                 <th scope="col" class="">
                                     Phone Number
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['contact.delete', 'contact.edit'].some(f => feature.includes(f))">
                                     
                                 </th>
                             </tr>
@@ -58,12 +58,12 @@
                                     <td class="whitespace-nowrap">
                                         {{ contact.phone_number }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['contact.delete', 'contact.edit'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(contact, index)">
+                                            @click="editBtnClicked(contact, index)" v-show="feature.includes('contact.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(contact.id)"
+                                        <button @click="deleteBtnClicked(contact.id)" v-show="feature.includes('contact.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -163,7 +163,7 @@
                         <label for="" class="label-form mb-3">
                             Phone Number
                         </label>
-                        <input type="text" placeholder="Phone Number" v-model="ph_number" class="input-ui">
+                        <input type="tel" placeholder="Phone Number" v-model="ph_number" class="input-ui">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -206,7 +206,7 @@
                         <label for="" class="label-form mb-3">
                             Phone Number
                         </label>
-                        <input type="text" placeholder="Phone Number" v-model="ph_number_edit" class="input-ui">
+                        <input type="tel" placeholder="Phone Number" v-model="ph_number_edit" class="input-ui">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -214,9 +214,9 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                     </button>
-                    <button type="button" @click="btnClickedEditGps()"
+                    <button type="button" @click="btnClickedEditContact()"
                             class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
+                            Edit
                     </button>
                 </div>
             </div>
@@ -257,11 +257,12 @@ export default {
             url_search:'',
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getContactList(pageNumber) {
             let url = this.url;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -299,16 +300,16 @@ export default {
             }
             
         },
-        btnClickedEditGps(){
+        btnClickedEditContact(){
             if(!this.ph_number_edit){
                 this.alertValidationMessage(`Phone Number`);
                 return 1;
             }
             else{
-                this.editGps();
+                this.editContact();
             }
         },
-        async editGps(){
+        async editContact(){
             let formData = new FormData();
             formData.append('phone_number',this.ph_number_edit);
             formData.append('id',this.editDetail.id);

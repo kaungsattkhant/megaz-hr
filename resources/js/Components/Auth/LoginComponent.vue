@@ -64,10 +64,10 @@
                 fcmToken: null,
                 remember: true,
             }
-        },
+        }, 
 
         methods: {
-            ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles']),
+            ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles', 'setFeature']),
 
             async login(){
                 let url = '/api/login';
@@ -90,8 +90,12 @@
                     response.data.user.roles.forEach(role => {
                         roles.push({name: role.name, id: role.id});
                     });
-
                     this.setRoles(roles);
+
+                    let features = [];
+                    features = JSON.parse(JSON.stringify(response.data.features));
+                    this.setFeature(features);
+
                     this.$refs.signinForm.submit();
 
                     return true;

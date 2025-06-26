@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Event;
 use App\Models\Staff;
-use App\Models\InventoryLedger;
 
+use App\Models\InventoryLedger;
 use App\Models\PurchaseOrderItem;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Laravel\Sanctum\HasApiTokens;
 
 class PurchaseOrder extends BaseModel
 {
@@ -31,7 +32,9 @@ class PurchaseOrder extends BaseModel
         'is_bought',
         'purchased_date_time',
         'procurement_manager_check_id',
-        'procurement_manager_check_time'
+        'procurement_manager_check_time',
+        'type',
+        'event_id'
     ];
 
     public function getCreatedAt()
@@ -73,5 +76,10 @@ class PurchaseOrder extends BaseModel
     public function procurementCheckedBy()
     {
         return $this->belongsTo(Staff::class, 'procurement_manager_check_id');
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'event_id');
     }
 }

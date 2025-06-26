@@ -74,6 +74,6 @@ class Role extends BaseModel
 
     public function leaveAllowances()
     {
-        return $this->hasMany(LeaveAllowance::class);
+        return $this->morphMany(LeaveAllowance::class, 'allowanceable');
     }
 }

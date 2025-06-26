@@ -30,7 +30,7 @@
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-                <button type="button"
+                <button type="button" v-show="feature.includes('overtime-fee.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
@@ -55,7 +55,7 @@
                                 <th scope="col" class="">
                                     Overtime Rate
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['overtime-fee.edit', 'overtime-fee.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -76,12 +76,12 @@
                                     <td class="whitespace-nowrap">
                                         {{ ot.fee }} x
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['overtime-fee.edit', 'overtime-fee.delete'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(ot, index)">
+                                            class="pr-3" @click="editBtnClicked(ot, index)" v-show="feature.includes('overtime-fee.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(ot.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(ot.id)" data-te-toggle="modal" v-show="feature.includes('overtime-fee.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -349,11 +349,13 @@ export default {
             searchDepartment: null,
             searchRole: null,
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getOvertimeList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

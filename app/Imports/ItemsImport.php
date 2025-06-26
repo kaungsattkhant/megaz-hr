@@ -44,19 +44,20 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         try {
             $itemCode = Item::where('code',  $row['code'])->first();
             if ($itemCode) {
-                return ResponseMessage('Duplicate itemcode.',  419);
+                return ResponseMessage($itemCode . ' is duplicate itemcode.',  419);
             }
             $categoryId = Category::where('category_code', $row['category_code'])->value('id');
             $itemTypeId = ItemType::where('item_type_code', $row['item_type_code'])->value('id');
             $baseUomId = Uom::where('uom_code', $row['base_uom_code'])->value('id');
+            $conversionRate = $row['conversion'];
             $uomId = Uom::where('uom_code', $row['uom_code'])->value('id');
             $minHoldingBaseUomQuantity = $row['min_holding_base_uom_quantity'] ?? 0;
             $minHoldingUomQuantity = $row['min_holding_uom_quantity'] ?? 0;
-            $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
-            if (!$uomConversion) {
-                return ResponseMessage('No UOM conversion found for the given units.', 404);
-            }
-            $conversionRate = $uomConversion->conversion;
+            // $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
+            // if (!$uomConversion) {
+            //     return ResponseMessage('No UOM conversion found for the given units.', 404);
+            // }
+            // $conversionRate = $uomConversion->conversion;
             if ($conversionRate <= 0) {
                 return ResponseMessage('Invalid conversion rate.', 404);
             }
@@ -75,9 +76,25 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 'min_holding_base_uom_quantity' => $minHoldingBaseUomQuantity ?? 0,
                 'min_holding_uom_quantity' => $minHoldingUomQuantity ?? 0,
                 'minimum_holding_amount' =>  $minimumHoldingAmount  ?? 0,
+                'limitation_type' => $row['limitation_type'] ?? null,
+                'amount' => $row['amount'] ?? 0,
+                'max_limit_base_uom_quantity' => $row['max_limit_base_uom_quantity'] ?? 0,
+                'max_limit_uom_quantity' => $row['max_limit_uom_quantity'] ?? 0,
             ]);
 
+            if ($row['limitation_type'] === "finance") {
+                $item['amount'] = $row['amount'] ?? 0;
+            } elseif ($row['limitation_type'] === "uom") {
+                $item['max_limit_base_uom_quantity'] = $row['max_limit_base_uom_quantity'] ?? 0;
+                $item['max_limit_uom_quantity'] = $row['max_limit_uom_quantity'] ?? 0;
+            }
             $item->save();
+            $uomConversion = UomConversion::create([
+                'item_id' => $item->id,
+                'base_unit_id' => $baseUomId,
+                'conversion_unit_id' => $uomId,
+                'conversion' =>  $conversionRate,
+            ]);
             DB::commit();
 
             return $item;
@@ -89,50 +106,7 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
 
     public function rules(): array
     {
-        return [
-            // '*.name' => ['required', 'string'],
-            // '*.code' => [
-            //     'required',
-            //     'string',
-            //     'unique:items,code',
-            //     Rule::notIn($this->importedCodes),
-            // ],
-            // '*.category_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('categories', 'category_code'),
-            // ],
-            // '*.item_type_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('item_types', 'item_type_code'),
-            // ],
-            // '*.base_uom_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('uoms', 'uom_code'),
-            // ],
-            // '*.uom_id' => [
-            //     'required',
-            //     'string',
-            //     Rule::exists('uoms', 'uom_code'),
-            // ],
-            // '*.min_holding_base_uom_quantity' => [
-            //     'required',
-            //     'numeric',
-            //     'min:0',
-            // ],
-            // '*.min_holding_uom_quantity' => [
-            //     'required',
-            //     'numeric',
-            //     'min:0',
-            // ],
-            // '*.minimum_holding_amount' => [
-            //     'required',
-            //     'numeric',
-            //     'min:0',
-            // ],
-        ];
+        return [];
     }
 
 

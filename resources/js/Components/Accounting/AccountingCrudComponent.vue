@@ -19,7 +19,7 @@
             <div class="flex justify-end flex-col">
 
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('account.create')">
                     Add New
                 </button>
             </div>
@@ -66,13 +66,13 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3"
-                                        @click="editBtnClicked(account.id, index)">
+                                        @click="editBtnClicked(account.id, index)"  v-show="feature.includes('account.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <!-- <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <input
+                                        <input v-show="feature.includes('account.toggle')"
                                         :checked="account.is_active == 1"
                                         @change="isActiveToggled(account.id)"
                                         class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
@@ -396,11 +396,13 @@
                 currentGroup: 0,
                 isFirstGroup: true,
                 isLastGroup: false,
+
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getHeadAccountList(){
                 let url = `/api/head_accounts`;

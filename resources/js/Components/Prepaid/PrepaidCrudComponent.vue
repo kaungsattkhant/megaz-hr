@@ -18,7 +18,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('prepaid.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -76,6 +76,9 @@
                                 <th scope="col" class="">
                                     Payment
                                 </th>
+                                <th scope="col" class="" v-show="feature.includes('prepaid-payment.create')">
+
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,7 +120,7 @@
                                     <td class="align-middle">
                                         {{ prepaid.prepaid.payment || 0 }}
                                     </td>
-                                    <td class=" align-middle">
+                                    <td class=" align-middle" v-show="feature.includes('prepaid-payment.create')">
                                         <button
                                         data-te-toggle="modal" data-te-target="#create_payment_modal" @click="btnClickedPaymentModal(prepaid)">
                                             <i class="fal fa-plus" ></i>
@@ -396,11 +399,12 @@
                 lastPage: 0,
                 totalData:0,
 
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             monthChange(){
                 this.selectedNewMonth = this.selectedMonth.slice(5,7);

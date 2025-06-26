@@ -18,7 +18,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('brand.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="createBtnClicked">
                     Add New
@@ -34,7 +34,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th></th>
+                                <th v-show="feature.includes('brand.edit')"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +47,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ brand.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="feature.includes('brand.edit')">
                                         <button id="edit-btn" class="pr-2" data-te-toggle="modal"
                                             data-te-target="#create_modal" @click="editBtnClicked(brand)">
                                             <i class="fas fa-pen"></i>
@@ -228,11 +228,12 @@ export default {
             selectedItem:[],
 
             editId: null,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

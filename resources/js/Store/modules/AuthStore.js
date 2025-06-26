@@ -28,7 +28,11 @@ export default {
 
         setCsrfToken(state, csrfToken){
             state.csrfToken = csrfToken;
-        }
+        },
+
+        setFeature(state, feature){
+            state.feature = feature;
+        },
     },
 
     actions: {},
@@ -52,6 +56,10 @@ export default {
 
         getCsrfToken(state){
             return state.csrfToken;
+        },
+
+        getFeature(state){
+            return state.feature;
         }
     }
 };

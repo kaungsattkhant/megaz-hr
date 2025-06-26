@@ -23,7 +23,7 @@
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div> -->
-                <button type="button"
+                <button type="button"  v-show="feature.includes('time-shift.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
@@ -70,15 +70,28 @@
                                     <td class="whitespace-nowrap">
                                         {{ shift.to_time }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap relative">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(shift, index)">
+                                            @click="editBtnClicked(shift, index)" v-show="feature.includes('time-shift.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(shift.id)"
+                                        <!-- <button @click="deleteBtnClicked(shift.id)" v-show="feature.includes('time-shift.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        </button> -->
+                                        <input v-show="feature.includes('time-shift.delete')" :checked="shift.is_active == 1" @change="isActiveToggled(shift.id)"
+                                            class="mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white before:pointer-events-none before:absolute before:h-3.5
+                                            before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:-mt-[0.1875rem] after:h-5
+                                            after:w-5 after:rounded-full after:border-none after:bg-black after:transition-[background-color_0.2s,transform_0.2s]
+                                            after:content-[''] checked:bg-black checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                            checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-black checked:after:shadow-switch-1
+                                            checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                            focus:before:opacity-[0.12]  focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                            focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                             checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100
+                                            checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
+                                            type="checkbox" role="switch" />
+
                                     </td>
                                 </tr>
                             </div>
@@ -371,11 +384,12 @@ export default {
             url_role:'',
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getShiftList(){
             let response = await getApiData({ url: '/api/shifts', token: this.getToken() });
             if (response.data) {
@@ -510,6 +524,22 @@ export default {
                 // this.perPage = response.data.per_page;
             }
         },
+        isActiveToggled(id) {
+            let index = this.timeShiftList.findIndex(shift => shift.id == id);
+            if (index != -1) {
+                if (this.timeShiftList[index].is_active == 1) {
+                    this.timeShiftList[index].is_active = 0;
+                }
+                else {
+                    this.timeShiftList[index].is_active = 1;
+                }
+
+                let url = '/api/time_shifts/' + id + '/toggle';
+                let formData = new FormData();
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
+        },
+
 
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput

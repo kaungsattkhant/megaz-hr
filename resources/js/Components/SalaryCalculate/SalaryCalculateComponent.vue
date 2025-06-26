@@ -5,7 +5,7 @@
         </p>
     </div>
     <div class="mt-4 bg-white ">
-        <div class="border-b py-3 px-8 mb-8">
+        <div class="border-b py-3 px-8 mb-5" v-if="feature.includes('salary-calculate.create')">
             <notifications position="top center" />
             <div class="grid grid-cols-4 pr-0 gap-x-4">
                 
@@ -27,7 +27,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                        <select data-te-select-init data-te-select-placeholder="Select Batch"
                             data-te-select-filter="true" name="" id="" v-model="selectedBatch" class="input-ui !text-black text-sm">
                             <option :value="batch" v-for="(batch, index) in batchList"
                                 :key="index"> {{ batch.name }} </option>
@@ -46,6 +46,7 @@
                 
             </div>
         </div>
+        <div v-else class="py-1.5"></div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class="table-container">
@@ -120,7 +121,7 @@
                         </tbody>
                     </table>
                     <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
-                        class="pr-3 opacity-0 w-0 h-0">
+                        class=" opacity-0 w-0 h-0">
                     </button>
 
                     <!-- pagination -->
@@ -139,8 +140,8 @@
                         </div>
                     </div> -->
                 
-                    <button type="button"
-                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnCreateSalaryCalculate">
+                    <button type="button" v-if="feature.includes('salary-calculate.publish')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 mt-4" @click="btnCreateSalaryCalculate">
                         Publish
                     </button>
                 </div>
@@ -253,11 +254,13 @@ export default {
 
             pay_slip:[],
             test: [],
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getBatchList() {
             let url = '/api/hr/salary_batches';

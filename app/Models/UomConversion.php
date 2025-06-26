@@ -13,6 +13,7 @@ class UomConversion extends Model
         'base_unit_id',
         'conversion_unit_id',
         'conversion',
+        'item_id',
         'is_show',
         'is_active',
         'created_by'

@@ -92,7 +92,7 @@
                 
                 <div class="col-span-3">
                     <label for="" class="label-form mb-3">
-                        Duration ( minutes )
+                        Lead Time ( minutes )
                     </label>
                     <input type="number" v-model="duration" class="input-ui ">
                 </div>
@@ -127,7 +127,7 @@
                                 Date
                             </th> -->
                             <th scope="col" class="">
-                                Duration ( minutes )
+                                Lead Time ( minutes )
                             </th>
                             <th scope="col" class="">
 

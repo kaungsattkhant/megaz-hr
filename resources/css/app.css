@@ -31,7 +31,7 @@
         @apply focus:outline-none focus:ring-0 focus:shadow-none active:ring-0 active:outline-none active:shadow-none
     }
     .box-container-table{
-        @apply block mx-4 mt-4 pb-4
+        @apply block mx-6 mt-4 pb-4
     }
     .btn-container{
         @apply flex justify-between mb-3 px-4 py-4 border-b

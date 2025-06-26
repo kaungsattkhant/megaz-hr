@@ -30,7 +30,7 @@
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-                <a href="/salary_batch/create"
+                <a href="/salary_batch/create" v-if="feature.includes('salary-batch.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -54,7 +54,7 @@
                                 <th scope="col" class="">
                                     Salary Date
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['salary-batch.delete', 'salary-batch.edit'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -75,11 +75,11 @@
                                     <td class="whitespace-nowrap">
                                         {{ batch.day_of_monthly }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        <a :href="'/salary_batch/'+batch.id+'/edit'" class="pr-3">
+                                    <td class="whitespace-nowrap" v-show="['salary-batch.delete', 'salary-batch.edit'].some(f => feature.includes(f))">
+                                        <a :href="'/salary_batch/'+batch.id+'/edit'" class="pr-3"  v-if="feature.includes('salary-batch.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(batch.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(batch.id)" data-te-toggle="modal" v-show="feature.includes('salary-batch.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -198,11 +198,12 @@ export default {
             searchRole: null,
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getSalaryBatchList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

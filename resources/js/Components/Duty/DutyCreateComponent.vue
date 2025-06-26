@@ -61,10 +61,10 @@
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
-                <button class="add-btn py-[9px]" :disabled="!selectedCookingPlace && !selectedDate && !selectedstaff && !selectedDate" @click="addDutyStaff()">
+                <button class="add-btn py-[9px]" :disabled="!selectedCookingPlace && !selectedDate && !selectedStaff && !selectedDate" @click="addDutyStaff()">
                     Add
                 </button>
-                <button class="!bg-[#df845a] add-btn py-[9px] ml-4" :disabled="!selectedstaff && !selectedCookingPlace && !selectedDate"
+                <button class="!bg-[#df845a] add-btn py-[9px] ml-4" :disabled="!selectedStaff && !selectedCookingPlace && !selectedDate"
                     data-te-toggle="modal" data-te-target="#add_duty_modal">
                     Add Task
                 </button>
@@ -385,7 +385,7 @@ export default {
         },
         changeDepartment(){
             this.getStaffList();
-            this.selectedstaff = null;
+            this.selectedStaff = null;
         },
         async getStaffList(){
             let response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
@@ -462,6 +462,10 @@ export default {
                 tasks:this.sampleTaskList,
             })
             document.getElementById("close_first_modal").click();
+            this.selectedStaff = null;
+            this.selectedCookingPlace = null;
+            this.selectedDepartment = null;
+            this.selectedDate = null;
         },
         removeTask(i,j){
             this.staffAndTaskList[i].tasks.splice(j, 1);

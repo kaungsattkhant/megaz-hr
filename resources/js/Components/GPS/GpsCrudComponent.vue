@@ -48,7 +48,7 @@
                                 <th scope="col" class="">
                                     Longitude
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="feature.includes('gps.edit')">
                                     
                                 </th>
                             </tr>
@@ -70,7 +70,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ gps.longitude }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="feature.includes('gps.edit')">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
                                             @click="editBtnClicked(gps, index)">
                                             <i class="fal fa-pen"></i>
@@ -239,11 +239,12 @@ export default {
             url_role:'',
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getGpsList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url;

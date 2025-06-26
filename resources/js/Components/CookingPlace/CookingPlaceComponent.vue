@@ -16,7 +16,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <a href="/cooking_places/create"
+                <a href="/cooking_places/create" v-if="feature.includes('cooking-place.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
                     Add New
                 </a>
@@ -44,6 +44,9 @@
 
                                 <th scope="col" class="">
                                     Skill
+                                </th>
+                                <th scope="col" class=""  v-show="['cooking-place.edit', 'cooking-place.delete'].some(f => feature.includes(f))">
+
                                 </th>
                             </tr>
                         </thead>
@@ -73,11 +76,11 @@
                                             place.cooking_placeable_type === 'skill')?.cooking_placeable.skill }}
                                     </td>
 
-                                    <td class="whitespace-nowrap">
-                                        <a :href="'/cooking_places/' + cookingPlace.id + '/edit'">
+                                    <td class="whitespace-nowrap" v-show="['cooking-place.edit', 'cooking-place.delete'].some(f => feature.includes(f))">
+                                        <a :href="'/cooking_places/' + cookingPlace.id + '/edit'" v-if="feature.includes('cooking-place.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <i class="far fa-trash-alt cursor-pointer"
+                                        <i class="far fa-trash-alt cursor-pointer" v-if="feature.includes('cooking-place.delete')"
                                             @click="deleteCookingPlace(cookingPlace.id)"></i>
                                     </td>
                                 </tr>
@@ -121,11 +124,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getCookingPlaces(pageNumber) {
             const response = await getApiData({ url: `/api/cooking_places?page=${pageNumber}`, token: this.getToken() });

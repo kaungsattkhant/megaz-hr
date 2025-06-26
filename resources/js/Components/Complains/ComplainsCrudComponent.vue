@@ -15,7 +15,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('complaint.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -85,13 +85,13 @@
                                     </button> -->
 
                                         <button id="edit-btn" class="pr-1" @click="statusChangeClick(complain.id)"
-                                            data-te-toggle="modal" data-te-target="#statusChange"
+                                            data-te-toggle="modal" data-te-target="#statusChange" v-show="feature.includes('complaint.update')"
                                             :disabled="complain.status === 'Done'">
                                             <i class="far fa-info-circle"></i>
                                         </button>
 
 
-                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(complain.id)"
+                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(complain.id)" v-show="feature.includes('complaint.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -314,11 +314,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getComplain(pageNumber) {
 

@@ -63,14 +63,14 @@
                 </div>
                 
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Terms
                 </label>
                 <textarea name="" v-model="credit_terms"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="7"></textarea>
-            </div>
+            </div> -->
             <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
@@ -111,6 +111,40 @@
                     </p>
                 </div>
             </div>
+
+            <div class="col-span-3"></div>
+            <div class="mb-12 col-span-3 pb-0 rounded-md">
+                <label class="label-form mb-3">Credit Terms</label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Credit Term" v-model="selectedTermType" class="input-ui !text-black"
+                    data-te-select-filter="false">
+                        <option :value="type.value" v-for="type in termList">{{ type.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4 col-span-3 " v-if="selectedTermType === 'day'">
+                <label for="" class="block text-sm text-black mb-3">
+                    Day
+                </label>
+                <input type="number" v-model="term_day"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3 " v-if="selectedTermType === 'exact_date'">
+                <label for="" class="block text-sm text-black mb-3">
+                    Exact Date
+                </label>
+                <input type="date" v-model="term_exact_date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3" v-if="selectedTermType === 'amount_limitation'">
+                <label for="" class="block text-sm text-black mb-3">
+                    Amount Limitation
+                </label>
+                <input type="number" v-model="term_limitation_amount"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-12"></div>
+
             
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -148,7 +182,7 @@
                 <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addItemBtnClicked()" >
                     Add
                 </button>
-            </div>
+            </div><div class="col-span-3"></div>
             <div class=" col-span-12 mb-8" v-show="selectedItemList.length > 0">
                 <table class="min-w-[50%] text-sm font-light ml-2">
                     <thead class="font-medium text-left ">
@@ -549,6 +583,16 @@ export default {
                 {value:'kpay',name:'Kpay'}
             ],
             test:null,
+
+            termList:[
+                {value:'day',name:'Day'},
+                {value:'amount_limitation',name:'Amount Limitation'},
+                {value:'exact_date',name:'Exact Date'}
+            ],
+            selectedTermType: null,
+            term_day: null,
+            term_exact_date: null,
+            term_limitation_amount: null,
         };
     },
 
@@ -600,7 +644,17 @@ export default {
                 this.lead_time_day = this.supplier.lead_time_day;
                 this.lead_time_hour = this.supplier.lead_time_hour;
                 this.lead_time_min = this.supplier.lead_time_minutes;
-                this.credit_terms = this.supplier.credit_terms;
+                this.selectedTermType = this.supplier.credit_term_type;
+                if(this.supplier.credit_term_type === 'day'){
+                    this.term_day = this.supplier.day;
+                }
+                if(this.supplier.credit_term_type === 'exact_date'){
+                    this.term_day = this.supplier.exact_date;
+                }
+                if(this.supplier.credit_term_type === 'amount_limitation'){
+                    this.term_day = this.supplier.amount_limitation;
+                }
+                // this.credit_terms = this.supplier.credit_terms;
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
                 this.selectedCreditAccount = this.creditAccList.find(crd => crd.id === this.supplier.creditor_account_id )
@@ -797,8 +851,8 @@ export default {
                 this.alertValidationMessage(`Lead Time`);
                 return 1;
             }
-            if(!this.credit_terms){
-                this.alertValidationMessage(`Credit Terms`);
+            if(!this.selectedTermType){
+                this.alertValidationMessage(`Credit Terms Type`);
                 return 1;
             }
             if(!this.selectedCreditAccount){
@@ -815,7 +869,16 @@ export default {
             formData.append("lead_time_day", this.lead_time_day);
             formData.append("lead_time_hour", this.lead_time_hour);
             formData.append("lead_time_minutes", this.lead_time_min);
-            formData.append("credit_terms", this.credit_terms);
+            formData.append("credit_term_type", this.selectedTermType);
+            if(this.selectedTermType === 'day'){
+                formData.append("day", this.term_day);
+            }
+            if(this.selectedTermType === 'exact_date'){
+                formData.append("exact_date", this.term_exact_date);
+            }
+            if(this.selectedTermType === 'amount_limitation'){
+                formData.append("amount_limitation", this.term_limitation_amount);
+            }
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);

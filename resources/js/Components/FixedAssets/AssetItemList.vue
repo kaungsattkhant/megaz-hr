@@ -15,7 +15,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/asset_items/create" class="add-btn text-[13px] font-inter">
+                <a href="/asset_items/create" class="add-btn text-[13px] font-inter" v-if="feature.includes('asset-item.create')">
                     Add New
                 </a>
 
@@ -107,11 +107,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getAssetItemList(pageNumber) {
 
