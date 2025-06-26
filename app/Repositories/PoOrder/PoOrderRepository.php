@@ -1498,7 +1498,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $latestSupplierItemIds = SupplierItem::select(DB::raw('MAX(id) as id'))
         ->where('item_id', $itemId)
         ->groupBy('supplier_id');
-        $supplierByItem = SupplierItem::with(['supplier', 'brand', 'item'])
+        $supplierByItem = SupplierItem::with(['supplier', 'brand', 'item', 'item_price'])
         ->whereIn('id', $latestSupplierItemIds)
         ->get();
         foreach($supplierByItem as $supplier){
