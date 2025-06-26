@@ -478,7 +478,9 @@ Route::controller(AdsAPIController::class)->group(function () {
     Route::get('/ads', 'getAds');
     Route::post('/ads', 'createAds');
     Route::post('/ads/{id}', 'editAds');
+    Route::get('/ads/{id}', 'adsDetail');
     Route::delete('/ads/{id}', 'deleteAds');
+    Route::get('/latest-ads', 'latestAds');
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
