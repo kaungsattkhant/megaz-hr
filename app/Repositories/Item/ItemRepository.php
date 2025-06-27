@@ -37,6 +37,7 @@ class ItemRepository implements ItemRepositoryInterface
     public function listAllData(Request $request)
     {
         $category_id = $request->category_id;
+        $searchInput=$request->search_input;
         if ($request->per_page || $request->page) {
             return Item::with([
                 'category',
@@ -47,6 +48,9 @@ class ItemRepository implements ItemRepositoryInterface
             ])
                 ->when($category_id, function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
+                })
+                ->when($searchInput,function($q)use($searchInput){
+                    $q->where('items.name','LIKE','%'.$searchInput.'%');
                 })
                 // ->withAveragePrice()
                 ->orderByDesc('id')
@@ -61,6 +65,9 @@ class ItemRepository implements ItemRepositoryInterface
             ])
                 ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
+                })
+                ->when($searchInput,function($q)use($searchInput){
+                    $q->where('items.name','LIKE','%'.$searchInput.'%');
                 })
                 // ->withAveragePrice()
                 ->orderByDesc('id')

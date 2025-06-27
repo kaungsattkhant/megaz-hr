@@ -42,7 +42,6 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   }
   public function store($validatedData)
   {
-
     DB::beginTransaction();
     try {
       $data = [];
