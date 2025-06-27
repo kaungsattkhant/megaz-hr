@@ -263,7 +263,7 @@
                     @endif
                     <li>
                         <p class="text-[#2a3547] text-xs font-semibold ml-1 pt-2">
-                            WORLD
+                            SAMPLE
                         </p>
                     </li>
                     @if (checkFeaturePermission('ar'))
@@ -279,8 +279,8 @@
                         <li>
                             <a href="{{ route('skill') }}"
                                 class="flex items-center @yield('skill') sidebar-gap-x">
-                                <img class=" sidebar-img" src="{{ asset('img/skill.png') }}" alt="">
-                                <!-- <i class="far fa-award"></i> -->
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/skill.png') }}" alt=""> -->
+                                <i class="far fa-award"></i>
                                 Skill
                             </a>
                         </li>
@@ -290,9 +290,9 @@
                         <li>
                             <a href="{{ route('cookingPlace') }}"
                                 class="flex items-center @yield('cooking_place') sidebar-gap-x">
-                                <!-- <i class="far fa-hat-chef"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-cooking-50.png') }}"
-                                    alt="">
+                                <i class="far fa-hat-chef"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-cooking-50.png') }}"
+                                    alt=""> -->
                                 Cooking Place
                             </a>
                         </li>
@@ -302,9 +302,9 @@
                         <li>
                             <a href="{{ route('departments') }}"
                                 class="flex items-center @yield('departments') sidebar-gap-x">
-                                <!-- <i class="fal fa-network-wired  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-department-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-network-wired"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-department-50.png') }}"
+                                    alt=""> -->
                                 Department
                             </a>
                         </li>
@@ -313,20 +313,24 @@
                         <li>
                             <a href="{{ route('roles') }}"
                                 class="flex items-center @yield('roles') sidebar-gap-x">
-                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-role-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-tasks"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-role-50.png') }}" alt=""> -->
                                 Roles
                             </a>
                         </li>
                     @endif
+
+                    <li>
+                        <p class="text-[#2a3547] text-xs font-semibold ml-1 pt-2">
+                            TASKS
+                        </p>
+                    </li>
                     @if (checkFeaturePermission('task'))
                         <li>
                             <a href="{{ route('tasks') }}"
                                 class="flex items-center @yield('tasks') sidebar-gap-x">
-                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-tasks"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt=""> -->
                                 Tasks
                             </a>
                         </li>
@@ -335,9 +339,8 @@
                         <li>
                             <a href="{{ route('custom_tasks') }}"
                                 class="flex items-center @yield('custom_tasks') sidebar-gap-x">
-                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-tasks"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt=""> -->
                                 Custom Tasks
                             </a>
                         </li>
@@ -346,9 +349,8 @@
                         <li>
                             <a href="{{ route('task_report') }}"
                                 class="flex items-center @yield('tasks_reports') sidebar-gap-x">
-                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-tasks"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt=""> -->
                                 Report Tasks
                             </a>
                         </li>
@@ -357,9 +359,8 @@
                         <li>
                             <a href="{{ route('areas') }}"
                                 class="flex items-center @yield('areas') sidebar-gap-x">
-                                <!-- <i class="fal fa-network-wired  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-area-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-network-wired"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-area-50.png') }}" alt=""> -->
                                 Areas
                             </a>
                         </li>
@@ -368,20 +369,23 @@
                         <li>
                             <a href="{{ route('brands') }}"
                                 class="flex items-center @yield('brands') sidebar-gap-x">
-                                <!-- <i class="fal fa-copyright  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-brand-48.png') }}"
-                                    alt="">
+                                <i class="fal fa-copyright"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-brand-48.png') }}" alt=""> -->
                                 Brands
                             </a>
                         </li>
                     @endif
+                    <li>
+                        <p class="text-[#2a3547] text-xs font-semibold ml-1 pt-2">
+                            ITEM UOM
+                        </p>
+                    </li>
                     @if (checkFeaturePermission('item'))
                         <li>
                             <a href="{{ route('items') }}"
                                 class="flex items-center @yield('items') sidebar-gap-x">
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-item-48.png') }}"
-                                    alt="">
-                                <!-- <i class="fal fa-hand-receiving  pr-3"></i> -->
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-item-48.png') }}" alt=""> -->
+                                <i class="fal fa-hand-receiving"></i>
                                 Items
                             </a>
                         </li>
@@ -389,9 +393,8 @@
                     @if (checkFeaturePermission('uom-conversion'))
                         <li>
                             <a href="{{ route('uoms') }}" class="flex items-center @yield('uom_conversions') sidebar-gap-x">
-                                <!-- <i class="fal fa-balance-scale  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-unit-48.png') }}"
-                                    alt="">
+                                <i class="fal fa-balance-scale"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-unit-48.png') }}" alt=""> -->
                                 UOMs
                             </a>
                         </li>
@@ -407,8 +410,8 @@
 
                         <li>
                             <a href="{{ route('item_usage_forecasts_by_month') }}"
-                                class="flex items-center @yield('item_usage_forecasts_month')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
+                                class="flex items-center @yield('item_usage_forecasts_month') sidebar-gap-x">
+                                <i class="fal fa-truck-loading"></i>
                                 Item Usage Forecasts By Month
                             </a>
                         </li>
@@ -448,12 +451,16 @@
                             </a>
                         </li>
 @endif -->
+                    <li>
+                        <p class="text-[#2a3547] text-xs font-semibold ml-1 pt-2">
+                            ENTERTAINMENT
+                        </p>
+                    </li>
                     @if (checkFeaturePermission('room'))
                         <li>
                             <a href="{{ route('room') }}" class="flex items-center @yield('room') sidebar-gap-x">
-                                <!-- <i class="fal fa-microphone-alt  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-microphone-20.png') }}"
-                                    alt="">
+                                <i class="fal fa-microphone-alt"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-microphone-20.png') }}" alt=""> -->
                                 Room
                             </a>
                         </li>
@@ -463,9 +470,8 @@
                         <li>
                             <a href="{{ route('table') }}"
                                 class="flex items-center @yield('table') sidebar-gap-x">
-                                <!-- <i class="fal fa-utensils  pr-3"></i> -->
-                                <img class=" sidebar-img" src="{{ asset('img/icons8-table-50.png') }}"
-                                    alt="">
+                                <i class="fal fa-utensils"></i>
+                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-table-50.png') }}" alt=""> -->
                                 Table
                             </a>
                         </li>
