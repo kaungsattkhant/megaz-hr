@@ -79,7 +79,7 @@
                     <label for="" class="label-form mb-3">
                         Paid Sessions
                     </label>
-                    <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession"
+                    <input type="number" class="input-ui" v-model="paySession"
                         placeholder="Paid Sessions">
                 </div>
 
@@ -87,7 +87,7 @@
                     <label for="" class="label-form mb-3">
                         Free Sessions
                     </label>
-                    <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession"
+                    <input type="number" class="input-ui" v-model="freeSession"
                         placeholder="Free Sessions">
                 </div>
                 <div class="col-span-6"></div>
