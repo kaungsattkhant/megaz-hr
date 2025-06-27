@@ -66,7 +66,7 @@ class AreaRepository implements AreaRepositoryInterface
     public function getAreaByAreaType(int $id)
     {
 
-        $areas = Area::where('is_active', 1)->where('area_type_id', $id)->get();
+        $areas = Area::where('is_active', 1)->where('area_category_id', $id)->get();
         return $areas;
     }
 
@@ -101,7 +101,7 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getAreaByDepartment($department_id)
     {
-        return Area::where('department_id', $department_id)->get();
+        return Area::orderBy('id','desc')->get();
     }
 
     public function getSellingAreas($request)

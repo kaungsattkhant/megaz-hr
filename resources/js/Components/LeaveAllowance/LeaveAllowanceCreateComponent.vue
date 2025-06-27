@@ -346,8 +346,10 @@ export default {
                 leave_category_id: this.selectedLeaveType.id,
                 day: this.selectedDay,
             })
+            this.selectedType = null;
             this.selectedDepartment = null;
             this.selectedRole = null;
+            this.selectedStaff = null;
             this.selectedLeaveType = null;
             this.selectedDay = null;
         },
