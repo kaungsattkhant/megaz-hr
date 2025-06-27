@@ -45,7 +45,7 @@ return [
     //procurement
     'po-order' => 'procurement_order_items.index',   //procurement order-item
     'arrival-item' => 'procurement_order_arrival.index',
-    'po-order-invoice' => 'purchase_order_invoices.index',   //purchase order invoice listc
+    'po-order-invoice' => 'purchase_order_invoices',   //purchase order invoice listc
     //end procurement
 
     //added
