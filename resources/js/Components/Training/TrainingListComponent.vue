@@ -16,7 +16,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/training/create" class="add-btn ">
+                <a href="/training/create" class="add-btn " v-if="feature.includes('training.create')">
                     Add New
                 </a>
 
@@ -55,7 +55,7 @@
                                 <th scope="col" class=" ">
                                     Trained By
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['training.delete', 'training.edit'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -97,13 +97,13 @@
                                         
                                         {{ training.trained_by.name }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/training/' + training.id + '/edit'">
+                                    <td class="whitespace-nowrap "  v-show="['training.delete', 'training.edit'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/training/' + training.id + '/edit'" v-if="feature.includes('training.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(training.id)"
+                                            @click="deleteBtnClicked(training.id)" v-if="feature.includes('training.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -204,11 +204,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getTrainingList(pageNumber) {
             let url = `/api/trainings`;

@@ -36,7 +36,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         'updated_at',
         'purchased_date_time',
         'procurement_manager_check_id',
-        'procurement_manager_check_time'
+        'procurement_manager_check_time',
+        'type',
+        'event_id',
     ];
     use SendNotification;
     private $morphMapName;
@@ -112,6 +114,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $data = $request->all();
         $staff = UserData();
         $items = json_decode($request->items);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return ResponseMessage('Invalid JSON data provided for purchase order items.', 400);
+        }
         DB::beginTransaction();
         try {
             if (!isset($request->id)) {
@@ -130,6 +135,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $data['manager_check_id'] = $staff->id;
                     $data['manager_check_time'] = now();
                     $data['status'] = 'manager_checked';
+                }
+            }
+            if (isset($data['type']) && $data['type'] === "event") {
+                if (empty($data['event_id'])) {
+                    return ResponseMessage('event_id is required when type is event', 422);
                 }
             }
             $po = PurchaseOrder::updateOrCreate(
@@ -160,6 +170,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['base_uom_quantity'] = $item->base_uom_quantity;
                 $item_data['uom_quantity'] = $item->uom_quantity;
                 $item_data['remark'] = $item->remark ?? null;
+                $item_data['is_exceed_max_limitation'] = $item->is_exceed_max_limitation ?? 0;
+
                 if (isset($item->later_buy) && $item->later_buy) {
 
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
@@ -227,7 +239,25 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             throw $e;
         }
     }
-
+    public function checkLimitation($request)
+    {
+        $item = Item::find($request['item_id']);
+        if (!$item) {
+            ResponseMessage("Item not found", 404);
+        }
+        if ($item->limitation_type === "uom") {
+            if (
+                (isset($item->max_limit_uom_quantity) && $request['uom_quantity'] > $item->max_limit_uom_quantity) ||
+                (isset($item->max_limit_base_uom_quantity) && $request['base_uom_quantity'] > $item->max_limit_base_uom_quantity)
+            ) {
+                ResponseMessage("Quantity exceeds the allowed limit.", 422);
+            }
+        } elseif ($item->limitation_type === "amount") {
+            if (isset($item->amount) && $request['amount'] > $item->amount) {
+                ResponseMessage("Amount exceeds the allowed limit.", 422);
+            }
+        }
+    }
     public function storeGRN($item)
     {
         if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {

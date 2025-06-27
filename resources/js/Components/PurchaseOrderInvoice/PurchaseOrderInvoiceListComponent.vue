@@ -80,7 +80,7 @@
                                                 <i class="fal fa-pen"></i>
                                             </button> -->
                                             <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                            @click="checkBtnClicked(item.arrival_items[0], index, item)">
+                                            @click="checkBtnClicked(item.arrival_items[0], index, item)" v-show="feature.includes('po-order-invoice.paid')">
                                                 <i class="fal fa-check"></i>
                                             </button>
                                             <a class="pr-2" :href="'/purchase_order_invoices/' + item.id + '/confirm'">
@@ -201,11 +201,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         }
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         showInput() {
             this.isShowInput = true;

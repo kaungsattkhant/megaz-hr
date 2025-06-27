@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Salary Management
+            Allowance Management
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -30,7 +30,7 @@
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-                <button type="button"
+                <button type="button" v-show="feature.includes('allowance.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
                     Add New
@@ -309,11 +309,13 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getAllowanceList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

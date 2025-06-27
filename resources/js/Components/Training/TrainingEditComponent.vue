@@ -334,7 +334,7 @@ export default {
 
                 let staff = []
                 data.participants.forEach(participant => {
-                    // staff.push( this.staffList.find(staff => staff.id == participant.staff_id) );
+                    staff.push( this.staffList.find(staff => staff.id == participant.staff_id) );
                     this.previous_staff_id.push(participant.staff_id)
                 });
                 this.selectedStaff = staff
@@ -418,7 +418,7 @@ export default {
             // let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
         async getTrainedByList(){
@@ -426,7 +426,7 @@ export default {
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.trainedByList = response.data.data;
+                this.trainedByList = response.data;
             }
         },
         async getTypeList(){

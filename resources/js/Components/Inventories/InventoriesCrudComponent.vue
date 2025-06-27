@@ -27,6 +27,7 @@
             <div class="flex justify-end flex-col">
 
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    @click="addBtnClicked" v-show="feature.includes('inventory.create')"
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
                 </button>
@@ -48,7 +49,7 @@
                                 <th scope="col" class="">
                                     Departments/Areas
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['inventory.toggle', 'inventory.update'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -69,12 +70,13 @@
                                             {{ inventoryable.inventoryable.name }}
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap"  v-show="['inventory.toggle', 'inventory.update'].some(f => feature.includes(f))">
                                         <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(inventory.id)"
                                         data-te-toggle="modal" data-te-target="#deleteModal">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
                                         <input :checked="inventory.is_active == 1" @change="isActiveToggled(inventory.id)"
+                                            v-show="feature.includes('inventory.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                         before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                         after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -88,7 +90,7 @@
                                             type="checkbox" role="switch" />
 
                                         <button data-te-toggle="modal" data-te-target="#editModal" id="edit-btn"
-                                            class="pr-3 ml-2" @click="editBtnClicked(inventory.id)">
+                                            class="pr-3 ml-2" @click="editBtnClicked(inventory.id)" v-if="feature.includes('inventory.update')">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                     </td>
@@ -382,11 +384,13 @@ export default {
             searchInventoryList:[],
             searchInventory:null,
             url_inventory:'',
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         inventoryableSelectChanged() {
             if (this.inventoryableIds.length < 1) {
@@ -470,6 +474,17 @@ export default {
                 // console.log(this.inventoryableListEdit);
                 // this.inventoryableIdsEdit = [];
             }
+        },
+        addBtnClicked(){
+            this.name = null;
+            this.start_time = null;
+            this.end_time = null;
+            this.selectedInventoryType = null;
+
+            this.inventoryableList = [];
+            this.selectedInventoryable = null;
+            this.inventoryableIds= [];
+            this.typeList = []
         },
 
         createBtnClicked() {

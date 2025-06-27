@@ -42,7 +42,6 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   }
   public function store($validatedData)
   {
-
     DB::beginTransaction();
     try {
       $data = [];
@@ -286,10 +285,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
     try {
       $menu = Menu::findOrFail($menuId);
       if (isset($validatedData['is_active'])) {
-        $menu->is_active = $menu->is_active ? 0 : 1;
+        $menu->is_active = $validatedData['is_active'];
       }
       if (isset($validatedData['is_feature'])) {
-        $menu->is_feature = $menu->is_feature ? 0 : 1;
+        $menu->is_feature = $validatedData['is_feature'];
       }
       $menu->save();
       DB::commit();

@@ -28,15 +28,15 @@
 
             </div>
             <div class="flex justify-end gap-x-4">
-                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer">
+                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
                     Import Type
                     <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
                 </label>
-                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer">
+                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-category.import')">
                     Import Category
                     <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
                 </label>
-                <label for="excel_import" class="add-btn h-8 cursor-pointer">
+                <label for="excel_import" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
                     Import Item
                     <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                 </label>
@@ -45,7 +45,7 @@
                     data-te-toggle="modal" data-te-target="#import_modal">
                     Excel Import
                 </button> -->
-                <button type="button"
+                <button type="button" v-if="feature.includes('item.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
                     data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                     Add New
@@ -76,7 +76,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
-                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Detail] </a>
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" v-show="feature.includes('item.detail')"> [Detail] </a>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.code }}
@@ -353,6 +353,12 @@
                                 </option>
                             </select>
                         </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Conversion
+                            </label>
+                            <input type="number" step="0.01" placeholder="Conversion" v-model="conversion" class="input-ui">
+                        </div>
                         <!-- <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 Lead Time
@@ -399,6 +405,41 @@
                                 Minimum Holding Amount ( UOM - အသေး )
                             </label>
                             <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
+                        </div>
+
+                        <div class="mb-4 relative">
+                            <label for="" class="label-form mb-3">
+                                PO Limit Type
+                            </label>
+                            <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Type" data-te-select-filter="true"
+                                    name="" id="" v-model="selectedLimitType" class="input-ui !text-black" @change="limitTypeChange()">
+                                    <option :value="type.value" v-for="(type, index) in limitTypeList" class="!uppercase"
+                                        :key="index"> {{ type.name }} </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div v-show="selectedLimitType === 'uom'">
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Maximum Limit ( Base UOM - အကြီး )
+                                </label>
+                                <input type="number" placeholder="Max Base Uom" min="0" v-model="maxBaseUomLimit" class="input-ui">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Maximum Limit ( UOM - အသေး )
+                                </label>
+                                <input type="number" placeholder="Max Uom" min="0" v-model="maxUomLimit" class="input-ui">
+                            </div>
+                        </div>
+
+                        <div class="mb-4" v-show="selectedLimitType === 'finance'">
+                            <label for="" class="label-form mb-3">
+                                Amount
+                            </label>
+                            <input type="number" placeholder="Amount " min="0" v-model="limit_amount" class="input-ui">
                         </div>
                     </div>
                     <!--Modal footer-->
@@ -651,11 +692,23 @@ export default {
             // brandsList: [],
             // selectedBrands: [],
             selectedFile:null,
+            limitTypeList:[
+                {'name': 'UOM', 'value': 'uom'},
+                {'name': 'Finanace', 'value': 'finance'}
+            ],
+
+            selectedLimitType: null,
+            maxBaseUomLimit: null,
+            maxUomLimit: null,
+            limit_amount: null,
+            conversion: null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({
@@ -805,6 +858,15 @@ export default {
             // formData.append('brand_id',this.selectedBrand.id);
             formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             formData.append('min_holding_uom_quantity',this.min_amount);
+            formData.append('conversion',this.conversion);
+            formData.append('limitation_type',this.selectedLimitType);
+            if(this.selectedLimitType === 'uom'){
+                formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
+                formData.append('max_limit_uom_quantity',this.maxUomLimit);
+            }
+            else{
+                formData.append('amount',this.limit_amount);
+            }
             if(this.selectedBrand.length > 0){
                 this.selectedBrand.forEach((brand)=>{
                     formData.append('brand_id[]', brand.id);

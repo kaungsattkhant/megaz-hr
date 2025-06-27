@@ -69,12 +69,12 @@
                     </template>
                 </multiselect>
             </div>
-            <div class="mb-4 col-span-3 rounded-md">
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Code
                 </label>
                 <div class="">
-                    <input type='text' v-model='code' class="input-ui w-full !p-1 text-xs" placeholder="Code" />
+                    <input type='text' v-model='code' class="input-ui w-full text-xs" placeholder="Code" />
                 </div>
 
             </div>

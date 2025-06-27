@@ -94,70 +94,7 @@ class StaffSeeder extends Seeder
                         ]);
                         $department_id = $department->id;
                         $name = $department->name;
-                        // switch ($department_id) {
-                        //     case 1:
-                        //         $staff->features()->sync($hr_features);
-                        //         break;
-                        //     case 2:
-                        //         $staff->features()->sync($finance_features);
-                        //         break;
-                        //     case 4:
-                        //         $staff->features()->sync($management_features);
-                        //         break;
-                        //     case 5:
-                        //         $staff->features()->sync($catering_features);
-                        //         break;
-                        //     case 6:
-                        //         $staff->features()->sync($inventory_features);
-                        //         break;
-
-                        //     default:
-                        //         $staff->features()->sync($hr_features);
-                        // }
-                        switch ($name) {
-                            case 'HR':
-                                $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                break;
-                            case 'Finance':
-                                $featureIds = Feature::whereIn('slug', $finance_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                break;
-                            case 'Management':
-                                $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                break;
-                            // case 'Inventory':
-                            //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
-                            //     $staff->features()->sync($featureIds);
-                            case 'Catering':
-                                $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                break;
-                            case 'Canteen':
-                                $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                break;
-                            case 'Entertainement':
-                                $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                break;
-                            case 'Kitchen':
-                                $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                $inventoryIds = Inventory::whereIn('name', ['Kitchen Inventory'])->pluck('id')->toArray();
-                                $staff->inventories()->sync($inventoryIds);
-                                break;
-                            case 'Procurement':
-                                $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                                $inventoryIds = Inventory::whereIn('name', ['Main Inventory'])->pluck('id')->toArray();
-                                $staff->inventories()->sync($inventoryIds);
-                                break;
-                            default:
-                                $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                                $staff->features()->sync($featureIds);
-                        }
+                       
                         $staff->roles()->sync([$departmentRole->id]);
                         DB::commit();
                     } catch (Exception $e) {

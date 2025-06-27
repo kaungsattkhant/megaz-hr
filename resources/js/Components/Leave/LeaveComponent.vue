@@ -114,7 +114,7 @@
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(leave.id)" v-if="leave.status != 'received'"
+                                        <button @click="deleteBtnClicked(leave.id)" v-if="leave.status != 'received' && feature.includes('leave.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn"
                                             class="pr-1">
                                             <i class="far fa-trash-alt"></i>
@@ -471,11 +471,13 @@ export default {
 
             leaveDetail:null,
             isUnpaidConfirmModal: false,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken','getFeature']),
 
         async getLeaveList(pageNumber) {
             let url = this.url + this.url_department + this.url_role;
@@ -677,7 +679,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/leave_allowances/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/leaves/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getLeaveList(1);
             }

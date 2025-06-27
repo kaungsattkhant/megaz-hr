@@ -13,7 +13,7 @@
                 </label>
             </div>
             <div class="flex justify-end flex-col">
-                <button type="button"
+                <button type="button" v-if="feature.includes('department.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
@@ -36,7 +36,7 @@
                                 <th scope="col" class="">
                                     Features
                                 </th>
-                                <th></th>
+                                <th v-show="feature.includes('department.edit')"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -81,8 +81,8 @@
                                           See Less
                                         </button>
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        <button @click="editBtnClicked(department.id)" data-te-toggle="modal"
+                                    <td class="whitespace-nowrap"  v-show="feature.includes('department.edit')">
+                                        <button v-if="feature.includes('department.edit')" @click="editBtnClicked(department.id)" data-te-toggle="modal"
                                             data-te-target="#editModal" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </button>
@@ -330,11 +330,13 @@
 
                 defaultVisibleCount: 3, // Number of items to show by default
                 expandedRows: [], // Tracks which rows are expanded
+
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getDepartmentList(pageNumber){
                 const response = await getApiData({ url: '/api/departments?page=${pageNumber}', token: this.getToken() });

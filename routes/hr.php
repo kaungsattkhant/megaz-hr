@@ -1,9 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\CvController;
+use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
+use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
 
 Route::middleware('auth:api')->group(function () {
@@ -67,6 +71,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
+
+    Route::get('/export-salary', 'exportSalary');
   });
   Route::prefix('hr')->controller(ResignationController::class)->group(function () {
     Route::get('/resignation_categories', 'getResignationCategoryLists');
@@ -78,4 +84,38 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/resignations/{id}', 'updateResignation');
     Route::get('/resignations-by-staff/{staffId}', 'getResignationByStaffId');
   });
+  Route::prefix('hr')->controller(CvController::class)->group(function () {
+    Route::get('/cvs', 'getAllCvs');
+    Route::post('/cvs/{id}', 'updateCv');
+    Route::delete('/cvs/{id}', 'deleteCv');
+    Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
+    Route::get('/cvs/{id}', 'getCvById');
+    Route::post('/cvs/{id}/status', 'updateCvStatus');
+  });
+  Route::prefix('hr')->controller(ExamController::class)->group(function () {
+    Route::get('/exams', 'getAllExams');
+    Route::post('/exams', 'createExam');
+    Route::post('/exams/{id}', 'updateExam');
+    Route::delete('/exams/{id}', 'deleteExam');
+    Route::get('/exams/{id}', 'getExamById');
+    Route::delete('/exam_skills/{id}', 'deleteExamSkill');
+    Route::delete('/grades/{id}', 'deleteGrade');
+    Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
+    Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
+  });
+  Route::prefix('hr')->controller(InterviewController::class)->group(function () {
+    Route::get('/interviews-by-role/{roleId}', 'getInterviewsByRoleId');
+    Route::get('/interviews/{id}', 'getInterviewById');
+    Route::post('/interviews', 'storeInterview');
+    Route::get('/interviews-results', 'getInterviewResults');
+  });
+  Route::prefix('hr')->controller(LocationController::class)->group(function () {
+    Route::get('/locations', 'getAllLocations');
+    Route::post('/locations', 'createLocation');
+    Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
+    Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
+  });
+});
+Route::prefix('hr')->controller(CvController::class)->group(function () {
+  Route::post('/cvs', 'createCv');
 });

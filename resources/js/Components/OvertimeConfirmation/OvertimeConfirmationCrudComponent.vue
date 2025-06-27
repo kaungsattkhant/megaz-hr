@@ -30,7 +30,7 @@
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-                <button type="button"
+                <button type="button" v-show="feature.includes('overtime-confirmation.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
@@ -461,11 +461,13 @@ export default {
             deleteId:null,
 
             currentTime: getCurretDateTime(),
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getOvertimeList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

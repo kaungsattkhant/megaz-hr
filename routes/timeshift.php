@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/time_shifts', 'storeTimeShift');
     Route::post('/time_shifts/{id}', 'updateTimeShift');
     Route::delete('/time_shifts/{id}', 'deleteTimeShiftById');
+    Route::post('/time_shifts/{id}/toggle', 'toggleTimeShift');
 
     //mobile check in out
     Route::get('/current_time_shifts', 'getCurrentTimeShift');
@@ -53,6 +54,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/invoices/{invoiceId}', 'getInvoiceById');
     Route::post('/invoices', 'storeInvoices');
     Route::post('/po_arrival_list/{arrivalId}', 'updateArrivalList');
+    Route::get('/po-items/{itemId}/suppliers', 'getSuppliersListsByItem');
   });
 
   Route::controller(ParticipantNotificationController::class)->group(function () {

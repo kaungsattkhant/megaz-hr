@@ -14,7 +14,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Supplier</th>
-                                <!-- <th>Brand</th> -->
+                                <th>Item</th>
                                 <!-- <th>Price</th>
                                 <th></th> -->
                             </tr>
@@ -28,11 +28,12 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ itemSupplier.supplier.name }}
-                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline" > [Detail] </a>
+                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline" 
+                                        v-show="feature.includes('item-supplier.detail')"> [Detail] </a>
                                     </td>
-                                    <!-- <td class="whitespace-nowrap">
-                                        {{ itemSupplier.brand.name }}
-                                    </td> -->
+                                    <td class="whitespace-nowrap">
+                                        {{ itemSupplier.item_name }}
+                                    </td>
                                     <!-- <td class="whitespace-nowrap">
                                         <span v-if="itemSupplier.item_price">
                                             {{ (itemSupplier.item_price.price).toLocaleString() }}
@@ -192,11 +193,13 @@ export default {
             price: null,
             supplierItemId: null,
             baseUomId: null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

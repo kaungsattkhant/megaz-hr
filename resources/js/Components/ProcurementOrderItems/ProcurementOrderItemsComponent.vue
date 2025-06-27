@@ -87,6 +87,7 @@
                                                 <i class="fal fa-pen"></i>
                                             </button> -->
                                             <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
+                                                v-show="feature.includes('po-order.confirm')"
                                                 @click="checkBtnClicked(item.purchase_order_details[0], item.item_id, index)">
                                                 <i class="fal fa-check"></i>
                                             </button>
@@ -354,11 +355,13 @@ export default {
             uomUpperLimit: 0,
 
             item_left_id:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getUomConversions(){
             let response = await getApiData({ url: '/api/uom_conversions', token: this.getToken() });

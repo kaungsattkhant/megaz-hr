@@ -56,11 +56,21 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if ($data['status'] == 'placed') {
-                if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
-                    ResponseMessage("Permission doesn't allow", 422);
-                }
+            if ($data['status'] == 'placed' || $data['status'] == 'cancelled') {
                 $orderItem = OrderItem::where('id', $data['id'])->first();
+                if ($data['status'] == 'cancelled') {
+                    if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
+                        ResponseMessage("Permission doesn't allow", 422);
+                    }
+                    $nonCancellableStatuses = [
+                        'in progress' => "Order item can't be canceled because it is already in progress.",
+                        'done' => "Order item can't be canceled because it is already done.",
+                        'pos_confirmed' => "Order item can't be canceled because it is already confirmed.",
+                    ];
+                    if (isset($nonCancellableStatuses[$orderItem->status])) {
+                        ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
+                    }
+                }
                 if (!$orderItem) {
                     ResponseMessage("Order Item Not Found", 422);
                 }
@@ -392,7 +402,9 @@ class OrderRepository implements OrderRepositoryInterface
                         "group_order_id", order_items.group_order_id
                     )
                 ) as order_items_details')
-            )->groupBy('menus.id', 'menus.name', 'group_order_id');
+            )
+            ->whereNotIn('order_items.status',['placed'])
+            ->groupBy('menus.id', 'menus.name', 'group_order_id');
         if ($request->has('area_id') && $request->area_id) {
             $groupedOrderItem->where('order_items.area_id', $request->area_id);
         }

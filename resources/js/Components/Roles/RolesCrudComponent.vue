@@ -21,7 +21,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-if="getFeature().includes('role.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="name = null, selectedDepartment = null">
                     Add New
@@ -65,7 +65,7 @@
                                         {{ role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <button type="button" class="pr-3"
+                                        <button type="button" class="pr-3" v-if="getFeature().includes('role.edit')"
                                             data-te-toggle="modal" data-te-target="#edit_modal" @click="editRolesBtnClicked(role)">
                                             <i class="fas fa-pen"></i>
                                         </button>
@@ -310,12 +310,13 @@ export default {
             lastPage: 0,
             totalData: 0,
 
-            department_url:''
+            department_url:'',
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getDepartmentList() {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
@@ -362,7 +363,10 @@ export default {
                 console.log("success")
             }
             else {
-                alert('some errors occur');
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
         editRolesBtnClicked(role) {

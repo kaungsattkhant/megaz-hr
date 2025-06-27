@@ -79,6 +79,12 @@ class TimeShiftController extends Controller
         ResponseData($data);
     }
 
+    public function toggleTimeShift($timeShiftId)
+    {
+        $data = $this->TimeShiftRepository->toggleTimeShift($timeShiftId);
+        ResponseData($data);
+    }
+
     public function deleteTimeShiftById($timeShiftId)
     {
         $data = $this->TimeShiftRepository->deleteTimeShiftById($timeShiftId);

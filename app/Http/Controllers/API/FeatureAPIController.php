@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Models\Feature;
-use App\Repositories\Feature\FeatureRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Imports\FeaturesImport;
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\HeadingRowImport;
+use App\Repositories\Feature\FeatureRepositoryInterface;
 
 class FeatureAPIController extends Controller
 {
@@ -21,5 +23,25 @@ class FeatureAPIController extends Controller
     {
         $features = $this->featureRepo->listAllData();
         ResponseData($features);
+    }
+
+    public function featureImport(Request $request)
+    {
+        $file = $request->file('feature_import');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = [
+            'module',
+            'name',
+            'slug'
+        ];
+        $actualHeadings = $headings[0][0];
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
+        }
+        $featureImport = new FeaturesImport();
+        $featureImport->import($file);
+        return ResponseMessage('Feature Import Successfully', 200);
     }
 }

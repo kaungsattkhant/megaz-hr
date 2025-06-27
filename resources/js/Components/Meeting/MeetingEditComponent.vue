@@ -292,7 +292,7 @@ export default {
                 let url = '/api/staffs?' + url_department + url_joint + url_role;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.staffList = response.data.data;
+                    this.staffList = response.data;
                     let staffs = [];
                     detail.participants.forEach(participant => {
                         staffs.push(this.staffList.find(staff => staff.id == participant.staff_id)) 

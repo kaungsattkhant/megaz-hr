@@ -25,13 +25,13 @@
                         Excel Import
                         <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                     </label>
-                    <button type="button"  @click="createUomConversionBtnClicked"
+                    <button type="button"  @click="createUomConversionBtnClicked" v-if="feature.includes('uom-conversion.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
-                        Add New
+                        Add Conversion
                     </button>
 
-                    <button type="button" @click="createUomBtnClicked"
+                    <button type="button" @click="createUomBtnClicked" v-if="feature.includes('uom-conversion.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#uom">
                         Create Uom
@@ -404,11 +404,12 @@ export default {
             totalData:0,
 
             selectedFile: null,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getUomConversionList(pageNumber) {
             let url = `/api/uom_conversions?page=${pageNumber}`;

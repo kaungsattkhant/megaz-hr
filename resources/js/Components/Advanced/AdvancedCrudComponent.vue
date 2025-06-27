@@ -16,7 +16,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('staff-balance.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -225,11 +225,13 @@
                 perPage: 0,
                 lastPage: 0,
                 totalData:0,
+
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             monthChange(){
                 let selectedNewMonth = this.selectedMonth.slice(5,7);

@@ -2,29 +2,36 @@
 
 namespace App\Http\Requests\Area;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\APIRequest;
+use Illuminate\Contracts\Validation\Validator;
 
-class AreaCreateRequest extends FormRequest
+class AreaCreateRequest extends APIRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
+    public function rules()
     {
-        return true;
+        $isSellingArea = $this->get('area_category_id') == 2 ? true : false;
+        if ($isSellingArea) {
+            return [
+                //
+                'name' => 'required',
+                'area_type_id' => 'required|exists:area_types,id',
+                'area_category_id' => 'required|exists:area_categories,id',
+            ];
+        } else {
+            return [
+                'name' => 'required',
+                'area_category_id' => 'required|exists:area_categories,id',
+            ];
+        }
+    }
+    public function authorize()
+    {
+        return parent::authorize();
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
-    public function rules(): array
+    public function failedValidation(Validator $validator)
     {
-        return [
-            //
-            'name' => 'required',
-            'area_type_id' => 'required',
-        ];
+        parent::failedValidation($validator);
     }
+
 }

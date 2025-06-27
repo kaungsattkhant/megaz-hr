@@ -18,7 +18,7 @@
             <div class="flex justify-end flex-col">
 
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('ar.create')">
                     Add New
                 </button>
             </div>
@@ -39,7 +39,7 @@
                                     Receivable Amount
                                 </th>
 
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="feature.includes('ar-payment.create')">
 
                                 </th>
                             </tr>
@@ -57,7 +57,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ ar.ar_balance }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="feature.includes('ar-payment.create')">
                                         <button id="edit-btn" class="pr-3 transition duration-150 ease-in-out"
                                         @click="btnClickedPaidModal(ar)"
                                         data-te-toggle="modal" data-te-target="#paid_modal">
@@ -251,11 +251,12 @@
                 lastPage: 0,
                 totalData:0,
 
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getArList(pageNumber){
                 const response = await getApiData({ url: '/api/account_receivable_lists?page='+pageNumber, token: this.getToken() });

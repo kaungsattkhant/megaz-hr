@@ -20,12 +20,15 @@ class Supplier extends Model
         'address',
         'email',
         'credit_limit',
-        'credit_terms',
         'credit_opening_date',
         'credit_opening_amount',
         'lead_time_day',
         'lead_time_hour',
         'lead_time_minutes',
+        'credit_term_type',
+        'day',
+        'amount_limitation',
+        'exact_date',
     ];
 
     public function items()

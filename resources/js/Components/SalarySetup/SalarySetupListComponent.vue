@@ -30,7 +30,7 @@
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-                <a href="/salary_setup/create"
+                <a href="/salary_setup/create" v-if="feature.includes('salary-setup.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -60,7 +60,7 @@
                                 <th scope="col" class="">
                                     Net Salary
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['salary-setup.edit', 'salary-setup.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -88,11 +88,11 @@
                                         {{ salary.net_salary }}
                                     </td>
                                     
-                                    <td class="whitespace-nowrap">
-                                        <a :href="'/salary_setup/'+salary.id+'/edit'" class="pr-3">
+                                    <td class="whitespace-nowrap" v-show="['salary-setup.edit', 'salary-setup.delete'].some(f => feature.includes(f))">
+                                        <a :href="'/salary_setup/'+salary.id+'/edit'" class="pr-3" v-if="feature.includes('salary-setup.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(salary.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(salary.id)" data-te-toggle="modal" v-show="feature.includes('salary-setup.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -164,11 +164,12 @@ export default {
             url_role:'',
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getSalaryList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

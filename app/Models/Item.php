@@ -28,6 +28,10 @@ class Item extends BaseModel
         'min_holding_base_uom_quantity',
         'min_holding_uom_quantity',
         'minimum_holding_amount',
+        'limitation_type',
+        'amount',
+        'max_limit_base_uom_quantity',
+        'max_limit_uom_quantity',
     ];
 
 
@@ -134,9 +138,6 @@ class Item extends BaseModel
             );
     }
 
-
-
-
     public function getItemPriceWithConversionAttribute()
     {
         // Calculate the item price with conversion
@@ -222,7 +223,7 @@ class Item extends BaseModel
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) -
-                     SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
+                    SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
             )
             ->groupBy('inventory_ledger_items.item_id');
     }

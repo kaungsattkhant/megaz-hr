@@ -300,6 +300,12 @@ class SalaryRepository implements SalaryRepositoryInterface
   {
     DB::beginTransaction();
     try {
+      $exits = OvertimeFee::where('role_id', $data['role_id'])
+        ->first();
+      if ($exits) {
+        DB::rollback();
+        ResponseMessage('Overtime fee already exists for this role.', 409);
+      }
       $overtimeFee = OvertimeFee::updateOrCreate(
         [
           'id' => $data['id'] ?? null,
@@ -648,6 +654,7 @@ class SalaryRepository implements SalaryRepositoryInterface
     $totalDays = $startDate->diffInDays($endDate) + 1;
     $salaryBatchStaffs = SalaryBatchStaff::where('salary_batch_id', $request->salary_batch_id)
       ->with([
+        'salaryBatch',
         'staff.overtimes',
         'staff.salary',
         'staff.salary.salarySetup',
@@ -818,6 +825,7 @@ class SalaryRepository implements SalaryRepositoryInterface
           'role_id' => $staff->roles->first() ? $staff->roles->first()->id : null,
           'role_name' => $staff->roles->first() ? $staff->roles->first()->name : null,
           'salary_batch_id' => $request->salary_batch_id,
+          'salary_batch_name' => $salaryBatchStaff->salaryBatch->name,
           'salary_id' => $salary->id,
           // 'formal_basic_salary' =>  $salary->basic_salary,
           'allowance' =>  round($totalAllowance, 2),
@@ -841,7 +849,7 @@ class SalaryRepository implements SalaryRepositoryInterface
       }
     }
 
-    return ResponseData([
+    return [
       'data' => $salaryDetails,
       'pagination' => [
         'total' => $salaryBatchStaffs->total(),
@@ -855,9 +863,9 @@ class SalaryRepository implements SalaryRepositoryInterface
         'next_page_url' => $salaryBatchStaffs->nextPageUrl(),
         'prev_page_url' => $salaryBatchStaffs->previousPageUrl(),
         'path' => $salaryBatchStaffs->path(),
-        'links' => $salaryBatchStaffs->links(), // This will give you pagination links
+        'links' => $salaryBatchStaffs->links(),
       ]
-    ]);
+    ];
   }
 
   public function getAllowanceTypes($request)

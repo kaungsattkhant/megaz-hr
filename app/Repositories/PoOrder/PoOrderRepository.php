@@ -4,8 +4,10 @@ namespace App\Repositories\PoOrder;
 
 use App\Models\PoOrder;
 use App\Models\ItemLeft;
+use App\Models\Inventory;
 use App\Models\PoInvoice;
 use App\Models\ArrivalItem;
+use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\InventoryLedger;
 use App\Models\PurchaseOrderItem;
@@ -14,7 +16,6 @@ use App\Models\InventoryLedgerItem;
 use App\Traits\PoInvoiceTransaction;
 use App\Http\Resources\PoInvoiceResource;
 use App\Http\Resources\PoOrderItemResource;
-use App\Models\Inventory;
 
 class PoOrderRepository implements PoOrderRepositoryInterface
 {
@@ -1111,6 +1112,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $newPoInvoice = PoInvoice::create($invoiceData);
 
         $arrivalItemData = [
+          'quality' => $validatedData['quality'],
           'base_uom_id' => $validatedData['base_uom_id'],
           'base_uom_quantity' => $validatedData['base_uom_quantity'],
           'uom_id' => $validatedData['uom_id'],
@@ -1138,6 +1140,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           $poInvoice->total_invoice_amount += $validatedData['amount'];
           $poInvoice->save();
           $arrivalItemData = [
+            'quality' => $validatedData['quality'],
             'base_uom_id' => $validatedData['base_uom_id'],
             'base_uom_quantity' => $validatedData['base_uom_quantity'],
             'uom_id' => $validatedData['uom_id'],
@@ -1233,8 +1236,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   private function storeInventoryLedger($validatedData, $arrivalItem)
   {
-
-    // $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
     $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
     if (!$inventoryId) {
       ResponseMessage('Main Inventory not found.', 404);
@@ -1266,7 +1267,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->get();
 
     if ($poOrderlist->isEmpty()) {
-      ResponseMessage('No purchase orders found for this supplier.', 404);
+      return null;
+      //ResponseMessage('No purchase orders found for this supplier.', 404);
     }
 
     $purchaseOrderIds = $poOrderlist->pluck('purchase_order_id');
@@ -1274,6 +1276,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $totalArrivalItemCount = ArrivalItem::whereIn('purchase_order_id', $purchaseOrderIds)
       ->where('supplier_id', $supplierId)
       ->count();
+    if ($totalArrivalItemCount === 0) {
+      return null;
+    }
 
     foreach ($poOrderlist as $poOrder) {
       $orderTime = new \Carbon\Carbon($poOrder->created_at);
@@ -1326,9 +1331,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
     return $result;
   }
-
-
-
 
   private function formatTime($totalTimeInSeconds)
   {
@@ -1465,11 +1467,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function updateArrivalList($arrivalId, $validatedData)
   {
-
     DB::beginTransaction();
-
     try {
-
       $arrivalItem = ArrivalItem::findOrFail($arrivalId);
       if (!$arrivalItem) {
         return ResponseMessage('No arrival items found for this item', 404);
@@ -1480,7 +1479,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $arrivalItem->amount = $validatedData['unit_price'] * $arrivalItem->quantity;
         $arrivalItem->save();
       }
-
       $poInvoice = $arrivalItem->poInvoice;
       if ($poInvoice) {
         $totalAmount = $poInvoice->arrivalItems->sum('amount');
@@ -1494,5 +1492,33 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       DB::rollBack();
       return ResponseMessage('Error updating unit price: ' . $e->getMessage(), 500);
     }
+  }
+
+  public function getSuppliersListsByItem($itemId){
+    $latestSupplierItemIds = SupplierItem::select(DB::raw('MAX(id) as id'))
+        ->where('item_id', $itemId)
+        ->groupBy('supplier_id');
+        $supplierByItem = SupplierItem::with(['supplier', 'brand', 'item'])
+        ->whereIn('id', $latestSupplierItemIds)
+        ->get();
+        foreach($supplierByItem as $supplier){
+            $averageQuality = ArrivalItem::where('item_id', $itemId)
+                ->where('supplier_id', $supplier->supplier_id)
+                ->avg('quality');
+            $supplier->average_quality = $averageQuality ? round($averageQuality, 2) : null;
+
+            $leadTimeData = $this->getSupplierLeadTime($supplier->supplier_id);
+            $leadTime = null;
+            if (isset($leadTimeData['details'])) {
+                foreach ($leadTimeData['details'] as $detail) {
+                    if ($detail['item_id'] == $itemId) {
+                        $leadTime = $detail['average_order_time'];
+                        break;
+                    }
+                }
+            }
+            $supplier->lead_time = $leadTime;
+        }
+        return $supplierByItem;
   }
 }

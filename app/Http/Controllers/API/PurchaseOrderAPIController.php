@@ -29,6 +29,11 @@ class PurchaseOrderAPIController extends Controller
         $purchaseOrder = $this->purchaseOrderRepo->createOrUpdate($request);
         ResponseData($purchaseOrder);
     }
+    public function checkLimitation(Request $request)
+    {
+        $purchaseOrder = $this->purchaseOrderRepo->checkLimitation($request->all());
+        ResponseData($purchaseOrder);
+    }
 
     public function updatePurchaseOrder(PurchaseOrderUpdateRequest $request, int $id)
     {

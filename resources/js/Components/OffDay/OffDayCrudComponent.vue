@@ -23,12 +23,12 @@
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div> -->
-                <button type="button"
+                <button type="button" v-show="feature.includes('off-day.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_holiday_modal" @click="addHolidayModalBtnClicked">
                     Add Holiday
                 </button>
-                <button type="button"
+                <button type="button" v-show="feature.includes('off-day.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add Off Day
@@ -53,7 +53,7 @@
                                 <th scope="col" class="">
                                     Repetition
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['off-day.edit', 'off-day.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -76,12 +76,12 @@
                                     <td class="whitespace-nowrap">
                                         {{ offDay.off_day.repetition }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['off-day.edit', 'off-day.delete'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(offDay, index)">
+                                            class="pr-3" @click="editBtnClicked(offDay, index)"  v-show="feature.includes('off-day.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(offDay.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(offDay.id)" data-te-toggle="modal" v-show="feature.includes('off-day.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -195,14 +195,20 @@
                             </select>
                         </div> -->
                         <multiselect v-model="selectedDay" :options="dayList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                        :preserve-search="true" placeholder="Select Day" label="name" track-by="name" :preselect-first="false">
-                            <template #selection="{ values, search, isOpen }">
+                        :preserve-search="true" placeholder="Select Day" label="name" track-by="name" :preselect-first="false"
+                        :taggable="true" @tag="addTag" id="tagging">
+                            <!-- <template #selection="{ values, search, isOpen }">
                                 <span class="multiselect__single"
                                     v-if="values.length"
                                     v-show="!isOpen">{{ values.length }} Day selected</span>
-                            </template>
+                            </template> -->
                         </multiselect>
                     </div>
+                    <!-- <div><label class="typo__label">Tagging</label>
+                        <multiselect id="tagging" v-model="selectedDay" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="name"
+                                     track-by="value" :options="dayList" :multiple="true" :taggable="true" @tag="addTag"></multiselect>
+                        <pre class="language-json"><code>{{ value }}</code></pre>
+                      </div> -->
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Repetition
@@ -235,14 +241,17 @@
                         </label>
                         <div class="bg-white mb-0 w-full inline-block h-[34px] !text-black !text-sm"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Type"
+                            <select data-te-select-init data-te-select-placeholder="Select Type" @change="typeChange"
                                 data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
-                                <option value="department"> Department </option>
-                                <option value="staff"> Staff </option>
+                                <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                                    {{ type.name }}
+                                </option>
+                                <!-- <option value="department"> Department </option>
+                                <option value="staff"> Staff </option> -->
                             </select>
                         </div>
                     </div>
-                    <div class="mb-4" v-show="selectedType == 'department'">
+                    <div class="mb-4" v-show="selectedType && selectedType.value === 'department'">
                         <label for="" class="label-form mb-3">
                             Department
                         </label>
@@ -264,7 +273,7 @@
                             </template>
                         </multiselect>
                     </div>
-                    <div class="mb-4" v-show="selectedType == 'staff'">
+                    <div class="mb-4" v-show="selectedType && selectedType.value === 'staff'">
                         <label for="" class="label-form mb-3">
                             Staff
                         </label>
@@ -426,12 +435,13 @@ export default {
             selectedDateRange: null,
 
 
-
+            feature: this.getFeature(),
+            test: null,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -444,6 +454,10 @@ export default {
                 this.staffList = response.data;
             }
         },
+        typeChange(){
+            this.selectedStaff = [];
+            this.selectedDepartment = [];
+        },
         btnCreateOffDay(){
             if(this.selectedDay.length < 1){
                 this.alertValidationMessage(`Day`);
@@ -453,11 +467,11 @@ export default {
                 this.alertValidationMessage(`Repetition`);
                 return 1;
             }
-            else if(this.selectedType == 'department' && this.selectedDepartment.length < 1){
+            else if(this.selectedType.value == 'department' && this.selectedDepartment.length < 1){
                 this.alertValidationMessage(`Department`);
                 return 1;
             }
-            else if(this.selectedType == 'staff' && this.selectedStaff.length < 1){
+            else if(this.selectedType.value == 'staff' && this.selectedStaff.length < 1){
                 this.alertValidationMessage(`Staff`);
                 return 1;
             }
@@ -484,7 +498,7 @@ export default {
                 })
                 formData.append('offdayable_id', JSON.stringify(offdayable_id));
             }
-            if(this.selectedType == 'staff'){
+            if(this.selectedType.value === 'staff'){
                 let offdayable_id = [];
                 this.selectedStaff.forEach((staff) => {
                     offdayable_id.push(String(staff.id))
@@ -495,6 +509,11 @@ export default {
             if(response.success){
                 this.getOffDayList();
                 document.getElementById("close_create_modal").click();
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
@@ -518,7 +537,7 @@ export default {
 
         addHolidayModalBtnClicked(){
             this.name = null;
-            this.selectedDate = [];
+            this.selectedDateRange = [];
         },
         btnCreateHoliday(){
             if(!this.name){
@@ -542,6 +561,11 @@ export default {
             if(response.success){
                 this.getOffDayList();
                 document.getElementById("close_create_holiday_modal").click();
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
         // async searchBtnClicked() {
@@ -573,6 +597,14 @@ export default {
             }
         },
 
+        addTag (newTag) {
+            const tag = {
+                name: newTag,
+                code: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+            }
+            this.dayList.push(tag)
+            this.selectedDay.push(tag)
+        },
 
 
         alertValidationMessage(field) {

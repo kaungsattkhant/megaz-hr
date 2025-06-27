@@ -11,6 +11,7 @@ class ArrivalItem extends Model
     use HasFactory;
 
     protected $fillable = [
+        'quality',
         'base_uom_id',
         'base_uom_quantity',
         'uom_id',

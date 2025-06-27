@@ -31,7 +31,7 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 
-                <a href="/leave_allowance/create"
+                <a href="/leave_allowance/create" v-if="feature.includes('leave-allowance.create')"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -87,7 +87,7 @@
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(leave.id)"
+                                        <button @click="deleteBtnClicked(leave.id)" v-if="feature.includes('leave-allowance.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -196,11 +196,13 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getLeaveAllowanceList(pageNumber) {
             let url = this.url + this.url_department + this.url_role;

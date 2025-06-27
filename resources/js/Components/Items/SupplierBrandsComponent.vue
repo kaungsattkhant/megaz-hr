@@ -13,6 +13,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Supplier</th>
+                                <th>Item</th>
                                 <th>Brand</th>
                                 <th>Price</th>
                                 <th>UOM</th>
@@ -27,6 +29,12 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        {{ brand.supplier.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ brand.item.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
                                         {{ brand.brand.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
@@ -36,7 +44,7 @@
                                         <span v-if="brand.item_price"> {{ brand.item_price.uom.name }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
+                                        <button id="price-edit-btn" class="pr-2" data-te-toggle="modal" v-if="feature.includes('item-price.update')"
                                         data-te-target="#priceUpdateModal" @click="brandBtnClicked(brand)" >
                                             <i class="fas fa-tag"></i>
                                         </button>
@@ -203,11 +211,13 @@ export default {
             baseUomId: null,
             price: null,
             supplierItemId: null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken' ,'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

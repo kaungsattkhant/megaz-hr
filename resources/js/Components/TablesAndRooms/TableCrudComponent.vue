@@ -18,7 +18,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('table.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="[name = null,pricePerHour = 0]">
                     Add New
@@ -66,7 +66,7 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ room.price_per_hour }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
+                                    <td class="whitespace-nowrap " v-show="feature.includes('table.toggle')">
                                         <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(room.id)"
                                     data-te-toggle="modal" data-te-target="#deleteModal">
                                         <i class="fas fa-trash-alt"></i>
@@ -268,11 +268,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getTableList(pageNumber) {
             let url=`/api/entities?type=table&page=${pageNumber}`;

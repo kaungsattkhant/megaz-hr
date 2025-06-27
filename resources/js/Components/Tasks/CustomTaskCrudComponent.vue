@@ -14,7 +14,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('custom-task.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -88,8 +88,12 @@
                                         {{ task.kpi }}
                                     </td>
 
-                                    <td class="  " @click="editTask(task.id)">
-                                        <i class="fas fa-pen" data-te-toggle="modal" data-te-target="#update_task"></i>
+                                    <td class="  " v-show="getFeature().includes('custom-task.edit')">
+                                        <button type="button" class="pr-3" 
+                                            data-te-toggle="modal" data-te-target="#update_task" @click="editTask(task.id)">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <!-- <i class="fas fa-pen" data-te-toggle="modal" data-te-target="#update_task"></i> -->
                                     </td>
 
                                 </tr>
@@ -415,11 +419,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async doubleChecked(id) {
             let url = `/api/tasks/${id}/double_checked`;
