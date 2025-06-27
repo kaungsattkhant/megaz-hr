@@ -22,7 +22,7 @@ class AuthController extends Controller
         $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Staff"))->run("staff_token");
 
         if($loginResponse["code"] != 200){
-            ResponseMessage($loginResponse["message"], 401);
+            ResponseMessage($loginResponse["message"], $loginResponse["code"]);
         }
         else{
             $staff = Staff::with(["gender","department","roles"])->find($loginResponse["user"]["id"]);
