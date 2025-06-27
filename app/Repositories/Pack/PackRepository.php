@@ -66,7 +66,7 @@ class PackRepository implements PackRepositoryInterface
                 //curent is here
                 // dd(UserData()->department->inventory->inventory_id);
                 $inventoryId = UserData()->department->inventory->inventory_id;
-                $inventoryLedger = (new StoStoreInventoryreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
+                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
                 foreach ($menuStepItemByMenu as $item) {
                     // $itemInventories = InventoryLedgerItem::where('item_id', $item->id)->get();
                     // $enterInventoryValue = 0;
