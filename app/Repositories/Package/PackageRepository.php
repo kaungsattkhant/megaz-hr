@@ -136,10 +136,10 @@ class PackageRepository implements PackageRepositoryInterface
             $data['image_path'] = $imageData->storeAs('images/package_images', $hashedName, 'public');
             $data['image_url'] = Storage::url($data['image_path']);
 
-            $data['session'] = $data['pay_session'] + $data['free_session'];
+            $data['session'] = $data['type']=='ktv' ? $data['pay_session'] + $data['free_session'] : 0;
             $data['package_discount'] = 0;
             $data['session_price'] = 10000;
-            $sessionPrice = $data['pay_session'] * $maxSessionPrice;
+            $sessionPrice =  $data['type']=='ktv' ? $data['pay_session'] * $maxSessionPrice : 0;
             $package = Package::create($data);
             $menuPrice = 0;
             $accessoryPrice = 0;
