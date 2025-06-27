@@ -50,13 +50,19 @@
                                     Leave Days
                                 </th>
                                 <th scope="col" class="">
+                                    Type
+                                </th>
+                                <th scope="col" class="">
                                     Department
                                 </th>
                                 <th scope="col" class="">
                                     Role
                                 </th>
                                 <th scope="col" class="">
-                                    Type
+                                    Staff
+                                </th>
+                                <th scope="col" class="">
+                                    Leave Type
                                 </th>
                                 <th scope="col" class="">
                                     
@@ -74,11 +80,17 @@
                                     <td class="whitespace-nowrap">
                                         {{ leave.day }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ leave.role.department.name }}
+                                    <td class="whitespace-nowrap capitalize">
+                                        {{ leave.allowanceable_type }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.role.name }}
+                                        {{ leave.allowanceable.department.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ leave.allowanceable.roles ? leave.allowanceable.roles[0].name : leave.allowanceable.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ leave.allowanceable_type === 'staff' ? leave.allowanceable.name : '--' }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ leave.leave_category.name }}
