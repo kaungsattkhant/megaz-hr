@@ -184,7 +184,7 @@
     </div>
 
     <div data-te-modal-init
-        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-auto outline-none"
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
         id="check_modal" tabindex="-1" aria-labelledby="check_modalLabel" aria-hidden="true">
         <div data-te-modal-dialog-ref
             class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
@@ -211,7 +211,7 @@
                             v-model="baseUomQty"
                             min="0"
                             class="input-ui"
-                            @input="baseUomQtyChanged">
+                            @change="baseUomQtyChanged">
                         </div>
                         <div>
                             <input type="text"
@@ -227,7 +227,7 @@
                             min="0"
                             :max="uomUpperLimit"
                             class="input-ui"
-                            @input="uomQtyChanged">
+                            @change="uomQtyChanged">
                         </div>
                         <div>
                             <input type="text"
@@ -270,47 +270,7 @@
                             Later Buy
                         </label>
                     </div>
-
-                    <div class="mb-4 text-xs">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th> Supplier Name </th>
-                                    <th> Brand </th>
-                                    <th> Price </th>
-                                    <th> UOM </th>
-                                    <th> Average Lead Time </th>
-                                    <th> Average Quality </th>
-                                    <th> Payment Date </th>
-                                    <th> &nbsp; </th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(supplier,index) in itemSuppliers" :key="index">
-                                    <td class="px-6 py-4 text-sm text-gray-900">{{ supplier.supplier.name }}</td>
-                                    <td> {{ supplier.brand.name }} </td>
-                                    <td> {{ supplier.price.toLocaleString() }} </td>
-                                    <td> {{ baseUomQty }} {{ baseUomName }} {{ uomQty }} {{ uomName }} </td>
-                                    <td> {{ supplier.lead_time }} </td>
-                                    <td> {{ supplier.average_quality }} </td>
-                                    <td> {{ supplier.payment_date }} </td>
-                                    <td class="px-6 py-4">
-                                        <input
-                                        type="radio"
-                                        class="checkbox-style"
-                                        :id="'opt-' + supplier.id"
-                                        :value="supplier"
-                                        v-model="selectedSupplier"
-                                        name="selection"
-                                        @change="supplierSelectChanged"
-                                        >
-                                        <label :for="'opt-' + supplier.id"></label>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- <div class="mb-4">
+                    <div class="mb-4">
                         <label for="supplier" class="text-sm">Supplier</label>
                         <select name="" id="supplier" v-model="selectedSupplier"
                         class="text-sm border border-gray-300 input-ui w-12
@@ -336,7 +296,7 @@
                         class="input-ui"
                         v-model="totalPrice"
                         disabled>
-                    </div> -->
+                    </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -358,13 +318,8 @@
 import { Modal, Ripple, Select, initTE } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
-import Multiselect from 'vue-multiselect';
-// import { set } from 'vue';
 
 export default {
-    components: {
-        Multiselect,
-    },
     data() {
         return {
             orderItems: [],
@@ -402,13 +357,6 @@ export default {
             item_left_id:null,
 
             feature: this.getFeature(),
-
-            selected: null,
-            options: [
-                { id: 'opt1', name: 'Option One' },
-                { id: 'opt2', name: 'Option Two' },
-                { id: 'opt3', name: 'Option Three' }
-            ]
         };
     },
 
@@ -422,103 +370,11 @@ export default {
             }
         },
 
-        brandSelectChanged(){
-            console.log(this.selectedBrand);
-            if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
-                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
-            }else{
-                this.totalPrice = 0;
-            }
-            if(!this.selectedBrand.item_price){
-                this.alertValidationMessage('No Item Price Select Brand');
-            }
-        },
-
-        baseUomQtyChanged(){
-            if(this.baseUomQty < 0 || this.uomQty < 0){
-                this.alertValidationMessage('Base UOM and UOM must be greater than zero');
-                return;
-            }
-            // if(this.confirmPO){
-            //     this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-            //     // if(this.confirmPOTotalQty < this.originalPOTotalQty){
-            //     //     this.isLaterBuy = true;
-            //     // }else{
-            //     //     this.isLaterBuy = false;
-            //     // }
-            // }
-            // this.brandSelectChanged();
-            // this.getItemSuppliers(this.itemId);
-            this.updatePriceOfSuppliers();
-        },
-
-        uomQtyChanged(){
-            if(this.baseUomQty < 0 || this.uomQty < 0){
-                this.alertValidationMessage('Base UOM and UOM must be greater than zero');
-                return;
-            }
-            // if(this.confirmPO){
-            //     this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-            //     // if(this.confirmPOTotalQty < this.originalPOTotalQty){
-            //     //     this.isLaterBuy = true;
-            //     // }else{
-            //     //     this.isLaterBuy = false;
-            //     // }
-            // }
-            // this.brandSelectChanged();
-            // this.getItemSuppliers(this.itemId);
-            this.updatePriceOfSuppliers();
-        },
-
-        updatePriceOfSuppliers(){
-            this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-            // this.itemSuppliers.forEach(itemSupplier => {
-            //     itemSupplier.price = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * itemSupplier.item.average_price;
-            // });
-            this.itemSuppliers = this.itemSuppliers.map(supplier => {
-                // Defensive check for nested properties
-                const averagePrice = supplier.item?.average_price;
-
-                let newPrice = 0;
-                // Ensure conversion is not zero to prevent division by zero
-                if (averagePrice !== undefined && this.selectedUomConversion.conversion !== 0) {
-                    newPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * averagePrice;
-                }
-
-                return {
-                    ...supplier, // Spread existing properties to create a new object
-                    price: Math.round(newPrice * 100) / 100 // Assign the new, rounded price
-                };
-            });
-        },
-
         async getItemSuppliers(itemId){
-            // let response = await getApiData({ url: `/api/supplier_by_item/${itemId}`, token: this.getToken() });
-            // if(response.data){
-            //     this.itemSuppliers = response.data;
-            // }
-            this.itemSuppliers = [];
-            this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-            getApiData({ url: `/api/po-items/${itemId}/suppliers`, token: this.getToken() }).then(response => {
-                if (response.success) {
-                    this.itemSuppliers = response.data;
-                    this.itemSuppliers.forEach(itemSupplier => {
-                        itemSupplier.price = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * itemSupplier.item.average_price;
-                        if(itemSupplier.credit_term_type == 'amount_limitation'){
-                            itemSupplier.payment_date = [itemSupplier.supplier.amount_limitation];
-                        }
-                        if(itemSupplier.credit_term_type == 'exact_date'){
-                            itemSupplier.payment_date = itemSupplier.supplier.exact_date;
-                        }
-                        if(itemSupplier.credit_term_type == 'day'){
-                            itemSupplier.payment_date = [itemSupplier.supplier.day];
-                        }
-                        itemSupplier.payment_date = null;
-                    });
-                }
-            });
+            let response = await getApiData({ url: `/api/supplier_by_item/${itemId}`, token: this.getToken() });
+            if(response.data){
+                this.itemSuppliers = response.data;
+            }
         },
 
         async getItemBrands(){
@@ -533,6 +389,20 @@ export default {
                 // this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
                 // this.totalPrice = Math.round(this.totalPrice * 100) / 100;
                 this.brandSelectChanged();
+            }
+        },
+
+        brandSelectChanged(){
+            console.log(this.selectedBrand);
+            if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
+                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
+                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+            }else{
+                this.totalPrice = 0;
+            }
+            if(!this.selectedBrand.item_price){
+                this.alertValidationMessage('No Item Price Select Brand');
             }
         },
 
@@ -559,7 +429,7 @@ export default {
         },
 
         async checkBtnClicked(purchaseOrder, itemId, orderItemIndex){
-            // console.log(this.orderItems[orderItemIndex]);
+            console.log(this.orderItems[orderItemIndex]);
             this.itemId = itemId;
             this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === purchaseOrder.uom_conversion_id);
             if(typeof this.selectedUomConversion === 'undefined'){
@@ -580,10 +450,41 @@ export default {
             console.log('uom = ' + this.uomQty + ' / base uom = ' + this.baseUomQty)
         },
 
-        async confirmBtnClicked(){
-            // let unit_price = this.selectedBrand.item_price.price / this.selectedBrand.item.uom_conversion;
+        baseUomQtyChanged(){
+            if(this.baseUomQty < 0 || this.uomQty < 0){
+                this.alertValidationMessage('Base UOM and UOM must be greater than zero');
+                return;
+            }
+            // if(this.confirmPO){
+            //     this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+            //     // if(this.confirmPOTotalQty < this.originalPOTotalQty){
+            //     //     this.isLaterBuy = true;
+            //     // }else{
+            //     //     this.isLaterBuy = false;
+            //     // }
+            // }
+            this.brandSelectChanged();
+        },
 
-            console.log(unit_price);
+        uomQtyChanged(){
+            if(this.baseUomQty < 0 || this.uomQty < 0){
+                this.alertValidationMessage('Base UOM and UOM must be greater than zero');
+                return;
+            }
+            // if(this.confirmPO){
+            //     this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+            //     // if(this.confirmPOTotalQty < this.originalPOTotalQty){
+            //     //     this.isLaterBuy = true;
+            //     // }else{
+            //     //     this.isLaterBuy = false;
+            //     // }
+            // }
+            this.brandSelectChanged();
+        },
+
+        async confirmBtnClicked(){
+            let unit_price = this.selectedBrand.item_price.price / this.selectedBrand.item.uom_conversion;
+            console.log(unit_price)
             let formData = new FormData();
             if(!this.selectedBrand || !this.selectedSupplier){
                 this.alertValidationMessage('you forgot to provide required data');
@@ -596,17 +497,14 @@ export default {
             formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
             formData.append('item_id', this.itemId);
             formData.append('supplier_id', this.selectedSupplier.supplier_id);
-            // formData.append('brand_id', this.selectedBrand.brand_id); // old
-            formData.append('brand_id', this.selectedSupplier.brand.id); // new
-            formData.append('item_price_id', this.selectedBrand.item_price.id); // old, new needs to be provided with 'item_price' object from 'api/po-items/{itemId}/suppliers' api
+            formData.append('brand_id', this.selectedBrand.brand_id);
+            formData.append('item_price_id', this.selectedBrand.item_price.id);
             formData.append('purchase_order_id', this.confirmPO.purchase_order.id);
             formData.append('quantity', this.confirmPOTotalQty);// total single qty // check for single value
-            // formData.append('amount', this.totalPrice); // old
-            formData.append('amount', this.selectedSupplier.price); // new
+            formData.append('amount', this.totalPrice);
             formData.append('later_buy', (this.isLaterBuy) ? 1 : 0);
             formData.append('item_leftable_type', 'po_order');
-            // formData.append('unit_price', unit_price); // old
-            formData.append('unit_price', this.selectedSupplier.item.average_price); // new
+            formData.append('unit_price', unit_price);
             formData.append('item_left_id', this.item_left_id);
             let response = await postApiData({ url: '/api/po_items', form_data: formData , token: this.getToken() });
             if(response.success){
@@ -638,10 +536,6 @@ export default {
             }
         },
 
-        supplierSelectChanged(){
-            // this.itemBrands = this.selectedSupplier.item.brands;
-        },
-
         // async searchBtnClicked() {
         //     this.url_search = '&search=' + this.searchInput
         //     this.getGpsList(1);
@@ -671,40 +565,3 @@ export default {
 }
 </script>
 <style scoped src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
-
-<style>
-/* Hide original radio */
-input[type="radio"].checkbox-style {
-    display: none;
-}
-
-/* Styled label as checkbox */
-input[type="radio"].checkbox-style+label {
-    display: inline-block;
-    width: 1.25rem;
-    height: 1.25rem;
-    border: 2px solid #ccc;
-    border-radius: 0.25rem;
-    position: relative;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-input[type="radio"].checkbox-style:checked+label {
-    background-color: #3b82f6;
-    /* Tailwind blue-500 */
-    border-color: #3b82f6;
-}
-
-input[type="radio"].checkbox-style:checked+label::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-</style>
