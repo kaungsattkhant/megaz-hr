@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->longText('job_specification');
             $table->foreignId('job_description_id')->constrained('job_descriptions')->onDelete('cascade');
+            $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
     }

@@ -16,9 +16,9 @@ class SkillAPIController extends Controller
         $this->skillRepo = $skillRepo;
     }
 
-    public function listAllSkills()
+    public function listAllSkills(Request $request)
     {
-        $this->skillRepo->listAllSkill();
+        $this->skillRepo->listAllSkill($request);
     }
 
     public function createSkill(Request $request)
