@@ -139,9 +139,13 @@ use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\FoodOrder\FoodOrderRepositoryInterface;
 use App\Repositories\Interview\InterviewRepositoryInterface;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
+
+// =======
+use App\Repositories\JobDescription\JobDescriptionInterface;
 use App\Repositories\TimeShift\TimeShiftRepositoryInterface;
 use App\Repositories\AccountPayable\AccountPayableRepository;
 use App\Repositories\DeliveryCharge\DeliveryChargeRepository;
+use App\Repositories\JobDescription\JobDescriptionRepository;
 use App\Repositories\SaleTargetMenu\SaleTargetMenuRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\MRPForecast\MRPForecastRepositoryInterface;
@@ -161,6 +165,7 @@ use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepository;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepository;
 use App\Repositories\DeliveryCharge\DeliveryChargeRepositoryInterface;
+use App\Repositories\JobDescription\JobDescriptionRepositoryInterface;
 use App\Repositories\SaleTargetMenu\SaleTargetMenuRepositoryInterface;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepository;
 use App\Repositories\AssetInventoryLedger\AssetInventoryLedgerInterface;
@@ -274,5 +279,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(EventRepositoryInterface::class, EventRepository::class);
         $this->app->bind(BankRepositoryInterface::class, BankRepository::class);
 
+        $this->app->bind(JobDescriptionRepositoryInterface::class, JobDescriptionRepository::class);
     }
 }
