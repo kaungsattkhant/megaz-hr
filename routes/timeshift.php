@@ -54,6 +54,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/invoices/{invoiceId}', 'getInvoiceById');
     Route::post('/invoices', 'storeInvoices');
     Route::post('/po_arrival_list/{arrivalId}', 'updateArrivalList');
+    Route::get('/po-items/{itemId}/suppliers', 'getSuppliersListsByItem');
   });
 
   Route::controller(ParticipantNotificationController::class)->group(function () {

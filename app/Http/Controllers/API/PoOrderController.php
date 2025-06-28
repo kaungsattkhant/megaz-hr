@@ -85,4 +85,10 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->updateArrivalList($arrivalId, $request->validated());
         ResponseData($data);
     }
+
+    public function getSuppliersListsByItem($itemId)
+    {
+        $data =  $this->PoOrderRepository->getSuppliersListsByItem($itemId);
+        ResponseData($data);
+    }
 }

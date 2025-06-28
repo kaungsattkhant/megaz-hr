@@ -16,4 +16,8 @@ interface AdsRepositoryInterface
 
     // user app
     public function listAdsByUserApp(Request $request);
+
+    public function adsDetail(int $id);
+
+    public function latestAds();
 }

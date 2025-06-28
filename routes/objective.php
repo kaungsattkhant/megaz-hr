@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\API\MRPForecastController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ObjectiveController;
+use App\Http\Controllers\API\MRPForecastController;
+use App\Http\Controllers\API\JobDescriptionController;
 
 Route::middleware('auth:api')->group(function () {
   Route::controller(ObjectiveController::class)->group(function () {
@@ -43,7 +44,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/ktv/objective_trees/{id}', 'updateKtvObjTree');
   });
 
-
   Route::controller(MRPForecastController::class)->group(function () {
     Route::post('/forecast/menus', 'getForcastMenus');
     Route::post('/forecast/menus/{menuId}', 'getForcastMenusByMenuId');
@@ -71,4 +71,15 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/forecast/ktvs_hr/{entityId}', 'getForecastKTVHrByEntityId');
     Route::delete('/mrp_forecasts/{mrp_forecast_id}', 'deleteMrpForecast');
   });
+
+  Route::controller(JobDescriptionController::class)->group(function () {
+    Route::get('/job-descriptions', 'getJobDescription');
+    Route::post('/job-descriptions', 'storeJobDescription');
+    Route::get('/job-descriptions/{id}', 'showJobDescription');
+    Route::post('/job-descriptions/{id}', 'updateJobDescription');
+    Route::delete('/job-descriptions/{id}', 'deleteJobDescription');
+
+    Route::post('/job-specifications', 'storeJobSpecification');
+  });
+  
 });
