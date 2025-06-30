@@ -95,7 +95,7 @@
                     </select>
                 </div>
             </div>
-            
+
             <div class="contents" v-show="selectedMenuType == 'menu'">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -117,7 +117,7 @@
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
-                         
+
                             data-te-select-filter="true" name="" id="" v-model="selectedMenu" class="input-ui">
                             <option :value="menu" v-for="(menu, menuIndex) in menuList"
                                 :key="menuIndex"> {{ menu.name }} </option>
@@ -234,7 +234,7 @@
                         <input type="number" v-model="expectedQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                     </div><div class="col-span-6"></div>
                 </div>
-                
+
                 <div  v-show="!is_show" class="col-span-3"></div>
                 <div class="mb-0 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -284,7 +284,7 @@
                 </div>
             </div>
             <div class="col-span-12"></div>
-            
+
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -296,14 +296,14 @@
 
 
         </div>
-        
+
 
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
 
             <div v-if="menuLevel.item_menu.length > 0">
                 <div class="flex mb-2">
                     <p v-if="menuLevel.level">
-                        {{ menuLevel.level }} : 
+                        {{ menuLevel.level }} :
                     </p>
                     <p>
                         &nbsp;{{ menuLevel.type }}
@@ -312,7 +312,7 @@
                 <div class="flex gap-x-8 mb-4">
                     <div class="flex mb-2">
                         <p>
-                            Position : 
+                            Position :
                         </p>
                         <p>
                             &nbsp;{{ menuLevel.role_name }}
@@ -320,7 +320,7 @@
                     </div>
                     <div class="flex mb-2">
                         <p>
-                            Duration : 
+                            Duration :
                         </p>
                         <p>
                             &nbsp;{{ menuLevel.duration }} min
@@ -347,7 +347,7 @@
                         </tr>
                     </thead>
                     <tbody v-if="menuLevel">
-                        
+
                         <tr v-if="menuLevel.item_menu.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item_menu"
                             :key="menuIndex">
                             <td class="">
@@ -377,14 +377,14 @@
             </div>
             <div class="flex gap-x-4 mt-8 mb-4">
                 <button class="add-btn" @click="clearMenuLevel()">
-                    Clear 
+                    Clear
                 </button>
                 <button class="add-btn" @click="addLevelBtnClicked()">
-                    Add 
+                    Add
                 </button>
             </div>
 
-            
+
 
         </div>
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
@@ -431,7 +431,7 @@
                             </td>
                         </tr>
                         <tr class="" v-for="(submenu, submenuIndex) in subMenuList"
-                            :key="submenuIndex">    
+                            :key="submenuIndex">
                             <td class="" colspan="4">
                                 {{ submenu.name }}
                             </td>
@@ -455,7 +455,7 @@
                 </table>
             </div>
 
-            
+
 
         </div>
 
@@ -465,7 +465,7 @@
                 Create Menu
             </button>
         </div>
-        
+
     </div>
 </template>
 
@@ -568,7 +568,7 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        
+
 
         async getCookingAreaList() {
             let response = await getApiData({ url: `/api/cooking_place`, token: this.getToken() });
@@ -711,6 +711,10 @@ export default {
         },
         btnClickedAddMenuLevel(){
             if(this.selectedMenuType == 'menu'){
+                if(!this.selectedMenu){
+                    this.alertValidationMessage('menu');
+                    return;
+                }
                 this.subMenuList.push({
                     name: this.selectedMenu.name,
                     id: this.selectedMenu.id,
@@ -730,7 +734,7 @@ export default {
             }
             else if (!this.selectedType) {
                 this.alertValidationMessage('Type');
-                return 1;                
+                return 1;
             }
             else if(!this.selectedRole){
                 this.alertValidationMessage('Role');
@@ -822,7 +826,7 @@ export default {
                     //     this.menuLevel.order_time = 0;
                     //     this.menuLevel.expected_quantity = 0;
                     // }
-                    
+
                     this.menuLevel.item_menu.push({
                         item_id: this.selectedItem.id,
                         price: price,
@@ -834,7 +838,7 @@ export default {
                         uom_type: uom_type,
                         uom_conversion: this.selectedUom.uom_conversion
                     });
-                    
+
                 }
                 else{
                     this.menuLevel.item_menu.push({
@@ -955,7 +959,7 @@ export default {
                 if(sub_menu_id.length > 0){
                     formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
-                
+
                 let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     window.location.replace(`/mrp`);
@@ -981,7 +985,7 @@ export default {
             this.menuLevel.item_menu=[];
         },
 
-        
+
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
