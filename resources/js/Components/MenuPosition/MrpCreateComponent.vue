@@ -409,7 +409,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody v-if="levelTable.length > 0">
+                    <tbody v-if="levelTable.length > 0 || subMenuList.length > 0">
                         <tr class="" v-for="(level, levelIndex) in levelTable"
                             :key="levelIndex">
                             <td class="">
@@ -717,6 +717,8 @@ export default {
                 });
                 // this.subMenu.push(this.selectedMenu.id);
                 this.selectedMenu = null;
+                this.categoryMenu = null;
+                this.menuList = [];
             }
             else{
                 this.addCustom();

@@ -40,7 +40,7 @@
         @apply focus:ring-0 focus:outline-none focus:shadow-none
     }
     .container-card{
-        @apply bg-white mt-4 pt-4  px-5
+        @apply bg-white mt-4 pt-4  px-5 shadow-lg border border-gray-100
     }
     .sidebar-title{
         @apply text-[#2a3547] text-xs font-semibold ml-1 pt-2

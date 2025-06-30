@@ -96,7 +96,7 @@
                 </div>
             </div>
             
-            <div class="contents" v-if="selectedMenuType == 'menu'">
+            <div class="contents" v-show="selectedMenuType == 'menu'">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Menu Category
@@ -125,7 +125,7 @@
                     </div>
                 </div><div class="col-span-3"></div>
             </div>
-            <div class="contents" v-if="selectedMenuType == 'custom'">
+            <div class="contents" v-show="selectedMenuType == 'custom'">
                 <div class="col-span-9"></div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
