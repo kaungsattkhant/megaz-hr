@@ -40,37 +40,41 @@ class APILoginAction
      *
      * @return Array   authentication token data
      */
-    public function run($token_name, array $abilities = null): array
+    public function run($token_name, array $abilities = []): array
     {
-        $user = $this->credential_type::where($this->credential_name, $this->identity)->first();
         $login_response = [
             "token" => null,
             "code" => 401,
             "success" => false,
             "message" => null
         ];
-        
+        $user = $this->credential_type::where($this->credential_name, $this->identity)->first();
+
+        if (!isset($user) || !$user) {
+            $login_response["message"] = "User not found";
+            $login_response["code"] = 404;
+
+            return $login_response;
+        }
+
         if ($user && $user->is_active === 0) {
             $login_response["message"] = "User is not active";
 
             return $login_response;
         }
 
-        if (!isset($user) || !$user) {
-            $login_response["message"] = "User not found";
-
-            return $login_response;
-        }
-      
         if (!Hash::check($this->password, $user->getAuthPassword())) {
             $login_response["message"] = "Password not match";
             return $login_response;
         }
-        // dd($user->features);
-        $features=$user->features;
-        $feature_slug=$features->pluck('slug')->toArray();
         $login_response["user"] = $user;
-        $login_response["features"] = $feature_slug;
+        // dd($user->features);
+        $features = $user->features;
+        if($features){
+            $feature_slug = $features->pluck('slug')->toArray();
+            $login_response["features"] = $feature_slug;
+        }
+
         if ($abilities) {
             $token = $user->createToken($token_name, $abilities)->plainTextToken;
         } else {
