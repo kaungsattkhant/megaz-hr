@@ -17,7 +17,7 @@
                 <label for="" class="label-form mb-3">
                     Selling Price
                 </label>
-                <input type="text" v-model="sellingPrice" class="input-ui">
+                <input type="number" v-model="sellingPrice" class="input-ui">
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -409,7 +409,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody v-if="levelTable.length > 0">
+                    <tbody v-if="levelTable.length > 0 || subMenuList.length > 0">
                         <tr class="" v-for="(level, levelIndex) in levelTable"
                             :key="levelIndex">
                             <td class="">
@@ -721,6 +721,8 @@ export default {
                 });
                 // this.subMenu.push(this.selectedMenu.id);
                 this.selectedMenu = null;
+                this.categoryMenu = null;
+                this.menuList = [];
             }
             else{
                 this.addCustom();

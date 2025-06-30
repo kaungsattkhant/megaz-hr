@@ -11,7 +11,7 @@ use App\Http\Action\Transaction\StoreTransactionLedger;
 
 trait PoInvoiceTransaction
 {
-    public function storeInvoiceTransaction($model, $amount,$cashAccountId)
+    public function storeInvoiceTransaction($model, $amount,$cashAccountId,$supplierId)
     {
         $purchaseOrderItemGroupedByCategory = $this->groupedByCategoryAndSupplier($model);
         $data['date'] = now();
@@ -112,6 +112,8 @@ trait PoInvoiceTransaction
                 'transaction_id' => $transaction->id,
                 'account_id' => $supplier_account_id,
                 'action' => 'credit',
+                'personable_id'=>$supplier_id,
+                'personable_type'=>'supplier',
             ]);
         }
     }

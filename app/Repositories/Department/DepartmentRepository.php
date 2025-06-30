@@ -3,6 +3,7 @@
 namespace App\Repositories\Department;
 
 use App\Models\Department;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -26,6 +27,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $data['slug']=Str::slug($data['name'], '-');
             $department = Department::create($data);
             $featureIds = json_decode($data['featureIds'], true);
             foreach ($featureIds as $feature) {

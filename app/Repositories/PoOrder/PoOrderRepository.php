@@ -1291,16 +1291,16 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $avgLeadtime = $leadTime / $totalArrivalItemCount;
         $totalAvgLeadTime += $avgLeadtime;
         // Group lead times by item_id (handle duplicates)
-        if (!isset($itemLeadTimes[$arrival->item->id])) {
-          $itemLeadTimes[$arrival->item->id] = [
+        if (!isset($itemLeadTimes[$arrival->item_id])) {
+          $itemLeadTimes[$arrival->item_id] = [
             'total_lead_time' => 0,
             'count' => 0
           ];
         }
 
         // Add lead time and increase count for unique items
-        $itemLeadTimes[$arrival->item->id]['total_lead_time'] += $leadTime;
-        $itemLeadTimes[$arrival->item->id]['count']++;
+        $itemLeadTimes[$arrival->item_id]['total_lead_time'] += $leadTime;
+        $itemLeadTimes[$arrival->item_id]['count']++;
       }
     }
 
@@ -1310,7 +1310,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       $avgOrderTime = $data['total_lead_time'] / $data['count'];
       $formattedAvgOrderTime = $this->formatTime($avgOrderTime);
 
-      $item = $poOrderlist->firstWhere('item.id', $itemId)->item;
+      $item = $poOrderlist->firstWhere('item_id', $itemId)->item;
       $itemName = $item ? $item->name : 'null';
 
       $itemsData[] = [
@@ -1445,7 +1445,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
     DB::beginTransaction();
     try {
-      $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId);
+      $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId,$supplierId);
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
         $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
       }
