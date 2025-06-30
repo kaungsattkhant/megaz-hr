@@ -23,37 +23,40 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // (new ComplaintCategorySeeder())->run();
-        // (new DepartmentSeeder())->run();
-        // (new RoleSeeder())->run();
-        // (new GenderSeeder())->run();
-        // (new StaffSeeder())->run();
-        // (new ServiceCategorySeeder())->run();
         $this->call([
-            DivisionSeeder::class,
-            TownshipSeeder::class,
-            ComplaintCategorySeeder::class,
-            // InventorySeeder::class,
-            FeatureSeeder::class,
-            DepartmentSeeder::class,
-            AreaSeeder::class,
-            RoleSeeder::class,
-            GenderSeeder::class,
-            // CategorySeeder::class,
-            AccessoryCategorySeeder::class,
-            MenuCategorySeeder::class,
-            ServiceCategorySeeder::class,
-            // UomSeeder::class,
-            // ItemSeeder::class,
-            // ItemTypeSeeder::class,
-            HeadAccountSeeder::class,
-            SubAccountSeeder::class,
-            // RoomAndTableSeeder::class,
-            InventorySeeder::class,
-            StaffSeeder::class,
+            FeatureSeeder::class,//important
+            DivisionSeeder::class,//important
+            TownshipSeeder::class,//important
+            GenderSeeder::class,//important
+            NrcTownshipSeeder::class,//important
+            StaffSeeder::class,//important
+            AreaCategorySeeder::class,//important
+            HeadAccountSeeder::class, //important
+            SubAccountSeeder::class,//important
+            MenuCategorySeeder::class, //important
+            AccessoryCategorySeeder::class, //important
+            ServiceCategorySeeder::class, //important
             GpsSeeder::class,
-            DepartmentFeatureSeeder::class,
-            NrcTownshipSeeder::class,
+
+            // ComplaintCategorySeeder::class,
+            // // InventorySeeder::class,
+            // FeatureSeeder::class,
+            // DepartmentSeeder::class,
+            // AreaCategorySeeder::class,
+            // // AreaSeeder::class,
+            // RoleSeeder::class,
+            // GenderSeeder::class,
+            // AccessoryCategorySeeder::class,
+            // MenuCategorySeeder::class,
+            // ServiceCategorySeeder::class,
+            // HeadAccountSeeder::class,
+            // SubAccountSeeder::class,
+            // // RoomAndTableSeeder::class,
+            // InventorySeeder::class,
+            // StaffSeeder::class,
+            // GpsSeeder::class,
+            // DepartmentFeatureSeeder::class,
+            // NrcTownshipSeeder::class,
         ]);
     }
 }
