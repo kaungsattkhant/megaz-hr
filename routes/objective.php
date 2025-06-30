@@ -9,7 +9,7 @@ Route::middleware('auth:api')->group(function () {
   Route::controller(ObjectiveController::class)->group(function () {
     //admin 
     Route::get('/objectives', 'getObjectives');
-    Route::get('/roles_department/{id}', 'getRolesByDepartmentId');
+    Route::get('/roles_department/{departmentId}', 'getRolesByDepartmentId');
     Route::post('/objectives', 'store');
     Route::post('/objectives/{id}', 'update');
     Route::get('/objectives/{id}', 'getObjectiveById');
@@ -80,6 +80,14 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/job-descriptions/{id}', 'deleteJobDescription');
 
     Route::post('/job-specifications', 'storeJobSpecification');
+    Route::get('/job-specifications', 'getJobSpecification');
+    Route::get('/job-specifications/{id}', 'showJobSpecification');
+    Route::delete('/job-specifications/{id}', 'deleteJobSpecification');
+
+    Route::post('/sops', 'storeSop');
+    Route::get('/sops', 'getSop');
+    Route::get('/sops/{id}', 'showSop');
+    Route::delete('/sops/{id}', 'deleteSop');
   });
   
 });

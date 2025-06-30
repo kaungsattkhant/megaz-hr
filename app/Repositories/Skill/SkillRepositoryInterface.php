@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface SkillRepositoryInterface
 {
-    public function listAllSkill();
+    public function listAllSkill(Request $request);
 
     public function createSkill(Request $request);
 

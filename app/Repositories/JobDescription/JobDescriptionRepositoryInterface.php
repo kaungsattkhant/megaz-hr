@@ -16,5 +16,19 @@ interface JobDescriptionRepositoryInterface
 
     public function deleteJobDescription(int $jobDescriptionId);
 
+    public function getJobSpecification(Request $request);
+
     public function storeJobSpecification(array $validatedData);
+
+    public function showJobSpecification(int $jobSpecificationId);
+
+    public function deleteJobSpecification(int $jobSpecificationId);
+
+    public function storeSop(array $data);
+
+    public function getSop(Request $request);
+
+    public function showSop(int $sopId);
+    
+    public function deleteSop(int $sopId);
 }
