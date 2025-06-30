@@ -17,7 +17,7 @@
                 <label for="" class="label-form mb-3">
                     Selling Price
                 </label>
-                <input type="text" v-model="sellingPrice" class="input-ui">
+                <input type="number" v-model="sellingPrice" class="input-ui">
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
