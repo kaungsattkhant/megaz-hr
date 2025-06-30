@@ -13,43 +13,37 @@ class AccountPayableRepository implements AccountPayableInterface
 {
     public function list($request)
     {
-        $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
-            ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
-            ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
-            ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
-            ->where('sub_accounts.head_account_id', config('common.liabilities'))
-            ->where('ledgers.personable_type', 'supplier')
-            ->select(
-                'ledgers.personable_id as supplier_id',
-                'suppliers.account_id',
-                'suppliers.name as supplier_name',
-                DB::raw('SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as debit_amount'),
-                DB::raw('SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as credit_amount'),
-                DB::raw('(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) - SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END)) as total_credit_amount')
-            )
-            ->groupBy('ledgers.personable_id')
-            ->get();
-        return $ledger;
-
         // $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
         //     ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
-        //     ->join('po_grns', 'ledgers.personable_id', '=', 'po_grns.id')
-        //     ->join('suppliers', 'po_grns.supplier_id', '=', 'suppliers.id')
+        //     ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
         //     ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
         //     ->where('sub_accounts.head_account_id', config('common.liabilities'))
-        //     ->where('ledgers.personable_type', 'po_grn')
+        //     ->where('ledgers.personable_type', 'supplier')
         //     ->select(
-        //         'suppliers.id as supplier_id',
+        //         'ledgers.personable_id as supplier_id',
         //         'suppliers.account_id',
         //         'suppliers.name as supplier_name',
-        //         'po_grns.invoice_no as invoice_no',
         //         DB::raw('SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as debit_amount'),
         //         DB::raw('SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as credit_amount'),
         //         DB::raw('(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) - SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END)) as total_credit_amount')
         //     )
-        //     ->groupBy('suppliers.id','po_grns.invoice_no')
+        //     ->groupBy('ledgers.personable_id')
         //     ->get();
-        // return $ledger;
+        $ledger = DB::table('account_payables')
+            ->join('suppliers', 'account_payables.supplier_id', '=', 'suppliers.id')
+
+            ->select(
+                'supplier_id',
+                'suppliers.name as supplier_name',
+                'suppliers.account_id',
+                DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) as credit_amount'),
+                DB::raw('SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) as debit_amount'),
+                DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) - SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) as total_credit_amount')
+            )
+            ->groupBy('supplier_id')
+            ->get();
+        return $ledger;
+
     }
     public function createPayableAccount($request)
     {
@@ -120,6 +114,16 @@ class AccountPayableRepository implements AccountPayableInterface
                 'personable_type' => 'supplier',
                 'action' => 'debit',
             ]);
+
+            $accountPayable = AccountPayable::create([
+                'type' => 'addition',
+                'date_time' => now(),
+                'amount' => $request->value,
+                'supplier_id' => $request->supplier_id,
+                'account_id' => $request->account_id,
+                'cash_account_id' => $request->cash_account_id,
+                'created_by' => UserData()->id,
+            ]);
             DB::commit();
             return $transaction;
         } catch (\Exception $e) {
@@ -131,29 +135,40 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function listOfAccountPayableTransaction($request)
     {
-        $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
-            ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
-            ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
-            ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
-            ->where('sub_accounts.head_account_id', config('common.liabilities'))
-            ->where('ledgers.personable_type', 'supplier')
-            ->where('ledgers.personable_id', $request->supplier_id)
-            ->whereNull('transactions.transactionable_id')
+
+        $ledger = DB::table('account_payables')
+            ->join('suppliers', 'account_payables.supplier_id', '=', 'suppliers.id')
+            ->join('accounts', 'account_payables.account_id', '=', 'accounts.id')
             ->select(
-                // 'ledgers.created_at as date',
-                DB::raw("DATE_FORMAT(ledgers.created_at, '%M %d %Y %H:%i') as date"),
                 'accounts.name as account_name',
-                'ledgers.personable_id as supplier_id',
-                'suppliers.account_id',
+                'accounts.account_code as account_code',
                 'suppliers.name as supplier_name',
-                'ledgers.value as amount'
-                // DB::raw('SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as debit_amount'),
-                // DB::raw('SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as credit_amount'),
-                // DB::raw('(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) - SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END)) as total_credit_amount')
+                'suppliers.account_id',
+                'account_payables.amount as amount',
+                DB::raw("DATE_FORMAT(account_payables.created_at, '%M %d %Y %H:%i') as date"),
             )
-            ->with('account')
-            // ->groupBy('ledgers.personable_id')
+            ->where('account_payables.type','settlement')
             ->get();
+        // $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
+        //     ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+        //     ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+        //     ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
+        //     ->where('sub_accounts.head_account_id', config('common.liabilities'))
+        //     ->where('ledgers.personable_type', 'supplier')
+        //     ->where('ledgers.personable_id', $request->supplier_id)
+        //     ->whereNull('transactions.transactionable_id')
+        //     ->select(
+        //         // 'ledgers.created_at as date',
+        //         DB::raw("DATE_FORMAT(ledgers.created_at, '%M %d %Y %H:%i') as date"),
+        //         'accounts.name as account_name',
+        //         'ledgers.personable_id as supplier_id',
+        //         'suppliers.account_id',
+        //         'suppliers.name as supplier_name',
+        //         'ledgers.value as amount'
+        //     )
+        //     ->with('account')
+        //     // ->groupBy('ledgers.personable_id')
+        //     ->get();
         return $ledger;
     }
 
@@ -237,8 +252,9 @@ class AccountPayableRepository implements AccountPayableInterface
     }
 
 
-    public function accountPayableReport($request){
-        
+    public function accountPayableReport($request)
+    {
+
     }
 
 }
