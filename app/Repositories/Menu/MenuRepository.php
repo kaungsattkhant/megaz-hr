@@ -19,7 +19,7 @@ class MenuRepository implements MenuRepositoryInterface
         $sellingAreaId = isset($request->selling_area_id) ? $request->selling_area_id : null;
         if ($request->per_page || $request->page || !$sellingAreaId) {
             $menu_category_id = $request->menu_category_id;
-            $menuQuery= Menu::with([
+            $menuQuery = Menu::with([
                 'menu_category',
                 'prices',
                 'items',
@@ -33,11 +33,11 @@ class MenuRepository implements MenuRepositoryInterface
                 ->when($menu_category_id, function ($query) use ($menu_category_id) {
                     $query->where('menu_category_id', $menu_category_id);
                 });
-            if(isset($request->page)){
-                return $menuQuery ->paginate(config('common.list_count'));
+            if (isset($request->page)) {
+                return $menuQuery->paginate(config('common.list_count'));
             }
-            return $menuQuery->get();
-               
+            return $menuQuery->where('is_active',1)->get();
+
         } else {
             // $menus = Menu::with(['menu_category', 'prices', 'items', 'menuServiceDiscounts' => function ($query) use ($validateDate) {
             //     $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
@@ -86,7 +86,9 @@ class MenuRepository implements MenuRepositoryInterface
 
             return $menus;
         } else {
-            return Menu::where('menu_category_id', $id)->with('prices', 'menuServiceDiscounts')->get();
+            return Menu::where('menu_category_id', $id)->with('prices', 'menuServiceDiscounts')
+            ->where('is_active',1)
+            ->get();
         }
     }
 

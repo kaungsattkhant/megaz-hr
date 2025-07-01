@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Cooking Place
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Cooking Place
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <notifications position="top center" />
 
-                <a href="/cooking_places/create" v-if="feature.includes('cooking-place.create')"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <a href="/cooking_places/create" v-if="feature.includes('cooking-place.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+                        Add New
+                    </a>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

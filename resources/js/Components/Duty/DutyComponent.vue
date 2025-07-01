@@ -1,31 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Duties
-        </p>
-    </div>
+    
     <notifications position="top center" />
 
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <input type="date" class="input-ui  mr-2 h-8" v-model="selectedDate" @change="dateChange()">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Duties
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/duty/create" v-if="feature.includes('duty.create')"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <!-- hidden btn -->
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 hidden"
-                    data-te-toggle="modal" data-te-target="#create_modal"></button>
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <input type="date" class="input-ui  mr-2 h-8" v-model="selectedDate" @change="dateChange()">
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/duty/create" v-if="feature.includes('duty.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+                        Add New
+                    </a>
+
+                    <!-- hidden btn -->
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 hidden"
+                        data-te-toggle="modal" data-te-target="#create_modal"></button>
+                </div>
             </div>
         </div>
 

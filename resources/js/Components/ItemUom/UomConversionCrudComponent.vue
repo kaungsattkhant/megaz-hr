@@ -1,41 +1,43 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            UOM Conversion
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search !pr-[22px]" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                    <!-- <i class="far fa-times !left-auto !right-2 !text-red-400 hover:cursor-pointer" @click="clearSearchBtnClicked"></i> -->
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
-
-                <!-- <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button> -->
-
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    UOM Conversion
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <div class="flex gap-3">
-                    <label for="excel_import" class="add-btn h-8 cursor-pointer">
-                        Excel Import
-                        <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search !pr-[22px]" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                        <!-- <i class="far fa-times !left-auto !right-2 !text-red-400 hover:cursor-pointer" @click="clearSearchBtnClicked"></i> -->
                     </label>
-                    <button type="button"  @click="createUomConversionBtnClicked" v-if="feature.includes('uom-conversion.create')"
-                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                        data-te-toggle="modal" data-te-target="#create_modal">
-                        Add Conversion
-                    </button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
 
-                    <button type="button" @click="createUomBtnClicked" v-if="feature.includes('uom-conversion.create')"
-                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                        data-te-toggle="modal" data-te-target="#uom">
-                        Create Uom
-                    </button>
+                    <!-- <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button> -->
+
+                </div>
+                <div class="flex justify-end flex-col">
+                    <div class="flex gap-3">
+                        <label for="excel_import" class="add-btn h-8 cursor-pointer">
+                            Excel Import
+                            <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                        </label>
+                        <button type="button"  @click="createUomConversionBtnClicked" v-if="feature.includes('uom-conversion.create')"
+                            class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                            data-te-toggle="modal" data-te-target="#create_modal">
+                            Add Conversion
+                        </button>
+
+                        <button type="button" @click="createUomBtnClicked" v-if="feature.includes('uom-conversion.create')"
+                            class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                            data-te-toggle="modal" data-te-target="#uom">
+                            Create Uom
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

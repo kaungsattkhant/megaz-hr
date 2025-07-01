@@ -242,12 +242,20 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
-                            data-te-select-filter="true" name="" id="" v-model="selectedItemCategory" class="input-ui"
+                        <!-- <select data-te-select-init data-te-select-placeholder="Select Category"
+                             v-model="selectedItemCategory" class="input-ui"
                             @change="itemCategorySelectChanged">
                             <option :value="itemCategory" v-for="(itemCategory, itemCategoryIndex) in itemCategoryList"
                                 :key="itemCategoryIndex"> {{ itemCategory.name }} </option>
-                        </select>
+                        </select> -->
+                        <multiselect v-model="selectedItemCategory" :options="itemCategoryList" :multiple="false" :close-on-select="true" :clear-on-select="false"
+                        :preserve-search="true" placeholder="Select Category" label="name" track-by="id" :preselect-first="true" @close="itemCategorySelectChanged">
+                            <!-- <template #selection="{ values, search, isOpen }">
+                                <span class="multiselect__single"
+                                    v-if="values.length"
+                                    v-show="!isOpen">{{ values.length }} Cooking Place selected</span>
+                            </template> -->
+                        </multiselect>
                     </div>
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
@@ -636,14 +644,25 @@ export default {
         },
 
         async itemCategorySelectChanged() {
+            this.selectedItem = null;
+            // this.amount = null;
+            this.selectedUom = null;
             this.itemUoms = [];
             let response = await getApiData({ url: `/api/items?category_id=${this.selectedItemCategory.id}`, token: this.getToken() });
             if (response.data) {
                 this.itemList = response.data;
             }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+            }
         },
 
         itemSelectChanged() {
+            this.selectedUom = null;
             this.itemUoms = [];
             console.log(this.selectedItem)
             if(this.selectedItem.base_uom_id === this.selectedItem.uom_id){
@@ -861,6 +880,8 @@ export default {
                 this.amount = null;
                 this.selectedDepartment = null;
                 this.is_disable_custom = true;
+                this.itemUoms = [];
+                this.itemList = [];
             }
             // this.updateItemPriceTotal(this.ingredientItems);
 
