@@ -157,7 +157,7 @@
                             <option :value="type" v-for="(type, typeIndex) in typeList"
                                 :key="typeIndex"> {{ type.name }} </option>
                         </select> -->
-                        <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
+                        <multiselect v-model="selectedType" :options="typeList" :close-on-select="true" @select="typeChange()"
                         :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select Type" label="name"
                         :preselect-first="false"></multiselect>
