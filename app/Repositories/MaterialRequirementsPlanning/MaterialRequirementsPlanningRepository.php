@@ -61,88 +61,86 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         'image_path' => $data['image_path'] ?? null,
         'image_url' => $data['image_url'] ?? null,
       ]);
-      // if (!empty($validatedData['menu_steps'])) {
-      $menuSteps = json_decode($validatedData['menu_steps']);
-      foreach ($menuSteps as $step) {
-        if ($step->type === "ready_to_sale") {
-          if (!isset($step->expired_at)) {
-            return ResponseMessage("The 'expired_at' field is required for type 'ready_to_sale'.", 402);
+      if (isset($validatedData['menu_steps'])) {
+        $menuSteps = json_decode($validatedData['menu_steps']);
+        foreach ($menuSteps as $step) {
+          if ($step->type === "ready_to_sale") {
+            if (!isset($step->expired_at)) {
+              return ResponseMessage("The 'expired_at' field is required for type 'ready_to_sale'.", 402);
+            }
+          }
+          $menuStep = MenuStep::create([
+            'menu_id' => $menu->id,
+            'role_id' => $step->role_id,
+            'duration' => $step->duration,
+            'order_time' => $step->order_time,
+            'expected_quantity' => $step->expected_quantity,
+            'level' => $step->level,
+            'type' => $step->type,
+            'expired_at' => $step->expired_at ?? null,
+          ]);
+
+          if (isset($step->item_menu)) {
+            foreach ($step->item_menu as $itemData) {
+
+              $quantity = ($itemData->uom_type === 'base_uom')
+                ? $itemData->weight * $itemData->uom_conversion
+                : $itemData->weight;
+
+              MenuStepItem::create([
+                'menu_step_id' => $menuStep->id,
+                'item_id' => $itemData->item_id,
+                'uom_id' => $itemData->uom_id,
+                'quantity' => $quantity,
+                'weight' =>  $itemData->weight,
+                'uom_type' => $itemData->uom_type
+              ]);
+            }
           }
         }
-        $menuStep = MenuStep::create([
-          'menu_id' => $menu->id,
-          'role_id' => $step->role_id,
-          'duration' => $step->duration,
-          'order_time' => $step->order_time,
-          'expected_quantity' => $step->expected_quantity,
-          'level' => $step->level,
-          'type' => $step->type,
-          'expired_at' => $step->expired_at ?? null,
-        ]);
-
-        // if (!empty($step['item_menu'])) {
-        foreach ($step->item_menu as $itemData) {
-
-          $quantity = ($itemData->uom_type === 'base_uom')
-            ? $itemData->weight * $itemData->uom_conversion
-            : $itemData->weight;
-
-          MenuStepItem::create([
-            'menu_step_id' => $menuStep->id,
-            'item_id' => $itemData->item_id,
-            'uom_id' => $itemData->uom_id,
-            'quantity' => $quantity,
-            'weight' =>  $itemData->weight,
-            'uom_type' => $itemData->uom_type
-          ]);
-        }
       }
-      // }
-      // }
 
-      if (!empty($validatedData['price'])) {
+
+      if (isset($validatedData['price'])) {
         MenuPrice::create([
           'menu_id' => $menu->id,
           'price' => $validatedData['price']
         ]);
       }
 
-      $cookingPlace = json_decode($validatedData['cooking_place_id']);
-      $menu->menuPlaces()->sync($cookingPlace);
-
-
-      $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
-
-      foreach ($cookingPlace  as $place) {
-        $place = CookingPlace::findOrFail($place);
-
-        $areaId = $place->area_id;
-        $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
-          ->get();
-        foreach ($menuCategoryAreas as $menuCategoryArea) {
-          MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
-            ->update(['is_default' => 0]);
-          $menuArea = MenuArea::updateOrCreate([
-            'menu_category_area_id' => $menuCategoryArea->id,
-            'cooking_area_id' =>  $areaId,
-          ], [
-            'menu_category_area_id' => $menuCategoryArea->id,
-            'cooking_area_id' =>  $areaId,
-            'is_default' => 1,
-          ]);
-        }
+      if (isset($validatedData['cooking_place_id'])) {
+        $cookingPlace = json_decode($validatedData['cooking_place_id']);
+          $menu->menuPlaces()->sync($cookingPlace);
+          if (isset($validatedData['menu_category_id'])) {
+          $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
+          foreach ($cookingPlace  as $place) {
+            $place = CookingPlace::findOrFail($place);
+            $areaId = $place->area_id;
+            $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
+                  ->get();
+                  foreach ($menuCategoryAreas as $menuCategoryArea) {
+                    MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
+                      ->update(['is_default' => 0]);
+                    MenuArea::updateOrCreate([
+                      'menu_category_area_id' => $menuCategoryArea->id,
+                      'cooking_area_id' =>  $areaId,
+                    ], [
+                      'menu_category_area_id' => $menuCategoryArea->id,
+                      'cooking_area_id' =>  $areaId,
+                      'is_default' => 1,
+                    ]
+                  );
+                }
+              }
+          }
       }
 
-
-      // if (!isset($validatedData['sub_menu_id'])) {
-      $submenu = json_decode($validatedData['sub_menu_id']);
-      // if (!empty($validatedData['sub_menu_id'])) {
-      $menu->subMenus()->sync($submenu);
-      // }
+      if (isset($validatedData['sub_menu_id'])) {
+        $submenu = json_decode($validatedData['sub_menu_id']);
+        $menu->subMenus()->sync($submenu);
+      }
 
       DB::commit();
-      // $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
-
       return ResponseMessage('Menu stored successfully!', 201);
     } catch (Exception $e) {
       ResponseMessage($e->getMessage(), 500);
@@ -178,73 +176,74 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
         $data['image_url'] = Storage::url($data['image_path']);
       }
-      $menuSteps = json_decode($validatedData['menu_steps']);
-      $updatedMenuStepIds = [];
-      foreach ($menuSteps as $step) {
-          if (isset($step->id)) {
-              $updatedMenuStepIds[] = $step->id;
-          }
-      }
-      
-      $existingMenuStepIds = $menu->menuSteps->pluck('id')->toArray();
-      
-      $menuStepsToDelete = array_diff($existingMenuStepIds, $updatedMenuStepIds);
-      
-      if (!empty($menuStepsToDelete)) {
-          foreach ($menuStepsToDelete as $menuStepId) {
-              $menuStep = $menu->menuSteps->find($menuStepId);
-              if ($menuStep) {
-                  $menuStep->menuStepItem()->delete();
-                  $menuStep->delete();
-              }
-          }
-      }
-
-      foreach ($menuSteps as $step) {
-        if ($step->type === "ready_to_sale") {
-          if (!isset($step->expired_at) || empty($step->expired_at)) {
-            return ResponseMessage("The 'expired_at' field is required for  type 'ready_to_sale'.", 402);
-          }
+      if (isset($validatedData['menu_steps'])) {
+        $menuSteps = json_decode($validatedData['menu_steps']);
+        $updatedMenuStepIds = [];
+        foreach ($menuSteps as $step) {
+            if (isset($step->id)) {
+                $updatedMenuStepIds[] = $step->id;
+            }
         }
-        $menuStep =  $menu->menuSteps()->updateOrCreate(
-          [
-            'id' => $step->id ?? null,
-            'menu_id' => $menuId,
-          ],
-          [
-            'role_id' => $step->role_id,
-            'duration' => $step->duration,
-            'order_time' => $step->order_time,
-            'expected_quantity' => $step->expected_quantity,
-            'level' => $step->level,
-            'type' => $step->type,
-            'expired_at' => $step->expired_at ?? null,
-          ]
-        );
+        
+        $existingMenuStepIds = $menu->menuSteps->pluck('id')->toArray();
+        
+        $menuStepsToDelete = array_diff($existingMenuStepIds, $updatedMenuStepIds);
+        
+        if (!empty($menuStepsToDelete)) {
+            foreach ($menuStepsToDelete as $menuStepId) {
+                $menuStep = $menu->menuSteps->find($menuStepId);
+                if ($menuStep) {
+                    $menuStep->menuStepItem()->delete();
+                    $menuStep->delete();
+                }
+            }
+        }
 
-        foreach ($step->item_menu as $itemData) {
-          $quantity = ($itemData->uom_type === 'base_uom')
-            ? $itemData->weight * $itemData->uom_conversion
-            : $itemData->weight;
-          $menuStep->menuStepItem()->updateOrCreate(
+        foreach ($menuSteps as $step) {
+          if ($step->type === "ready_to_sale") {
+            if (!isset($step->expired_at) || empty($step->expired_at)) {
+              return ResponseMessage("The 'expired_at' field is required for  type 'ready_to_sale'.", 402);
+            }
+          }
+          $menuStep =  $menu->menuSteps()->updateOrCreate(
             [
-              'id' => $itemData->id ?? null,
-              'menu_step_id' => $menuStep->id
+              'id' => $step->id ?? null,
+              'menu_id' => $menuId,
             ],
             [
-              'item_id' => $itemData->item_id,
-              'uom_id' => $itemData->uom_id,
-              'weight' => $itemData->weight,
-              'quantity' => $quantity,
-              'uom_type' => $itemData->uom_type
+              'role_id' => $step->role_id,
+              'duration' => $step->duration,
+              'order_time' => $step->order_time,
+              'expected_quantity' => $step->expected_quantity,
+              'level' => $step->level,
+              'type' => $step->type,
+              'expired_at' => $step->expired_at ?? null,
             ]
           );
+
+          foreach ($step->item_menu as $itemData) {
+            $quantity = ($itemData->uom_type === 'base_uom')
+              ? $itemData->weight * $itemData->uom_conversion
+              : $itemData->weight;
+            $menuStep->menuStepItem()->updateOrCreate(
+              [
+                'id' => $itemData->id ?? null,
+                'menu_step_id' => $menuStep->id
+              ],
+              [
+                'item_id' => $itemData->item_id,
+                'uom_id' => $itemData->uom_id,
+                'weight' => $itemData->weight,
+                'quantity' => $quantity,
+                'uom_type' => $itemData->uom_type
+              ]
+            );
+          }
         }
       }
 
-
-      $cookingPlace = json_decode($validatedData['cooking_place_id']);
-      if (!empty($cookingPlace)) {
+      if (isset($validatedData['cooking_place_id'])) {
+        $cookingPlace = json_decode($validatedData['cooking_place_id']);
         $menu->menuPlaces()->sync($cookingPlace);
         $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
         foreach ($cookingPlace as $place) {
@@ -269,14 +268,14 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menu->menuPlaces()->detach();
       }
 
-      $submenu = json_decode($validatedData['sub_menu_id'] ?? '[]', true);
-      if (!empty($submenu)) {
-        $menu->subMenus()->sync($submenu);
-      } else {
-        $menu->subMenus()->detach();
+      if(isset($validatedData['sub_menu_id'])){
+        $submenu = json_decode($validatedData['sub_menu_id'] ?? '[]', true);
+        if (isset($submenu)) {
+          $menu->subMenus()->sync($submenu);
+        } else {
+          $menu->subMenus()->detach();
+        }
       }
-
-
       DB::commit();
       $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
 
@@ -392,7 +391,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
   public function getMenuPrices($menuId)
   {
-    $menuPrices = MenuPrice::where('menu_id', $menuId)->where('is_created', 1)->latest()->first();
+    $menuPrices = MenuPrice::where('menu_id', $menuId)->latest()->first();
     ResponseData($menuPrices);
   }
 
@@ -400,10 +399,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   {
     DB::beginTransaction();
     try {
-      $menuPrice = MenuPrice::create(
-        ['menu_id' => $menuId],
-        ['price' => $data['price']]
-      );
+      $menuPrice = MenuPrice::create([
+        'price' => $data['price'],
+        'menu_id' => $menuId
+      ]);
       DB::commit();
       ResponseData($menuPrice, 201, 'MenuPrice updated successfully!');
     } catch (\Exception $e) {
