@@ -37,7 +37,7 @@ class ItemRepository implements ItemRepositoryInterface
     public function listAllData(Request $request)
     {
         $category_id = $request->category_id;
-        $searchInput=$request->search_input;
+        $searchInput = $request->search_input;
         if ($request->per_page || $request->page) {
             return Item::with([
                 'category',
@@ -49,8 +49,8 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when($category_id, function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                ->when($searchInput,function($q)use($searchInput){
-                    $q->where('items.name','LIKE','%'.$searchInput.'%');
+                ->when($searchInput, function ($q) use ($searchInput) {
+                    $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
                 })
                 // ->withAveragePrice()
                 ->orderByDesc('id')
@@ -66,8 +66,8 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                ->when($searchInput,function($q)use($searchInput){
-                    $q->where('items.name','LIKE','%'.$searchInput.'%');
+                ->when($searchInput, function ($q) use ($searchInput) {
+                    $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
                 })
                 // ->withAveragePrice()
                 ->orderByDesc('id')
@@ -79,7 +79,7 @@ class ItemRepository implements ItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if (!isset($request->id)) {
+            if (!isset($data['id'])) {
                 $data['id'] = null;
             }
             if (!isset($data['base_uom_id']) || !isset($data['uom_id'])) {
@@ -128,17 +128,18 @@ class ItemRepository implements ItemRepositoryInterface
                 }
             }
 
-            // $item = Item::updateOrCreate(
-            //     ['id' => $data['id']],
-            //     $data
-            // );
-            $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
+            $item = Item::updateOrCreate(
+                ['items.id' => $data['id']],
+                $data
+            );
+            dd($item);
+            // $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
             //create uom converion 
             $uomConversion = $this->createUomConversion($item, $data);
-            // dd('hello world');
+            dd($uomConversion);
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
@@ -280,7 +281,7 @@ class ItemRepository implements ItemRepositoryInterface
             ->select('supplier_id', 'items.name as item_name', DB::raw('MAX(supplier_items.id) as id')) // Use MAX(id) to pick a unique row per supplier_id
             ->groupBy('supplier_id')
             ->get();
-//         foreach($supplierByItem as $supplier){
+        //         foreach($supplierByItem as $supplier){
 //   // Calculate Average Quality
 //             $averageQuality = ArrivalItem::where('item_id', $itemId)
 //                 ->where('supplier_id', $supplier->supplier_id)
@@ -458,19 +459,67 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function createUomConversion($item, $data)
     {
-        $existConversion = UomConversion::where('item_id', $item->id)
-            ->where('base_unit_id', $data['base_uom_id'])
-            ->where('conversion_unit_id', $data['uom_id'])
-            ->first();
-        if ($existConversion) {
-            ResponseMessage('Uom Conversion is already exist', 419);
+        // if (isset($data['id'])) {
+        //     // dd($item);
+        //     $existConversion = UomConversion::where('item_id', $item->id)
+        //         ->orderBy('id', 'desc')
+        //         ->first();
+        //     if (!$existConversion) {
+        //         $uomConversion = UomConversion::create([
+        //             'item_id' => $item->id,
+        //             'base_unit_id' => $data['base_uom_id'],
+        //             'conversion_unit_id' => $data['uom_id'],
+        //             'conversion' => $data['conversion'],
+        //         ]);
+        //         return $uomConversion;
+        //     }
+        //     if ($data['base_uom_id'] != $existConversion->base_unit_id || $data['uom_id'] != $existConversion->conversion_unit_id) {
+        //         $uomConversion = UomConversion::create([
+        //             'item_id' => $item->id,
+        //             'base_unit_id' => $data['base_uom_id'],
+        //             'conversion_unit_id' => $data['uom_id'],
+        //             'conversion' => $data['conversion'],
+        //         ]);
+        //         return $uomConversion;
+        //     }
+        // } else {
+        //     $uomConversion = UomConversion::create([
+        //         'item_id' => $item->id,
+        //         'base_unit_id' => $data['base_uom_id'],
+        //         'conversion_unit_id' => $data['uom_id'],
+        //         'conversion' => $data['conversion'],
+        //     ]);
+        //     return $uomConversion;
+        // }
+
+        $shouldCreate = false;
+
+        if (isset($data['id'])) {
+            $existConversion = UomConversion::where('item_id', $item->id)
+                ->orderBy('id', 'desc')
+                ->first();
+            if (
+                !$existConversion ||
+                $data['base_uom_id'] != $existConversion->base_unit_id ||
+                $data['uom_id'] != $existConversion->conversion_unit_id
+            ) {
+                $shouldCreate = true;
+            }
+            
+        } else {
+            $shouldCreate = true;
         }
-        $uomConversion = UomConversion::create([
-            'item_id' => $item->id,
-            'base_unit_id' => $data['base_uom_id'],
-            'conversion_unit_id' => $data['uom_id'],
-            'conversion' => $data['conversion'],
-        ]);
-        return $uomConversion;
+
+        if ($shouldCreate) {
+            return UomConversion::create([
+                'item_id' => $item->id,
+                'base_unit_id' => $data['base_uom_id'],
+                'conversion_unit_id' => $data['uom_id'],
+                'conversion' => $data['conversion'],
+            ]);
+        }
+
+        return null;
+
     }
 }
