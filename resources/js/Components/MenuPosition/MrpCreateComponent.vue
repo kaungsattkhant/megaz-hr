@@ -133,12 +133,16 @@
                     </label>
                     <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
+                        <!-- <select data-te-select-init data-te-select-placeholder="Select Category"
                         :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedLevel" class="input-ui">
                             <option :value="level" v-for="(level, levelIndex) in levelList"
                                 :key="levelIndex"> {{ level.name }} </option>
-                        </select>
+                        </select> -->
+                        <multiselect v-model="selectedLevel" :options="levelList" :close-on-select="true"
+                        :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Level" label="name"
+                        :preselect-first="false"></multiselect>
                     </div>
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
@@ -147,12 +151,16 @@
                     </label>
                     <div class=" mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category" @change="typeChange()"
+                        <!-- <select data-te-select-init data-te-select-placeholder="Select Category" @change="typeChange()"
                         :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                             <option :value="type" v-for="(type, typeIndex) in typeList"
                                 :key="typeIndex"> {{ type.name }} </option>
-                        </select>
+                        </select> -->
+                        <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
+                        :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Type" label="name"
+                        :preselect-first="false"></multiselect>
                     </div>
                 </div>
                 <div class="contents" v-show="isReadyToSale">
@@ -185,12 +193,17 @@
                     </label>
                     <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
+                        <!-- <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
                             :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
                             <option :value="department" v-for="(department, index) in departmentList"
                                 :key="index"> {{ department.name }} </option>
-                        </select>
+                        </select> -->
+                        <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
+                        @select="selectedDepartmentChange()"
+                        :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Department" label="name"
+                        :preselect-first="false"></multiselect>
                     </div>
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
@@ -199,12 +212,16 @@
                     </label>
                     <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                        <!-- <select data-te-select-init data-te-select-placeholder="Select Role"
                             :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
                             <option :value="role" v-for="(role, roleIndex) in roleList"
                                 :key="roleIndex"> {{ role.name }} </option>
-                        </select>
+                        </select> -->
+                        <multiselect v-model="selectedRole" :options="roleList" :close-on-select="true"
+                        :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Role" label="name"
+                        :preselect-first="false"></multiselect>
                     </div>
                 </div>
                 <!-- <div class="mb-4 col-span-3 rounded-md">
@@ -242,12 +259,20 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
-                            data-te-select-filter="true" name="" id="" v-model="selectedItemCategory" class="input-ui"
+                        <!-- <select data-te-select-init data-te-select-placeholder="Select Category"
+                             v-model="selectedItemCategory" class="input-ui"
                             @change="itemCategorySelectChanged">
                             <option :value="itemCategory" v-for="(itemCategory, itemCategoryIndex) in itemCategoryList"
                                 :key="itemCategoryIndex"> {{ itemCategory.name }} </option>
-                        </select>
+                        </select> -->
+                        <multiselect v-model="selectedItemCategory" :options="itemCategoryList" :multiple="false" :close-on-select="true" :clear-on-select="false"
+                        :preserve-search="true" placeholder="Select Category" label="name" track-by="id" :preselect-first="true" @close="itemCategorySelectChanged">
+                            <!-- <template #selection="{ values, search, isOpen }">
+                                <span class="multiselect__single"
+                                    v-if="values.length"
+                                    v-show="!isOpen">{{ values.length }} Cooking Place selected</span>
+                            </template> -->
+                        </multiselect>
                     </div>
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
@@ -636,14 +661,25 @@ export default {
         },
 
         async itemCategorySelectChanged() {
+            this.selectedItem = null;
+            // this.amount = null;
+            this.selectedUom = null;
             this.itemUoms = [];
             let response = await getApiData({ url: `/api/items?category_id=${this.selectedItemCategory.id}`, token: this.getToken() });
             if (response.data) {
                 this.itemList = response.data;
             }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+            }
         },
 
         itemSelectChanged() {
+            this.selectedUom = null;
             this.itemUoms = [];
             console.log(this.selectedItem)
             if(this.selectedItem.base_uom_id === this.selectedItem.uom_id){
@@ -772,7 +808,7 @@ export default {
             }
             else{
                 let item_price = parseFloat(this.selectedItem.average_price)
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${item_price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${item_price}&base_uom_id=${this.selectedItem.base_uom_id}&item_id=${this.selectedItem.id}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 let uomConversion = null;
                 let amount = 0;
@@ -857,6 +893,8 @@ export default {
                 this.amount = null;
                 this.selectedDepartment = null;
                 this.is_disable_custom = true;
+                this.itemUoms = [];
+                this.itemList = [];
             }
             // this.updateItemPriceTotal(this.ingredientItems);
 

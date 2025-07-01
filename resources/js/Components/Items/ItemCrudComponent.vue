@@ -1,55 +1,57 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Items
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4 ">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter by category"
-                        data-te-select-filter="true" v-model="searchCategory">
-                        <option :value="category" v-for="category in itemCategoryList">
-                            {{ category.name }}
-                        </option>
-                    </select>
-                </div>
-
-
-
-                <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
-
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Items
+                </p>
             </div>
-            <div class="flex justify-end gap-x-4">
-                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
-                    Import Type
-                    <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
-                </label>
-                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-category.import')">
-                    Import Category
-                    <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
-                </label>
-                <label for="excel_import" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
-                    Import Item
-                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
-                </label>
-                <!-- <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#import_modal">
-                    Excel Import
-                </button> -->
-                <button type="button" v-if="feature.includes('item.create')"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <div class=" flex gap-x-4 ">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+
+                    <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter by category"
+                            data-te-select-filter="true" v-model="searchCategory">
+                            <option :value="category" v-for="category in itemCategoryList">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+
+
+
+                    <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+
+                </div>
+                <div class="flex justify-end gap-x-4">
+                    <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
+                        Import Type
+                        <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
+                    </label>
+                    <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-category.import')">
+                        Import Category
+                        <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
+                    </label>
+                    <label for="excel_import" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
+                        Import Item
+                        <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
+                    <!-- <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#import_modal">
+                        Excel Import
+                    </button> -->
+                    <button type="button" v-if="feature.includes('item.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

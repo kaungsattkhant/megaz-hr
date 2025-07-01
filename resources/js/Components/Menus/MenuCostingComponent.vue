@@ -1,34 +1,37 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Menu Costing
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container mb-2">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Menu Costing
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                
-                <div class="w-full" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category" v-model="selectedMenuCategory"
-                    data-te-select-filter="true" @change="menuCategoryChanged()" class="input-ui w-full">
-                    <option value="all">All</option>
-                    <option v-for="(category,index) in menuCategoryList" :key="index"> {{ category.name }} </option>
-                    </select>
+            <div class="btn-container mb-2">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <input type="date" class="input-ui h-8" v-model="fromDate">
-                <input type="date" class="input-ui h-8" v-model="toDate">
-                <button class="add-btn h-8" @click="monthChanged()">Done</button>
+                <div class="flex pr-0 gap-x-4">
+                    
+                    <div class="w-full" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category" v-model="selectedMenuCategory"
+                        data-te-select-filter="true" @change="menuCategoryChanged()" class="input-ui w-full">
+                        <option value="all">All</option>
+                        <option v-for="(category,index) in menuCategoryList" :key="index"> {{ category.name }} </option>
+                        </select>
+                    </div>
+                    <input type="date" class="input-ui h-8" v-model="fromDate">
+                    <input type="date" class="input-ui h-8" v-model="toDate">
+                    <button class="add-btn h-8" @click="monthChanged()">Done</button>
+                </div>
             </div>
         </div>
-        <div class="block mx-4 mt-4 pb-4">
+        <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class="table-container">
                     <table class="primary-table ">
