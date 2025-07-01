@@ -79,12 +79,12 @@ class UomAPIController extends Controller
             ->orderBy('id', 'desc')
             ->first();
         if ($uom_conversion) {
-            $uom_conversion_for_po = UomConversion::where('base_unit_id', $request->po_uom_id)
-                ->where('conversion_unit_id', $request->item_uom_id)
-                ->first();
+            // $uom_conversion_for_po = UomConversion::where('base_unit_id', $request->po_uom_id)
+            //     ->where('conversion_unit_id', $request->item_uom_id)
+            //     ->first();
             $priceByItem = format_price($request->item_price / $uom_conversion->conversion);
-            $uom_conversion_for_po->price = $priceByItem;
-            ResponseData($uom_conversion_for_po);
+            $uom_conversion->price = $priceByItem;
+            ResponseData($uom_conversion);
         }
         ResponseMessage('Uom conversion is required');
 

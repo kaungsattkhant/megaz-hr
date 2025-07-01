@@ -79,7 +79,9 @@ class ItemRepository implements ItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
             if (!isset($data['base_uom_id']) || !isset($data['uom_id'])) {
                 return ResponseMessage('Required UOM data is missing.', 400);
             }
@@ -126,12 +128,17 @@ class ItemRepository implements ItemRepositoryInterface
                 }
             }
 
+            // $item = Item::updateOrCreate(
+            //     ['id' => $data['id']],
+            //     $data
+            // );
             $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
             //create uom converion 
             $uomConversion = $this->createUomConversion($item, $data);
+            // dd('hello world');
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
@@ -451,6 +458,7 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function createUomConversion($item, $data)
     {
+        dd($data);
         $existConversion = UomConversion::where('item_id', $item->id)
             ->where('base_unit_id', $data['base_uom_id'])
             ->where('conversion_unit_id', $data['uom_id'])
