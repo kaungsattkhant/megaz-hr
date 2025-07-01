@@ -458,7 +458,6 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function createUomConversion($item, $data)
     {
-        dd($data);
         $existConversion = UomConversion::where('item_id', $item->id)
             ->where('base_unit_id', $data['base_uom_id'])
             ->where('conversion_unit_id', $data['uom_id'])
