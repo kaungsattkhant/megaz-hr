@@ -178,12 +178,27 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
         $data['image_url'] = Storage::url($data['image_path']);
       }
-      foreach ($menu->menuSteps as $menuStep) {
-        $menuStep->menuStepItem()->delete();
-      }
-      $menu->menuSteps()->delete();
-      // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
+      $updatedMenuStepIds = [];
+      foreach ($menuSteps as $step) {
+          if (isset($step->id)) {
+              $updatedMenuStepIds[] = $step->id;
+          }
+      }
+      
+      $existingMenuStepIds = $menu->menuSteps->pluck('id')->toArray();
+      
+      $menuStepsToDelete = array_diff($existingMenuStepIds, $updatedMenuStepIds);
+      
+      if (!empty($menuStepsToDelete)) {
+          foreach ($menuStepsToDelete as $menuStepId) {
+              $menuStep = $menu->menuSteps->find($menuStepId);
+              if ($menuStep) {
+                  $menuStep->menuStepItem()->delete();
+                  $menuStep->delete();
+              }
+          }
+      }
 
       foreach ($menuSteps as $step) {
         if ($step->type === "ready_to_sale") {
@@ -207,7 +222,6 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
           ]
         );
 
-        // if (!empty( $step['item_menu'])) {
         foreach ($step->item_menu as $itemData) {
           $quantity = ($itemData->uom_type === 'base_uom')
             ? $itemData->weight * $itemData->uom_conversion
@@ -222,14 +236,12 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
               'uom_id' => $itemData->uom_id,
               'weight' => $itemData->weight,
               'quantity' => $quantity,
-              'weight' => $itemData->weight,
               'uom_type' => $itemData->uom_type
             ]
           );
         }
-        // }
       }
-      // }
+
 
       $cookingPlace = json_decode($validatedData['cooking_place_id']);
       if (!empty($cookingPlace)) {
@@ -376,5 +388,28 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $query->whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))]);
       })->get();
     ResponseData($areaCategory);
+  }
+
+  public function getMenuPrices($menuId)
+  {
+    $menuPrices = MenuPrice::where('menu_id', $menuId)->where('is_created', 1)->latest()->first();
+    ResponseData($menuPrices);
+  }
+
+  public function updateMenuPrices(int $menuId, array $data)
+  {
+    DB::beginTransaction();
+    try {
+      $menuPrice = MenuPrice::create(
+        ['menu_id' => $menuId],
+        ['price' => $data['price']]
+      );
+      DB::commit();
+      ResponseData($menuPrice, 201, 'MenuPrice updated successfully!');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
   }
 }

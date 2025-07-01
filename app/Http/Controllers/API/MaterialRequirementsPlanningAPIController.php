@@ -90,4 +90,16 @@ class MaterialRequirementsPlanningAPIController extends Controller
         $data = $this->MaterialRequirementsPlanningRepository->getSellingAreas($request);
         ResponseData($data);
     }
+
+    public function getMenuPrices(int $menuId)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->getMenuPrices($menuId);
+        ResponseData($data);
+    }
+
+    public function updateMenuPrices(int $menuId, Request $request)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->updateMenuPrices($menuId, $request->all());
+        ResponseData($data);
+    }
 }

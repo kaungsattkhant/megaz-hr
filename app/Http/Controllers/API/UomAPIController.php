@@ -70,8 +70,8 @@ class UomAPIController extends Controller
     }
 
 
-     #test
-     public function getUomConversionByUom(Request $request){
+    #test
+    public function getUomConversionByUom(Request $request){
         // dd($request->all());
         if($request->po_uom_id==$request->item_uom_id){
             //old
@@ -84,7 +84,7 @@ class UomAPIController extends Controller
             //     ResponseData($uom_conversion);
             // }
             //calculate item price with average price of supplier 
-             $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
+            $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
             ->where('conversion_unit_id',$request->item_uom_id)
             ->first();
             if($uom_conversion){
