@@ -1,40 +1,45 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Staff
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
-                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
-                </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
-                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
-                        <option :value="role" v-for="(role, roleIndex) in searchRoleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
-                </div>
-
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+        
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Staff
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a  v-if="feature.includes('staff.create')" href="/staff/create" class="add-btn text-[13px] font-inter">
-                    Add New
-                </a>
-
+            <div class="btn-container">
+                
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+    
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+    
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a  v-if="feature.includes('staff.create')" href="/staff/create" class="add-btn text-[13px] font-inter">
+                        Add New
+                    </a>
+    
+                </div>
             </div>
         </div>
         <div class="box-container-table">

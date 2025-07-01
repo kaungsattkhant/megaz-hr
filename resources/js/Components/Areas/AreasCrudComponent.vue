@@ -1,31 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Areas
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category" v-model="filterCategory" @change="filterCategoryChange()" class="input-ui w-full !text-sm">
-                        <!-- <option value="all">All</option> -->
-                        <option v-for="(category,index) in categoryList" :key="index" :value="category"> {{ category.name }} </option>
-                    </select>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Areas
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <button type="button" v-if="feature.includes('area.create')"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addBtnClicked"
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category" v-model="filterCategory" @change="filterCategoryChange()" class="input-ui w-full !text-sm">
+                            <!-- <option value="all">All</option> -->
+                            <option v-for="(category,index) in categoryList" :key="index" :value="category"> {{ category.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-if="feature.includes('area.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addBtnClicked"
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

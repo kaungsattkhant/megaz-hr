@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class=" text-lg font-semibold font-inter">
+        <p class=" page-title">
             Accessories list
         </p>
     </div>

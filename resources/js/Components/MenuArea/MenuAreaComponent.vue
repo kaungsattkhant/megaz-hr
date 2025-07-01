@@ -1,32 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Menu Area
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Menu Area
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <!-- <a href="/warning/create" class="add-btn ">
-                    Add New
-                </a> -->
-                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Selling Area" v-model="selectedSellingArea"
-                    data-te-select-filter="true" @change="selectedSellingAreaChanged()" class="input-ui w-full !text-sm">
-                        <!-- <option value="all">All</option> -->
-                        <option v-for="(sellingArea,index) in sellingAreaList" :key="index" :value="sellingArea"> {{ sellingArea.name }} </option>
-                    </select>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
+                <div class="flex justify-end flex-col">
+                    <!-- <a href="/warning/create" class="add-btn ">
+                        Add New
+                    </a> -->
+                    <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Selling Area" v-model="selectedSellingArea"
+                        data-te-select-filter="true" @change="selectedSellingAreaChanged()" class="input-ui w-full !text-sm">
+                            <!-- <option value="all">All</option> -->
+                            <option v-for="(sellingArea,index) in sellingAreaList" :key="index" :value="sellingArea"> {{ sellingArea.name }} </option>
+                        </select>
+                    </div>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">

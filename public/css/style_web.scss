@@ -161,9 +161,20 @@ body{
 .multi-select .multiselect{
   min-height: fit-content;
 }
-
+.page-title{
+  padding-left: 1rem;
+  padding-top: 1rem;
+  @extend .font-inter;
+}
 .box-container-table{
-  box-shadow: rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+  border-radius: 3px;
+  box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+}
+.card-shadow{
+  box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+  border: 1px solid #f3f4f6;
+  margin-bottom: 1.5rem;
+  border-radius: 3px;
 }
 .table-container{
   // border: 1px solid #e5e7eb;
