@@ -132,14 +132,12 @@ class ItemRepository implements ItemRepositoryInterface
                 ['items.id' => $data['id']],
                 $data
             );
-            dd($item);
             // $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
             if (isset($data['brand_id'])) {
                 $item->brands()->sync($data['brand_id']);
             }
             //create uom converion 
             $uomConversion = $this->createUomConversion($item, $data);
-            dd($uomConversion);
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
@@ -147,6 +145,14 @@ class ItemRepository implements ItemRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function detail($id){
+        $item=Item::with(['uom','base_uom'])->find($id);
+        if(!$item){
+            ResponseMessage('Item not found',419);
+        }
+        return $item;
     }
 
     public function updateData(array $data, int $id)
@@ -305,12 +311,12 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function brandBySupplier($request)
     {
-
         $itemId = $request->item_id;
         $supplierId = $request->supplier_id;
         $supplierByItem = SupplierItem::with('brand', 'supplier', 'item', 'item_price.uom')
             ->where('item_id', $itemId)
             ->where('supplier_id', $supplierId)->get();
+        // dd($supplierByItem);
         return $supplierByItem;
     }
 
@@ -501,7 +507,8 @@ class ItemRepository implements ItemRepositoryInterface
             if (
                 !$existConversion ||
                 $data['base_uom_id'] != $existConversion->base_unit_id ||
-                $data['uom_id'] != $existConversion->conversion_unit_id
+                $data['uom_id'] != $existConversion->conversion_unit_id || 
+                $data['conversion'] != $existConversion->conversion
             ) {
                 $shouldCreate = true;
             }

@@ -60,9 +60,17 @@ class Item extends BaseModel
         return $this->hasMany(PurchaseOrderItem::class);
     }
 
-    public function uoms()
+    // public function uoms()
+    // {
+    //     return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
+    // }
+    public function uom()
     {
-        return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
+        return $this->belongsTo(Uom::class,'uom_id','');
+    }
+    public function base_uom()
+    {
+        return $this->belongsTo(Uom::class,'base_uom_id');
     }
 
     public function baseUoms()

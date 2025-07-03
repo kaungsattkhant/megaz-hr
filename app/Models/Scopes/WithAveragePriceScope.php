@@ -15,12 +15,29 @@ class WithAveragePriceScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         //
-        $builder->from('items')->leftJoin('uom_conversions', function ($join) {
-            $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
-                ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
-                ->whereColumn('uom_conversions.item_id','items.id')
-                ->where('uom_conversions.is_active', '=', 1);
-        })
+        $builder->from('items')
+        ->leftJoin(DB::raw('
+        (
+            SELECT uc.*
+            FROM uom_conversions uc
+            JOIN (
+                SELECT item_id, MAX(id) as max_id
+                FROM uom_conversions
+                WHERE is_active = 1
+                GROUP BY item_id
+            ) latest_uc ON uc.id = latest_uc.max_id
+        ) as uom_conversions
+    '), function ($join) {
+        $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
+            ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+            ->whereColumn('uom_conversions.item_id', '=', 'items.id');
+    })
+        // ->leftJoin('uom_conversions', function ($join) {
+        //     $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
+        //         ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+        //         ->whereColumn('uom_conversions.item_id','items.id')
+        //         ->where('uom_conversions.is_active', '=', 1);
+        // })
         ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
         ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
         ->addSelect([

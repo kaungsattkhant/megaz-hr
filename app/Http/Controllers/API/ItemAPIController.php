@@ -23,7 +23,11 @@ class ItemAPIController extends Controller
         $items = $this->itemRepo->listAllData($request);
         ResponseData($items);
     }
-
+    public function detail($id)
+    {
+        $items = $this->itemRepo->detail($id);
+        ResponseData($items);
+    }
     public function createItem(ItemRequest $request)
     {
         $item = $this->itemRepo->createData($request->all());
