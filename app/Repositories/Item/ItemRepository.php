@@ -149,7 +149,7 @@ class ItemRepository implements ItemRepositoryInterface
             $uomConversion = $this->createUomConversion($item, $data);
             if (!empty($brand_suppliers)) {
                 foreach ($brand_suppliers as $bs) {
-                    $bs['id'] = 10; //testing
+                    // $bs['id'] = 10; //testing
                     $bs['item_id'] = $item->id;
                     if (!isset($bs['id'])) {
                         $bs['id'] = null;
@@ -170,10 +170,18 @@ class ItemRepository implements ItemRepositoryInterface
                         $bs['type'] = 'uom';
                         $bs['price'] = $data['conversion'] * $bs['uom_price'];
                     } else {
-                        ResponseMessage('Uom is missing for item_pirce', 419);
+                        ResponseMessage($bs['type'] . ' is missing for item_pirce', 419);
                     }
                     $supplierItem = SupplierItem::updateOrCreate(['id' => $bs['id']], $bs);
-                    if ($isUomChange || $isBaseUomChange || $isConversionChange) {
+                    //change item price
+                    $isItemPriceChange = false;
+                    // dd((double)$supplierItem->item_price->price != (double) $bs['price']);
+                    if ($supplierItem->item_price && ($supplierItem->item_price->price != ( $bs['price']))) {
+                        $isItemPriceChange = true;
+                    }
+                    //end
+                    // dd('Uom change' , $isUomChange ,'Base Change',$isBaseUomChange,'Conversion change',$isConversionChange,'Item Price Change',$itemPriceChange);
+                    if (!isset($data['id']) || $isUomChange || $isBaseUomChange || $isConversionChange || $isItemPriceChange) {
                         $createdItemPrice = ItemPrice::create([
                             'supplier_item_id' => $supplierItem->id,
                             'uom_id' => $bs['uom_id'],
