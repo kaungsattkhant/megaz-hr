@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Models\SupplierItem;
 use App\Models\UomConversion;
 use App\Models\MrpRawMaterial;
 use Illuminate\Support\Facades\DB;
@@ -66,11 +67,11 @@ class Item extends BaseModel
     // }
     public function uom()
     {
-        return $this->belongsTo(Uom::class,'uom_id','');
+        return $this->belongsTo(Uom::class, 'uom_id', '');
     }
     public function base_uom()
     {
-        return $this->belongsTo(Uom::class,'base_uom_id');
+        return $this->belongsTo(Uom::class, 'base_uom_id');
     }
 
     public function baseUoms()
@@ -101,6 +102,10 @@ class Item extends BaseModel
     public function suppliers()
     {
         return $this->belongsToMany(Supplier::class, 'supplier_items');
+    }
+    public function supplier_item()
+    {
+        return $this->hasMany(SupplierItem::class);
     }
     public function uomConversion()
     {
