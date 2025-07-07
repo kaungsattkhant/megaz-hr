@@ -15,6 +15,7 @@ use App\Models\UsedDefectedItem;
 use App\Models\ComplaintCategory;
 use App\Models\PurchaseOrderItemLeft;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\TagController;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BankController;
@@ -40,8 +41,8 @@ use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\OrderAPIController;
-use App\Http\Controllers\API\SkillAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
+use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AccessoryController;
@@ -697,3 +698,9 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
 Route::controller(TestController::class)->group(function () {
     Route::get('/get_holidays', 'getHolidays');
 });
+
+Route::controller(TagController::class)->group(function () {
+    Route::get('/tags', 'getTags');
+    Route::post('/tags', 'createTag');
+});
+
