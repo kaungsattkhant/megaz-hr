@@ -22,9 +22,9 @@ class MaterialRequirementsPlanningAPIController extends Controller
         ResponseData($data);
     }
 
-    public function store(Request $request)
+    public function store(MrpStoreRequest $request)
     {
-        $data = $this->MaterialRequirementsPlanningRepository->store($request);
+        $data = $this->MaterialRequirementsPlanningRepository->store($request->validated());
         ResponseData($data);
     }
 
@@ -88,6 +88,18 @@ class MaterialRequirementsPlanningAPIController extends Controller
     public function getSellingAreas(Request $request)
     {
         $data = $this->MaterialRequirementsPlanningRepository->getSellingAreas($request);
+        ResponseData($data);
+    }
+
+    public function getMenuPrices(int $menuId)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->getMenuPrices($menuId);
+        ResponseData($data);
+    }
+
+    public function updateMenuPrices(int $menuId, Request $request)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->updateMenuPrices($menuId, $request->all());
         ResponseData($data);
     }
 }
