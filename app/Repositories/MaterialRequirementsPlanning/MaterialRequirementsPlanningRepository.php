@@ -110,29 +110,31 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
       if (isset($validatedData['cooking_place_id'])) {
         $cookingPlace = json_decode($validatedData['cooking_place_id']);
-          $menu->menuPlaces()->sync($cookingPlace);
-          if (isset($validatedData['menu_category_id'])) {
+        $menu->menuPlaces()->sync($cookingPlace);
+        if (isset($validatedData['menu_category_id'])) {
           $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
           foreach ($cookingPlace  as $place) {
             $place = CookingPlace::findOrFail($place);
             $areaId = $place->area_id;
             $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
-                  ->get();
-                  foreach ($menuCategoryAreas as $menuCategoryArea) {
-                    MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
-                      ->update(['is_default' => 0]);
-                    MenuArea::updateOrCreate([
-                      'menu_category_area_id' => $menuCategoryArea->id,
-                      'cooking_area_id' =>  $areaId,
-                    ], [
-                      'menu_category_area_id' => $menuCategoryArea->id,
-                      'cooking_area_id' =>  $areaId,
-                      'is_default' => 1,
-                    ]
-                  );
-                }
-              }
+              ->get();
+            foreach ($menuCategoryAreas as $menuCategoryArea) {
+              MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
+                ->update(['is_default' => 0]);
+              MenuArea::updateOrCreate(
+                [
+                  'menu_category_area_id' => $menuCategoryArea->id,
+                  'cooking_area_id' =>  $areaId,
+                ],
+                [
+                  'menu_category_area_id' => $menuCategoryArea->id,
+                  'cooking_area_id' =>  $areaId,
+                  'is_default' => 1,
+                ]
+              );
+            }
           }
+        }
       }
 
       if (isset($validatedData['sub_menu_id'])) {
@@ -180,23 +182,23 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menuSteps = json_decode($validatedData['menu_steps']);
         $updatedMenuStepIds = [];
         foreach ($menuSteps as $step) {
-            if (isset($step->id)) {
-                $updatedMenuStepIds[] = $step->id;
-            }
+          if (isset($step->id)) {
+            $updatedMenuStepIds[] = $step->id;
+          }
         }
-        
+
         $existingMenuStepIds = $menu->menuSteps->pluck('id')->toArray();
-        
+
         $menuStepsToDelete = array_diff($existingMenuStepIds, $updatedMenuStepIds);
-        
+
         if (!empty($menuStepsToDelete)) {
-            foreach ($menuStepsToDelete as $menuStepId) {
-                $menuStep = $menu->menuSteps->find($menuStepId);
-                if ($menuStep) {
-                    $menuStep->menuStepItem()->delete();
-                    $menuStep->delete();
-                }
+          foreach ($menuStepsToDelete as $menuStepId) {
+            $menuStep = $menu->menuSteps->find($menuStepId);
+            if ($menuStep) {
+              $menuStep->menuStepItem()->delete();
+              $menuStep->delete();
             }
+          }
         }
 
         foreach ($menuSteps as $step) {
@@ -268,7 +270,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menu->menuPlaces()->detach();
       }
 
-      if(isset($validatedData['sub_menu_id'])){
+      if (isset($validatedData['sub_menu_id'])) {
         $submenu = json_decode($validatedData['sub_menu_id'] ?? '[]', true);
         if (isset($submenu)) {
           $menu->subMenus()->sync($submenu);
