@@ -24,6 +24,7 @@ class Item extends BaseModel
         'category_id',
         'item_type_id',
         'base_uom_id',
+        'tag_id',
         'uom_id',
         'is_active',
         'min_holding_base_uom_quantity',
@@ -51,10 +52,14 @@ class Item extends BaseModel
     {
         return $this->belongsTo(Category::class);
     }
+    public function tag()
+    {
+        return $this->belongsTo(Tag::class);
+    }
     public function item_type()
     {
         return $this->belongsTo(ItemType::class);
-    }
+    }   
 
     public function PurchaseOrderItem()
     {

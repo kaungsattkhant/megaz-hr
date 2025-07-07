@@ -217,7 +217,7 @@ class ItemRepository implements ItemRepositoryInterface
     }
     public function detail($id)
     {
-        $item = Item::with(['uom', 'base_uom', 'supplier_item.item_price.uom', 'supplier_item.brand', 'supplier_item.supplier'])->find($id);
+        $item = Item::with(['uom','tag', 'base_uom', 'supplier_item.item_price.uom', 'supplier_item.brand', 'supplier_item.supplier'])->find($id);
         if (!$item) {
             ResponseMessage('Item not found', 419);
         }
