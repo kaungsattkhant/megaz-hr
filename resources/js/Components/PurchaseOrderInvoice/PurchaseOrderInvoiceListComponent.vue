@@ -1,18 +1,20 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Purchase Order Invoices
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class="flex pr-0 gap-x-4">
-                <button type="button" hidden disabled
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#check_modal">
-                    Add New
-                </button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Purchase Order Invoices
+                </p>
+            </div>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class="flex pr-0 gap-x-4">
+                    <button type="button" hidden disabled
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#check_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

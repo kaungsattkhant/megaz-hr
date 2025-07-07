@@ -235,6 +235,11 @@ import InterviewCreateComponent from './Components/Interviews/InterviewCreateCom
 import InterviewResultComponent from './Components/Interviews/InterviewResultComponent.vue';
 import LocationListComponent from './Components/Locations/LocationListComponent.vue';
 import LocationDetailComponent from './Components/Locations/LocationDetailComponent.vue';
+import JdCrudComponent from './Components/JobDescription/JdCrudComponent.vue';
+import JsListComponent from './Components/JobSpecification/JsListComponent.vue';
+import JsCreateComponent from './Components/JobSpecification/JsCreateComponent.vue';
+import SopListComponent from './Components/SOP/SopListComponent.vue';
+import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -450,6 +455,11 @@ app.component('InterviewCreateComponent',InterviewCreateComponent);
 app.component('InterviewResultComponent',InterviewResultComponent);
 app.component('LocationListComponent',LocationListComponent);
 app.component('LocationDetailComponent',LocationDetailComponent);
+app.component('JdCrudComponent',JdCrudComponent);
+app.component('JsListComponent',JsListComponent);
+app.component('JsCreateComponent',JsCreateComponent);
+app.component('SopListComponent',SopListComponent);
+app.component('SopCreateComponent',SopCreateComponent);
 
 
 app.use(store);

@@ -29,4 +29,8 @@ interface MaterialRequirementsPlanningInterface
   public function updateMenuCategoryCookingAreas($menuAreaId);
 
   public function getSellingAreas(Request $request);
+
+  public function getMenuPrices($menuId);
+
+  public function updateMenuPrices(int $menuId, array $data);
 }

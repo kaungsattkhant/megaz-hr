@@ -1,73 +1,82 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-                <i class="fal fa-search"></i>
-            </label>
-            <button hidden class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
-                <i class="fal fa-plus"></i>
-            </button>
+    <div class="mt-4 bg-white">
+        <div class="card-shadow">
+            <div>
+                <p class="page-title">
+                    Creditor
+                </p>
+            </div>
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button hidden class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
+                        <i class="fal fa-plus"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class=" px-4 py-4 mt-4 bg-white rounded">
-        <div class="overflow-x-auto">
-            <div class="table-container">
-                <table class="primary-table">
-                    <thead class="">
-                        <tr>
-                            <th scope="col" class="">
-                                #
-                            </th>
-                            <th scope="col" class="">
-                                Supplier Name
-                            </th>
-                            <th scope="col" class="">
-                                Total Credit
-                            </th>
-                            <!-- <th scope="col" class="">
-                                Total Debit
-                            </th> -->
-                            <th scope="col" class="">
-                                Outstanding Debt
-                            </th>
-                            <th scope="col" class="">
-                                &nbsp;
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <div class="contents" v-for="(creditor, index) in creditorList" :key="index">
-                            <tr class="">
-                                <td class="  font-medium ">
-                                    {{ ++index }}
-                                </td>
-                                <td class="whitespace-nowrap  ">
-                                    {{ creditor.supplier_name }}
-                                    <a :href="`/creditor/suppliers/${creditor.supplier_id}/transactions`" class="text-blue-600 hover:underline" > Detail </a>
-                                </td>
-                                <td class="whitespace-nowrap  ">
-                                    {{ (creditor.credit_amount).toLocaleString() }}
-                                </td>
-
-                                <!-- <td class="  ">
-                                    {{ (creditor.debit_amount).toLocaleString() }}
-                                </td> -->
-
-                                <td class="  ">
-                                    {{ (creditor.total_credit_amount).toLocaleString() }}
-                                </td>
-
-                                <td class="  ">
-                                    <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal"
-                                    @click="payCreditBtnClicked(creditor)">
-                                        <i class="fal fa-plus"></i>
-                                    </button>
-                                </td>
+        <div class=" box-container-table">
+            <div class="overflow-x-auto">
+                <div class="table-container">
+                    <table class="primary-table">
+                        <thead class="">
+                            <tr>
+                                <th scope="col" class="">
+                                    #
+                                </th>
+                                <th scope="col" class="">
+                                    Supplier Name
+                                </th>
+                                <th scope="col" class="">
+                                    Total Credit
+                                </th>
+                                <!-- <th scope="col" class="">
+                                    Total Debit
+                                </th> -->
+                                <th scope="col" class="">
+                                    Outstanding Debt
+                                </th>
+                                <th scope="col" class="">
+                                    &nbsp;
+                                </th>
                             </tr>
-                        </div>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <div class="contents" v-for="(creditor, index) in creditorList" :key="index">
+                                <tr class="">
+                                    <td class="  font-medium ">
+                                        {{ ++index }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ creditor.supplier_name }}
+                                        <a :href="`/creditor/suppliers/${creditor.supplier_id}/transactions`" class="text-blue-600 hover:underline" > Detail </a>
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ (creditor.credit_amount).toLocaleString() }}
+                                    </td>
+
+                                    <!-- <td class="  ">
+                                        {{ (creditor.debit_amount).toLocaleString() }}
+                                    </td> -->
+
+                                    <td class="  ">
+                                        {{ (creditor.total_credit_amount).toLocaleString() }}
+                                    </td>
+
+                                    <td class="  ">
+                                        <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal"
+                                        @click="payCreditBtnClicked(creditor)">
+                                            <i class="fal fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </div>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

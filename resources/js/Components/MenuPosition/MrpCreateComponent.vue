@@ -157,7 +157,7 @@
                             <option :value="type" v-for="(type, typeIndex) in typeList"
                                 :key="typeIndex"> {{ type.name }} </option>
                         </select> -->
-                        <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
+                        <multiselect v-model="selectedType" :options="typeList" :close-on-select="true" @select="typeChange()"
                         :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select Type" label="name"
                         :preselect-first="false"></multiselect>
@@ -970,6 +970,10 @@ export default {
                 this.alertValidationMessage(`Type`);
                 return 1;
             }
+            else if(!this.description){
+                this.alertValidationMessage(`Description`);
+                return 1;
+            }
             else {
                 let cookingPlaceId = [];
                 this.selectedCookingArea.forEach((item) => {
@@ -986,7 +990,7 @@ export default {
                 formData.append('menu_category_id', this.selectedMenuCategory.id);
                 formData.append('code', this.code);
                 formData.append('image',this.selectedImage);
-                // formData.append('description',this.description);
+                formData.append('description',this.description);
                 formData.append('price', this.sellingPrice);
                 formData.append('Menu_type', this.selectedMenuType);
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));

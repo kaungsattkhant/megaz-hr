@@ -109,6 +109,10 @@
                                         <a :href="`/mrp/${menu.id}/edit`" id="edit-btn" class="pr-1 ml-2">
                                             <i class="fas fa-pen"></i>
                                         </a>
+                                        <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
+                                        data-te-target="#priceUpdateModal">
+                                            <i class="fas fa-tag"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </div>
@@ -135,7 +139,66 @@
 
 
         </div>
+
+
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="priceUpdateModal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Update Item Price
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <!-- <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Price
+                            </label>
+                            <input type="number" placeholder="Price" v-model="price"
+                            class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Uom
+                            </label>
+                            <select name="" id="" v-model="selectedUom" class="input-ui">
+                                <option :value="uom" v-for="(uom, index) in uomList" :key="index"> {{ uom.uom_name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div> -->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 "
+                            @click="confirmUpdatePriceBtnClicked">
+                            Update Price
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <button id="price-edit-btn" class="hidden" data-te-toggle="modal"
+                                        data-te-target="#priceUpdateModal">
+                                            
+                                        </button>
 </template>
 
 <script>
