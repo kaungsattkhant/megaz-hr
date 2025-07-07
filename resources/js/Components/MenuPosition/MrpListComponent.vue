@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="mt-4 bg-white">
         <div class="card-shadow">
             <div>
@@ -47,7 +47,13 @@
                                     #
                                 </th>
                                 <th scope="col" class="  ">
-                                    Menu Name
+                                    Menu
+                                </th>
+                                <th scope="col" class="  ">
+                                    Description
+                                </th>
+                                <th scope="col" class="  ">
+                                    Price
                                 </th>
                                 <!-- <th scope="col" class="  ">
                                     Ingredients
@@ -71,10 +77,16 @@
                             <div class="contents" v-for="(menu, index) in menuList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ menu.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ menu.description }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ (menu.price)?.price.toLocaleString() }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap  ">
                                         <p v-for="(ingredient, ingredientIndex) in menu.items" :key="ingredientIndex">
@@ -95,20 +107,24 @@
                                         {{ (menu.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td> -->
                                     <td class="whitespace-nowrap ">
-                                        
+
                                         <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
-                                            class="mt-[0.1rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white relative mx-3 
-                                            before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] 
-                                            after:absolute after:-mt-[0.2875rem] after:h-5 after:-left-1 after:w-5 after:rounded-full after:border-none after:bg-black after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] 
-                                            checked:bg-black checked:after:absolute checked:after:z-[2] checked:after:-mt-[4px] checked:after:ms-[1.3625rem] checked:after:h-5 
-                                            checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-black checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] 
-                                            hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:ring-0 focus:shadow-none focus:before:opacity-[0.12] focus:before:transition-[box-shadow_0.2s,transform_0.2s] 
-                                            checked:focus:bg-black checked:hover:bg-black focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] 
+                                            class="mt-[0.1rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white relative mx-3
+                                            before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-['']
+                                            after:absolute after:-mt-[0.2875rem] after:h-5 after:-left-1 after:w-5 after:rounded-full after:border-none after:bg-black after:transition-[background-color_0.2s,transform_0.2s] after:content-['']
+                                            checked:bg-black checked:after:absolute checked:after:z-[2] checked:after:-mt-[4px] checked:after:ms-[1.3625rem] checked:after:h-5
+                                            checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-black checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-['']
+                                            hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:ring-0 focus:shadow-none focus:before:opacity-[0.12] focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                            checked:focus:bg-black checked:hover:bg-black focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
                                             checked:focus:before:ms-[1.3625rem] checked:focus:before:scale-100 checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]"
                                                     type="checkbox" role="switch" />
                                         <a :href="`/mrp/${menu.id}/edit`" id="edit-btn" class="pr-1 ml-2">
                                             <i class="fas fa-pen"></i>
                                         </a>
+                                        <button class="pr-1 ml-2" type="button" data-te-toggle="modal" data-te-target="#update_price_modal"
+                                        @click="updatePriceBtnClicked(menu,index)">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </div>
@@ -136,6 +152,134 @@
 
         </div>
     </div>
+
+    <!-- Bank Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="update_price_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="update_price_modalLabel">
+                            Update Price
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            id="close_create_bank_modal" aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                New Price
+                            </label>
+                            <input type="number" v-model="newPrice" placeholder="Price" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss
+                        @click="confirmUpdatePriceBtnClicked">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button trigger modal -->
+<button
+  type="button"
+  hidden
+  disabled
+  class=""
+  data-te-toggle="modal"
+  data-te-target="#exampleModal"
+  data-te-ripple-init
+  data-te-ripple-color="light">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div
+  data-te-modal-init
+  class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div
+    data-te-modal-dialog-ref
+    class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+    <div
+      class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-4 outline-none dark:bg-surface-dark">
+      <div
+        class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 p-4 dark:border-white/10">
+        <h5
+          class="text-xl font-medium leading-normal text-surface dark:text-white"
+          id="exampleModalLabel">
+          Modal title
+        </h5>
+        <button
+          type="button"
+          class="box-content rounded-none border-none text-neutral-500 hover:text-neutral-800 hover:no-underline focus:text-neutral-800 focus:opacity-100 focus:shadow-none focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+          data-te-modal-dismiss
+          aria-label="Close">
+          <span class="[&>svg]:h-6 [&>svg]:w-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="relative flex-auto p-4" data-te-modal-body-ref>
+        Modal body text goes here.
+      </div>
+
+      <!-- Modal footer -->
+      <div
+        class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 p-4 dark:border-white/10">
+        <button
+          type="button"
+          class="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-200 focus:bg-primary-accent-200 focus:outline-none focus:ring-0 active:bg-primary-accent-200 dark:bg-primary-300 dark:hover:bg-primary-400 dark:focus:bg-primary-400 dark:active:bg-primary-400"
+          data-te-modal-dismiss
+          data-te-ripple-init
+          data-te-ripple-color="light">
+          Close
+        </button>
+        <button
+          type="button"
+          class="ms-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong"
+          data-te-ripple-init
+          data-te-ripple-color="light">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script>
@@ -157,6 +301,10 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+
+            editId: null,
+            editIndex: null,
+            newPrice: null,
         };
     },
 
@@ -241,7 +389,41 @@ export default {
             this.getMenuList(1);
         },
 
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
+        },
 
+        updatePriceBtnClicked(menu, index){
+            if(menu.price){
+                this.newPrice = menu.price.price;
+            }
+            this.editId = menu.id;
+            this.editIndex = index;
+        },
+
+        confirmUpdatePriceBtnClicked(){
+            if(!this.newPrice){
+                this.alertvalidationMessage('new price');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('price', this.newPrice);
+            postApiData({url: `/api/menus/${this.editId}/prices`, form_data: formData, token: this.getToken()}).then(response=>{
+                if(response.data){
+                    this.menuList[this.editIndex].price = response.data;
+                    // menu.price = response.data;
+                    // console.log(response.data);
+                    this.editId = null;
+                    this.newPrice = null;
+                    this.editIndex = null;
+                }
+            });
+        },
 
     },
 
