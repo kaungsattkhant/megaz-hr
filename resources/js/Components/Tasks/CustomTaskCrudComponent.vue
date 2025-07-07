@@ -60,7 +60,6 @@
                             </tr>
                         </thead>
                         <tbody>
-
                             <!-- looping start -->
                             <div class="contents" v-for="(task, index) in tasksList" :key="index">
                                 <tr class="">

@@ -970,6 +970,10 @@ export default {
                 this.alertValidationMessage(`Type`);
                 return 1;
             }
+            else if(!this.description){
+                this.alertValidationMessage(`Description`);
+                return 1;
+            }
             else {
                 let cookingPlaceId = [];
                 this.selectedCookingArea.forEach((item) => {
@@ -986,7 +990,7 @@ export default {
                 formData.append('menu_category_id', this.selectedMenuCategory.id);
                 formData.append('code', this.code);
                 formData.append('image',this.selectedImage);
-                // formData.append('description',this.description);
+                formData.append('description',this.description);
                 formData.append('price', this.sellingPrice);
                 formData.append('Menu_type', this.selectedMenuType);
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));

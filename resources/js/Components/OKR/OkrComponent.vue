@@ -1,46 +1,49 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Objective Key Results
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-
-            <!-- <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Objective Key Results
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <notifications position="top center" />
 
-                <a href="/OKR/create"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
-            </div> -->
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-            </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Date" v-model="selectedDate" @change="dateChange(1)"
-                    data-te-select-filter="true" class="input-ui w-full">
-                        <option value="">All</option>
-                        <option v-for="(date,index) in dateList" :key="index" :value="date"> {{ date }} </option>
-                    </select>
+                <!-- <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
                 </div>
-                <a href="/OKR/create" v-if="feature.includes('okr.create')"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-                </a>
+                <div class="flex justify-end flex-col">
+
+                    <a href="/OKR/create"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+                        Add New
+                    </a>
+                </div> -->
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Date" v-model="selectedDate" @change="dateChange(1)"
+                        data-te-select-filter="true" class="input-ui w-full">
+                            <option value="">All</option>
+                            <option v-for="(date,index) in dateList" :key="index" :value="date"> {{ date }} </option>
+                        </select>
+                    </div>
+                    <a href="/OKR/create" v-if="feature.includes('okr.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

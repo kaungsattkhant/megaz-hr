@@ -1,38 +1,40 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Inventory Stocks
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        
-        <div class="btn-container pt-10">
-           
-            <div class=" flex pr-0 gap-x-4">
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded">
-                </div>
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
-                    <input type="date" v-model="toDate" class="search-input rounded">
-                </div>
-                <div class="ml-2 px-2">
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
-                </div>
-
-            </div>
-            <div>
-
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
-                        data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
-                        <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
-                            :key="inventoryIndex"> {{ inventory.name }} </option>
-                    </select>
-                </div>
     
+    <div class="mt-4 bg-white">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Inventory Stocks
+                </p>
+            </div>
+            <div class="btn-container pt-10">
+            
+                <div class=" flex pr-0 gap-x-4">
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
+                        <input type="date" v-model="fromDate" class="search-input rounded">
+                    </div>
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
+                        <input type="date" v-model="toDate" class="search-input rounded">
+                    </div>
+                    <div class="ml-2 px-2">
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                    </div>
+
+                </div>
+                <div>
+
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
+                            data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
+                            <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
+                                :key="inventoryIndex"> {{ inventory.name }} </option>
+                        </select>
+                    </div>
+        
+                </div>
             </div>
         </div>
         <div class="box-container-table">

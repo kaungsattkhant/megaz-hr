@@ -5,7 +5,7 @@
                 Form
             </p>
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-2 container-card">
+        <div class="grid !grid-cols-12 gap-x-4 mb-4 container-card">
 
             <div class=" col-span-12 mb-6">
                 <p class=" text-xl text-black">
@@ -42,12 +42,11 @@
                 <input type="text" v-model="selectedExp" placeholder="Exp" class="input-ui">
             </div>
             <div class="col-span-3"></div>
-            <hr class="col-span-12 mb-4">
         </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 container-card !pt-0 !mt-0">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 container-card !pt-0 !mt-0 border-t border-gray-100">
             <div class=" col-span-12 mb-6">
-                <p class=" text-xl text-black">
+                <p class=" text-xl text-black pt-3">
                     Personal Information
                 </p>
             </div>

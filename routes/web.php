@@ -474,15 +474,15 @@ Route::middleware(['departments:ktv-forecasting.edit'])->group(function () {
 
 
 // ktv product tree
-Route::middleware(['departments:ktv-product-tree'])->group(function () {
+// Route::middleware(['departments:ktv-product-tree'])->group(function () {
     Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
-});
-Route::middleware(['departments:ktv-product-tree.create'])->group(function () {
+// });
+// Route::middleware(['departments:ktv-product-tree.create'])->group(function () {
     Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
-});
-Route::middleware(['departments:ktv-product-tree.edit'])->group(function () {
+// });
+// Route::middleware(['departments:ktv-product-tree.edit'])->group(function () {
     Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
-});
+// });
 
 
 Route::middleware(['departments:po-order'])->group(function () {
@@ -663,6 +663,14 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::middleware(['departments:event'])->group(function () {
         Route::view('/events', 'event.index')->name('event.index');
     });
+
+
+
+    Route::view('/JD', 'job_description.index')->name('job_description.index');
+    Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
+    Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
+    Route::view('/SOP', 'SOP.index')->name('SOP.index');
+    Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
 // });
 
 // =======
