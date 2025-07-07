@@ -165,10 +165,10 @@
                 </div>
                 <div class="contents" v-show="isReadyToSale">
                     <div class="mb-4 col-span-3 rounded-md">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Expire Date
+                        <label for="" class="label-form mb-3">
+                            Expiry Date
                         </label>
-                        <input type='number' v-model="expireDate" class="input-ui w-full !p-1 text-xs" min="0"/>
+                        <input type='number' v-model="expireDate" class="input-ui " min="0" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''"/>
                     </div>
                     <div class="col-span-3"  v-show="isReadyToSale"></div>
                 </div>
@@ -892,6 +892,8 @@ export default {
                 this.selectedUom = null;
                 this.amount = null;
                 this.selectedDepartment = null;
+                this.selectedRole = null;
+                this.expireDate = null;
                 this.is_disable_custom = true;
                 this.itemUoms = [];
                 this.itemList = [];
