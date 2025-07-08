@@ -1007,7 +1007,7 @@ export default {
                     formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
 
-                let response = await postApiData({ url: `/api/mrp/${this.mrpId}/test_data/form`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     window.location.replace(`/mrp`);
                 }
