@@ -157,10 +157,10 @@
                 </div>
                 <div class="contents" v-show="isReadyToSale">
                     <div class="mb-4 col-span-3 rounded-md">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Expire Date
+                        <label for="" class="label-form mb-3">
+                            Expiry Date
                         </label>
-                        <input type='date' v-model="expireDate" class="input-ui w-full !p-1 text-xs" />
+                        <input type='number' v-model="expireDate" class="input-ui " min="0"/>
                     </div>
                     <div class="col-span-3"  v-show="isReadyToSale"></div>
                 </div>
@@ -425,7 +425,7 @@
 
         <div>
             <button class="add-btn" @click="createMenuBtnClicked">
-                Create Menu
+                Update Menu
             </button>
         </div>
 
@@ -570,6 +570,7 @@ export default {
             // });
 
             let sampleMenuLevel = {
+                id: null,
                 level : null,
                 type : null,
                 position : null,
@@ -580,8 +581,11 @@ export default {
                 expected_quantity : null,
                 menu_id : null,
                 item_menu:[],
+                menu_step_item: []
             };
             detail.menu_steps.forEach(step => {
+                console.log(step);
+                sampleMenuLevel.id = step.id;
                 sampleMenuLevel.level = step.level
                 sampleMenuLevel.type = step.type
                 // sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
@@ -592,6 +596,7 @@ export default {
                 sampleMenuLevel.expected_quantity = step.expected_quantity
                 sampleMenuLevel.expired_at = step.expired_at
                 sampleMenuLevel.menu_id = step.menu_id
+                sampleMenuLevel.menu_step_item = step.menu_step_item
                 step.menu_step_item.forEach(item => {
                     sampleMenuLevel.item_menu.push({
                         item_id: item.item_id,
@@ -606,10 +611,11 @@ export default {
                     });
                 })
                 this.testtestmenu = sampleMenuLevel
-                console.log(sampleMenuLevel)
+                // console.log(sampleMenuLevel);
                 this.levelTable.push(sampleMenuLevel)
-                console.log(this.levelTable)
+                // console.log(this.levelTable);
                 sampleMenuLevel = {
+                    id: null,
                     level : null,
                     type : null,
                     position : null,
@@ -708,7 +714,7 @@ export default {
 
         itemSelectChanged() {
             this.itemUoms = [];
-            console.log(this.selectedItem)
+            // console.log(this.selectedItem);
             this.itemUoms.push(
                 {
                     id:this.selectedItem.base_uom_id,
@@ -773,7 +779,7 @@ export default {
             else{
                 this.addCustom();
             }
-            console.log(this.selectedMenuType)
+            // console.log(this.selectedMenuType)
         },
         async addCustom() {
             if(!this.selectedLevel){
@@ -981,7 +987,7 @@ export default {
                 this.subMenuList.forEach((submenu) => {
                     sub_menu_id.push(submenu.id)
                 })
-                console.log('array ' ,cookingPlaceId)
+                // console.log('array ' ,cookingPlaceId);
                 let formData = new FormData();
                 formData.append('name', this.menuName);
                 formData.append('menu_category_id', this.selectedMenuCategory.id);
@@ -1001,7 +1007,7 @@ export default {
                     formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
 
-                let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrp/${this.mrpId}/test_data/form`, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     window.location.replace(`/mrp`);
                 }
