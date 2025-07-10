@@ -584,7 +584,7 @@ export default {
                 menu_step_item: []
             };
             detail.menu_steps.forEach(step => {
-                console.log(step);
+                // console.log(step);
                 sampleMenuLevel.id = step.id;
                 sampleMenuLevel.level = step.level
                 sampleMenuLevel.type = step.type
@@ -596,9 +596,9 @@ export default {
                 sampleMenuLevel.expected_quantity = step.expected_quantity
                 sampleMenuLevel.expired_at = step.expired_at
                 sampleMenuLevel.menu_id = step.menu_id
-                sampleMenuLevel.menu_step_item = step.menu_step_item
                 step.menu_step_item.forEach(item => {
                     sampleMenuLevel.item_menu.push({
+                        id: item.id,
                         item_id: item.item_id,
                         menu_step_id: item.menu_step_id,
                         price: item.item.average_price,
@@ -907,8 +907,8 @@ export default {
                 this.selectedUom = null;
                 this.amount = null;
                 this.is_disable_custom = true;
-                this.selectedDepartment = null;
-                this.selectedRole = null;
+                // this.selectedDepartment = null;
+                // this.selectedRole = null;
             }
             // this.updateItemPriceTotal(this.ingredientItems);
 
@@ -932,6 +932,8 @@ export default {
             this.orderTime = null;
             this.expectedQuantity = null;
             this.is_disable_custom = false;
+            this.selectedDepartment = null;
+            this.selectedRole = null;
         },
         addLevelBtnClicked(){
             this.levelTable.push(
