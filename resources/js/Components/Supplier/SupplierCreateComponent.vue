@@ -197,7 +197,7 @@
                 </div>
             </div> -->
 
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -252,20 +252,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ selectedItem.name }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <span class="text-sm"v-for="(brand) in selectedItem.brands" > {{ brand.name }}, </span>
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <button>
-                                    <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
-                                </button>
-                            </td>
-                        </tr> -->
-
                         <div class="contents" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <tr v-for="(brand) in selectedItem.brands" >
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
@@ -283,7 +269,7 @@
                         </div>
                     </tbody>
                 </table>
-            </div>
+            </div> -->
 
             <!-- supplier phone list -->
             <div class="contents">
@@ -783,6 +769,12 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
+                // if(this.routeLocation){
+                //     window.location.replace(this.routeLocation);
+                // }
+                // else{
+                //     window.location.replace("/suppliers");
+                // }
                 window.location.replace("/suppliers");
             }
         },
