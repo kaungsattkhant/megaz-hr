@@ -5,7 +5,7 @@
                 Add New Supplier
             </p>
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md card-shadow">
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Supplier Name
@@ -397,6 +397,7 @@
             </div>
         </div>
         <div>
+            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none mr-4" @click="btnClickCancel"> Cancel </button>
             <button class="add-btn" @click="createBtnClicked">
                 Create Supplier
             </button>
@@ -525,6 +526,8 @@ import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 
 export default {
+    props: ['route-location'],
+    emits: ['cancel'],
     components: {
         Multiselect
     },
@@ -837,6 +840,14 @@ export default {
                 list.splice(index, 1);
             }
         },
+        btnClickCancel(){
+            if(this.routeLocation){
+                this.$emit('cancel')
+            }
+            else{
+                window.location.replace("/suppliers");
+            }
+        }
     },
 
     created(){

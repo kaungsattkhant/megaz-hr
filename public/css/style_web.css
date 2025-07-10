@@ -78,7 +78,7 @@ body {
 
 .main-content {
   margin-left: auto;
-  width: calc(100% - 16rem);
+  width: calc(100% - 256px);
   margin-inline-start: 16rem;
   display: inline-block; }
 
