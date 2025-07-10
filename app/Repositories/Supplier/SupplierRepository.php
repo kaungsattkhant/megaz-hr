@@ -26,7 +26,7 @@ class SupplierRepository implements SupplierInterface
                     ->orWhere('shop_name', 'LIKE', '%' . $searchTerm . '%')
                     ->orWhere('phone_number', 'LIKE', '%' . $searchTerm . '%')
                     ->orWhere('address', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('credit_limit', 'LIKE', '%' . $searchTerm . '%');
+                    ->orWhere('credit_limit', 'LIKE',    '%' . $searchTerm . '%');
             });
         }
 
