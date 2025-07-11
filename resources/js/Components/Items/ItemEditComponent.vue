@@ -5,7 +5,6 @@
                 Edit Item
             </p>
         </div>
-
         <div class="grid !grid-cols-12 gap-x-8 gap-y-4 bg-white py-6 mb-0">
             <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
@@ -73,14 +72,17 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
+                    <!-- <multiselect v-model="selectedLimitType" :options="limitTypeList" :close-on-select="true" track-by="value"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Type" label="name"
+                        :preselect-first="false"></multiselect> -->
                     <select data-te-select-init data-te-select-placeholder="Select Type" data-te-select-filter="true"
                         name="" id="" v-model="selectedLimitType" class="input-ui !text-black">
-                        <option :value="type.value" v-for="(type, index) in limitTypeList" class="!uppercase"
+                        <option :value="type" v-for="(type, index) in limitTypeList" class="!uppercase"
                             :key="index"> {{ type.name }} </option>
                     </select>
                 </div>
             </div>
-            <div v-show="selectedLimitType === 'uom'" class="contents">
+            <div v-show="selectedLimitType && selectedLimitType.value === 'uom'" class="contents">
                 <div class="mb-6 col-span-3">
                     <label for="" class="label-form mb-3">
                         Maximum Limit ( Base UOM - အကြီး )
@@ -94,7 +96,7 @@
                     <input type="number" placeholder="Max Uom" min="0" v-model="maxUomLimit" class="input-ui">
                 </div>
             </div>
-            <div class="mb-6 col-span-3" v-show="selectedLimitType === 'finance'">
+            <div class="mb-6 col-span-3" v-show="selectedLimitType && selectedLimitType.value === 'finance'">
                 <label for="" class="label-form mb-3">
                     Amount
                 </label>
@@ -271,6 +273,10 @@
                                 {{ price.uom_name }}
                             </td>
                             <td class="text-center">
+                                <button  class="px-2 pt-2"  data-te-toggle="modal" data-te-target="#edit_price_uom_modal" 
+                                    @click="editPriceUomBtnClicked(price,priceIndex)">
+                                    <i class="fal fa-pen"></i>
+                                </button>
                                 <button @click="removePrice(priceIndex)">
                                     <i class="fas fa-times  pr-3"></i>
                                 </button>
@@ -290,7 +296,7 @@
 
         <div>
             <button class="add-btn" @click="btnClickedCreateItem()">
-                Create Item
+                Edit Item
             </button>
         </div>
 
@@ -491,12 +497,70 @@
             </div>
         </div>
 
+        <!-- edit  price and uom -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="edit_price_uom_modal" tabindex="-1" aria-labelledby="add_duty_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_tag_label">
+                            Edit
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close" id="close_edit_price_uom_modal">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Price
+                            </label>
+                            <input type="text" v-model="selectedEditPrice"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4 relative ">
+                            <label for="" class="label-form mb-3">
+                                UOM
+                            </label>
+                            <div class="flex gap-x-2">
+                                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                                    data-te-select-wrapper-ref>
+                                    <select name="" id="" v-model="selectedEditUom" class="input-ui"
+                                        data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                                        <option :value="uom" v-for="(uom, uomIndex) in selectedUomList"
+                                            :key="uomIndex"> {{ uom.uom_name }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                        </button>
+                        <button type="button" @click="editPriceUom()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
     </div>
 
     <div v-show="isSupplier">
-        <supplier-create-component route-location="/items/create" @cancel="isSupplier = false" />
+        <supplier-create-component route-location="/items/create" @finish="handleSupplier" @cancel="isSupplier = false" />
     </div>
 </template>
 
@@ -560,6 +624,11 @@ export default {
             isSupplier: false,
 
             detail: null,
+
+            selectedEditPrice: null,
+            selectedEditUom: null,
+            editIndex: null,
+            // editId: null,
         };
     },
 
@@ -573,6 +642,51 @@ export default {
             }
         },
         addDetail(detail){
+            this.name = detail.name;
+            this.selectedCategory = this.itemCategoryList.find(cat => cat.id === detail.category_id);
+            this.selectedItemType = this.itemTypeList.find(type => type.id === detail.item_type_id);
+            this.selectedTag = this.tagList.find(tag => tag.id = detail.tag_id);
+            this.selectedCode = detail.code;
+            this.selectedLimitType = this.limitTypeList.find(limit => limit.value === detail.limitation_type);
+            if(this.selectedLimitType.value === "uom"){
+                this.maxBaseUomLimit = detail.max_limit_base_uom_quantity
+                this.maxUomLimit = detail.max_limit_uom_quantity
+            }
+            if(this.selectedLimitType.value === "finance"){
+                this.limit_amount = detail.amount
+            }
+            this.selectedBaseUom = this.uomList.find(base_uom => base_uom.id === detail.base_uom_id);
+            this.selectedUomList.push({
+                uom_name: this.selectedBaseUom.name,
+                uom_id: this.selectedBaseUom.id,
+                uom_type: 'base_uom'
+            })
+            this.selectedUOM = this.uomList.find(normal_uom => normal_uom.id === detail.uom_id);
+            this.selectedUomList.push({
+                uom_name: this.selectedUOM.name,
+                uom_id: this.selectedUOM.id,
+                uom_type: 'uom'
+            })
+            this.conversion = detail.uom_conversion;
+            this.base_min_amount = detail.min_holding_base_uom_quantity;
+            this.min_amount = detail.min_holding_uom_quantity;
+            detail.supplier_item.forEach(item => {
+                this.selectedItemPriceList.push({
+                    id: item.id,
+                    brand_id: item.brand_id,
+                    brand_name: item.brand.name,
+                    supplier_id: item.supplier_id,
+                    supplier_name: item.supplier.name,
+                    uom_price: item.item_price.uom_price,
+                    uom_id: item.item_price.uom_id,
+                    uom_name: item.item_price.uom.name,
+                    uom_type: item.item_price.type,
+                })
+            });
+            
+
+
+            // this.selectedLimitType = detail.limitation_type;
             // this.selectedMonth = detail.date;
             // detail.target_mrp_forecasts.forEach(mrp => {
             //     this.selectedRoomList.push({
@@ -652,6 +766,7 @@ export default {
             if(response.success){
                 document.getElementById('close_category_modal').click();
                 this.getItemCategoryList();
+                // this.selectedCategory = this.itemCategoryList.find(cat => cat.name === this.categoryName)
             }
             else {
                 this.$notify({
@@ -660,7 +775,7 @@ export default {
                 });
             }
         },
-        addCategoryModalClicked(){
+        addTypeModalClicked(){
             this.typeName = null;
         },
         btnClickedCreateType(){
@@ -780,6 +895,18 @@ export default {
             this.price = null;
 
         },
+        editPriceUomBtnClicked(item,index){
+            this.editIndex = index;
+            this.selectedEditPrice = item.uom_price;
+            this.selectedEditUom = this.selectedUomList.find(uom => uom.uom_id === item.uom_id)
+        },
+        editPriceUom(){
+            this.selectedItemPriceList[this.editIndex].uom_price = this.selectedEditPrice;
+            this.selectedItemPriceList[this.editIndex].uom_id = this.selectedEditUom.uom_id;
+            this.selectedItemPriceList[this.editIndex].uom_name = this.selectedEditUom.uom_name;
+            this.selectedItemPriceList[this.editIndex].uom_type = this.selectedEditUom.base_uom;
+            document.getElementById('close_edit_price_uom_modal').click();
+        },
         removePrice(index){
             this.selectedItemPriceList.splice(index, 1);
         },
@@ -840,8 +967,7 @@ export default {
                 this.alertValidationMessage(`PO Limit Type`);
                 return 1;
             }
-            
-            if(this.selectedLimitType && this.selectedLimitType === 'uom'){
+            if(this.selectedLimitType && this.selectedLimitType.value === 'uom'){
                 if(!this.maxBaseUomLimit){
                     this.alertValidationMessage(`Maximum Base Uom Limit`);
                     return 1;
@@ -851,13 +977,12 @@ export default {
                     return 1;
                 }
             }
-            if(this.selectedLimitType && this.selectedLimitType === 'finance'){
+            if(this.selectedLimitType && this.selectedLimitType.value === 'finance'){
                 if(!this.limit_amount){
                     this.alertValidationMessage(`Limit Amount`);
                     return 1;
                 }
             }
-
             if(!this.selectedBaseUom){
                 this.alertValidationMessage(`Base Uom`);
                 return 1;
@@ -879,42 +1004,29 @@ export default {
                 this.alertValidationMessage(`Price List`);
                 return 1;
             }
-            this.createItem();
+
+            const uomIds = this.selectedUomList.map(u => u.uom_id)
+            const hasInvalidUOM = this.selectedItemPriceList.some(b => !uomIds.includes(b.uom_id))
+            console.log('uomId = ' + uomIds)
+            console.log('hasInvalidUOM = ' + hasInvalidUOM)
+            if(hasInvalidUOM){
+                this.$notify({
+                    title: 'Invalid UOM',
+                    text: 'One or more UOM have invalid UOMs.',
+                    type: 'warn'
+                })
+                return 1;
+            }
+            else{
+                this.createItem();
+            }
+            
         },
         async createItem() {
-            // if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.selectedItemType || !this.selectedBrand ) {
-            //     this.alertValidationMessage('required data');
-            //     return false;
-            // }
-            // if (this.isValid(this.name, 'Name')) return;
-            // if (this.isValid(this.selectedCategory, 'Category')) return;
-            // if (this.isValid(this.selectedItemType,'Item Type')) return;
-
-            // if (this.isValid(this.selectedTag, 'Tag')) return;
-            // if (this.isValid(this.selectedCode, 'Code')) return;
-            // if (this.isValid(this.selectedLimitType, 'PO Limit Type')) return;
-            // if(this.selectedLimitType && this.selectedLimitType === 'uom'){
-            //     if (this.isValid(this.maxBaseUomLimit, 'Maximum Base Uom Limit')) return;
-            //     if (this.isValid(this.maxUomLimit, 'Maximum Base Uom Limit')) return;
-            // }
-            // if(this.selectedLimitType && this.selectedLimitType === 'finance'){
-            //     if (this.isValid(this.limit_amount, 'Limit Amount')) return;
-            // }
-
-            // if (this.isValid(this.selectedBaseUom, 'Base Uom')) return;
-            // if (this.isValid(this.selectedUOM, 'Uom')) return;
-            // if (this.isValid(this.conversion, 'Conversion')) return;
-            // if(this.base_min_amount < 1 && this.min_amount < 1){
-            //     this.alertValidationMessage('Amount');
-            //     return 1;
-            // }
-            // if (this.isLengthValid(this.selectedItemPriceList,'Price List')) return;
-
-
             let url = `/api/items`;
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('code',this.code);
+            formData.append('code',this.selectedCode);
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('uom_id', this.selectedUOM.id);
@@ -923,8 +1035,8 @@ export default {
             formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             formData.append('min_holding_uom_quantity',this.min_amount);
             formData.append('conversion',this.conversion);
-            formData.append('limitation_type',this.selectedLimitType);
-            if(this.selectedLimitType === 'uom'){
+            formData.append('limitation_type',this.selectedLimitType.value);
+            if(this.selectedLimitType.value === 'uom'){
                 formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
                 formData.append('max_limit_uom_quantity',this.maxUomLimit);
             }
@@ -932,6 +1044,7 @@ export default {
                 formData.append('amount',this.limit_amount);
             }
             formData.append('brand_suppliers',JSON.stringify(this.selectedItemPriceList));
+            formData.append('id',this.itemId);
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace("/items");
@@ -939,7 +1052,7 @@ export default {
             else {
                 this.$notify({
                     title: `Error Message`,
-                    text: response.message,
+                    text: response.message.code,
                     type: "warn"
                 });
             }
@@ -949,26 +1062,9 @@ export default {
 
 
 
-
-        isLengthValid(selectedClass,selectedName){
-            if(selectedClass.length < 1){
-                this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to provide ${selectedName}, please try again`,
-                    type: "warn"
-                });
-                return 1;
-            }
-        },
-        isValid(selectedClass,selectedName){
-            if(!selectedClass){
-                this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to provide ${selectedName}, please try again`,
-                    type: "warn"
-                });
-                return 1;
-            }
+        handleSupplier(){
+            this.isSupplier = false;
+            this.getSupplierList();
         },
         alertValidationMessage(field) {
             this.$notify({

@@ -527,7 +527,7 @@
     </div>
 
     <div v-show="isSupplier">
-        <supplier-create-component route-location="/items/create" @cancel="isSupplier = false" />
+        <supplier-create-component route-location="/items/create" @finish="handleSupplier" @cancel="isSupplier = false" />
     </div>
 </template>
 
@@ -658,6 +658,7 @@ export default {
             if(response.success){
                 document.getElementById('close_category_modal').click();
                 this.getItemCategoryList();
+                // this.selectedCategory = this.itemCategoryList.find(cat => cat.name === this.categoryName)
             }
             else {
                 this.$notify({
@@ -666,7 +667,7 @@ export default {
                 });
             }
         },
-        addCategoryModalClicked(){
+        addTypeModalClicked(){
             this.typeName = null;
         },
         btnClickedCreateType(){
@@ -685,6 +686,7 @@ export default {
             if(response.success){
                 document.getElementById('close_type_modal').click();
                 this.getItemTypeList();
+                // this.selectedItemType = this.itemTypeList.find(type => type.name === this.typeName);
             }
             else {
                 this.$notify({
@@ -955,7 +957,10 @@ export default {
 
 
 
-
+        handleSupplier(){
+            this.isSupplier = false;
+            this.getSupplierList();
+        },
         isLengthValid(selectedClass,selectedName){
             if(selectedClass.length < 1){
                 this.$notify({

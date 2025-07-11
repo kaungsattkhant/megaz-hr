@@ -197,7 +197,7 @@
                 </div>
             </div> -->
 
-            <!-- <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -269,7 +269,7 @@
                         </div>
                     </tbody>
                 </table>
-            </div> -->
+            </div>
 
             <!-- supplier phone list -->
             <div class="contents">
@@ -513,7 +513,7 @@ import Multiselect from 'vue-multiselect';
 
 export default {
     props: ['route-location'],
-    emits: ['cancel'],
+    emits: ['cancel','finish'],
     components: {
         Multiselect
     },
@@ -692,10 +692,10 @@ export default {
                 this.alertValidationMessage(`Supplier Address`);
                 return 1;
             }
-            if(this.selectedItems.length < 1){
-                this.alertValidationMessage(`Supplier selling Items`);
-                return 1;
-            }
+            // if(this.selectedItems.length < 1){
+            //     this.alertValidationMessage(`Supplier selling Items`);
+            //     return 1;
+            // }
             if(this.phoneNumberList.length < 1){
                 this.alertValidationMessage(`Supplier Phone Number`);
                 return 1;
@@ -769,13 +769,14 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // if(this.routeLocation){
-                //     window.location.replace(this.routeLocation);
-                // }
-                // else{
-                //     window.location.replace("/suppliers");
-                // }
-                window.location.replace("/suppliers");
+                if(this.routeLocation){
+                    // window.location.replace(this.routeLocation);
+                    this.$emit('finish')
+                }
+                else{
+                    window.location.replace("/suppliers");
+                }
+                // window.location.replace("/suppliers");
             }
         },
 
