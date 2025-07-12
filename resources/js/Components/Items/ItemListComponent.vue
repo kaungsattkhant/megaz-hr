@@ -93,6 +93,11 @@
                                     <td class="whitespace-nowrap">
                                         {{ item.category.name }}
                                     </td>
+                                    <td>
+                                        <a :href="'/items/' + item.id + '/edit'">
+                                            <i class="far fa-pen cursor-pointer mr-3"></i>
+                                        </a>
+                                    </td>
                                     <!-- <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
                                             data-te-target="#priceUpdateModal" @click="updatePriceBtnClicked(item.id)">

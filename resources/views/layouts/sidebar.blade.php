@@ -1224,6 +1224,27 @@
                         </a>
                     </li>
                     @endif
+                    <li>
+                        <a href="/JD" class="flex items-center @yield('JD') sidebar-gap-x">
+                            <i class="fal fa-creative-commons-nd"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            JD
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/JS" class="flex items-center @yield('JS') sidebar-gap-x">
+                            <i class="fal fa-briefcase"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            JS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/SOP" class="flex items-center @yield('SOP') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            SOP
+                        </a>
+                    </li>
 
                 </ul>
 

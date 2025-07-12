@@ -54,7 +54,7 @@ Route::middleware(['departments:uom-conversion'])->group(function () {
 Route::middleware(['departments:item'])->group(function () {
     Route::view('/items', 'items.index')->name('items');
     Route::view('/items/create', 'items.create')->name('items.create');
-    Route::view('/items', 'items.index')->name('items');
+    Route::view('/items/{id}/edit', 'items.edit')->name('items.edit');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
 });
 Route::middleware(['departments:item.detail'])->group(function () {

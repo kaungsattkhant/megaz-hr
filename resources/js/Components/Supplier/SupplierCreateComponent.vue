@@ -252,20 +252,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ selectedItem.name }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <span class="text-sm"v-for="(brand) in selectedItem.brands" > {{ brand.name }}, </span>
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <button>
-                                    <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
-                                </button>
-                            </td>
-                        </tr> -->
-
                         <div class="contents" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <tr v-for="(brand) in selectedItem.brands" >
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
@@ -527,7 +513,7 @@ import Multiselect from 'vue-multiselect';
 
 export default {
     props: ['route-location'],
-    emits: ['cancel'],
+    emits: ['cancel','finish'],
     components: {
         Multiselect
     },
@@ -706,10 +692,10 @@ export default {
                 this.alertValidationMessage(`Supplier Address`);
                 return 1;
             }
-            if(this.selectedItems.length < 1){
-                this.alertValidationMessage(`Supplier selling Items`);
-                return 1;
-            }
+            // if(this.selectedItems.length < 1){
+            //     this.alertValidationMessage(`Supplier selling Items`);
+            //     return 1;
+            // }
             if(this.phoneNumberList.length < 1){
                 this.alertValidationMessage(`Supplier Phone Number`);
                 return 1;
@@ -783,7 +769,14 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/suppliers");
+                if(this.routeLocation){
+                    // window.location.replace(this.routeLocation);
+                    this.$emit('finish')
+                }
+                else{
+                    window.location.replace("/suppliers");
+                }
+                // window.location.replace("/suppliers");
             }
         },
 

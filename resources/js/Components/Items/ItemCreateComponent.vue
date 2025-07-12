@@ -228,7 +228,7 @@
                     <button  class="px-2 pt-2" @click="addSupplierClicked"><i class="fal fa-plus"></i></button>
                 </div>
             </div>
-            <div class="mb-6 relative col-span-2">
+            <div class="mb-6 relative col-span-3">
                 <label for="" class="label-form mb-3">
                     UOM
                 </label>
@@ -243,7 +243,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-6 col-span-3">
+            <div class="mb-6 col-span-2">
                 <label for="" class="label-form mb-3">
                     Price
                 </label>
@@ -527,7 +527,7 @@
     </div>
 
     <div v-show="isSupplier">
-        <supplier-create-component route-location="/items/create" @cancel="isSupplier = false" />
+        <supplier-create-component route-location="/items/create" @finish="handleSupplier" @cancel="isSupplier = false" />
     </div>
 </template>
 
@@ -639,7 +639,9 @@ export default {
                 this.supplierList = response.data;
             }
         },
-
+        addCategoryModalClicked(){
+            this.categoryName = null;
+        },
         btnClickedCreateCategory(){
             if(!this.categoryName){
                 this.alertValidationMessage(`Name`);
@@ -656,6 +658,7 @@ export default {
             if(response.success){
                 document.getElementById('close_category_modal').click();
                 this.getItemCategoryList();
+                // this.selectedCategory = this.itemCategoryList.find(cat => cat.name === this.categoryName)
             }
             else {
                 this.$notify({
@@ -663,6 +666,9 @@ export default {
                     type: "error"
                 });
             }
+        },
+        addTypeModalClicked(){
+            this.typeName = null;
         },
         btnClickedCreateType(){
             if(!this.typeName){
@@ -680,6 +686,7 @@ export default {
             if(response.success){
                 document.getElementById('close_type_modal').click();
                 this.getItemTypeList();
+                // this.selectedItemType = this.itemTypeList.find(type => type.name === this.typeName);
             }
             else {
                 this.$notify({
@@ -687,6 +694,9 @@ export default {
                     type: "error"
                 });
             }
+        },
+        addTagModalClicked(){
+            this.tagName = null;
         },
         btnClickedCreateTag(){
             if(!this.tagName){
@@ -714,6 +724,7 @@ export default {
                 });
             }
         },
+
         addBrandModalClicked(){
             this.brandName = null;
         },
@@ -745,6 +756,22 @@ export default {
             this.isSupplier = true;
         },
         btnClickedAddPrice(){
+            if(!this.selectedBrand){
+                this.alertValidationMessage(`Brand`);
+                return 1;
+            }if(!this.selectedSupplier){
+                this.alertValidationMessage(`Supplier`);
+                return 1;
+            }if(!this.uomForBrandSupplier){
+                this.alertValidationMessage(`Uom`);
+                return 1;
+            }if(!this.price){
+                this.alertValidationMessage(`Price`);
+                return 1;
+            }
+            this.addPrice();
+        },
+        addPrice(){
             this.selectedItemPriceList.push({
                 brand_id: this.selectedBrand.id,
                 brand_name: this.selectedBrand.name,
@@ -755,6 +782,11 @@ export default {
                 uom_name: this.uomForBrandSupplier.uom_name,
                 uom_type: this.uomForBrandSupplier.base_uom,
             })
+            this.selectedBrand = null;
+            this.selectedSupplier = null;
+            this.uomForBrandSupplier = null;
+            this.price = null;
+
         },
         removePrice(index){
             this.selectedItemPriceList.splice(index, 1);
@@ -791,26 +823,111 @@ export default {
             })
         },  
 
+        btnClickedCreateItem() {
+            if(!this.name){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            if(!this.selectedCategory){
+                this.alertValidationMessage(`Category`);
+                return 1;
+            }
+            if(!this.selectedItemType){
+                this.alertValidationMessage(`Item Type`);
+                return 1;
+            }
+            if(!this.selectedTag){
+                this.alertValidationMessage(`Tag`);
+                return 1;
+            }
+            if(!this.selectedCode){
+                this.alertValidationMessage(`Code`);
+                return 1;
+            }
+            if(!this.selectedLimitType){
+                this.alertValidationMessage(`PO Limit Type`);
+                return 1;
+            }
+            
+            if(this.selectedLimitType && this.selectedLimitType === 'uom'){
+                if(!this.maxBaseUomLimit){
+                    this.alertValidationMessage(`Maximum Base Uom Limit`);
+                    return 1;
+                }
+                if(!this.maxUomLimit){
+                    this.alertValidationMessage(`Maximum Uom Limit`);
+                    return 1;
+                }
+            }
+            if(this.selectedLimitType && this.selectedLimitType === 'finance'){
+                if(!this.limit_amount){
+                    this.alertValidationMessage(`Limit Amount`);
+                    return 1;
+                }
+            }
 
-        async btnClickedCreateItem() {
+            if(!this.selectedBaseUom){
+                this.alertValidationMessage(`Base Uom`);
+                return 1;
+            }
+            if(!this.selectedUOM){
+                this.alertValidationMessage(`Uom`);
+                return 1;
+            }
+            if(!this.conversion){
+                this.alertValidationMessage(`Conversion`);
+                return 1;
+            }
+            
+            if(this.base_min_amount < 1 && this.min_amount < 1){
+                this.alertValidationMessage('Amount');
+                return 1;
+            }
+            if(this.selectedItemPriceList.lenght < 1){
+                this.alertValidationMessage(`Price List`);
+                return 1;
+            }
+            this.createItem();
+        },
+        async createItem() {
             // if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.selectedItemType || !this.selectedBrand ) {
             //     this.alertValidationMessage('required data');
             //     return false;
             // }
-            if(this.base_min_amount < 1 && this.min_amount < 1){
-                this.alertValidationMessage('Amount');
-                return false;
-            }
+            // if (this.isValid(this.name, 'Name')) return;
+            // if (this.isValid(this.selectedCategory, 'Category')) return;
+            // if (this.isValid(this.selectedItemType,'Item Type')) return;
+
+            // if (this.isValid(this.selectedTag, 'Tag')) return;
+            // if (this.isValid(this.selectedCode, 'Code')) return;
+            // if (this.isValid(this.selectedLimitType, 'PO Limit Type')) return;
+            // if(this.selectedLimitType && this.selectedLimitType === 'uom'){
+            //     if (this.isValid(this.maxBaseUomLimit, 'Maximum Base Uom Limit')) return;
+            //     if (this.isValid(this.maxUomLimit, 'Maximum Base Uom Limit')) return;
+            // }
+            // if(this.selectedLimitType && this.selectedLimitType === 'finance'){
+            //     if (this.isValid(this.limit_amount, 'Limit Amount')) return;
+            // }
+
+            // if (this.isValid(this.selectedBaseUom, 'Base Uom')) return;
+            // if (this.isValid(this.selectedUOM, 'Uom')) return;
+            // if (this.isValid(this.conversion, 'Conversion')) return;
+            // if(this.base_min_amount < 1 && this.min_amount < 1){
+            //     this.alertValidationMessage('Amount');
+            //     return 1;
+            // }
+            // if (this.isLengthValid(this.selectedItemPriceList,'Price List')) return;
+
+
             let url = `/api/items`;
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('code',this.code);
+            formData.append('code',this.selectedCode);
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('uom_id', this.selectedUOM.id);
             formData.append('item_type_id',this.selectedItemType.id);
             formData.append('tag_id',this.selectedTag.id);
-            // formData.append('brand_id',this.selectedBrand.id);
             formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             formData.append('min_holding_uom_quantity',this.min_amount);
             formData.append('conversion',this.conversion);
@@ -822,22 +939,16 @@ export default {
             else{
                 formData.append('amount',this.limit_amount);
             }
-            // if(this.selectedBrand.length > 0){
-            //     this.selectedBrand.forEach((brand)=>{
-            //         formData.append('brand_id[]', brand.id);
-            //     });
-            // }
             formData.append('brand_suppliers',JSON.stringify(this.selectedItemPriceList));
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
-                // this.getItemList(this.currentPage);
-                // this.selectedBrands = [];
                 window.location.replace("/items");
             }
             else {
                 this.$notify({
-                    text: response.message,
-                    type: "error"
+                    title: `Error Message`,
+                    text: response.message.code,
+                    type: "warn"
                 });
             }
         },
@@ -846,28 +957,30 @@ export default {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        handleSupplier(){
+            this.isSupplier = false;
+            this.getSupplierList();
+        },
+        isLengthValid(selectedClass,selectedName){
+            if(selectedClass.length < 1){
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${selectedName}, please try again`,
+                    type: "warn"
+                });
+                return 1;
+            }
+        },
+        isValid(selectedClass,selectedName){
+            if(!selectedClass){
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${selectedName}, please try again`,
+                    type: "warn"
+                });
+                return 1;
+            }
+        },
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
@@ -878,6 +991,7 @@ export default {
     },
 
     watch: {
+        
     },
 
     async created() {
