@@ -38,10 +38,26 @@ class GetInventoryStockAction
             ->join('uoms as item_uom', 'items.uom_id', '=', 'item_uom.id')
             ->join('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
             ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-            ->join('uom_conversions', function ($join) {
-                $join->on('latest_prices.base_uom_id', '=', 'uom_conversions.base_unit_id')
-                    ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
-                    ->where('uom_conversions.is_active', 1);
+            // ->join('uom_conversions', function ($join) {
+            //     $join->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
+            //         ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
+            //         ->on('items.id','=','uom_conversions.item_id')
+            //         ->where('uom_conversions.is_active', 1);
+            // })
+            ->join(DB::raw('(
+                SELECT *
+                FROM uom_conversions
+                WHERE is_active = 1
+                AND id IN (
+                    SELECT MAX(id)
+                    FROM uom_conversions
+                    WHERE is_active = 1
+                    GROUP BY item_id
+                )
+            ) as uom_conversions'), function ($join) {
+                $join->on('items.id', '=', 'uom_conversions.item_id')
+                     ->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
+                     ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id');
             })
             ->select(
                 'items.name',
@@ -136,10 +152,25 @@ class GetInventoryStockAction
             ->join('uoms as item_uom', 'items.uom_id', '=', 'item_uom.id')
             ->join('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
             ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-            ->join('uom_conversions', function ($join) {
-                $join->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
-                    ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
-                    ->where('uom_conversions.is_active', 1);
+            // ->join('uom_conversions', function ($join) {
+            //     $join->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
+            //         ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
+            //         ->where('uom_conversions.is_active', 1);
+            // })
+            ->join(DB::raw('(
+                SELECT *
+                FROM uom_conversions
+                WHERE is_active = 1
+                AND id IN (
+                    SELECT MAX(id)
+                    FROM uom_conversions
+                    WHERE is_active = 1
+                    GROUP BY item_id
+                )
+            ) as uom_conversions'), function ($join) {
+                $join->on('items.id', '=', 'uom_conversions.item_id')
+                     ->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
+                     ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id');
             })
             ->select(
                 'items.name',
