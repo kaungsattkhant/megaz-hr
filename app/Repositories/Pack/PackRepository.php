@@ -49,7 +49,8 @@ class PackRepository implements PackRepositoryInterface
             $menuId = $data['menu_id'];
             $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
                 ->whereHas('menuStep', function ($q) use ($menuId) {
-                    $q->where('menu_id', $menuId);
+                    $q->where('menu_id', $menuId)
+                    ->where('type','ready_to_sale');
                 })
                 ->select('items.uom_id', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
                 ->groupBy('item_id')
