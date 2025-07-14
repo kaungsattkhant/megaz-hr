@@ -162,7 +162,7 @@ class ItemRepository implements ItemRepositoryInterface
                     //end
                     if ($bs['uom_id'] == $data['base_uom_id'] && $bs['uom_id'] != $data['uom_id']) {
                         $bs['type'] = 'base_uom';
-                        $bs['price'] = $bs['uom_price'];
+                        $bs['price'] = $data['conversion'] * $bs['uom_price'];
                     } elseif ($bs['uom_id'] == $data['uom_id'] && $bs['uom_id'] != $data['base_uom_id']) {
                         $bs['type'] = 'uom';
                         $bs['price'] = $data['conversion'] * $bs['uom_price'];
@@ -180,8 +180,10 @@ class ItemRepository implements ItemRepositoryInterface
                         $isItemPriceChange = true;
                     }
                     //end
-                    // dd('Uom change' , $isUomChange ,'Base Change',$isBaseUomChange,'Conversion change',$isConversionChange,'Item Price Change',$itemPriceChange);
-                    if (!isset($data['id']) || $isUomChange || $isBaseUomChange || $isConversionChange || $isItemPriceChange) {
+                    // if(!isset($bs['id'])){
+                    //     dd('Uom change' , $isUomChange ,'Base Change',$isBaseUomChange,'Conversion change',$isConversionChange,'Item Price Change',$isItemPriceChange);
+                    // }
+                    if (!isset($bs['id']) || $isUomChange || $isBaseUomChange || $isConversionChange || $isItemPriceChange) {
                         $createdItemPrice = ItemPrice::create([
                             'supplier_item_id' => $supplierItem->id,
                             'uom_id' => $bs['uom_id'],

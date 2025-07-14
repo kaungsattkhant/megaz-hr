@@ -74,7 +74,7 @@ class SupplierRepository implements SupplierInterface
                 ['id' => $data['id']],
                 $data
             );
-            //remove supplier item at supplier
+            //remove supplier item at 
             // $decodedSupplierItems = json_decode($request->supplier_items);
 
             // if (json_last_error() !== JSON_ERROR_NONE) {
