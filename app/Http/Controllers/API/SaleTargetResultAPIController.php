@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use Carbon\Carbon;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\SaleTargetMenu;
 use App\Models\TargetPosition;
@@ -43,7 +44,8 @@ class SaleTargetResultAPIController extends Controller
             ->selectRaw('SUM(target_position_results.amount ) as total_result_amount,SUM(head_counts.total_head_count) as total_result_count')
             ->first();
 
-        if (in_array(UserData()->department_id, [5, 7, 8])) {
+            $depts = Department::whereIn('name', ['Catering', 'Bar', 'Procurement'])->pluck('id')->toArray();
+            if (in_array(UserData()->department_id, $depts)) {
             $targetMenus = SaleTargetMenu::whereYear('month', $year)
                 ->whereMonth('month', $month)
                 ->with([
