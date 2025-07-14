@@ -879,10 +879,10 @@
                     </li>
                     @endif
                     <li>
-                        <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
+                        <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
                             data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
                             aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-sack-dollar  pr-3"></i>
+                            <i class="fal fa-sack-dollar"></i>
                             CRM
                         </button>
                         <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>

@@ -277,9 +277,9 @@
                                     @click="editPriceUomBtnClicked(price,priceIndex)">
                                     <i class="fal fa-pen"></i>
                                 </button>
-                                <button @click="removePrice(priceIndex)">
+                                <!-- <button @click="removePrice(priceIndex)">
                                     <i class="fas fa-times  pr-3"></i>
-                                </button>
+                                </button> -->
                             </td>
                         </tr>
                         <tr class=" !text-center" v-if="selectedItemPriceList.length < 1">
