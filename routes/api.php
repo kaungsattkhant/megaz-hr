@@ -618,36 +618,8 @@ Route::post('/menu/{id}/is_feature', [MenuAPIController::class, 'featureToggleMe
 Route::get('/menu_report', [MenuAPIController::class, 'menuReport']);
 Route::get('/menu_costing', [MenuAPIController::class, 'costingMenu']);
 
-//moved to pos.php
 
-// Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
-// Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
-// Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvoiceDetail']);
-// Route::get('/table/{id}', [EntityAPIController::class, 'tableWithInvoiceDetail']);
-// Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
-
-// Route::post('/entities/start', [InvoiceAPIController::class, 'startEntity']);
-// Route::post('/entities/orders', [OrderAPIController::class, 'addOrder']);
-// Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMoreSessions']);
-// Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
-// Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
-// Route::post('/room_done', [InvoiceAPIController::class, 'doneRoom']);
-// Route::post('/entities/confirm', [InvoiceAPIController::class, 'roomConfirm']);
-// Route::get('/order_items', [OrderAPIController::class, 'getOrderItemList']);
-// Route::get('/order_items/{invoiceId}/invoice', [OrderAPIController::class, 'getOrderItemByInvoice']);
-// Route::get('/pos_order_items', [OrderAPIController::class, 'getOrderItemForPOS']);
-// Route::post('/pos_order_items/{order_item_id}/status', [OrderAPIController::class, 'orderItemAreaConfirm']);
-// Route::post('/pos_orders/check_foc_supervision', [OrderAPIController::class, 'checkFocSupervision']);
-
-// Route::controller(InvoiceAPIController::class)->group(function () {
-//     Route::post('entities/add_service', 'addService');
-//     Route::post('entities/end_service', 'endService');
-// });
-// Route::get('/pos/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
-
-//end moved api
-
-// Route::group(['prefix' => 'management'], function () {});
+// Route::group(['prefix' => 'management'], function () {});    
 Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus', [MenuAPIController::class, 'menuByMenuCategory']);
