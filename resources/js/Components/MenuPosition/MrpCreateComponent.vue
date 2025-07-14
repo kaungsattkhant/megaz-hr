@@ -1120,6 +1120,9 @@ export default {
             this.orderTime = null;
             this.expectedQuantity = null;
             this.is_disable_custom = false;
+            this.expireDate = null;
+            this.selectedDepartment = null;
+            this.selectedRole = null;
         },
         addLevelBtnClicked() {
             if (!this.menuLevel.level) {
