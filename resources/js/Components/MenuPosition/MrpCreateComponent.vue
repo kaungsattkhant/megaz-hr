@@ -1093,7 +1093,7 @@ export default {
                 this.amount = null;
                 // this.selectedDepartment = null;
                 // this.selectedRole = null;
-                this.expireDate = null;
+                // this.expireDate = null;
                 this.is_disable_custom = true;
                 this.itemUoms = [];
                 this.itemList = [];
