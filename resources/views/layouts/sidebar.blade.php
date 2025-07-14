@@ -879,10 +879,10 @@
                     </li>
                     @endif
                     <li>
-                        <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
+                        <button class="flex items-center my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
                             data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
                             aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-sack-dollar"></i>
+                            <i class="fal fa-sack-dollar w-6 text-left"></i>
                             CRM
                         </button>
                         <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
@@ -1226,7 +1226,7 @@
                     @endif
                     <li>
                         <a href="/JD" class="flex items-center @yield('JD') sidebar-gap-x">
-                            <i class="fal fa-creative-commons-nd"></i>
+                            <i class="fal fa-layer-group"></i>
                             <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
                             JD
                         </a>
