@@ -197,7 +197,7 @@
                 </div>
             </div> -->
 
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -269,7 +269,7 @@
                         </div>
                     </tbody>
                 </table>
-            </div>
+            </div> -->
 
             <!-- supplier phone list -->
             <div class="contents">
@@ -760,7 +760,7 @@ export default {
                 });
             });
 
-            formData.append("supplier_items", JSON.stringify(itemBrandList));
+            // formData.append("supplier_items", JSON.stringify(itemBrandList));
             formData.append("supplier_phones", JSON.stringify(this.phoneNumberList));
             if(this.bankAccountList.length > 0){
                 formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));
