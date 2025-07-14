@@ -649,6 +649,7 @@ export default {
         },
         addCategoryModalClicked(){
             this.categoryName = null;
+            this.categoryCode = null;
         },
         btnClickedCreateCategory(){
             if(!this.categoryName){
