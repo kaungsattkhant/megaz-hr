@@ -397,7 +397,7 @@ export default {
             paySession: null,
             freeSession: null,
             sessionPrice: null,
-            selectedRoom:null,
+            selectedRoom: [],
 
             name: null,
             price: null,
