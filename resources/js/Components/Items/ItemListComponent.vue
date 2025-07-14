@@ -46,11 +46,15 @@
                         data-te-toggle="modal" data-te-target="#import_modal">
                         Excel Import
                     </button> -->
-                    <button type="button" v-if="feature.includes('item.create')"
+                    <!-- <button type="button" v-if="feature.includes('item.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
                         data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                         Add New
-                    </button>
+                    </button> -->
+                    <a href="/items/create"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
                 </div>
             </div>
         </div>
@@ -88,6 +92,11 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.category.name }}
+                                    </td>
+                                    <td>
+                                        <a :href="'/items/' + item.id + '/edit'">
+                                            <i class="far fa-pen cursor-pointer mr-3"></i>
+                                        </a>
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"

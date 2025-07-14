@@ -146,7 +146,7 @@
             <div class="col-span-12"></div>
 
             
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -226,7 +226,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </div> -->
 
             <!-- supplier phone list -->
             <div class="contents">
@@ -835,10 +835,10 @@ export default {
             //     this.alertValidationMessage(`supplier Bank Account`);
             //     return 1;
             // }
-            if(this.selectedItemList.length < 1 ){
-                this.alertValidationMessage(`supplier selling items`);
-                return 1;
-            }
+            // if(this.selectedItemList.length < 1 ){
+            //     this.alertValidationMessage(`supplier selling items`);
+            //     return 1;
+            // }
             if(!this.maxCredit){
                 this.alertValidationMessage(`supplier credit limit`);
                 return 1;
@@ -891,7 +891,7 @@ export default {
                     brand_id:item.brand_id
                 })
             });
-            formData.append("supplier_items", JSON.stringify(this.selectedItemList));
+            // formData.append("supplier_items", JSON.stringify(this.selectedItemList));
             formData.append("supplier_phones", JSON.stringify(this.phoneNumberList));
             if(this.bankAccountList.length > 0){
                 formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));

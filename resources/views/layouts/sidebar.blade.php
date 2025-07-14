@@ -879,10 +879,10 @@
                     </li>
                     @endif
                     <li>
-                        <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
+                        <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button" data-te-collapse-init
                             data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
                             aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-sack-dollar  pr-3"></i>
+                            <i class="fal fa-sack-dollar"></i>
                             CRM
                         </button>
                         <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
@@ -1224,6 +1224,27 @@
                         </a>
                     </li>
                     @endif
+                    <li>
+                        <a href="/JD" class="flex items-center @yield('JD') sidebar-gap-x">
+                            <i class="fal fa-creative-commons-nd"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            JD
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/JS" class="flex items-center @yield('JS') sidebar-gap-x">
+                            <i class="fal fa-briefcase"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            JS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/SOP" class="flex items-center @yield('SOP') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            SOP
+                        </a>
+                    </li>
 
                 </ul>
 

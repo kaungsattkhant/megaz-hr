@@ -1,11 +1,14 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Item Suppliers
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container"></div>
+        <div class="card-shadow">
+            <div>
+                <p class="page-title mb-4">
+                    Item Suppliers
+                </p>
+            </div>
+            <!-- <div class="btn-container"></div> -->
+        </div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class="table-container">

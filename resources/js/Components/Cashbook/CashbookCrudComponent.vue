@@ -1,24 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            CashBook
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate">
-                <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate">
-
-                <button class="add-btn " @click="searchBtnClicked">Search</button>
-                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class="page-title">
+                    CashBook
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate">
+                    <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate">
 
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button class="add-btn " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

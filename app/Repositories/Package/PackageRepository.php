@@ -18,7 +18,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
-        $roomId=isset($request->room_id) ? $request->room_id  :null;
+        $roomId = isset($request->room_id) ? $request->room_id : null;
         // $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
         //     ->orderBy('created_at', 'desc')
         //     ->when($request->has('search'), function ($q) use ($request) {
@@ -37,7 +37,7 @@ class PackageRepository implements PackageRepositoryInterface
         //         }
         //     ])
         //     ->paginate(config('common.list_count'));
-        $sellingAreaId= isset($request->selling_area_id) ? $request->selling_area_id : null;
+        $sellingAreaId = isset($request->selling_area_id) ? $request->selling_area_id : null;
         $packageQuery = Package::with([
             'menuPackages.menu' => function ($query) use ($sellingAreaId) {
                 $query->leftJoinSub(
@@ -76,12 +76,12 @@ class PackageRepository implements PackageRepositoryInterface
                     ->where('to_date', '>=', $validateDate);
             }
         ])
-        ->when($roomId,function($q)use($roomId){
-            $q->whereHas('rooms',function($roomQuery)use($roomId){
-                $roomQuery->where('id',$roomId);
-            });
-        })
-        ->where('from_date', '<=', $validateDate)
+            ->when($roomId, function ($q) use ($roomId) {
+                $q->whereHas('rooms', function ($roomQuery) use ($roomId) {
+                    $roomQuery->where('id', $roomId);
+                });
+            })
+            ->where('from_date', '<=', $validateDate)
             ->where('to_date', '>=', $validateDate)
             ->orderBy('created_at', 'desc')
             ->when($request->has('search'), function ($q) use ($request) {
@@ -119,27 +119,29 @@ class PackageRepository implements PackageRepositoryInterface
             // if ($isValid) {
             //     ResponseMessage('Package dates overlap with existing packages for the specified rooms.', 422);
             // }
-            if(isset($data['type']) && $data['type'] === "event" && empty($data['event_date'])) {
+            if (isset($data['type']) && $data['type'] === "event" && empty($data['event_date'])) {
                 ResponseMessage('Event date is required for event type packages', 422);
             }
             $imageData = $data['image'];
             $extension = $imageData->getClientOriginalExtension();
             $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-            if (isset($data['rooms']) && is_array($data['rooms'])) {
+            if (($data['type'] == 'ktv' && !isset($data['rooms'])) || (isset($data['rooms']) && is_array($data['rooms']) && empty($data['rooms']))) {
+                ResponseMessage('Room is required', 419);
+            }
+
+            if (isset($data['rooms']) && is_array($data['rooms']) && $data['type'] == 'ktv') {
                 $maxSessionPrice = Entity::where('entity_type', 'room')->whereIn('id', $data['rooms'])->max('price_per_hour');
                 if ($maxSessionPrice < 0) {
                     ResponseMessage('Room price is invalid', 419);
                 }
-            } else {
-                ResponseMessage('Room Ids must be array format', 422);
             }
             $data['image_path'] = $imageData->storeAs('images/package_images', $hashedName, 'public');
             $data['image_url'] = Storage::url($data['image_path']);
 
-            $data['session'] = $data['type']=='ktv' ? $data['pay_session'] + $data['free_session'] : 0;
+            $data['session'] = $data['type'] == 'ktv' ? $data['pay_session'] + $data['free_session'] : 0;
             $data['package_discount'] = 0;
             $data['session_price'] = 10000;
-            $sessionPrice =  $data['type']=='ktv' ? $data['pay_session'] * $maxSessionPrice : 0;
+            $sessionPrice = $data['type'] == 'ktv' ? $data['pay_session'] * $maxSessionPrice : 0;
             $package = Package::create($data);
             $menuPrice = 0;
             $accessoryPrice = 0;
@@ -160,17 +162,18 @@ class PackageRepository implements PackageRepositoryInterface
 
                 if (empty($accessories)) {
                     // Accessories are empty or null
-                    return response()->json(['message' => 'No accessories provided'], 400);
+                    // return response()->json(['message' => 'No accessories provided'], 400);
+                    foreach ($accessories as $accessory_array) {
+                        $accessory = Accessory::find($accessory_array['accessory_id']);
+                        $accessoryPrice += $accessory->accessory_price->price * $accessory_array['quantity'];
+                        AccessoryPackage::create([
+                            'accessory_id' => $accessory->id,
+                            'quantity' => $accessory_array['quantity'],
+                            'package_id' => $package->id
+                        ]);
+                    }
                 }
-                foreach ($accessories as $accessory_array) {
-                    $accessory = Accessory::find($accessory_array['accessory_id']);
-                    $accessoryPrice += $accessory->accessory_price->price * $accessory_array['quantity'];
-                    AccessoryPackage::create([
-                        'accessory_id' => $accessory->id,
-                        'quantity' => $accessory_array['quantity'],
-                        'package_id' => $package->id
-                    ]);
-                }
+
             }
             $package_original_price = $menuPrice + $sessionPrice + $accessoryPrice;
             if ($package_original_price > $data['price']) {
@@ -183,8 +186,6 @@ class PackageRepository implements PackageRepositoryInterface
             if (isset($data['rooms']) && is_array($data['rooms'])) {
                 $roomIds = $data['rooms'];
                 $package->rooms()->sync($roomIds);
-            } else {
-                ResponseMessage('Room Ids must be array format', 422);
             }
             DB::commit();
             ResponseData($package);
@@ -221,7 +222,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if(isset($data['type']) && $data['type'] === "event" && empty($data['event_date'])) {
+            if (isset($data['type']) && $data['type'] === "event" && empty($data['event_date'])) {
                 ResponseMessage('Event date is required for event type packages', 422);
             }
             if (isset($data['image'])) {

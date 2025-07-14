@@ -1,47 +1,50 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Financial Transaction
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container mb-2">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Financial Transaction
+                </p>
+            </div>
+            <div class="btn-container mb-2">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <input type="date" class="input-ui  mr-2 h-8" v-model="fromDate">
-                <input type="date" class="input-ui  mr-2 h-8" v-model="toDate">
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <input type="date" class="input-ui  mr-2 h-8" v-model="fromDate">
+                    <input type="date" class="input-ui  mr-2 h-8" v-model="toDate">
 
-                <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter" data-te-select-filter="true"
-                        v-model="searchCategory">
-                        <option value="-1"> Show all </option>
-                        <option value="0"> Show unconfirmed </option>
-                        <option value="1"> Show confirmed </option>
-                    </select>
+                    <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter" data-te-select-filter="true"
+                            v-model="searchCategory">
+                            <option value="-1"> Show all </option>
+                            <option value="0"> Show unconfirmed </option>
+                            <option value="1"> Show confirmed </option>
+                        </select>
+                    </div>
+
+                    <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
                 </div>
+                <div class="flex justify-end flex-col">
 
-                <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
-            <div class="flex justify-end flex-col">
-
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
-            </div>
+            
         </div>
-        <div class="block mx-4 mt-4 pb-4">
+        <div class="box-container-table">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
                 <button type="button" v-show="feature.includes('financial-transaction.confirm_selected')"
-                    class="mt-4 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 mb-2"
+                    class="mt-4 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 mb-2 mx-4"
                     :disabled="toBeConfirmTransactionList.length < 1" data-te-toggle="modal"
                     data-te-target="#confirm_modal">
                     Confirm Selected

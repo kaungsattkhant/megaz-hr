@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Event
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-    
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Event
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-    
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " v-show="feature.includes('event.create')"
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <notifications position="top center" />
+        
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+        
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " v-show="feature.includes('event.create')"
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

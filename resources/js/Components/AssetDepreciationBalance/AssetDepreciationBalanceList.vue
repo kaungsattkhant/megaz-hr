@@ -1,32 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Asset Depreciation Balance List
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Asset Depreciation Balance List
+                </p>
+            </div>
+            <div class="btn-container">
+                <div class=" flex gap-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                    <i class="fal fa-search"></i>
-                </label>
+                        <i class="fal fa-search"></i>
+                    </label>
 
-                <div>
-                    <input type="date" @change="filterDateAsset(filterDate)"  v-model="filterDate" class="input h-8 border border-slate-300 rounded-md">
+                    <div>
+                        <input type="date" @change="filterDateAsset(filterDate)"  v-model="filterDate" class="input h-8 border border-slate-300 rounded-md">
+                    </div>
+
                 </div>
 
-            </div>
 
+                <div class="flex justify-end flex-col">
 
-            <div class="flex justify-end flex-col">
-
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

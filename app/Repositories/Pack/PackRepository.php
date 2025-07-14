@@ -49,7 +49,8 @@ class PackRepository implements PackRepositoryInterface
             $menuId = $data['menu_id'];
             $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
                 ->whereHas('menuStep', function ($q) use ($menuId) {
-                    $q->where('menu_id', $menuId);
+                    $q->where('menu_id', $menuId)
+                    ->where('type','ready_to_sale');
                 })
                 ->select('items.uom_id', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
                 ->groupBy('item_id')
@@ -63,8 +64,6 @@ class PackRepository implements PackRepositoryInterface
                     'created_by' => $data['created_by'],
                     'status' => 'ready',
                 ]);
-                //curent is here
-                // dd(UserData()->department->inventory->inventory_id);
                 $inventoryId = UserData()->department->inventory->inventory_id;
                 $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
                 foreach ($menuStepItemByMenu as $item) {

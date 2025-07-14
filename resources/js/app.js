@@ -57,7 +57,9 @@ import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/Conf
 import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/PurchaseOrderWithLeftItemsComponent.vue';
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
 import BrandCrudComponent from './Components/Brands/BrandCrudComponent.vue';
-import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
+import ItemListComponent from './Components/Items/ItemListComponent.vue';
+import ItemCreateComponent from './Components/Items/ItemCreateComponent.vue';
+import ItemEditComponent from './Components/Items/ItemEditComponent.vue';
 import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
 import SupplierBrandsComponent from './Components/Items/SupplierBrandsComponent.vue';
 import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
@@ -235,6 +237,11 @@ import InterviewCreateComponent from './Components/Interviews/InterviewCreateCom
 import InterviewResultComponent from './Components/Interviews/InterviewResultComponent.vue';
 import LocationListComponent from './Components/Locations/LocationListComponent.vue';
 import LocationDetailComponent from './Components/Locations/LocationDetailComponent.vue';
+import JdCrudComponent from './Components/JobDescription/JdCrudComponent.vue';
+import JsListComponent from './Components/JobSpecification/JsListComponent.vue';
+import JsCreateComponent from './Components/JobSpecification/JsCreateComponent.vue';
+import SopListComponent from './Components/SOP/SopListComponent.vue';
+import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -320,7 +327,9 @@ app.component('ConfirmPurchaseOrderItemsComponent', ConfirmPurchaseOrderItemsCom
 app.component('PurchaseOrderWithLeftItemsComponent', PurchaseOrderWithLeftItemsComponent);
 app.component('LeftItemListComponent', LeftItemListComponent);
 app.component('BrandCrudComponent', BrandCrudComponent);
-app.component('ItemCrudComponent', ItemCrudComponent);
+app.component('ItemListComponent', ItemListComponent);
+app.component('ItemCreateComponent', ItemCreateComponent);
+app.component('ItemEditComponent', ItemEditComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
 app.component('ItemSuppliersComponent', ItemSuppliersComponent);
 app.component('SupplierBrandsComponent', SupplierBrandsComponent);
@@ -450,6 +459,11 @@ app.component('InterviewCreateComponent',InterviewCreateComponent);
 app.component('InterviewResultComponent',InterviewResultComponent);
 app.component('LocationListComponent',LocationListComponent);
 app.component('LocationDetailComponent',LocationDetailComponent);
+app.component('JdCrudComponent',JdCrudComponent);
+app.component('JsListComponent',JsListComponent);
+app.component('JsCreateComponent',JsCreateComponent);
+app.component('SopListComponent',SopListComponent);
+app.component('SopCreateComponent',SopCreateComponent);
 
 
 app.use(store);

@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <supplier-create-component/>
+    <supplier-create-component />
 </div>
 
 @endsection

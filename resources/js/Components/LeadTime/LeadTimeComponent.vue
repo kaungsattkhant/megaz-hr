@@ -1,31 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Lead Time
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container !border-0 !mb-1">
-            <notifications position="top center" />
-            <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Supplier" @change="getLeadTimeList"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSupplier" class="input-ui">
-                        <option :value="supplier" v-for="(supplier, supplierIndex) in supplierList"
-                            :key="supplierIndex"> {{ supplier.name }} </option>
-                    </select>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Lead Time
+                </p>
+            </div>
+            <div class="btn-container !border-0 !mb-1">
+                <notifications position="top center" />
+                <div class="flex pr-0 gap-x-4">
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Supplier" @change="getLeadTimeList"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSupplier" class="input-ui">
+                            <option :value="supplier" v-for="(supplier, supplierIndex) in supplierList"
+                                :key="supplierIndex"> {{ supplier.name }} </option>
+                        </select>
+                    </div>
+                    <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Item"
+                            data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui">
+                            <option :value="item.value" v-for="(item, itemIndex) in itemList"
+                                :key="itemIndex"> {{ item.name }} </option>
+                        </select>
+                    </div> -->
+                    
                 </div>
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Item"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui">
-                        <option :value="item.value" v-for="(item, itemIndex) in itemList"
-                            :key="itemIndex"> {{ item.name }} </option>
-                    </select>
-                </div> -->
-                
             </div>
         </div>
-        <div class="flex justify-between mb-4 px-6 font-semibold">
+        <div class="flex justify-between mb-4 px-3 pt-3 font-semibold">
             <p v-if="selectedSupplier">
                 Supplier : {{ selectedSupplier.name }}
             </p>

@@ -287,8 +287,8 @@ class MenuRepository implements MenuRepositoryInterface
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('MONTH(order_items.created_at) as month'),
                 DB::raw('YEAR(order_items.created_at) as year')
-            )
-            ->where('order_items.status', 'done');
+            );
+            // ->where('order_items.status', 'done');
 
         // Apply filters
         if (!empty($searchTerm)) {
@@ -379,8 +379,8 @@ class MenuRepository implements MenuRepositoryInterface
             ->join('menus', 'order_items.menu_id', '=', 'menus.id')
             ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id')
             ->join('menu_prices', 'menus.id', '=', 'menu_prices.menu_id')
-            ->join('item_menu', 'menus.id', '=', 'item_menu.menu_id')
-            ->join('items', 'item_menu.item_id', '=', 'items.id')
+            // ->join('item_menu', 'menus.id', '=', 'item_menu.menu_id')
+            // ->join('items', 'item_menu.item_id', '=', 'items.id')
             ->select(
                 'order_items.menu_id',
                 'menus.code as menu_code',
@@ -388,7 +388,7 @@ class MenuRepository implements MenuRepositoryInterface
                 'menu_categories.name as menu_category',
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('SUM(order_items.quantity * menu_prices.price) as total_price'),
-                DB::raw('SUM(item_menu.price * order_items.quantity) as items_total_price')
+                DB::raw('SUM(order_items.sub_total_price) as items_total_price')
             );
 
         // Apply filters

@@ -90,7 +90,19 @@
                     <input type="number" class="input-ui" v-model="freeSession"
                         placeholder="Free Sessions">
                 </div>
-                <div class="col-span-6"></div>
+                <div class="mb-0 col-span-3 rounded-md">
+                    <label class="label-form mb-3"> Room </label>
+                    <multiselect v-model="selectedRoom" :options="roomList" :close-on-select="false"
+                        :multiple="true"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Room" label="name"
+                        track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                            Room selected</span>
+                        </template>
+                    </multiselect>
+                </div>
+                <div class="col-span-3"></div>
             </div>
             
             <!-- <div class="mb-3 col-span-3 rounded-md">
@@ -101,18 +113,7 @@
                     placeholder="Session Price">
             </div> -->
             
-            <div class="mb-0 col-span-3 rounded-md">
-                <label class="label-form mb-3"> Room </label>
-                <multiselect v-model="selectedRoom" :options="roomList" :close-on-select="false"
-                    :multiple="true"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select Room" label="name"
-                    track-by="id" :preselect-first="true">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
-                        Room selected</span>
-                    </template>
-                </multiselect>
-            </div>
+            
             <div class="mb-3 col-span-3 rounded-md">
                 <label class="label-form mb-3"> Type </label>
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
@@ -147,7 +148,7 @@
                         Can changeable?
                     </label>
                 </div>
-            </div><div class="col-span-3"></div>
+            </div><div class="col-span-6"></div>
             <div v-show="selectedType == 'menu'" class="contents">
                 <div class="mb-0 col-span-3 rounded-md" v-show="selectedType == 'menu'">
                     <div>
@@ -396,7 +397,7 @@ export default {
             paySession: null,
             freeSession: null,
             sessionPrice: null,
-            selectedRoom:null,
+            selectedRoom: [],
 
             name: null,
             price: null,
@@ -549,10 +550,14 @@ export default {
                 this.alertValiationMessage(`package price`);
                 return 1;
             }
-            if (this.selectedMenus.length < 1 && this.selectedAccessoryList.length < 1) {
+            if (this.selectedMenus.length < 1) {
                 this.alertValiationMessage(`package menus`);
                 return 1;
             }
+            // if (this.selectedAccessoryList.length < 1) {
+            //     this.alertValiationMessage(`Package Accessory`);
+            //     return 1;
+            // }
             if (!this.selectedImage) {
                 this.alertValiationMessage(`package image`);
                 return 1;
@@ -578,8 +583,17 @@ export default {
                     this.alertValiationMessage(`free sessions`);
                     return 1;
                 }
+                if (this.selectedRoom.length < 1) {
+                    this.alertValiationMessage(`Room`);
+                    return 1;
+                }
                 formData.append('pay_session', this.paySession);
                 formData.append('free_session', this.freeSession);
+                let room_ids = [];
+                this.selectedRoom.forEach((room) => {
+                    room_ids.push(room.id)
+                    formData.append('rooms[]', room.id);
+                });
             }
 
             let menuIds = [];
@@ -587,17 +601,15 @@ export default {
                 menuIds.push({ menu_id: menu.id, quantity: menu.quantity });
             });
             formData.append('menuIds', JSON.stringify(menuIds));
-            let accessoryIds = [];
-            this.selectedAccessoryList.forEach((accessory) => {
-                accessoryIds.push({ accessory_id: accessory.id, quantity: accessory.quantity });
-            });
+            if(this.selectedAccessoryList.length > 0){
+                let accessoryIds = [];
+                this.selectedAccessoryList.forEach((accessory) => {
+                    accessoryIds.push({ accessory_id: accessory.id, quantity: accessory.quantity });
+                });
 
-            formData.append('accessories', JSON.stringify(accessoryIds));
-            let room_ids = [];
-            this.selectedRoom.forEach((room) => {
-                room_ids.push(room.id)
-                formData.append('rooms[]', room.id);
-            });
+                formData.append('accessories', JSON.stringify(accessoryIds));
+            }
+            
             // formData.append('rooms', room_ids);
 
             let url = `/api/packages`;
