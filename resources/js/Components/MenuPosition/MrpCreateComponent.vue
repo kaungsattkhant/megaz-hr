@@ -1091,8 +1091,8 @@ export default {
                 this.selectedItem = null;
                 this.selectedUom = null;
                 this.amount = null;
-                this.selectedDepartment = null;
-                this.selectedRole = null;
+                // this.selectedDepartment = null;
+                // this.selectedRole = null;
                 this.expireDate = null;
                 this.is_disable_custom = true;
                 this.itemUoms = [];
