@@ -20,13 +20,13 @@
                 <input type="text" v-model="shopName"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Limit
                 </label>
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
+            </div> -->
             <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Lead Time
@@ -34,31 +34,31 @@
                 <input type="text" v-model="lead_time"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div> -->
-            <div class="mb-4 col-span-3 pb-6 relative">
-                <label for="" class="block text-sm text-black mb-3 absolute -top-6 text-center w-full">
-                    (Lead Time)
+            <div class="mb-4 col-span-6 pb-6 relative">
+                <label for="" class="block text-sm text-black mb-3  text-center w-full">
+                    Lead Time
                 </label>
-                <div class="grid grid-cols-3 gap-x-4">
-                    <div>
+                <div class="grid grid-cols-6 gap-x-8">
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_day"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Day
                         </label>
-                        <input type="number" v-model="lead_time_day"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div>
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_hour"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Hour
                         </label>
-                        <input type="number" v-model="lead_time_hour"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div>
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_min"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Min 
                         </label>
-                        <input type="number" v-model="lead_time_min"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                 </div>
                 
@@ -704,10 +704,10 @@ export default {
             //     this.alertValidationMessage(`supplier Bank Account`);
             //     return 1;
             // }
-            if(!this.maxCredit){
-                this.alertValidationMessage(`Supplier Credit Limit`);
-                return 1;
-            }
+            // if(!this.maxCredit){
+            //     this.alertValidationMessage(`Supplier Credit Limit`);
+            //     return 1;
+            // }
             if(!this.selectedAccount){
                 this.alertValidationMessage(`Supplier Account Payable`);
                 return 1;
@@ -729,7 +729,7 @@ export default {
             formData.append("name", this.name);
             formData.append("shop_name", this.shopName);
             // formData.append("phone_number", this.phoneNumber);
-            formData.append("credit_limit", this.maxCredit);
+            // formData.append("credit_limit", this.maxCredit);
             formData.append("lead_time_day", this.lead_time_day);
             formData.append("lead_time_hour", this.lead_time_hour);
             formData.append("lead_time_minutes", this.lead_time_min);

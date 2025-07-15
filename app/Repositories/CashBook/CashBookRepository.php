@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\DB;
 use stdClass;
 
 
-class CashBookRepository implements CashBookInterface  
-
+class CashBookRepository implements CashBookInterface
 {
     public function list($request)
     {
@@ -32,7 +31,7 @@ class CashBookRepository implements CashBookInterface
                 // dd($transaction->transactionable);
             }
             foreach ($transaction->ledgers as $ledger) {
-                if (in_array(config('common.pos_cash'), $cashAccountId) || in_array(config('common.pos_cash'), $cashAccountId)) {
+                if (in_array(config('common.pos_cash'), $cashAccountId) && in_array($ledger->account_id, $cashAccountId)) {
                     $ledger->action == 'debit' ? $current_debit_amount += $transaction->amount : $current_credit_amount += $transaction->amount;
                     $transaction->title = $transaction->transactionable_type == 'invoice' ? $ledger->account->name . '(' . $transaction->transactionable->invoice_id . ')' : $ledger->account->name;
                     $transaction->type = $ledger->account->name;
@@ -79,12 +78,13 @@ class CashBookRepository implements CashBookInterface
                     'opening_balance' => $openingBalance->opening_balance,
                     'closing_balance' => $closingBalance,
                     'cash_account_id' => $cashAccountId,
-                ]);
+                ]
+            );
 
             $latestTransaction = Transaction::
                 whereHas('ledgers', function ($query) use ($cashAccountId) {
-                $query->where('account_id', $cashAccountId); #transaction close depend on transaction
-            })
+                    $query->where('account_id', $cashAccountId); #transaction close depend on transaction
+                })
                 ->isConfirmed(1)
                 ->latest()
                 ->first();
@@ -107,5 +107,5 @@ class CashBookRepository implements CashBookInterface
         // ResponseMessage('Transaction closing is fail', 422);
     }
 
-    
+
 }
