@@ -27,13 +27,16 @@ class Item extends BaseModel
         'tag_id',
         'uom_id',
         'is_active',
-        'min_holding_base_uom_quantity',
+        'min_holding_quantity',
+        'min_uom_id',
         'min_holding_uom_quantity',
         'minimum_holding_amount',
         'limitation_type',
         'amount',
-        'max_limit_base_uom_quantity',
+        'max_limit_quantity',
+        'max_uom_id',
         'max_limit_uom_quantity',
+        'conversion'
     ];
 
 
