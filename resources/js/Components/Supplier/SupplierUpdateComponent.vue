@@ -649,10 +649,10 @@ export default {
                     this.term_day = this.supplier.day;
                 }
                 if(this.supplier.credit_term_type === 'exact_date'){
-                    this.term_day = this.supplier.exact_date;
+                    this.term_exact_date = this.supplier.exact_date;
                 }
                 if(this.supplier.credit_term_type === 'amount_limitation'){
-                    this.term_day = this.supplier.amount_limitation;
+                    this.term_limitation_amount = this.supplier.amount_limitation;
                 }
                 // this.credit_terms = this.supplier.credit_terms;
                 // this.existingItems = this.supplier.items;

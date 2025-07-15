@@ -147,6 +147,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
+                $supplierExist = SupplierItem::where('item_id', $item->item_id)
+                    ->where('is_active', 1)
+                    ->exists();
+                if (!$supplierExist) {
+                    return ResponseMessage('Supplier not found for this item', 422);
+                }
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
                 } else {

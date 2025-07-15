@@ -77,19 +77,18 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function createData(array $data)
     {
-        // dd($data);
         DB::beginTransaction();
         try {
+
             if (!isset($data['id'])) {
                 $data['id'] = null;
             }
             if (!isset($data['base_uom_id']) || !isset($data['uom_id'])) {
                 return ResponseMessage('Required UOM data is missing.', 400);
             }
-            if (!isset($data['min_holding_base_uom_quantity']) || !isset($data['min_holding_uom_quantity'])) {
-                return ResponseMessage('Required holding quantities are missing.', 400);
+            if (!isset($data['min_holding_quantity'])) {
+                return ResponseMessage('Required holding quantity is missing.', 400);
             }
-            // $this->checkUom($data);
             $isBaseUomChange = false;
             $isUomChange = false;
             $isConversionChange = false;
@@ -109,10 +108,15 @@ class ItemRepository implements ItemRepositoryInterface
             }
             $brand_suppliers = json_decode($data['brand_suppliers'], true);
 
+            if(isset($data['min_holding_quantity']) && isset($data['min_uom_id']) && $data['min_uom_id'] === $data['base_uom_id']){
+                $data['min_holding_uom_quantity'] = $data['min_holding_quantity'] * $data['conversion'];
+            }
+            else{
+                $data['min_holding_uom_quantity'] = $data['min_holding_quantity'];
+            }
             $conversionRate = $data['conversion'];
             $minimumHoldingAmount = $this->itemService->calculateMinimumHoldingAmount(
-                $data['min_holding_base_uom_quantity'],
-                $data['min_holding_uom_quantity'],
+                $data['min_holding_quantity'] ?? 0,
                 $conversionRate
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
@@ -122,11 +126,17 @@ class ItemRepository implements ItemRepositoryInterface
             }
 
             if ($data['limitation_type'] === "uom") {
-                if (!isset($data['max_limit_base_uom_quantity']) || !is_numeric($data['max_limit_base_uom_quantity']) || $data['max_limit_base_uom_quantity'] <= 0) {
-                    return ResponseMessage('For limitation_type "uom", max_limit_base_uom_quantity must be a positive number.', 422);
+                $hasBaseUom = isset($data['max_limit_quantity']);
+
+                if (!$hasBaseUom) {
+                    return ResponseMessage('For limitation_type "uom", provide max_limit_quantity.', 422);
                 }
-                if (!isset($data['max_limit_uom_quantity']) || !is_numeric($data['max_limit_uom_quantity']) || $data['max_limit_uom_quantity'] <= 0) {
-                    return ResponseMessage('For limitation_type "uom", max_limit_uom_quantity must be a positive number.', 422);
+
+                if($hasBaseUom && $data['max_uom_id'] === $data['base_uom_id']){
+                    $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0) *  $conversionRate;
+                }
+                else{
+                    $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0);
                 }
             }
 
@@ -135,8 +145,6 @@ class ItemRepository implements ItemRepositoryInterface
                     return ResponseMessage('For limitation_type "finance", amount must be a positive number.', 422);
                 }
             }
-
-            // dd($data);
             $item = Item::updateOrCreate(
                 ['items.id' => $data['id']],
                 $data

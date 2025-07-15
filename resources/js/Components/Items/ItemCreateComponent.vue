@@ -13,6 +13,13 @@
                 </label>
                 <input type="text" placeholder="Item Name" v-model="name" class="input-ui">
             </div>
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Item Code
+                </label>
+                <input type="text" placeholder="Code" v-model="selectedCode" class="input-ui">
+            </div>
+            <div class="col-span-6"></div>
             <div class="mb-6 relative col-span-3">
                 <label for="" class="label-form mb-3">
                     Category
@@ -61,12 +68,42 @@
                     <button  class="px-2 pt-2"  data-te-toggle="modal" data-te-target="#add_tag_modal" @click="addTagModalClicked"><i class="fal fa-plus"></i></button>
                 </div>
             </div>
+            <div class="col-span-3"></div>
+
             <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
-                    Item Code
+                    Base UOM (အကြီး)
                 </label>
-                <input type="text" placeholder="Code" v-model="selectedCode" class="input-ui">
+                <select name="" id="" v-model="selectedBaseUom" class="input-ui" @change="updateSelectedUoms"
+                    data-te-select-init data-te-select-placeholder="Select Base UOM" data-te-select-filter="true">
+                    <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                    </option>
+                </select>
             </div>
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Uom အသေး (Inventory သိမ်းဆည်း unit)
+                </label>
+                <div class="flex gap-x-2">
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select name="" id="" v-model="selectedUOM" class="input-ui" @change="updateSelectedUoms"
+                            data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                            </option>
+                            
+                        </select>
+                    </div>
+                    <button  class="px-2 pt-2"  data-te-toggle="modal" data-te-target="#add_uom_modal" @click="addUomModalClicked"><i class="fal fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Conversion
+                </label>
+                <input type="number" step="0.01" placeholder="Conversion" v-model="conversion" class="input-ui">
+            </div><div class="col-span-12"></div>
+
             <div class="mb-6 relative col-span-3">
                 <label for="" class="label-form mb-3">
                     PO Limit Type
@@ -81,7 +118,7 @@
                 </div>
             </div>
             <div v-show="selectedLimitType === 'uom'" class="contents">
-                <div class="mb-6 col-span-3">
+                <!-- <div class="mb-6 col-span-3">
                     <label for="" class="label-form mb-3">
                         Maximum Limit ( Base UOM - အကြီး )
                     </label>
@@ -92,7 +129,29 @@
                         Maximum Limit ( UOM - အသေး )
                     </label>
                     <input type="number" placeholder="Max Uom" min="0" v-model="maxUomLimit" class="input-ui">
+                </div> -->
+                <div class="mb-6 col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Maximum Limit
+                    </label>
+                    <input type="number" placeholder="Maximum Limit Amount" min="0" v-model="max_limit" class="input-ui">
                 </div>
+                <div class="mb-6 relative col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Maximum Limit UOM
+                    </label>
+                    <div class="flex gap-x-2">
+                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                            data-te-select-wrapper-ref>
+                            <select name="" id="" v-model="selectedMaxUom" class="input-ui"
+                                data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                                <option :value="uom" v-for="(uom, uomIndex) in selectedUomList"
+                                    :key="uomIndex"> {{ uom.uom_name }} </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="mb-6 col-span-3" v-show="selectedLimitType === 'finance'">
                 <label for="" class="label-form mb-3">
@@ -100,7 +159,7 @@
                 </label>
                 <input type="number" placeholder="Amount " min="0" v-model="limit_amount" class="input-ui">
             </div>
-            <div class="col-span-12"></div>
+            <div v-if="selectedLimitType" class="col-span-12"></div>
 
 
 
@@ -125,32 +184,7 @@
                     </template>
                 </multiselect>
             </div> -->
-            <div class="mb-6 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Base UOM (အကြီး)
-                </label>
-                <select name="" id="" v-model="selectedBaseUom" class="input-ui" @change="baseUomChange"
-                    data-te-select-init data-te-select-placeholder="Select Base UOM" data-te-select-filter="true">
-                    <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
-                    </option>
-                </select>
-            </div>
-            <div class="mb-6 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Uom အသေး (Inventory သိမ်းဆည်း unit)
-                </label>
-                <select name="" id="" v-model="selectedUOM" class="input-ui" @change="uomChange"
-                    data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
-                    <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
-                    </option>
-                </select>
-            </div>
-            <div class="mb-6 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Conversion
-                </label>
-                <input type="number" step="0.01" placeholder="Conversion" v-model="conversion" class="input-ui">
-            </div><div class="col-span-12"></div>
+            
             <!-- <div class="mb-4">
                 <label for="" class="label-form mb-3">
                     Lead Time
@@ -182,7 +216,7 @@
                     <i class="fal fa-plus"></i>
                 </button>
             </div> -->
-            <div class="mb-6 col-span-3">
+            <!-- <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
                     Minimum Holding Amount ( Base UOM - အကြီး )
                 </label>
@@ -193,7 +227,31 @@
                     Minimum Holding Amount ( UOM - အသေး )
                 </label>
                 <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
+            </div> -->
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Minimum Holding Amount 
+                </label>
+                <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
             </div>
+            <div class="mb-6 relative col-span-3">
+                <label for="" class="label-form mb-3">
+                    Minimum Holding UOM
+                </label>
+                <div class="flex gap-x-2">
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select name="" id="" v-model="selectedMinUom" class="input-ui"
+                            data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                            <option :value="uom" v-for="(uom, uomIndex) in selectedUomList"
+                                :key="uomIndex"> {{ uom.uom_name }} </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+
             <div class="col-span-12"></div>
             
             <div class="mb-6 relative col-span-3">
@@ -241,6 +299,7 @@
                                 :key="uomIndex"> {{ uom.uom_name }} </option>
                         </select>
                     </div>
+                    
                 </div>
             </div>
             <div class="mb-6 col-span-2">
@@ -528,7 +587,57 @@
                 </div>
             </div>
         </div>
+            <!-- uom modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="add_uom_modal"
+            tabindex="-1" aria-labelledby="uomLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create UOM
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_uom"
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Uom Name
+                            </label>
+                            <input type="text" placeholder="Uom" v-model="create_uom_name" class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Uom Code
+                            </label>
+                            <input type="text" placeholder="eg.uom-11" pattern="^uom-\d+$" required v-model="create_uom_code" class="input-ui">
+                        </div>
+
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createUomBtnClicked">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
     </div>
@@ -569,15 +678,20 @@ export default {
             selectedTag: null,
             selectedCode: null,
             selectedLimitType: null,
-            maxBaseUomLimit: null,
-            maxUomLimit: null,
+
+            // maxBaseUomLimit: null,
+            // maxUomLimit: null,
+            max_limit: null,
+            selectedMaxUom: null,
+
             limit_amount: null,
             selectedBaseUom: null,
             selectedUOM: null,
             conversion: null,
 
-            base_min_amount: null,
+            // base_min_amount: null,
             min_amount: null,
+            selectedMinUom: null,
 
             tagName: null,
             categoryName: null,
@@ -766,6 +880,54 @@ export default {
                 });
             }
         },
+        addUomModalClicked(){
+            this.create_uom_name = null;
+            this.create_uom_code = null;
+        },
+        createUomBtnClicked(){
+            const pattern = /^uom-\d*$/;
+            if(!this.create_uom_name){
+                this.alertValidationMessage(`UOM Name`);
+                return 1;
+            }
+            else if(!this.create_uom_code){
+                this.alertValidationMessage(`UOM Code`);
+                return 1;
+            }
+            else if (!pattern.test(this.create_uom_code)) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `Format must be like uom-11`,
+                    type: "warn"
+                });
+                return 1;
+            }
+            else{
+                this.createUom();
+            }
+        },
+        async createUom(){
+            let url = `/api/uoms`
+            let formData = new FormData();
+            formData.append('name', this.create_uom_name);
+            formData.append('uom_code', this.create_uom_code);
+
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success == true) {
+                document.getElementById('close_create_uom').click();
+                this.getUomList();
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+
+                return 1;
+            }
+        },
+        
         addSupplierClicked(){
             this.isSupplier = true;
         },
@@ -781,6 +943,17 @@ export default {
                 return 1;
             }if(!this.price){
                 this.alertValidationMessage(`Price`);
+                return 1;
+            }
+            let isBrand = this.selectedItemPriceList.some(item => item.brand_id === this.selectedBrand.id);
+            let isSupplier = this.selectedItemPriceList.some(item => item.supplier_id === this.selectedSupplier.id);
+            console.log('isbrand = ' + isBrand + ' issupplier = ' + isSupplier)
+            if(isBrand && isSupplier){
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You Can't add Same Brand and Supplier again`,
+                    type: "warn"
+                });
                 return 1;
             }
             this.addPrice();
@@ -808,34 +981,90 @@ export default {
 
 
 
-
-        baseUomChange(){
-            if(this.selectedBaseUom){
-                let index = this.selectedUomList.findIndex(uom => uom.uom_type == 'base_uom');
-                if (index != -1) {
-                    this.selectedUomList.splice(index, 1);
-                }
+        updateSelectedUoms() {
+            this.selectedUomList = []; // clear first
+            const base = this.selectedBaseUom;
+            const uom = this.selectedUOM;
+            // Skip if nothing is selected
+            if (!base && !uom) return;
+            // If both selected and different -> push both
+            if (base && uom && base.id !== uom.id) {
+                this.selectedUomList.push({
+                    uom_id: base.id,
+                    uom_name: base.name,
+                    uom_type: 'base_uom'
+                });
+                this.selectedUomList.push({
+                    uom_id: uom.id,
+                    uom_name: uom.name,
+                    uom_type: 'uom'
+                });
             }
-            this.selectedUomList.push({
-                uom_name: this.selectedBaseUom.name,
-                uom_id: this.selectedBaseUom.id,
-                uom_type: 'base_uom'
-            })
+            // If only one selected or both same → push only one
+            else if (base) {
+                this.selectedUomList.push({
+                    uom_id: base.id,
+                    uom_name: base.name,
+                    uom_type: 'base_uom'
+                });
+            } 
+            else if (uom) {
+                this.selectedUomList.push({
+                    uom_id: uom.id,
+                    uom_name: uom.name,
+                    uom_type: 'uom'
+                });
+            }
         },
-        uomChange(){
-            if(this.selectedUOM){
-                let index = this.selectedUomList.findIndex(uom => uom.uom_type == 'uom');
-                if (index != -1) {
-                    this.selectedUomList.splice(index, 1);
-                }
-                console.log(index)
-            }
-            this.selectedUomList.push({
-                uom_name: this.selectedUOM.name,
-                uom_id: this.selectedUOM.id,
-                uom_type: 'uom'
-            })
-        },  
+        // baseUomChange(){
+        //     const alreadyExists = this.selectedUomList.some(uom => uom.uom_id === this.selectedBaseUom.id);
+        //     const isBaseUom = this.selectedUomList.some(uom => uom.uom_type === 'base_uom');
+        //     if(isBaseUom){
+        //         console.log('hello')
+        //         let index = this.selectedUomList.findIndex(uom => uom.uom_type === 'base_uom');
+        //         if (index != -1) {
+        //             this.selectedUomList.splice(index, 1);
+        //         }
+        //     }
+        //     this.selectedUomList.push({
+        //         uom_name: this.selectedBaseUom.name,
+        //         uom_id: this.selectedBaseUom.id,
+        //         uom_type: 'base_uom'
+        //     })
+            
+        //     if(alreadyExists){
+        //         console.log('exit')
+        //         let index = this.selectedUomList.findIndex(uom => uom.uom_type === 'base_uom');
+        //         if (index != -1) {
+        //             this.selectedUomList.splice(index, 1);
+        //         }
+        //     }
+            
+        // },
+        // uomChange(){
+        //     const alreadyExists = this.selectedUomList.some(uom => uom.uom_id === this.selectedUOM.id);
+        //     const isUom = this.selectedUomList.some(uom => uom.uom_type === 'uom');
+        //     if(isUom){
+        //         console.log('hello')
+        //         let index = this.selectedUomList.findIndex(uom => uom.uom_type === 'uom');
+        //         if (index != -1) {
+        //             this.selectedUomList.splice(index, 1);
+        //         }
+        //     }
+        //     this.selectedUomList.push({
+        //         uom_name: this.selectedUOM.name,
+        //         uom_id: this.selectedUOM.id,
+        //         uom_type: 'uom'
+        //     })
+            
+        //     if(alreadyExists){
+        //         console.log('exit')
+        //         let index = this.selectedUomList.findIndex(uom => uom.uom_type === 'uom');
+        //         if (index != -1) {
+        //             this.selectedUomList.splice(index, 1);
+        //         }
+        //     }
+        // },  
 
         btnClickedCreateItem() {
             if(!this.name){
@@ -864,12 +1093,20 @@ export default {
             }
             
             if(this.selectedLimitType && this.selectedLimitType === 'uom'){
-                if(!this.maxBaseUomLimit){
-                    this.alertValidationMessage(`Maximum Base Uom Limit`);
+                // if(!this.maxBaseUomLimit){
+                //     this.alertValidationMessage(`Maximum Base Uom Limit`);
+                //     return 1;
+                // }
+                // if(!this.maxUomLimit){
+                //     this.alertValidationMessage(`Maximum Uom Limit`);
+                //     return 1;
+                // }
+                if(!this.max_limit){
+                    this.alertValidationMessage(`Maximum Limit`);
                     return 1;
                 }
-                if(!this.maxUomLimit){
-                    this.alertValidationMessage(`Maximum Uom Limit`);
+                if(!this.selectedMaxUom){
+                    this.alertValidationMessage(`Maximum Limit UOM`);
                     return 1;
                 }
             }
@@ -893,11 +1130,19 @@ export default {
                 return 1;
             }
             
-            if(this.base_min_amount < 1 && this.min_amount < 1){
-                this.alertValidationMessage('Amount');
+            // if(this.base_min_amount < 1 && this.min_amount < 1){
+            //     this.alertValidationMessage('Amount');
+            //     return 1;
+            // }
+            if(!this.min_amount){
+                this.alertValidationMessage('Minimum Holding Amount');
                 return 1;
             }
-            if(this.selectedItemPriceList.lenght < 1){
+            if(!this.selectedMinUom){
+                this.alertValidationMessage('Minimum Holding UOM');
+                return 1;
+            }
+            if(this.selectedItemPriceList.length < 1){
                 this.alertValidationMessage(`Price List`);
                 return 1;
             }
@@ -942,13 +1187,21 @@ export default {
             formData.append('uom_id', this.selectedUOM.id);
             formData.append('item_type_id',this.selectedItemType.id);
             formData.append('tag_id',this.selectedTag.id);
-            formData.append('min_holding_base_uom_quantity',this.base_min_amount);
-            formData.append('min_holding_uom_quantity',this.min_amount);
+
+            // formData.append('min_holding_base_uom_quantity',this.base_min_amount);
+            // formData.append('min_holding_uom_quantity',this.min_amount);
+            
+            formData.append('min_uom_id',this.selectedMinUom.id);
+            formData.append('min_holding_quantity',this.min_amount);
+
+
             formData.append('conversion',this.conversion);
             formData.append('limitation_type',this.selectedLimitType);
             if(this.selectedLimitType === 'uom'){
-                formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
-                formData.append('max_limit_uom_quantity',this.maxUomLimit);
+                // formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
+                // formData.append('max_limit_uom_quantity',this.maxUomLimit);
+                formData.append('max_uom_id',this.selectedMaxUom.id);
+                formData.append('max_limit_quantity',this.max_limit);
             }
             else{
                 formData.append('amount',this.limit_amount);
