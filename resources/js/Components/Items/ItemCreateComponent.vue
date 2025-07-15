@@ -81,7 +81,7 @@
                 </div>
             </div>
             <div v-show="selectedLimitType === 'uom'" class="contents">
-                <div class="mb-6 col-span-3">
+                <!-- <div class="mb-6 col-span-3">
                     <label for="" class="label-form mb-3">
                         Maximum Limit ( Base UOM - အကြီး )
                     </label>
@@ -92,7 +92,29 @@
                         Maximum Limit ( UOM - အသေး )
                     </label>
                     <input type="number" placeholder="Max Uom" min="0" v-model="maxUomLimit" class="input-ui">
+                </div> -->
+                <div class="mb-6 col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Maximum Limit
+                    </label>
+                    <input type="number" placeholder="Maximum Limit Amount" min="0" v-model="max_limit" class="input-ui">
                 </div>
+                <div class="mb-6 relative col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Maximum Limit UOM
+                    </label>
+                    <div class="flex gap-x-2">
+                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                            data-te-select-wrapper-ref>
+                            <select name="" id="" v-model="selectedMaxUom" class="input-ui"
+                                data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                                <option :value="uom" v-for="(uom, uomIndex) in selectedUomList"
+                                    :key="uomIndex"> {{ uom.uom_name }} </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="mb-6 col-span-3" v-show="selectedLimitType === 'finance'">
                 <label for="" class="label-form mb-3">
@@ -182,7 +204,7 @@
                     <i class="fal fa-plus"></i>
                 </button>
             </div> -->
-            <div class="mb-6 col-span-3">
+            <!-- <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
                     Minimum Holding Amount ( Base UOM - အကြီး )
                 </label>
@@ -193,7 +215,31 @@
                     Minimum Holding Amount ( UOM - အသေး )
                 </label>
                 <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
+            </div> -->
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Minimum Holding Amount 
+                </label>
+                <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
             </div>
+            <div class="mb-6 relative col-span-3">
+                <label for="" class="label-form mb-3">
+                    Minimum Holding UOM
+                </label>
+                <div class="flex gap-x-2">
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select name="" id="" v-model="selectedMinUom" class="input-ui"
+                            data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                            <option :value="uom" v-for="(uom, uomIndex) in selectedUomList"
+                                :key="uomIndex"> {{ uom.uom_name }} </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+
             <div class="col-span-12"></div>
             
             <div class="mb-6 relative col-span-3">
@@ -569,15 +615,20 @@ export default {
             selectedTag: null,
             selectedCode: null,
             selectedLimitType: null,
-            maxBaseUomLimit: null,
-            maxUomLimit: null,
+
+            // maxBaseUomLimit: null,
+            // maxUomLimit: null,
+            max_limit: null,
+            selectedMaxUom: null,
+
             limit_amount: null,
             selectedBaseUom: null,
             selectedUOM: null,
             conversion: null,
 
-            base_min_amount: null,
-            min_amount: null,
+            // base_min_amount: null,
+            min_amount: 0,
+            selectedMinUom: null,
 
             tagName: null,
             categoryName: null,
@@ -821,13 +872,10 @@ export default {
 
         updateSelectedUoms() {
             this.selectedUomList = []; // clear first
-
             const base = this.selectedBaseUom;
             const uom = this.selectedUOM;
-
             // Skip if nothing is selected
             if (!base && !uom) return;
-
             // If both selected and different -> push both
             if (base && uom && base.id !== uom.id) {
                 this.selectedUomList.push({
@@ -841,7 +889,6 @@ export default {
                     uom_type: 'uom'
                 });
             }
-
             // If only one selected or both same → push only one
             else if (base) {
                 this.selectedUomList.push({
@@ -935,12 +982,20 @@ export default {
             }
             
             if(this.selectedLimitType && this.selectedLimitType === 'uom'){
-                if(!this.maxBaseUomLimit){
-                    this.alertValidationMessage(`Maximum Base Uom Limit`);
+                // if(!this.maxBaseUomLimit){
+                //     this.alertValidationMessage(`Maximum Base Uom Limit`);
+                //     return 1;
+                // }
+                // if(!this.maxUomLimit){
+                //     this.alertValidationMessage(`Maximum Uom Limit`);
+                //     return 1;
+                // }
+                if(!this.max_limit){
+                    this.alertValidationMessage(`Maximum Limit`);
                     return 1;
                 }
-                if(!this.maxUomLimit){
-                    this.alertValidationMessage(`Maximum Uom Limit`);
+                if(!this.selectedMaxUom){
+                    this.alertValidationMessage(`Maximum Limit UOM`);
                     return 1;
                 }
             }
@@ -964,8 +1019,16 @@ export default {
                 return 1;
             }
             
-            if(this.base_min_amount < 1 && this.min_amount < 1){
-                this.alertValidationMessage('Amount');
+            // if(this.base_min_amount < 1 && this.min_amount < 1){
+            //     this.alertValidationMessage('Amount');
+            //     return 1;
+            // }
+            if(!this.min_amount){
+                this.alertValidationMessage('Minimum Holding Amount');
+                return 1;
+            }
+            if(!this.selectedMinUom){
+                this.alertValidationMessage('Minimum Holding UOM');
                 return 1;
             }
             if(this.selectedItemPriceList.length < 1){
@@ -1013,13 +1076,21 @@ export default {
             formData.append('uom_id', this.selectedUOM.id);
             formData.append('item_type_id',this.selectedItemType.id);
             formData.append('tag_id',this.selectedTag.id);
-            formData.append('min_holding_base_uom_quantity',this.base_min_amount);
-            formData.append('min_holding_uom_quantity',this.min_amount);
+
+            // formData.append('min_holding_base_uom_quantity',this.base_min_amount);
+            // formData.append('min_holding_uom_quantity',this.min_amount);
+            
+            formData.append('min_uom_id',this.selectedMinUom.id);
+            formData.append('min_holding_quantity',this.min_amount);
+
+
             formData.append('conversion',this.conversion);
             formData.append('limitation_type',this.selectedLimitType);
             if(this.selectedLimitType === 'uom'){
-                formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
-                formData.append('max_limit_uom_quantity',this.maxUomLimit);
+                // formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
+                // formData.append('max_limit_uom_quantity',this.maxUomLimit);
+                formData.append('max_uom_id',this.selectedMaxUom.id);
+                formData.append('max_limit_quantity',this.max_limit);
             }
             else{
                 formData.append('amount',this.limit_amount);
