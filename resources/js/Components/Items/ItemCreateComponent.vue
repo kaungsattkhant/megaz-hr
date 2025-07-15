@@ -13,6 +13,13 @@
                 </label>
                 <input type="text" placeholder="Item Name" v-model="name" class="input-ui">
             </div>
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Item Code
+                </label>
+                <input type="text" placeholder="Code" v-model="selectedCode" class="input-ui">
+            </div>
+            <div class="col-span-6"></div>
             <div class="mb-6 relative col-span-3">
                 <label for="" class="label-form mb-3">
                     Category
@@ -61,12 +68,42 @@
                     <button  class="px-2 pt-2"  data-te-toggle="modal" data-te-target="#add_tag_modal" @click="addTagModalClicked"><i class="fal fa-plus"></i></button>
                 </div>
             </div>
+            <div class="col-span-3"></div>
+
             <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
-                    Item Code
+                    Base UOM (အကြီး)
                 </label>
-                <input type="text" placeholder="Code" v-model="selectedCode" class="input-ui">
+                <select name="" id="" v-model="selectedBaseUom" class="input-ui" @change="updateSelectedUoms"
+                    data-te-select-init data-te-select-placeholder="Select Base UOM" data-te-select-filter="true">
+                    <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                    </option>
+                </select>
             </div>
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Uom အသေး (Inventory သိမ်းဆည်း unit)
+                </label>
+                <div class="flex gap-x-2">
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select name="" id="" v-model="selectedUOM" class="input-ui" @change="updateSelectedUoms"
+                            data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
+                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                            </option>
+                            
+                        </select>
+                    </div>
+                    <button  class="px-2 pt-2"  data-te-toggle="modal" data-te-target="#add_uom_modal" @click="addUomModalClicked"><i class="fal fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Conversion
+                </label>
+                <input type="number" step="0.01" placeholder="Conversion" v-model="conversion" class="input-ui">
+            </div><div class="col-span-12"></div>
+
             <div class="mb-6 relative col-span-3">
                 <label for="" class="label-form mb-3">
                     PO Limit Type
@@ -122,7 +159,7 @@
                 </label>
                 <input type="number" placeholder="Amount " min="0" v-model="limit_amount" class="input-ui">
             </div>
-            <div class="col-span-12"></div>
+            <div v-if="selectedLimitType" class="col-span-12"></div>
 
 
 
@@ -147,32 +184,7 @@
                     </template>
                 </multiselect>
             </div> -->
-            <div class="mb-6 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Base UOM (အကြီး)
-                </label>
-                <select name="" id="" v-model="selectedBaseUom" class="input-ui" @change="updateSelectedUoms"
-                    data-te-select-init data-te-select-placeholder="Select Base UOM" data-te-select-filter="true">
-                    <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
-                    </option>
-                </select>
-            </div>
-            <div class="mb-6 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Uom အသေး (Inventory သိမ်းဆည်း unit)
-                </label>
-                <select name="" id="" v-model="selectedUOM" class="input-ui" @change="updateSelectedUoms"
-                    data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
-                    <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
-                    </option>
-                </select>
-            </div>
-            <div class="mb-6 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Conversion
-                </label>
-                <input type="number" step="0.01" placeholder="Conversion" v-model="conversion" class="input-ui">
-            </div><div class="col-span-12"></div>
+            
             <!-- <div class="mb-4">
                 <label for="" class="label-form mb-3">
                     Lead Time
@@ -287,6 +299,7 @@
                                 :key="uomIndex"> {{ uom.uom_name }} </option>
                         </select>
                     </div>
+                    
                 </div>
             </div>
             <div class="mb-6 col-span-2">
@@ -574,7 +587,57 @@
                 </div>
             </div>
         </div>
+            <!-- uom modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="add_uom_modal"
+            tabindex="-1" aria-labelledby="uomLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create UOM
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_uom"
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Uom Name
+                            </label>
+                            <input type="text" placeholder="Uom" v-model="create_uom_name" class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Uom Code
+                            </label>
+                            <input type="text" placeholder="eg.uom-11" pattern="^uom-\d+$" required v-model="create_uom_code" class="input-ui">
+                        </div>
+
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createUomBtnClicked">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
     </div>
@@ -627,7 +690,7 @@ export default {
             conversion: null,
 
             // base_min_amount: null,
-            min_amount: 0,
+            min_amount: null,
             selectedMinUom: null,
 
             tagName: null,
@@ -817,6 +880,54 @@ export default {
                 });
             }
         },
+        addUomModalClicked(){
+            this.create_uom_name = null;
+            this.create_uom_code = null;
+        },
+        createUomBtnClicked(){
+            const pattern = /^uom-\d*$/;
+            if(!this.create_uom_name){
+                this.alertValidationMessage(`UOM Name`);
+                return 1;
+            }
+            else if(!this.create_uom_code){
+                this.alertValidationMessage(`UOM Code`);
+                return 1;
+            }
+            else if (!pattern.test(this.create_uom_code)) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `Format must be like uom-11`,
+                    type: "warn"
+                });
+                return 1;
+            }
+            else{
+                this.createUom();
+            }
+        },
+        async createUom(){
+            let url = `/api/uoms`
+            let formData = new FormData();
+            formData.append('name', this.create_uom_name);
+            formData.append('uom_code', this.create_uom_code);
+
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success == true) {
+                document.getElementById('close_create_uom').click();
+                this.getUomList();
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+
+                return 1;
+            }
+        },
+        
         addSupplierClicked(){
             this.isSupplier = true;
         },
