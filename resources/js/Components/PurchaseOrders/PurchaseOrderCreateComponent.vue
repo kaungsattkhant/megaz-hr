@@ -188,9 +188,9 @@
                             <th scope="col" class="">
                                 Qty
                             </th>
-                            <th scope="col" class="">
+                            <!-- <th scope="col" class="">
                                 UOM
-                            </th>
+                            </th> -->
                             <th scope="col" class="">
                                 Unit Price
                             </th>
@@ -213,11 +213,12 @@
                                     {{ purchaseOrderItem.brand_name }}
                                 </td>
                                 <td class="">
-                                    {{ purchaseOrderItem.quantity }}
+                                    {{ purchaseOrderItem.base_uom_quantity }}{{ purchaseOrderItem.base_uom_name }}
+                                    {{ purchaseOrderItem.uom_quantity }}{{ purchaseOrderItem.uom_name }}
                                 </td>
-                                <td class="">
+                                <!-- <td class="">
                                     {{ purchaseOrderItem.uom_name }}
-                                </td>
+                                </td> -->
                                 <td class="">
                                     {{ purchaseOrderItem.unit_price.toLocaleString() }}
                                 </td>

@@ -75,7 +75,9 @@
                             </tr>
                         </thead>
                         <tbody>
-
+                            <!-- <tr>
+                                {{ balanceFormat(2010, 1000, 'kg', 'g') }}
+                            </tr> -->
                             <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
                                 <tr>
                                     <td>
@@ -85,16 +87,22 @@
                                         {{ ledger.name }}
                                     </td>
                                     <td>
-                                        {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }} -->
+                                        {{ balanceFormat(ledger.opening_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
-                                        {{ ledger.in_balance }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ ledger.in_balance }} {{ ledger.conversion_uom_name }} -->
+
+                                        {{ balanceFormat(ledger.in_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
-                                        {{ (ledger.out_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ (ledger.out_balance).toLocaleString() }} {{ ledger.conversion_uom_name }} -->
+                                        {{ balanceFormat(ledger.out_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
-                                        {{ (ledger.closing_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ (ledger.closing_balance).toLocaleString() }} {{ ledger.conversion_uom_name }} -->
+
+                                        {{ balanceFormat(ledger.closing_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
                                         {{ ledger.base_balance }} {{ ledger.conversion_balance }}
@@ -543,8 +551,6 @@ export default {
                 this.inventoryList = response.data;
             }
         },
-
-
         async getUomList() {
             let url = `/api/uoms`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -552,7 +558,6 @@ export default {
                 this.uomList = response.data;
             }
         },
-
         btnClickedAddMinimum(ledger, index){
             this.minimumLedger = ledger;
         },
@@ -605,7 +610,6 @@ export default {
                 this.itemUoms.push(itemUom);
             }
         },
-
         async confirmAddDefectBtnClicked(){
             if(!this.type){
                 this.alertValidationMessage(`defect type`);
@@ -652,7 +656,6 @@ export default {
             this.type = null;
             this.defectItem = null;
         },
-
         async transferBtnClicked(ledger, ledgerIndex) {
             this.ledger = ledger
             this.itemId = ledger.item_id;
@@ -676,7 +679,6 @@ export default {
                 this.itemUoms.push(itemUom);
             }
         },
-
         confirmTransferBtnClicked() {
             if (!this.selectedSourceInventory) {
                 this.alertValidationMessage(`source inventory`);
@@ -696,7 +698,6 @@ export default {
             }
             this.transferInventory();
         },
-
         async transferInventory() {
             let formData = new FormData();
             formData.append('source_inventory_id', this.selectedSourceInventory);
@@ -735,14 +736,15 @@ export default {
 
             
         },
-
-
         async getSearchInventoryList(){
             const response = await getApiData({ url: '/api/get_inventory', token: this.getToken() });
             if (response.data) {
                 this.searchInventoryList = response.data;
                 this.searchInventory = response.data[0]
-                this.url_inventory = 'inventory_id=' + this.searchInventory.id
+                if(this.searchInventory){
+                    this.url_inventory = 'inventory_id=' + this.searchInventory.id
+                }
+                
                 this.getInventoryLegderList();
             }
         },
@@ -773,6 +775,24 @@ export default {
             this.selectedInventory = null,
                 this.quantity = null
         },
+
+
+
+
+        balanceFormat(amount, conversion, base_uom_name, uom_name) {
+            if (!conversion || isNaN(amount)) return '-';
+            // return Math.floor(amount / conversion) + ' ' + uom;
+            let balance = Math.floor(amount / conversion);
+            let base_balance = balance + '' + (balance > 0 ? base_uom_name : '');
+            let conversion_balance = '';
+            let conversionBalance = amount % conversion;
+            if(conversionBalance > 0){
+                conversion_balance = conversionBalance + '' + uom_name;
+            }
+
+            return conversion_balance ? base_balance + ' ' + conversion_balance : base_balance;
+            // return amount + ' ' + conversion + ' ' + base_uom_name + ' ' + uom_name
+        }
     },
 
     created() {

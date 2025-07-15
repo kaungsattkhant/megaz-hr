@@ -361,6 +361,13 @@
                                 <input type="text" v-model="categoryName"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
+                            <div class="mb-4 col-span-11">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Code
+                                </label>
+                                <input type="text" v-model="categoryCode"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            </div>
                         </div>
                         
                     </div>
@@ -574,6 +581,7 @@ export default {
 
             tagName: null,
             categoryName: null,
+            categoryCode: null,
             typeName: null,
 
             brandList: [],
@@ -641,10 +649,15 @@ export default {
         },
         addCategoryModalClicked(){
             this.categoryName = null;
+            this.categoryCode = null;
         },
         btnClickedCreateCategory(){
             if(!this.categoryName){
                 this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(!this.categoryCode){
+                this.alertValidationMessage(`Code`);
                 return 1;
             }
             else{
@@ -653,7 +666,8 @@ export default {
         },
         async createCategory(){
             let formData = new FormData();
-            formData.append('name', this.categoryName);            
+            formData.append('name', this.categoryName);   
+            formData.append('category_code', this.categoryCode);           
             let response = await postApiData({url:`/api/categories`, form_data:formData, token:this.getToken()})
             if(response.success){
                 document.getElementById('close_category_modal').click();

@@ -162,7 +162,7 @@ class ItemRepository implements ItemRepositoryInterface
                     //end
                     if ($bs['uom_id'] == $data['base_uom_id'] && $bs['uom_id'] != $data['uom_id']) {
                         $bs['type'] = 'base_uom';
-                        $bs['price'] = $data['conversion'] * $bs['uom_price'];
+                        $bs['price'] = $bs['uom_price'] ;
                     } elseif ($bs['uom_id'] == $data['uom_id'] && $bs['uom_id'] != $data['base_uom_id']) {
                         $bs['type'] = 'uom';
                         $bs['price'] = $data['conversion'] * $bs['uom_price'];

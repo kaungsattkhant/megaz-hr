@@ -1091,9 +1091,9 @@ export default {
                 this.selectedItem = null;
                 this.selectedUom = null;
                 this.amount = null;
-                this.selectedDepartment = null;
-                this.selectedRole = null;
-                this.expireDate = null;
+                // this.selectedDepartment = null;
+                // this.selectedRole = null;
+                // this.expireDate = null;
                 this.is_disable_custom = true;
                 this.itemUoms = [];
                 this.itemList = [];
@@ -1120,6 +1120,9 @@ export default {
             this.orderTime = null;
             this.expectedQuantity = null;
             this.is_disable_custom = false;
+            this.expireDate = null;
+            this.selectedDepartment = null;
+            this.selectedRole = null;
         },
         addLevelBtnClicked() {
             if (!this.menuLevel.level) {
