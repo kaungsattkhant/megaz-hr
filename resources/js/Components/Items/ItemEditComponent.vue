@@ -131,7 +131,7 @@
                 <label for="" class="label-form mb-3">
                     Base UOM (အကြီး)
                 </label>
-                <select name="" id="" v-model="selectedBaseUom" class="input-ui" @change="baseUomChange"
+                <select name="" id="" v-model="selectedBaseUom" class="input-ui" @change="updateSelectedUoms"
                     data-te-select-init data-te-select-placeholder="Select Base UOM" data-te-select-filter="true">
                     <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                     </option>
@@ -141,7 +141,7 @@
                 <label for="" class="label-form mb-3">
                     Uom အသေး (Inventory သိမ်းဆည်း unit)
                 </label>
-                <select name="" id="" v-model="selectedUOM" class="input-ui" @change="uomChange"
+                <select name="" id="" v-model="selectedUOM" class="input-ui" @change="updateSelectedUoms"
                     data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true">
                     <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                     </option>
@@ -876,6 +876,17 @@ export default {
                 this.alertValidationMessage(`Price`);
                 return 1;
             }
+            let isBrand = this.selectedItemPriceList.some(item => item.brand_id === this.selectedBrand.id);
+            let isSupplier = this.selectedItemPriceList.some(item => item.supplier_id === this.selectedSupplier.id);
+            console.log('isbrand = ' + isBrand + ' issupplier = ' + isSupplier)
+            if(isBrand && isSupplier){
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You Can't add Same Brand and Supplier again`,
+                    type: "warn"
+                });
+                return 1;
+            }
             this.addPrice();
         },
         addPrice(){
@@ -913,34 +924,72 @@ export default {
 
 
 
+        updateSelectedUoms() {
+            this.selectedUomList = []; // clear first
 
-        baseUomChange(){
-            if(this.selectedBaseUom){
-                let index = this.selectedUomList.findIndex(uom => uom.uom_type == 'base_uom');
-                if (index != -1) {
-                    this.selectedUomList.splice(index, 1);
-                }
+            const base = this.selectedBaseUom;
+            const uom = this.selectedUOM;
+
+            // Skip if nothing is selected
+            if (!base && !uom) return;
+
+            // If both selected and different -> push both
+            if (base && uom && base.id !== uom.id) {
+                this.selectedUomList.push({
+                    uom_id: base.id,
+                    uom_name: base.name,
+                    uom_type: 'base_uom'
+                });
+                this.selectedUomList.push({
+                    uom_id: uom.id,
+                    uom_name: uom.name,
+                    uom_type: 'uom'
+                });
             }
-            this.selectedUomList.push({
-                uom_name: this.selectedBaseUom.name,
-                uom_id: this.selectedBaseUom.id,
-                uom_type: 'base_uom'
-            })
+
+            // If only one selected or both same → push only one
+            else if (base) {
+                this.selectedUomList.push({
+                    uom_id: base.id,
+                    uom_name: base.name,
+                    uom_type: 'base_uom'
+                });
+            } 
+            else if (uom) {
+                this.selectedUomList.push({
+                    uom_id: uom.id,
+                    uom_name: uom.name,
+                    uom_type: 'uom'
+                });
+            }
         },
-        uomChange(){
-            if(this.selectedUOM){
-                let index = this.selectedUomList.findIndex(uom => uom.uom_type == 'uom');
-                if (index != -1) {
-                    this.selectedUomList.splice(index, 1);
-                }
-                console.log(index)
-            }
-            this.selectedUomList.push({
-                uom_name: this.selectedUOM.name,
-                uom_id: this.selectedUOM.id,
-                uom_type: 'uom'
-            })
-        },  
+        // baseUomChange(){
+        //     if(this.selectedBaseUom){
+        //         let index = this.selectedUomList.findIndex(uom => uom.uom_type == 'base_uom');
+        //         if (index != -1) {
+        //             this.selectedUomList.splice(index, 1);
+        //         }
+        //     }
+        //     this.selectedUomList.push({
+        //         uom_name: this.selectedBaseUom.name,
+        //         uom_id: this.selectedBaseUom.id,
+        //         uom_type: 'base_uom'
+        //     })
+        // },
+        // uomChange(){
+        //     if(this.selectedUOM){
+        //         let index = this.selectedUomList.findIndex(uom => uom.uom_type == 'uom');
+        //         if (index != -1) {
+        //             this.selectedUomList.splice(index, 1);
+        //         }
+        //         console.log(index)
+        //     }
+        //     this.selectedUomList.push({
+        //         uom_name: this.selectedUOM.name,
+        //         uom_id: this.selectedUOM.id,
+        //         uom_type: 'uom'
+        //     })
+        // },  
 
         btnClickedCreateItem() {
             if(!this.name){
