@@ -108,10 +108,9 @@ class ItemRepository implements ItemRepositoryInterface
             }
             $brand_suppliers = json_decode($data['brand_suppliers'], true);
 
-            if(isset($data['min_holding_quantity']) && isset($data['min_uom_id']) && $data['min_uom_id'] === $data['base_uom_id']){
+            if (isset($data['min_holding_quantity']) && isset($data['min_uom_id']) && $data['min_uom_id'] === $data['base_uom_id']) {
                 $data['min_holding_uom_quantity'] = $data['min_holding_quantity'] * $data['conversion'];
-            }
-            else{
+            } else {
                 $data['min_holding_uom_quantity'] = $data['min_holding_quantity'];
             }
             $conversionRate = $data['conversion'];
@@ -132,10 +131,9 @@ class ItemRepository implements ItemRepositoryInterface
                     return ResponseMessage('For limitation_type "uom", provide max_limit_quantity.', 422);
                 }
 
-                if($hasBaseUom && $data['max_uom_id'] === $data['base_uom_id']){
-                    $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0) *  $conversionRate;
-                }
-                else{
+                if ($hasBaseUom && $data['max_uom_id'] === $data['base_uom_id']) {
+                    $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0) * $conversionRate;
+                } else {
                     $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0);
                 }
             }
@@ -170,7 +168,7 @@ class ItemRepository implements ItemRepositoryInterface
                     //end
                     if ($bs['uom_id'] == $data['base_uom_id'] && $bs['uom_id'] != $data['uom_id']) {
                         $bs['type'] = 'base_uom';
-                        $bs['price'] = $bs['uom_price'] ;
+                        $bs['price'] = $bs['uom_price'];
                     } elseif ($bs['uom_id'] == $data['uom_id'] && $bs['uom_id'] != $data['base_uom_id']) {
                         $bs['type'] = 'uom';
                         $bs['price'] = $data['conversion'] * $bs['uom_price'];
@@ -184,7 +182,7 @@ class ItemRepository implements ItemRepositoryInterface
                     //change item price
                     $isItemPriceChange = false;
                     // dd((double)$supplierItem->item_price->price != (double) $bs['price']);
-                    if ($supplierItem->item_price && ($supplierItem->item_price->price != ( $bs['price']))) {
+                    if ($supplierItem->item_price && ($supplierItem->item_price->price != ($bs['price']))) {
                         $isItemPriceChange = true;
                     }
                     //end
@@ -201,7 +199,14 @@ class ItemRepository implements ItemRepositoryInterface
                         ]);
                     }
                 }
+                $brandIds = array_unique(array_column($brand_suppliers, 'brand_id'));
+
+                // Optional: reindex the array if needed
+                $brandIds = array_values($brandIds);
+                dd($brandIds);
+
             }
+            dd('end');
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
@@ -227,7 +232,7 @@ class ItemRepository implements ItemRepositoryInterface
     }
     public function detail($id)
     {
-        $item = Item::with(['uom','tag', 'base_uom', 'supplier_item.item_price.uom', 'supplier_item.brand', 'supplier_item.supplier'])->find($id);
+        $item = Item::with(['uom', 'tag', 'base_uom', 'supplier_item.item_price.uom', 'supplier_item.brand', 'supplier_item.supplier'])->find($id);
         if (!$item) {
             ResponseMessage('Item not found', 419);
         }
