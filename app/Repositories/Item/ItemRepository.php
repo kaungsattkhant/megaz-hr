@@ -86,8 +86,8 @@ class ItemRepository implements ItemRepositoryInterface
             if (!isset($data['base_uom_id']) || !isset($data['uom_id'])) {
                 return ResponseMessage('Required UOM data is missing.', 400);
             }
-            if (!isset($data['min_holding_quantity']) && !isset($data['min_holding_uom_quantity'])) {
-                return ResponseMessage('Required holding quantities are missing.', 400);
+            if (!isset($data['min_holding_quantity'])) {
+                return ResponseMessage('Required holding quantity is missing.', 400);
             }
             $isBaseUomChange = false;
             $isUomChange = false;
@@ -108,10 +108,15 @@ class ItemRepository implements ItemRepositoryInterface
             }
             $brand_suppliers = json_decode($data['brand_suppliers'], true);
 
+            if(isset($data['min_holding_quantity']) && isset($data['min_uom_id']) && $data['min_uom_id'] === $data['base_uom_id']){
+                $data['min_holding_uom_quantity'] = $data['min_holding_quantity'] * $data['conversion'];
+            }
+            else{
+                $data['min_holding_uom_quantity'] = $data['min_holding_quantity'];
+            }
             $conversionRate = $data['conversion'];
             $minimumHoldingAmount = $this->itemService->calculateMinimumHoldingAmount(
                 $data['min_holding_quantity'] ?? 0,
-                $data['min_holding_uom_quantity'] ?? 0,
                 $conversionRate
             );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
@@ -122,13 +127,16 @@ class ItemRepository implements ItemRepositoryInterface
 
             if ($data['limitation_type'] === "uom") {
                 $hasBaseUom = isset($data['max_limit_quantity']);
-                $hasUom = isset($data['max_limit_uom_quantity']);
-                if (!$hasBaseUom && !$hasUom) {
-                    return ResponseMessage('For limitation_type "uom", provide either max_limit_quantity or max_limit_uom_quantity.', 422);
+
+                if (!$hasBaseUom) {
+                    return ResponseMessage('For limitation_type "uom", provide max_limit_quantity.', 422);
                 }
 
-                if($hasBaseUom && !$hasUom){
+                if($hasBaseUom && $data['max_uom_id'] === $data['base_uom_id']){
                     $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0) *  $conversionRate;
+                }
+                else{
+                    $data['max_limit_uom_quantity'] = ($data['max_limit_quantity'] ?? 0);
                 }
             }
 
@@ -137,11 +145,6 @@ class ItemRepository implements ItemRepositoryInterface
                     return ResponseMessage('For limitation_type "finance", amount must be a positive number.', 422);
                 }
             }
-
-            if(isset($data['min_holding_quantity']) && isset($data['base_uom_id'])){
-                $data['min_holding_uom_quantity'] = ($data['min_holding_quantity'] ?? 0) *  $conversionRate;
-            }
-
             $item = Item::updateOrCreate(
                 ['items.id' => $data['id']],
                 $data
