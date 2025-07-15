@@ -203,10 +203,11 @@ class ItemRepository implements ItemRepositoryInterface
 
                 // Optional: reindex the array if needed
                 $brandIds = array_values($brandIds);
-                dd($brandIds);
-
+                if(empty($brandIds)){
+                    ResponseMessage('Brand is required',419);
+                }
+                $item->brands()->sync($brandIds);
             }
-            dd('end');
             DB::commit();
             ResponseData($item);
         } catch (\Exception $e) {
