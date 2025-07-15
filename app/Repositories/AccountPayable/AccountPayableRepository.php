@@ -116,7 +116,7 @@ class AccountPayableRepository implements AccountPayableInterface
             ]);
 
             $accountPayable = AccountPayable::create([
-                'type' => 'addition',
+                'type' => 'settlement',
                 'date_time' => now(),
                 'amount' => $request->value,
                 'supplier_id' => $request->supplier_id,
