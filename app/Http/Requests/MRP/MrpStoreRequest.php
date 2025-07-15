@@ -53,7 +53,7 @@ class MrpStoreRequest extends APIRequest
             'name' => 'required',
             'menu_category_id' => 'required|exists:menu_categories,id',
             'code' => 'required',
-            'image' => 'nullable|mimes:jpeg,png,jpg|max:10240',
+            'image' => 'nullable|mimes:jpeg,png,jpg,webp|max:10240',
             'description' => 'nullable|string',
             'cooking_place_id' => 'required|json',
             'price' => 'nullable',
