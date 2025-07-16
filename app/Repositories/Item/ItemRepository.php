@@ -147,10 +147,7 @@ class ItemRepository implements ItemRepositoryInterface
                 ['items.id' => $data['id']],
                 $data
             );
-            // $item = Item::firstOrCreate(['items.name' => $data['name'], 'items.code' => $data['code']], $data);
-            // if (isset($data['brand_id'])) {
-            //     $item->brands()->sync($data['brand_id']);
-            // }
+          
             //create uom converion 
             $uomConversion = $this->createUomConversion($item, $data);
             if (!empty($brand_suppliers)) {
@@ -199,14 +196,14 @@ class ItemRepository implements ItemRepositoryInterface
                         ]);
                     }
                 }
+                //brand sync
                 $brandIds = array_unique(array_column($brand_suppliers, 'brand_id'));
-
-                // Optional: reindex the array if needed
                 $brandIds = array_values($brandIds);
                 if(empty($brandIds)){
                     ResponseMessage('Brand is required',419);
                 }
                 $item->brands()->sync($brandIds);
+                //end
             }
             DB::commit();
             ResponseData($item);
