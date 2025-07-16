@@ -233,7 +233,7 @@
             </div>
         </div>
     </div>
-    <!--Check Modal -->
+    <!--used/defect Modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
         id="add_defect_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -268,8 +268,11 @@
                         <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                             <select data-te-select-init data-te-select-placeholder="Select Type"
                             data-te-select-filter="true" v-model="type">
-                                <option value="defect"> Defect </option>
-                                <option value="used"> Used </option>
+                                <option :value="type" v-for="(type,index) in typeList">
+                                    {{ type.name }}
+                                </option>
+                                <!-- <option value="defect" key="defect"> Defect </option>
+                                <option value="used" key="used"> Used </option> -->
                             </select>
                         </div>
                     </div>
@@ -452,6 +455,7 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import 'tw-elements';
 
 export default {
     data() {
@@ -502,6 +506,10 @@ export default {
             url_inventory:'',
             url_date:'',
             
+            typeList: [
+                { name: 'Defect', value: 'defect'},
+                { name: 'Used', value: 'used'}
+            ]
         };
     },
     // props: ['inventory_id'],
@@ -559,6 +567,8 @@ export default {
             }
         },
         btnClickedAddMinimum(ledger, index){
+            this.base_min_amount = 0;
+            this.min_amount = 0;
             this.minimumLedger = ledger;
         },
         async addMinimumAmount(){
@@ -595,6 +605,22 @@ export default {
             }
         },
         addDefectBtnClicked(id, ledgerIndex){
+            this.type = null;
+            this.selectedUom = null;
+            this.defectQuantity = null;
+            this.defectRemark = null;
+            this.$nextTick(() => {
+                // now modal content is in DOM
+                const el = this.$el.querySelector('[data-te-select-init]');
+                if (el) {
+                    const selectInstance = window.te?.Select?.getInstance(el);
+                    if (selectInstance) {
+                        selectInstance.setValue('');
+                    }
+                }
+            });
+
+
             this.defectItemId = id;
             this.defectItem = this.inventoryLegderList[ledgerIndex];
 
@@ -628,7 +654,7 @@ export default {
             // formData.append('inventory_id', this.inventory_id);/
             formData.append('quantity', this.defectQuantity);
             formData.append('uom_id', this.selectedUom.id);
-            formData.append('type', this.type);
+            formData.append('type', this.type.value);
             formData.append('base_uom_id', this.defectItem.base_unit_id);
             if(this.defectRemark){
                 formData.append('remark', this.defectRemark);
@@ -657,6 +683,10 @@ export default {
             this.defectItem = null;
         },
         async transferBtnClicked(ledger, ledgerIndex) {
+            this.selectedSourceInventory = null;
+            this.selectedDestinationInventory = null;
+            this.quantity = null;
+            this.selectedUom = null;
             this.ledger = ledger
             this.itemId = ledger.item_id;
             this.transferItem = this.inventoryLegderList[ledgerIndex];
