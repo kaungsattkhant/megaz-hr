@@ -27,42 +27,43 @@
                 <input type="tel" v-model="phoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div> -->
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Limit
                 </label>
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 relative">
-                <label for="" class="block text-sm text-black mb-3 absolute -top-6 text-center w-full">
-                    (Lead Time)
+            </div> -->
+            <div class="mb-4 col-span-6 pb-6 relative">
+                <label for="" class="block text-sm text-black mb-3  text-center w-full">
+                    Lead Time
                 </label>
-                <div class="grid grid-cols-3 gap-x-4">
-                    <div>
+                <div class="grid grid-cols-6 gap-x-8">
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_day" min="0"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Day
                         </label>
-                        <input type="number" v-model="lead_time_day" min="0"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div>
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_hour" min="0" max="24"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Hour
                         </label>
-                        <input type="number" v-model="lead_time_hour" min="0" max="24"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div>
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_min" min="0" max="60"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Min 
                         </label>
-                        <input type="number" v-model="lead_time_min" min="0" max="60"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                 </div>
                 
             </div>
+            
             <!-- <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Terms
@@ -644,7 +645,9 @@ export default {
                 this.lead_time_day = this.supplier.lead_time_day;
                 this.lead_time_hour = this.supplier.lead_time_hour;
                 this.lead_time_min = this.supplier.lead_time_minutes;
-                this.selectedTermType = this.supplier.credit_term_type;
+                // this.selectedTermType = this.supplier.credit_term_type;
+                this.selectedTermType = this.termList.find(type => type.value = this.supplier.credit_term_type).value;
+
                 if(this.supplier.credit_term_type === 'day'){
                     this.term_day = this.supplier.day;
                 }
@@ -654,6 +657,8 @@ export default {
                 if(this.supplier.credit_term_type === 'amount_limitation'){
                     this.term_limitation_amount = this.supplier.amount_limitation;
                 }
+                this.amount = this.supplier.credit_opening_amount;
+                this.date = this.supplier.credit_opening_date;
                 // this.credit_terms = this.supplier.credit_terms;
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
@@ -742,11 +747,11 @@ export default {
 
         addItemBtnClicked(){
             if(!this.selectedItem){
-                this.alertValiationMessage(`Item`);
+                this.alertValidationMessage(`Item`);
                 return 1;
             }
             else if(this.selectedItemBrands.length < 1){
-                this.alertValiationMessage(`Brands for item`);
+                this.alertValidationMessage(`Brands for item`);
                 return 1;
             }
             else{
@@ -766,11 +771,11 @@ export default {
         },
         btnclickedAddPhone(){
             if(!this.ph_number){
-                this.alertValiationMessage(`Phone Number`);
+                this.alertValidationMessage(`Phone Number`);
                 return;
             }
             else if(!this.selectedType){
-                this.alertValiationMessage(`Type`);
+                this.alertValidationMessage(`Type`);
                 return;
             }
             else{
@@ -784,11 +789,11 @@ export default {
         },
         btnclickedAddBankAccount(){
             if(!this.account_name){
-                this.alertValiationMessage(`Account Name`);
+                this.alertValidationMessage(`Account Name`);
                 return;
             }
             else if(!this.account_number){
-                this.alertValiationMessage(`Account Number`);
+                this.alertValidationMessage(`Account Number`);
                 return;
             }
             else{
@@ -839,10 +844,10 @@ export default {
             //     this.alertValidationMessage(`supplier selling items`);
             //     return 1;
             // }
-            if(!this.maxCredit){
-                this.alertValidationMessage(`supplier credit limit`);
-                return 1;
-            }
+            // if(!this.maxCredit){
+            //     this.alertValidationMessage(`supplier credit limit`);
+            //     return 1;
+            // }
             if(!this.selectedAccount){
                 this.alertValidationMessage(`Supplier Account Payable`);
                 return 1;
@@ -865,7 +870,7 @@ export default {
             formData.append("name", this.name);
             formData.append("shop_name", this.shopName);
             // formData.append("phone_number", this.phoneNumber);
-            formData.append("credit_limit", this.maxCredit);
+            // formData.append("credit_limit", this.maxCredit);
             formData.append("lead_time_day", this.lead_time_day);
             formData.append("lead_time_hour", this.lead_time_hour);
             formData.append("lead_time_minutes", this.lead_time_min);
@@ -924,8 +929,8 @@ export default {
                 this.creditAccList = response.data;
             }
         },
-
-        alertValiationMessage(field) {
+        
+        alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
                 text: `You forgot to provide ${field}, please try again`,

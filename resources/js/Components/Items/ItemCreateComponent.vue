@@ -1191,7 +1191,7 @@ export default {
             // formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             // formData.append('min_holding_uom_quantity',this.min_amount);
             
-            formData.append('min_uom_id',this.selectedMinUom.id);
+            formData.append('min_uom_id',this.selectedMinUom.uom_id);
             formData.append('min_holding_quantity',this.min_amount);
 
 
@@ -1200,7 +1200,7 @@ export default {
             if(this.selectedLimitType === 'uom'){
                 // formData.append('max_limit_base_uom_quantity',this.maxBaseUomLimit);
                 // formData.append('max_limit_uom_quantity',this.maxUomLimit);
-                formData.append('max_uom_id',this.selectedMaxUom.id);
+                formData.append('max_uom_id',this.selectedMaxUom.uom_id);
                 formData.append('max_limit_quantity',this.max_limit);
             }
             else{
