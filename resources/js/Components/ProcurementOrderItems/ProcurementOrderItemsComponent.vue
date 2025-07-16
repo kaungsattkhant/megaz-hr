@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="mt-4 bg-white">
         <div class="card-shadow">
             <div>
@@ -84,7 +84,7 @@
                                         {{ item.total_uom_quantity }} {{ item.uom_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <div v-if="item.purchase_order_details.length <= 1" >
+                                        <div v-if="item.purchase_order_details.length > 0" >
                                             <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
                                                 @click="editBtnClicked(item, index)">
                                                 <i class="fal fa-pen"></i>
@@ -292,7 +292,7 @@
                                 <tr v-for="(supplier,index) in itemSuppliers" :key="index">
                                     <td class="px-6 py-4 text-sm text-gray-900">{{ supplier.supplier.name }}</td>
                                     <td> {{ supplier.brand.name }} </td>
-                                    <td> {{ supplier.price.toLocaleString() }} </td>
+                                    <td> {{ supplier.item_price.price.toLocaleString() }} </td>
                                     <td> {{ baseUomQty }} {{ baseUomName }} {{ uomQty }} {{ uomName }} </td>
                                     <td> {{ (supplier.lead_time)? supplier.lead_time: 'Unknown' }} </td>
                                     <td> {{ (supplier.average_quality)? supplier.average_quality: 0 }} % </td>
@@ -454,7 +454,7 @@ export default {
             // }
             // this.brandSelectChanged();
             // this.getItemSuppliers(this.itemId);
-            this.updatePriceOfSuppliers();
+            // this.updatePriceOfSuppliers();
         },
 
         uomQtyChanged(){
@@ -472,7 +472,7 @@ export default {
             // }
             // this.brandSelectChanged();
             // this.getItemSuppliers(this.itemId);
-            this.updatePriceOfSuppliers();
+            // this.updatePriceOfSuppliers();
         },
 
         updatePriceOfSuppliers(){
@@ -522,8 +522,10 @@ export default {
                         }else{
                             itemSupplier.price = 0;
                         }
+                        console.log(itemSupplier.supplier.credit_term_type);
+                        console.log(itemSupplier);
                         if(itemSupplier.supplier.credit_term_type == 'amount_limitation'){
-                            itemSupplier.payment_date[0] = itemSupplier.supplier.amount_limitation;
+                            itemSupplier.payment_date[0] = itemSupplier.remaining_credit_limitation;
                         }
                         if(itemSupplier.supplier.credit_term_type == 'exact_date'){
                             itemSupplier.payment_date = itemSupplier.supplier.exact_date;
