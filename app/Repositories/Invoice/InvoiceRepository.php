@@ -1034,7 +1034,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'action' => 'debit',
                     'is_cashier_confirmed' => 0
                 ]);
-            }
+            }   
             $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
             if ($paidAmount > $invoiceCost) {
                 ResponseMessage('Paid amount is invalid', 419);
