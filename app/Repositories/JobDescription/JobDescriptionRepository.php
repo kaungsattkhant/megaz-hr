@@ -3,6 +3,7 @@
 namespace App\Repositories\JobDescription;
 
 use App\Models\Sop;
+use App\Models\JdSop;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Models\JobDescription;
@@ -15,12 +16,16 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function getJobDescription(Request $request)
     {
         $roleId = $request->role_id;
-        return JobDescription::with('role.department')
-        ->when($roleId, function ($query) use ($roleId){
-            return $query->where('role_id', $roleId);
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(config('common.list_count'));
+        $query = JobDescription::with('role.department')
+            ->when($roleId, function ($query) use ($roleId) {
+                return $query->where('role_id', $roleId);
+            })
+            ->orderBy('id', 'desc');
+        if ($request->per_page || $request->page) {
+            return $query->paginate(config('common.list_count'));
+        } else {
+            return $query->get();
+        }
     }
     public function storeJobDescription(array $validatedData)
     {
@@ -50,12 +55,14 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
             $jobSpecData = Arr::except($validatedData, ['skills']);
 
             $js = JobSpecification::updateOrCreate(
-                ['id' => $validatedData['id'] ?? null], $jobSpecData);
-            if(isset($validatedData['skills'])) {
+                ['id' => $validatedData['id'] ?? null],
+                $jobSpecData
+            );
+            if (isset($validatedData['skills'])) {
                 $js->skills()->sync($validatedData['skills']);
             }
             DB::commit();
-            return $js->load('skills'); 
+            return $js->load('skills');
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
@@ -66,19 +73,19 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function getJobSpecification(Request $request)
     {
         $roleId = $request->role_id;
-        return JobSpecification::with(['jobDescription.role.department','createdBy'])
-        ->when($roleId, function ($query) use ($roleId) {
-            return $query->whereHas('jobDescription', function ($q) use ($roleId) {
-                $q->where('role_id', $roleId);
-            });
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(config('common.list_count'));
+        return JobSpecification::with(['jobDescription.role.department', 'createdBy'])
+            ->when($roleId, function ($query) use ($roleId) {
+                return $query->whereHas('jobDescription', function ($q) use ($roleId) {
+                    $q->where('role_id', $roleId);
+                });
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(config('common.list_count'));
     }
 
     public function showJobSpecification(int $jobSpecificationId)
     {
-        return JobSpecification::with(['jobDescription.role.department','createdBy','skills.role.department'])->findOrFail($jobSpecificationId);
+        return JobSpecification::with(['jobDescription.role.department', 'createdBy', 'skills.role.department'])->findOrFail($jobSpecificationId);
     }
     public function deleteJobSpecification(int $jobSpecificationId)
     {
@@ -90,25 +97,52 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function getSop(Request $request)
     {
         $roleId = $request->role_id;
-        return Sop::with(['jobDescription.role.department','role.department'])
-        ->when($roleId, function ($query) use ($roleId) {
-            return $query->where('role_id', $roleId);
-        })
-        ->orderBy('id', 'desc')
-        ->paginate(config('common.list_count'));
+        $query =  JdSop::with(['jobDescription.role.department', 'sops.role.department'])
+            ->when($roleId, function ($query) use ($roleId) {
+                return $query->whereHas('sops', function ($q) use ($roleId) {
+                    $q->where('role_id', $roleId);
+                });
+            })
+            ->orderBy('id', 'desc');
+        if ($request->per_page || $request->page) {
+            return $query->paginate(config('common.list_count'));
+        } else {
+            return $query->get();
+        }
     }
 
-    public function showSop(int $sopId)
+    public function showSop(int $jdId)
     {
-        return Sop::with(['jobDescription.role.department','role.department'])->findOrFail($sopId);
+        return JdSop::with(['sops.role.department', 'jobDescription.role.department'])->findOrFail($jdId);
     }
 
     public function storeSop(array $data)
     {
         DB::beginTransaction();
         try {
-            $sop = Sop::updateOrCreate(
-                ['id' => $data['id'] ?? null], $data);
+            if (isset($data['sops'])) {
+                $decodedSops = json_decode($data['sops'], true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ResponseMessage('Invalid JSON data provided for sop items.', 400);
+                }
+            }
+            $jdSop = JdSop::updateOrCreate(
+                ['id' => $data['id'] ?? null],
+                [
+                    'job_description_id' => $data['job_description_id']
+                ]
+            );
+
+            foreach ($decodedSops as $sopData) {
+                $sop = Sop::updateOrCreate(
+                    ['id' => $sopData['id'] ?? null],
+                    [
+                        'jd_sop_id' => $jdSop->id,
+                        'sop' => $sopData['sop'],
+                        'role_id' => $sopData['role_id'],
+                    ]
+                );
+            }
             DB::commit();
             return $sop;
         } catch (\Exception $e) {
@@ -117,10 +151,14 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
             throw $e;
         }
     }
-    public function deleteSop(int $sopId)
+    public function deleteJdSopById(int $jdSopId)
     {
-        $sop = Sop::findOrFail($sopId);
-        $sop->delete();
-        return $sop;
+
+        $jdSop = JdSop::findOrFail($jdSopId);
+        $jdSop->sops()->each(function ($sop) {
+            $sop->delete();
+        });
+        $jdSop->delete();
+        return $jdSop;
     }
 }

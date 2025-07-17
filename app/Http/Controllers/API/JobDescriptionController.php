@@ -15,7 +15,7 @@ class JobDescriptionController extends Controller
     protected JobDescriptionRepositoryInterface $jobDescriptionRepository;
     public function __construct(JobDescriptionRepositoryInterface $jobDescriptionRepository)
     {
-    $this->jobDescriptionRepository = $jobDescriptionRepository;
+        $this->jobDescriptionRepository = $jobDescriptionRepository;
     }
 
     public function getJobDescription(Request $request)
@@ -64,9 +64,9 @@ class JobDescriptionController extends Controller
         $jobSpecification = $this->jobDescriptionRepository->deleteJobSpecification($jobSpecificationId);
         ResponseData($jobSpecification);
     }
-    public function storeSop(SopStoreRequest $validatedData)
+    public function storeSop(Request $request)
     {
-        $sop = $this->jobDescriptionRepository->storeSop($validatedData->all());
+        $sop = $this->jobDescriptionRepository->storeSop($request->all());
         ResponseData($sop);
     }
 
@@ -75,14 +75,14 @@ class JobDescriptionController extends Controller
         $sop = $this->jobDescriptionRepository->getSop($request);
         ResponseData($sop);
     }
-    public function showSop(int $sopId)
+    public function showSop(int $jdSopId)
     {
-        $sop = $this->jobDescriptionRepository->showSop($sopId);
+        $sop = $this->jobDescriptionRepository->showSop($jdSopId);
         ResponseData($sop);
     }
-    public function deleteSop(int $sopId)
+    public function deleteJdSopById(int $jdSopId)
     {
-        $sop = $this->jobDescriptionRepository->deleteSop($sopId);
+        $sop = $this->jobDescriptionRepository->deleteJdSopById($jdSopId);
         ResponseData($sop);
     }
 }

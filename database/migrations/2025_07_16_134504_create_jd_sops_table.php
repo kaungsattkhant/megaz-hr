@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('tag_id')->nullable()->after('code');
+        Schema::create('jd_sops', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('job_description_id')
+                ->constrained('job_descriptions')
+                ->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('items', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('jd_sops');
     }
 };
