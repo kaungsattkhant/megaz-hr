@@ -57,7 +57,7 @@
                                         Service?
                                     </td> -->
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.total }}
+                                        {{ invoice.sub_total }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span :class="invoice.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800 '" class="px-2 py-1 rounded capitalize font-semibold text-sm">
