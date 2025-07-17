@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Repositories\JobDescription;
 
@@ -28,7 +28,7 @@ interface JobDescriptionRepositoryInterface
 
     public function getSop(Request $request);
 
-    public function showSop(int $sopId);
-    
-    public function deleteSop(int $sopId);
+    public function showSop(int $jdId);
+
+    public function deleteJdSopById(int $sopId);
 }
