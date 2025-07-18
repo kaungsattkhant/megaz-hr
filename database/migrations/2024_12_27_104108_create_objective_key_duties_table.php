@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('objective_key_duties', function (Blueprint $table) {
-            // $table->id();
-            // $table->date('assign_date');
-            // $table->unsignedBigInteger('created_by');
-            // $table->boolean('is_active')->default(1);
-            // $table->date('due_date');
-            // $table->timestamps();
-        });
+        // Schema::create('objective_key_duties', function (Blueprint $table) {
+        // $table->id();
+        // $table->date('assign_date');
+        // $table->unsignedBigInteger('created_by');
+        // $table->boolean('is_active')->default(1);
+        // $table->date('due_date');
+        // $table->timestamps();
+        // });
     }
 
     /**
