@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\ObjectiveStaff;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ObjectiveKeyStaffImage extends Model
+class ObjectiveStaffImage extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'objectivekey_staff_id',
+        'objective_staff_id',
         'image_url',
         'image_path'
     ];
-    public function objective_keyStaff(): BelongsTo
+    public function objectiveStaff(): BelongsTo
     {
-        return  $this->belongsTo(ObjectivekeyStaff::class, 'objectivekey_staff_id');
+        return  $this->belongsTo(ObjectiveStaff::class, 'objective_staff_id');
     }
 }

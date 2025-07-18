@@ -9,15 +9,15 @@ class ObjectiveKeyDuty extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'assign_date',
-        'created_by',
-        'is_active',
-        'due_date'
-    ];
+    // protected $fillable = [
+    //     'assign_date',
+    //     'created_by',
+    //     'is_active',
+    //     'due_date'
+    // ];
 
-    public function objectivekeyStaff()
-    {
-        return $this->hasMany(ObjectivekeyStaff::class, 'objective_key_duty_id');
-    }
+    // public function objectivekeyStaff()
+    // {
+    //     return $this->hasMany(ObjectivekeyStaff::class, 'objective_key_duty_id');
+    // }
 }

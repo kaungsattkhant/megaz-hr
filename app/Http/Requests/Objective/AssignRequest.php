@@ -24,7 +24,6 @@ class AssignRequest extends APIRequest
     public function rules(): array
     {
         return [
-
             'assign_date' => 'required|date',
             'assign_duty' => 'required',
             'due_date' => 'required|date',

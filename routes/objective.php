@@ -11,7 +11,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/objectives', 'getObjectives');
     Route::get('/roles_department/{departmentId}', 'getRolesByDepartmentId');
     Route::post('/objectives', 'store');
-    Route::post('/objectives/{id}', 'update');
+    // Route::post('/objectives/{id}', 'update');
     Route::get('/objectives/{id}', 'getObjectiveById');
     Route::delete('/objectives/{id}', 'deleteObjective');
     Route::get('dashboard_okr', 'dashboardOkr');
@@ -22,8 +22,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/assign_duties/{id}', 'showAssignDutiesById');
     Route::delete('/assign_duties/{id}', 'deleteAssignDutiesById');
     Route::delete('/assign_duties/objective_key_staff/{id}', 'deleteAssignObjKeyStaffById');
-    Route::post('/assign_duties', 'storeAssignDutiesByObjectiveKeys');
-    Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
+    Route::post('/assign_duties', 'storeAssignDutiesByObjectives');
+    Route::get('/okr-assigns', 'getOkrAssigns');
+    // Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');

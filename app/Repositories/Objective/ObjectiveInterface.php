@@ -12,14 +12,15 @@ interface ObjectiveInterface
   public function getObjectiveById(Request $request, $objId);
   public function getRolesByDepartmentId(Request $request, int $departmentId);
   public function store(array $validatedData);
-  public function update(array $validatedData, int $objId);
+  // public function update(array $validatedData, int $objId);
   public function deleteObjective($objId);
 
   //assign duties keyresults
   public function getObjectiveKeysByStaffId(int $staffId);
   public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null);
-  public function storeAssignDutiesByObjectiveKeys($validatedData);
-  public function updateAssignDutiesByObjectiveKeys($validatedData, $objectiveKeyStaffId);
+  public function storeAssignDutiesByObjectives($validatedData);
+  public function getOkrAssigns(Request $request);
+  // public function updateAssignDutiesByObjectiveKeys($validatedData, $objectiveKeyStaffId);
   public function deleteAssignDutiesById($assignDutyId);
   public function deleteAssignObjKeyStaffById(int $objKeyStaffId);
   //mobil
