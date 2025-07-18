@@ -36,7 +36,6 @@ class ObjectiveStaff extends Model
         return $this->belongsTo(Staff::class, 'staff_id');
     }
 
-
     public function objStaffImg()
     {
         return $this->hasMany(ObjectiveStaffImage::class);

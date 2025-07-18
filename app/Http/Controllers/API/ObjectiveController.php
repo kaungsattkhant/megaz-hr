@@ -108,12 +108,16 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    // public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $assignDutyId)
-    // {
-    //     $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $assignDutyId);
-    //     ResponseData($data);
-    // }
-
+    public function getOkrAssignById(int $okrAssignId)
+    {
+        $data = $this->objectiveRepository->getOkrAssignById($okrAssignId);
+        ResponseData($data);
+    }
+    public function deleteOkrAssignById(int $okrAssignId)
+    {
+        $data = $this->objectiveRepository->deleteOkrAssignById($okrAssignId);
+        ResponseData($data);
+    }
 
     //for mobile
 

@@ -87,11 +87,11 @@ class ObjectiveRepository implements ObjectiveInterface
         $type = $request->input('type');
 
         $query = Objective::with(['role.department', 'sop', 'objectiveKeys'])
-        ->objectiveFilter($search, $roleId, $type)->orderBy('id', 'desc');
+            ->objectiveFilter($search, $roleId, $type)->orderBy('id', 'desc');
         if ($request->per_page || $request->page) {
-            return $query->paginate(config('common.list_count'));
+            return $query->orderBy('id', 'desc')->paginate(config('common.list_count'));
         } else {
-            return $query->get();
+            return $query->orderBy('id', 'desc')->get();
         }
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
@@ -131,7 +131,7 @@ class ObjectiveRepository implements ObjectiveInterface
                 foreach ($objectiveKeys as $objectiveKey) {
                     $updatedObjectiveKeys[] = $objectiveKey['id'] ?? null;
                 }
-                // Delete existing objective keys that are not in the updated list
+
                 $existingObjectiveKeys = ObjectiveKey::where('objective_id', $objective->id)->pluck('id')->toArray();
                 $objKeyToDelete = array_diff($existingObjectiveKeys, $updatedObjectiveKeys);
                 if (!empty($objKeyToDelete)) {
@@ -158,82 +158,47 @@ class ObjectiveRepository implements ObjectiveInterface
             throw $e;
         }
     }
-
-    // public function update(array $validatedData, int $objId)
-    // {
-    //     return $this->saveObjectiveData($validatedData, $objId);
-    // }
-
-    // private function saveObjectiveData(array $data, int $objId = null)
-    // {
-    //     DB::beginTransaction();
-    //     try {
-
-    //         $data['created_by'] = UserData()->id;
-
-    //         if ($objId) {
-    //             $objective = Objective::findOrFail($objId);
-    //             $objective->update($data);
-    //         } else {
-    //             $objective = Objective::create($data);
-    //         }
-
-    //         if (isset($data['objective_key'])) {
-    //             $this->syncObjectiveKeys($objective, $data['objective_key']);
-    //         }
-
-    //         DB::commit();
-    //         return $objective;
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         throw $e;
-    //     }
-    // }
-
-    // private function syncObjectiveKeys(Objective $objective, string $objectiveKeys)
-    // {
-    //     if (!empty($objectiveKeys)) {
-    //         $objectiveKeys = json_decode($objectiveKeys, true);
-
-    //         $objective->objectiveKeys()->delete();
-
-    //         foreach ($objectiveKeys as $key) {
-    //             ObjectiveKey::create([
-    //                 'objective_id' => $objective->id,
-    //                 'role_id' => $key['role_id'],
-    //                 'name' => $key['name'],
-    //                 'okr_point' => $key['okr_point'],
-    //                 'duration' => $key['duration'],
-    //             ]);
-    //         }
-    //     }
-    // }
-
     //assign duties keyresults
     public function getObjectiveKeysByStaffId(int $staffId)
     {
         $staff = Staff::findOrFail($staffId);
         $roleIds = $staff->roles->pluck('id');
-        return ObjectiveKey::with('objective', 'role.department', 'sop')->whereIn('role_id', $roleIds)->get();
+        return ObjectiveStaff::with([
+            'objective.objectiveKeys',
+            'staff.roles',
+            'staff.department',
+            'objective.sop',
+            'objective.role'
+        ])->where('staff_id', $staffId)->orderBy('id', 'desc')->paginate(config('common.list_count'));
     }
 
     public function storeAssignDutiesByObjectives($validatedData)
     {
         DB::beginTransaction();
         try {
-            if (isset($validatedData['assign_duty'])) {
-                $assignDuties = json_decode($validatedData['assign_duty'], true);
-                foreach ($assignDuties as $assignDuty) {
-                    $objective = Objective::findOrFail($assignDuty['objective_id']);
+            if (isset($validatedData['okr_assign'])) {
+                $okrAssigns = json_decode($validatedData['okr_assign'], true);
+                if (!is_array($okrAssigns)) {
+                    return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
+                }
+                if (isset($validatedData['del_ids'])) {
+                    $delIds = json_decode($validatedData['del_ids'], true);
+                    if (!is_array($delIds)) {
+                        return ResponseMessage('Invalid JSON format for delete IDs.', 400);
+                    }
+                    ObjectiveStaff::whereIn('id', $delIds)->delete();
+                }
+                foreach ($okrAssigns as $okrAssign) {
+                    $objective = Objective::findOrFail($okrAssign['objective_id']);
                     $objectiveStaff = ObjectiveStaff::updateOrCreate(
                         [
-                            'id' => $assignDuty['id'] ?? null,
+                            'id' => $okrAssign['id'] ?? null,
                         ],
                         [
-                            'staff_id' => $assignDuty['staff_id'],
-                            'start_date' => $assignDuty['start_date'],
-                            'end_date' => $assignDuty['end_date'],
-                            'objective_id' => $assignDuty['objective_id'],
+                            'staff_id' => $okrAssign['staff_id'],
+                            'start_date' => $okrAssign['start_date'],
+                            'end_date' => $okrAssign['end_date'],
+                            'objective_id' => $okrAssign['objective_id'],
                             'okr_point' => $objective->okr_point,
                         ]
                     );
@@ -248,15 +213,42 @@ class ObjectiveRepository implements ObjectiveInterface
     }
     public function getOkrAssigns(Request $request)
     {
-        $query = ObjectiveStaff::with(['staff', 'objective.objectiveKeys','objective.role.department','objective.sop']);
-        if($request->has('role_id')){
+        $query = ObjectiveStaff::with([
+            'staff.department',
+            'staff.roles',
+            'objective.objectiveKeys',
+            'objective.role.department',
+            'objective.sop'
+        ]);
+        if ($request->has('role_id')) {
             $query->whereHas('objective.role', function ($query) use ($request) {
                 $query->where('id', $request->role_id);
             });
         }
-        return $query->get();
+        if ($request->per_page || $request->page) {
+            return $query->orderBy('id', 'desc')->paginate(config('common.list_count'));
+        } else {
+            return $query->orderBy('id', 'desc')->get();
+        }
+    }
+    public function getOkrAssignById(int $okrAssignId)
+    {
+        $okrAssign = ObjectiveStaff::with([
+            'staff.department',
+            'staff.roles',
+            'objective.objectiveKeys',
+            'objective.role.department',
+            'objective.sop'
+        ])->findOrFail($okrAssignId);
+        return $okrAssign;
     }
 
+    public function deleteOkrAssignById(int $okrAssignId)
+    {
+        $okrAssign = ObjectiveStaff::findOrFail($okrAssignId);
+        $okrAssign->delete();
+        return $okrAssign;
+    }
 
     public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null)
     {
@@ -374,7 +366,7 @@ class ObjectiveRepository implements ObjectiveInterface
                 $image_url = Storage::url($image_path);
 
                 $storedImages[] = ObjectiveStaffImage::create([
-                    'objective_staff_id' =>$objStaffId,
+                    'objective_staff_id' => $objStaffId,
                     'image_path' => $image_path,
                     'image_url' => $image_url,
                 ]);
