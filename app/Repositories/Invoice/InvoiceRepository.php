@@ -1036,11 +1036,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ]);
             }   
             $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
-            if ((int)$paidAmount > $invoiceCost) {
+            if ($depositBalance>1 && (int)$paidAmount > $invoiceCost) {
                 ResponseMessage('Deposit balance is enough.Customer Deposit Balance is '.$depositBalance.'.Paid Amount does not require.Invoice cost is '.$invoiceCost, 419);
             }
             if($depositBalance>1 && $invoiceCost>$paidAmount){
                 ResponseMessage('Paid amount is required '. $invoiceCost,419);
+            }   
+            if($depositBalance < 1 && $invoiceCost>$paidAmount){
+                ResponseMessage('Paid amount is invalid!',419);
             }   
             $arAmount = $invoiceCost - $paidAmount;
             if ($arAmount > 0) {
