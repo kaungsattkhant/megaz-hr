@@ -220,25 +220,25 @@ class Staff extends Authenticatable
 
     public function completed_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'completed_by');
+        return $this->hasMany(ObjectiveStaff::class, 'completed_by');
     }
     public function in_progressed_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'in_progressed_by');
+        return $this->hasMany(ObjectiveStaff::class, 'in_progressed_by');
     }
     public function approved_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'approved_by');
+        return $this->hasMany(ObjectiveStaff::class, 'approved_by');
     }
 
     public function cancelled_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'cancelled_by');
+        return $this->hasMany(ObjectiveStaff::class, 'cancelled_by');
     }
 
     public function objectiveKeyStaff()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'staff_id');
+        return $this->hasMany(ObjectiveStaff::class, 'staff_id');
     }
 
     public function checkIns()

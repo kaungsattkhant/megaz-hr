@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Objective;
+use App\Models\CompletedObjectiveKey;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ObjectivekeyStaff extends Model
+class ObjectiveStaff extends Model
 {
     use HasFactory;
 
     protected $fillable =
     [
         'staff_id',
-        'objective_key_id',
-        'objective_key_duty_id',
+        'objective_id',
+        'start_date',
+        'end_date',
         'status',
         'in_progressed_at',
         'in_progressed_by',
@@ -34,18 +37,13 @@ class ObjectivekeyStaff extends Model
         return $this->belongsTo(Staff::class, 'staff_id');
     }
 
-    public function objectiveKey()
+    public function objStaffImg()
     {
-        return $this->belongsTo(ObjectiveKey::class, 'objective_key_id');
+        return $this->hasMany(ObjectiveStaffImage::class);
     }
 
-    public function objKeyStaffImg()
+    public function objective()
     {
-        return $this->hasMany(ObjectiveKeyStaffImage::class);
-    }
-
-    public function objectiveKeyDuty()
-    {
-        return $this->belongsTo(ObjectiveKeyDuty::class, 'objective_key_duty_id');
+        return $this->belongsTo(Objective::class, 'objective_id');
     }
 }

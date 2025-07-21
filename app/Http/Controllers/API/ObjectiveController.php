@@ -37,7 +37,7 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function store(ObjectiveRequest $request)
+    public function store(Request $request)
     {
 
         $data = $this->objectiveRepository->store($request->all());
@@ -51,20 +51,16 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function update(Request $request, int $objId)
-    {
-        $data = $this->objectiveRepository->update($request->all(), $objId);
-        ResponseData($data);
-    }
-
-
+    // public function update(Request $request, int $objId)
+    // {
+    //     $data = $this->objectiveRepository->update($request->all(), $objId);
+    //     ResponseData($data);
+    // }
     public function deleteObjective(int $objId)
     {
         $data = $this->objectiveRepository->deleteObjective($objId);
         ResponseData($data);
     }
-
-
 
     // assign duties 
 
@@ -100,19 +96,28 @@ class ObjectiveController extends Controller
     }
 
 
-    public function storeAssignDutiesByObjectiveKeys(AssignRequest $request)
+    public function storeAssignDutiesByObjectives(Request $request)
     {
-        $data = $this->objectiveRepository->storeAssignDutiesByObjectiveKeys($request->all());
+        $data = $this->objectiveRepository->storeAssignDutiesByObjectives($request->all());
         ResponseData($data);
     }
 
-
-    public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $assignDutyId)
+    public function getOkrAssigns(Request $request)
     {
-        $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $assignDutyId);
+        $data = $this->objectiveRepository->getOkrAssigns($request);
         ResponseData($data);
     }
 
+    public function getOkrAssignById(int $okrAssignId)
+    {
+        $data = $this->objectiveRepository->getOkrAssignById($okrAssignId);
+        ResponseData($data);
+    }
+    public function deleteOkrAssignById(int $okrAssignId)
+    {
+        $data = $this->objectiveRepository->deleteOkrAssignById($okrAssignId);
+        ResponseData($data);
+    }
 
     //for mobile
 
@@ -166,6 +171,12 @@ class ObjectiveController extends Controller
     public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
         $data = $this->objectiveRepository->getdailyObjectivesByStaffId($request, $staffId);
+        ResponseData($data);
+    }
+
+    public function storeCompletedObjKeys(Request $request)
+    {
+        $data = $this->objectiveRepository->storeCompletedObjKeys($request->all());
         ResponseData($data);
     }
 
