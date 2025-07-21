@@ -119,7 +119,9 @@ class OrderRepository implements OrderRepositoryInterface
                     // $entity = $latestRoomSession->entitySession->entity;
                     // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                     if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
-                        $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                        $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')
+                        ->where('expired_at', '>', CurrentTime())
+                        ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                         if (count($packs) < $orderItem->quantity) {
                             ResponseMessage('Not enough packs to sell', 402);
                         }

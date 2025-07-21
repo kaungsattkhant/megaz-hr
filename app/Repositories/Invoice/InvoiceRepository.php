@@ -1034,11 +1034,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'action' => 'debit',
                     'is_cashier_confirmed' => 0
                 ]);
-            }
+            }   
             $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
-            if ($paidAmount > $invoiceCost) {
-                ResponseMessage('Paid amount is invalid', 419);
+            if ($depositBalance>1 && (int)$paidAmount > $invoiceCost) {
+                ResponseMessage('Deposit balance is enough.Customer Deposit Balance is '.$depositBalance.'.Paid Amount does not require.Invoice cost is '.$invoiceCost, 419);
             }
+            if($depositBalance>1 && $invoiceCost>$paidAmount){
+                ResponseMessage('Paid amount is required '. $invoiceCost,419);
+            }   
+            if($depositBalance < 1 && $invoiceCost>$paidAmount){
+                ResponseMessage('Paid amount is invalid!',419);
+            }   
             $arAmount = $invoiceCost - $paidAmount;
             if ($arAmount > 0) {
                 // dd('Have ar amount '.$arAmount);
@@ -1083,12 +1089,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     'transactionable_type' => 'invoice',
             //     'is_confirmed' => 1,
             // ]);
-
-            $ledgerTransactionWriter->storeLedger([
-                'value' => $request->paid_amount,
-                'action' => 'debit',
-                'account_id' => $cashAccount->id
-            ], $transaction->id);
+            if($paidAmount>0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $request->paid_amount,
+                    'action' => 'debit',
+                    'account_id' => $cashAccount->id
+                ], $transaction->id);
+            }
+           
             if ($invoice->total_session_price > 0) {
                 $ledgerTransactionWriter->storeLedger([
                     'value' => $invoice->total_session_price,
