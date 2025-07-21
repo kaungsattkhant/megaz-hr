@@ -696,11 +696,14 @@ export default {
 
             departmentList: [],
             selectedDepartment: null,
+            originalSelectedDepartment: null,
 
             roleList: [],
             selectedRole: null,
+            originalSelectedRole: null,
             roleIds: [],
 
+            originalSelectedFeatures: [],
             featureList: [],
             selectedFeatures: [],
             featureIds: [],
@@ -795,6 +798,7 @@ export default {
             bankName: null,
             bankSelectError: null,
             bankAccountNumberError: null,
+            creatable: false,
         };
     },
 
@@ -864,9 +868,12 @@ export default {
         async reconstructStaffData() {
             if (this.staff) {
                 this.selectedDepartment = this.staff.department;
+                this.originalSelectedDepartment = this.selectedDepartment;
                 this.selectedRole = this.staff.roles[0];
+                this.originalSelectedRole = this.selectedRole;
                 this.selectedInventories = this.staff.inventories;
                 this.selectedFeatures = this.staff.features;
+                this.originalSelectedFeatures = this.selectedFeatures;
                 this.selectedSkills = this.staff.skills;
 
                 this.departmentList.forEach((department) => {
@@ -936,6 +943,10 @@ export default {
             // if (rolesResponse.data) {
             //     this.roleList = rolesResponse.data;
             // }
+            if(this.selectedDepartment.id == this.originalSelectedDepartment.id){
+                this.selectedRole = this.originalSelectedRole;
+                this.selectedFeatures = this.originalSelectedFeatures;
+            }
             if (this.selectedDepartment.features.length > 0) {
                 this.featureList = this.selectedDepartment.features;
             }
@@ -1015,7 +1026,7 @@ export default {
 
         async getSkillByRole(id) {
             this.selectedSkills = [];
-            this.selectedFeatures = [];
+            // this.selectedFeatures = [];
             let response = await getApiData({ url: `/api/roles/${id}/skills`, token: this.getToken() });
             if (response.data) {
                 this.skillList = response.data;
@@ -1026,81 +1037,102 @@ export default {
             this.featureIds = [];
             this.inventoryIds = [];
             this.skillIds = [];
+            this.creatable = true;
 
             if (!this.name) {
                 this.alertValiationMessage('name');
                 this.nameInputError = "Name must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.dob) {
                 this.alertValiationMessage('Date of Birth');
                 this.dateOfBirthInputError = "Date of birth must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.selectedGender) {
                 this.alertValiationMessage('gender');
                 this.genderInputError = "Gender must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if(!this.selectedNrcCode){
                 this.alertValiationMessage('NRC Code');
                 this.nrcCodeError = "NRC Code must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if(!this.selectedNrcTownship){
                 this.alertValiationMessage('NRC Township');
                 this.nrcTownshipError = "NRC Township must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if(!this.selectedNrcType){
                 this.alertValiationMessage('NRC Type');
                 this.nrcTypeError = "NRC Type must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
-            if (!this.nrcNumber || !this.nrcNumber.match(/^\d{6,8}$/)) {
+            // if (!this.nrcNumber || !this.nrcNumber.match(/^\d{6,8}$/)) {
+            //     this.alertValiationMessage('NRC Number');
+            //     this.nrcInputError = "NRC Number must be filled and valid (6 to 8 digits)";
+            //     // return 1;
+            //     this.creatable = false;
+            // }
+
+            if (!this.nrcNumber) {
                 this.alertValiationMessage('NRC Number');
                 this.nrcInputError = "NRC Number must be filled and valid (6 to 8 digits)";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.joinedDate) {
                 this.alertValiationMessage('joined date');
                 this.joinedDateInputError = "Joined date must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             // phone number format = !this.phoneNumber.match(/^09\d{7}(\d{2})?$/)
             if (!this.phoneNumber) {
                 this.alertValiationMessage('phone number');
-                this.phoneNumberInputError = "Phone number must be filled and valid (09XXXXXXXX or 09XXXXXXXXXX)";
-                return 1;
+                this.phoneNumberInputError = "Phone number must be filled";
+                // return 1;
+                this.creatable = false;
             }
 
             if(!this.selectedDepartment){
                 this.alertValiationMessage('department');
                 this.departmentInputError = "Department must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
             if(!this.selectedRole){
                 this.alertValiationMessage('role');
                 this.rolesInputError = "Staff role must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
             if (this.selectedFeatures.length < 1) {
                 this.alertValiationMessage('authorized features');
                 this.featuresInputError = "At least one feature must be authroized";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
             if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
                 this.alertValiationMessage('inventories');
                 this.inventoryInputError = "Inventory staff must select at least one inventory";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (this.selectedInventories.length > 0) {
@@ -1120,58 +1152,69 @@ export default {
             if (!this.state) {
                 this.alertValiationMessage('state');
                 this.stateInputError = "State/Division must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.city) {
                 this.alertValiationMessage('city');
                 this.cityInputError = "City must be selected";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.address) {
                 this.alertValiationMessage('address');
                 this.addressInputError = "Address must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.primaryName) {
                 this.alertValiationMessage('primary name');
                 this.primaryNameInputError = "Primary contact name must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.primaryPhone) {
                 this.alertValiationMessage('primary phone');
                 this.primaryPhoneInputError = "Primary contatct phone number must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.primaryRelationship) {
                 this.alertValiationMessage('primary relationship');
                 this.primaryRelationshipInputError = "Relationship with the primary contact must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.secondaryName) {
                 this.alertValiationMessage('secondary name');
                 this.secondaryNameInputError = "Secondary contact name must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.secondaryPhone) {
                 this.alertValiationMessage('secondary phone');
                 this.secondaryPhoneInputError = "Secondary contatct phone number must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
             if (!this.secondaryRelationship) {
                 this.alertValiationMessage('secondary relationship');
                 this.secondaryRelationshipInputError = "Relationship with the secondary contact must be filled";
-                return 1;
+                // return 1;
+                this.creatable = false;
             }
 
-            this.updateStaff();
+            if(this.creatable){
+                this.updateStaff();
+            }
         },
 
         async updateStaff() {
