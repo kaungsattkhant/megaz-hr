@@ -13,6 +13,8 @@
                 </label>
                 <input type="text" v-model="objName" class="input-ui ">
             </div><div class="col-span-9"></div>
+
+            
             <div class="col-span-10 border-b mt-4 mb-6"></div><div class="col-span-2"></div>
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">

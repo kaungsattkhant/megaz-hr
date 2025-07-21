@@ -1,5 +1,5 @@
 <template>
-    <div class=" container-card pb-4">
+    <div class=" container-card pb-4" v-show="!isFeature">
         <div class="mb-6">
             <p class="text-lg font-semibold font-inter">
                 Create New Staff
@@ -238,6 +238,15 @@
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
                     <label class="label-form mb-3">Authorized Features</label>
+                    <div class="input-ui flex justify-between">
+                        <span class="">{{ selectedFeatures ? selectedFeatures.length : '' }} features selected</span>
+                        <button class="px-3 border-l" @click="btnClickedChangeFeature()">
+                            <i class="fal fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- <div>
+                    <label class="label-form mb-3">Authorized Features</label>
                     <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
                     :preserve-search="true" placeholder="Select Features" label="name" track-by="id" :preselect-first="true">
                         <template #selection="{ values, search, isOpen }">
@@ -252,7 +261,7 @@
                     <div class="mt-1" v-if="featuresInputError">
                         <span class="px-1 text-red-600 text-sm">{{ featuresInputError }} *</span>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -659,6 +668,92 @@
             </div>
         </div>
     </div>
+
+
+    <transition
+        enter-active-class="fade-out duration-[200ms]"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="fade-in duration-[300ms]"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+        >
+    <div v-show="isFeature" class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008]" @click="btnClickedChangeFeature">
+        <div class="container-card pb-4 px-8 m-16 z-50 overflow-hidden" @click.stop>
+            <div class="mb-6 flex justify-between">
+                <p class="text-lg font-semibold font-inter">
+                    Feature
+                </p>
+                <div>
+                    <button type="button" class="add-btn focus:shadow-none focus:outline-none" @click="btnClickedChangeFeature">
+                        Done
+                    </button>
+                </div>
+            </div>
+            <div>
+                <div v-for="(module,index) in featureList" class="mb-4 pb-6 px-2 border-b border-gray-200 flex">
+                    <p class=" capitalize mb-4 font-semibold w-[20%]">
+                        {{ module.module }}
+                    </p>
+                    <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                        <div v-for="feature in module.features" class="">
+                            
+                            <label class="block items-center space-x-2 cursor-pointer">
+                                <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
+                                <input
+                                type="checkbox" :value="feature.id" v-model="selectedFeatures"
+                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                                />
+                                
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" class="add-btn focus:shadow-none focus:outline-none" @click="btnClickedChangeFeature">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+    </transition>
+    <!-- <div class="container-card pb-4 px-8" v-show="isFeature">
+
+        <div class="mb-6 flex justify-between">
+            <p class="text-lg font-semibold font-inter">
+                Feature
+            </p>
+            <div>
+                <button type="button" class="add-btn focus:shadow-none focus:outline-none" @click="btnClickedChangeFeature">
+                    Done
+                </button>
+            </div>
+        </div>
+        <div>
+            <div v-for="(module,index) in featureList" class="mb-4 pb-6 px-2 border-b border-gray-200">
+                <p class=" capitalize mb-4 font-semibold">
+                    {{ module.module }}
+                </p>
+                <div class=" grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                    <div v-for="feature in module.features" class="">
+                        <label class="inline-flex items-center space-x-2">
+                            <input
+                              type="checkbox" :value="feature.id" v-model="selectedFeatures"
+                              class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0"
+                            />
+                            <span class="text-black break-all capitalize">{{ feature.slug }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button type="button" class="add-btn focus:shadow-none focus:outline-none" @click="btnClickedChangeFeature">
+                Done
+            </button>
+        </div>
+    </div> -->
 </template>
 
 <script>
@@ -780,6 +875,8 @@ export default {
             bankName: null,
             bankSelectError: null,
             bankAccountNumberError: null,
+
+            isFeature: false,
         };
     },
 
@@ -871,12 +968,37 @@ export default {
             // if (rolesResponse.data) {
             //     this.roleList = rolesResponse.data;
             // }
-            if(this.selectedDepartment.features.length > 0){
-                this.featureList = this.selectedDepartment.features;
-            }
+
+
+            // if(this.selectedDepartment.features.length > 0){
+            //     this.featureList = this.selectedDepartment.features;
+            // }
+            this.getFeatureList();
 
             if(this.selectedDepartment.inventory){
                this.inventories.push(this.selectedDepartment.inventory.inventory);
+            }
+        },
+        async getFeatureList() {
+            let response = await getApiData({ url: `/api/feature_by_department/1`, token: this.getToken() });
+            if (response.data) {
+                this.featureList = response.data;
+            }
+        },
+        btnClickedChangeFeature(){
+            if(!this.selectedDepartment){
+                this.$notify({
+                    title: `Input validation`,
+                    text: `Please Select Department First`,
+                    type: "warn"
+                });
+                return
+            }
+            if(this.isFeature){
+                this.isFeature = false;
+            }
+            else{
+                this.isFeature = true;
             }
         },
 
@@ -904,7 +1026,7 @@ export default {
 
         async getSkillByRole(id){
             this.selectedSkills = [];
-            this.selectedFeatures = [];
+            // this.selectedFeatures = [];
             let response = await getApiData({ url: `/api/roles/${id}/skills`, token: this.getToken() });
             if (response.data) {
                 this.skillList = response.data;
@@ -1009,9 +1131,9 @@ export default {
                 this.skillIds.push(skill.id);
             });
 
-            this.selectedFeatures.forEach((feature) => {
-                this.featureIds.push(feature.id);
-            });
+            // this.selectedFeatures.forEach((feature) => {
+            //     this.featureIds.push(feature.id);
+            // });
 
             if (!this.state) {
                 this.alertValiationMessage('state');
@@ -1105,7 +1227,8 @@ export default {
             formData.append('department_id', this.selectedDepartment.id);
             formData.append('role_id', this.selectedRole.id);
             formData.append('skill_ids',JSON.stringify(this.skillIds));
-            formData.append('feature_ids', JSON.stringify(this.featureIds));
+            // formData.append('feature_ids', JSON.stringify(this.featureIds));
+            formData.append('feature_ids', JSON.stringify(this.selectedFeatures));
             if (this.inventoryIds.length > 0) {
                 formData.append('inventory_ids', JSON.stringify(this.inventoryIds));
             }
@@ -1239,6 +1362,8 @@ export default {
         this.getStateList();
         this.getBanksList();
         // this.getInventoryList();
+
+        this.getFeatureList();
     },
 
     mounted() {

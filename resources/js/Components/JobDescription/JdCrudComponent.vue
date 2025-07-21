@@ -357,7 +357,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/overtime_fees/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/job-descriptions/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getPrimaryList(1);
             }
