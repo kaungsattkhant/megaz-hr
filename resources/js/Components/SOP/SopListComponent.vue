@@ -17,20 +17,20 @@
                     <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
                 <div class="flex pr-0 gap-x-4">
-                    <!-- <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Department"
-                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                            <option :value="department.value" v-for="(department, departmentIndex) in departmentList"
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDeparment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in searchDepartmentList"
                                 :key="departmentIndex"> {{ department.name }} </option>
                         </select>
                     </div>
                     <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
-                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                            <option :value="role.value" v-for="(role, roleIndex) in roleList"
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
-                    </div> -->
+                    </div>
                     <a href="/SOP/create"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
@@ -47,7 +47,7 @@
                                 <th scope="col" class="">
                                     #
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class=" text-left">
                                     SOP
                                 </th>
                                 <th scope="col" class="">
@@ -71,14 +71,15 @@
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ item.sop }}
+                                    <td class="whitespace-nowrap text-left">
+                                        <!-- {{ item.sop }} -->
+                                        <span class="font-inter after-coma pr-1" v-for="sop in item.sops">{{ sop.sop }}</span>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.job_description.job_description }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.role.department.name }}
+                                        {{ item.job_description.role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.job_description.role.name }}
@@ -186,11 +187,11 @@ export default {
         return {
             primaryList: [],
             
-            departmentList: [],
+            searchDepartmentList: [],
             roleList: [],
             
-            selectedDepartment:null,
-            selectedRole:null,
+            selectedSearchDeparment:null,
+            selectedSearchRole:null,
 
             currentPage: 0,
             perPage: 0,
@@ -201,7 +202,7 @@ export default {
 
             overtime: null,
 
-            url:'/api/sops',
+            url:'/api/sops?page=1',
             url_search:'',
             url_department:'',
             url_role:'',
@@ -215,17 +216,31 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
-            let url = this.url + this.url_search + this.url_department + this.url_role;
+            // let url = this.url + this.url_search + this.url_department + this.url_role;
+            let url = this.url + this.url_role
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.primaryList = response.data.data;
+                if(response.data.data){
+                    this.primaryList = response.data.data;
+                }
+                else{
+                    this.primaryList = response.data;
+                }
             }
         },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
-                this.departmentList = response.data;
+                this.searchDepartmentList = response.data;
             }
+        },
+        searchDepartmentChange(){
+            this.roleList = this.selectedSearchDeparment.roles;
+            this.selectedSearchRole = null;
+        },
+        searchRoleChange(){
+            this.url = '/api/sops?role_id=' + this.selectedSearchRole.id
+            this.getPrimaryList();
         },
 
 
@@ -275,7 +290,8 @@ export default {
         
     },
     created() {
-        this.getPrimaryList();
+        this.getPrimaryList(1);
+        this.getDepartmentList();
     }
 }
 </script>
