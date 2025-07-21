@@ -92,6 +92,7 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\SellingExtraAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -585,6 +586,12 @@ Route::get('/items/{id}', [ItemAPIController::class, 'detail']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 
+Route::controller(SellingExtraAPIController::class)->group(function(){
+    Route::get('/selling_extras', 'getSellingExtras');
+    Route::post('/selling_extras', 'createSellingExtras');
+    Route::post('/selling_extras/{id}', 'updateSellingExtras');
+});
+
 Route::post('/add_item_price_by_supplier_item', [ItemAPIController::class, 'addItemPrice']);
 Route::get('/get_uom_conversion_by_uom', [UomAPIController::class, 'getUomConversionByUom']);
 Route::get('/get_item_type', [ItemAPIController::class, 'getItemType']);
@@ -620,7 +627,7 @@ Route::get('/menu_report', [MenuAPIController::class, 'menuReport']);
 Route::get('/menu_costing', [MenuAPIController::class, 'costingMenu']);
 
 
-// Route::group(['prefix' => 'management'], function () {});    
+// Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus', [MenuAPIController::class, 'menuByMenuCategory']);

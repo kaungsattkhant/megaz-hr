@@ -188,6 +188,8 @@ use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterf
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 
+use App\Repositories\SellingExtra\SellingExtraRepositoryInterface;
+use App\Repositories\SellingExtra\SellingExtraRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -283,5 +285,7 @@ class RepositoryServiceProvider extends ServiceProvider
 
         $this->app->bind(JobDescriptionRepositoryInterface::class, JobDescriptionRepository::class);
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
+
+        $this->app->bind(SellingExtraRepositoryInterface::class, SellingExtraRepository::class);
     }
 }
