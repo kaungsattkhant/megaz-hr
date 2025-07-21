@@ -30,12 +30,13 @@ interface ObjectiveInterface
   //mobil
   public function objectiveLists(Request $request);
   public function getdailyObjectives(Request $request, $objId);
-  public function updateDailyObjective(array $data, $objKeyStaffId);
+  public function updateDailyObjective(array $data,$objStaffId);
   public function storeImages($validatedData, $objKeystaffId);
   public function updateImages($validatedData, $objKeyStaffId);
   public function getObjKeyStaffImage($objKeystaffId);
   public function deleteObjKeystaffImage($imgId);
   public function getdailyObjectivesByStaffId(Request $request, $staffId);
+  public function storeCompletedObjKeys($data);
 
   //ktvobjtree
   public function getKtvRoom(Request $request);

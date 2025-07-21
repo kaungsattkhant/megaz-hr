@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Sop;
 use App\Models\Role;
+use App\Models\ObjectiveStaff;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,11 +22,13 @@ class Objective extends Model
         'sop_id',
     ];
 
-
-
     public function objectiveKeys(): HasMany
     {
         return $this->hasMany(ObjectiveKey::class, 'objective_id');
+    }
+    public function objectiveStaff(){
+        
+        return $this->hasMany(ObjectiveStaff::class, 'objective_id');
     }
 
     public function scopeObjectiveFilter($query, $search = null, $roleId = null, $type = null)

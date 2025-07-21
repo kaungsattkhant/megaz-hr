@@ -33,11 +33,12 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
     Route::get('/daily/objectives/{staffId}', 'getdailyObjectivesByStaffId');
-    Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
-    Route::post('/objectives/key_staff/{id}/images', 'storeImages');
-    Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');
-    Route::get('/objectives/key_staff/{objKeystaffId}/images', 'getObjKeyStaffImage');
-    Route::delete('/objectives/key_staff/images/{id}', 'deleteObjKeystaffImage');
+    Route::post('/daily/objectives_key_staff/{objStaffId}', 'updateDailyObjective');
+    Route::post('/objectives/key_staff/{objStaffId}/images', 'storeImages');
+    Route::post('/objectives/key_staff/{objStaffId}/images/update', 'updateImages');
+    Route::get('/objectives/key_staff/{objStaffId}/images', 'getObjKeyStaffImage');
+    Route::delete('/objectives/key_staff/images/{objStaffId}', 'deleteObjKeystaffImage');
+    Route::post('/complete-obj-keys', 'storeCompletedObjKeys');
 
     //ktv-objective-tree
     Route::get('/ktv/entity_room', 'getKtvRoom');

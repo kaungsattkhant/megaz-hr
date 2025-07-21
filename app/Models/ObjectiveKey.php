@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\CompletedObjectiveKey;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ObjectiveKey extends Model
 {
@@ -18,8 +19,8 @@ class ObjectiveKey extends Model
         return  $this->belongsTo(Objective::class, 'objective_id');
     }
 
-    public function getAssignedDaysAttribute($value)
-    {
-        return explode(',', $value);
-    }
+    // public function getAssignedDaysAttribute($value)
+    // {
+    //     return explode(',', $value);
+    // }
 }

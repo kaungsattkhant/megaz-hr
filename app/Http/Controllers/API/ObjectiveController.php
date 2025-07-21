@@ -174,6 +174,12 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function storeCompletedObjKeys(Request $request)
+    {
+        $data = $this->objectiveRepository->storeCompletedObjKeys($request->all());
+        ResponseData($data);
+    }
+
     //ktvProductTree
 
     public function getKtvRoom(Request $request)
