@@ -30,6 +30,7 @@
                                     <th>#</th>
                                     <th>Item</th>
                                     <th>Item Code</th>
+                                    <th>UOM</th>
                                     <th>Price</th>
                                     <th>Quantity</th>
                                     <th scope="col" class="">
@@ -48,6 +49,9 @@
                                         </td>
                                         <td class="">
                                             {{ sellingExtra.item.code }}
+                                        </td>
+                                        <td class="">
+                                            {{ sellingExtra.uom.name }}
                                         </td>
                                         <td class="">
                                             {{ sellingExtra.price }}
