@@ -43,6 +43,8 @@ class ItemRepository implements ItemRepositoryInterface
             return Item::with([
                 'category',
                 'supplier_items.brand',
+                'uom',
+                'base_uom',
                 'supplier_items.item_price' => function ($query) {
                     $query->orderByDesc('id');
                 }
@@ -63,6 +65,8 @@ class ItemRepository implements ItemRepositoryInterface
             return Item::with([
                 'category',
                 'supplier_items.brand',
+                'uom',
+                'base_uom',
                 'supplier_items.item_price' => function ($query) {
                     $query->orderByDesc('id');
                 }
