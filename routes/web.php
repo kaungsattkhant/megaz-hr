@@ -428,9 +428,9 @@ Route::middleware(['departments:okr-duty'])->group(function () {
     Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
 
 });
-Route::middleware(['departments:okr-duty.create'])->group(function () {
+// Route::middleware(['departments:okr-duty.create'])->group(function () {
     Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
-});
+// });
 Route::middleware(['departments:okr-duty.edit'])->group(function () {
     Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
 });
