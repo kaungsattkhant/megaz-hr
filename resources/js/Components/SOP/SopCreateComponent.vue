@@ -1,13 +1,13 @@
 <template>
-    <div class="px-6 pt-4 pb-8 mt-3 card-shadow">
-        <div class="mb-0 ">
+    <div class="px-0">
+        <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
                 Create SOP
             </p>
         </div>
 
 
-        <div class="grid !grid-cols-10 gap-x-8 bg-white py-6 mb-0">
+        <div class="grid !grid-cols-10 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
 
             <div class="mb-4 col-span-3 pb-3 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -30,7 +30,7 @@
 
                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="getSkillList"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="roleChange()"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                         <option :value="role" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
@@ -57,9 +57,51 @@
                     SOP
                 </label>
                 <input type="text" v-model="selectedSop" class="input-ui ">
-            </div><div class="col-span-4"></div>
+            </div>
+            <div class="col-span-4">
+                <label for="" class="label-form mb-3">
+                    &nbsp;
+                </label>
+                <button class="add-btn py-[9px]" @click="btnClickedAddSop()">
+                    Add
+                </button>
+            </div>
         </div>
 
+        <div class=" bg-white py-8 px-8 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="!text-left">
+                        <tr>
+                            <th scope="col" class="">
+                                SOP
+                            </th>
+                            <th scope="col" class="">
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="!text-left">
+                        <tr class="" v-for="(sop, sopIndex) in selectedSopList"
+                            :key="sopIndex">
+                            <td class="">
+                                {{ sop.sop ? sop.sop : '--' }}
+                            </td>
+                            <td class="text-center">
+                                <button @click="removeSop(sopIndex)">
+                                    <i class="fas fa-times  pr-3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class=" !text-center" v-if="selectedSopList.length < 1">
+                            <td class="" colspan="3">
+                                No Data Here
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <div>
             <button class="add-btn" @click="btnClickedCreateSOP()">
                 Create SOP
@@ -90,6 +132,7 @@ export default {
             selectedJd:null,
             selectedSop:null,
             
+            selectedSopList: [],
         };
     },
 
@@ -98,7 +141,7 @@ export default {
         async getJdList(){
             let response = await getApiData({ url: '/api/job-descriptions', token: this.getToken() });
             if (response.data) {
-                this.jdList = response.data.data;
+                this.jdList = response.data;
             }
         },
         async getDepartmentList(){
@@ -110,8 +153,33 @@ export default {
         changeDepartment(){
             this.selectedRole = null;
             this.roleList = this.selectedDepartment.roles;
-            this.selectedSkill = null;
-            this.skillList = [];
+        },
+        async roleChange(){
+            let response = await getApiData({ url: '/api/job-descriptions?role_id=' + this.selectedRole.id, token: this.getToken() });
+            if (response.data) {
+                this.jdList = response.data;
+            }
+        },
+
+        btnClickedAddSop(){
+            if(!this.selectedSop){
+                this.alertValidationMessage(`SOP`);
+                return 1;
+            }
+            else{
+                this.addSop();
+            }
+        },
+        async addSop(){
+            
+            this.selectedSopList.push({
+                sop: this.selectedSop ? this.selectedSop : null,
+                role_id: this.selectedRole ? this.selectedRole.id : null,
+            })
+            this.selectedSop = null;
+        },
+        removeSop(index){
+            this.selectedSopList.splice(index, 1);
         },
 
         btnClickedCreateSOP(){
@@ -127,7 +195,7 @@ export default {
                 this.alertValidationMessage(`Job Description`);
                 return 1;
             }
-            else if(!this.selectedSop){
+            else if(this.selectedSopList.length < 1){
                 this.alertValidationMessage(`SOP`);
                 return 1;
             }
@@ -137,8 +205,8 @@ export default {
         },
         async createSOP(){
             let formData = new FormData();
-            formData.append('sop',this.selectedSop);
-            formData.append('role_id',this.selectedRole.id);
+            formData.append('sops',JSON.stringify(this.selectedSopList));
+            // formData.append('role_id',this.selectedRole.id);
             formData.append('job_description_id',this.selectedJd.id);
             let response = await postApiData({url:`/api/sops`, form_data:formData, token:this.getToken()})
             if(response.success){
@@ -171,7 +239,7 @@ export default {
 
     mounted() {
         this.getDepartmentList();
-        this.getJdList();
+        // this.getJdList();
         initTE({ Modal, Select, Tab, Ripple });
     }
 }

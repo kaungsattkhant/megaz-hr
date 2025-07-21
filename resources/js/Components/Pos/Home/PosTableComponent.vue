@@ -242,7 +242,8 @@
                                 </div>
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div v-for="(menu, index) in purchaseMenuList" class="contents" :key="index">
-                                        <div v-for="menu2 in menu.order_items" class="contents" :key="menu2">
+
+                                        <div v-for="menu2 in combinedMenuList" class="contents" :key="menu2">
                                             <p class=" col-span-4 text-sm">
                                                 {{ menu2.menu.name }}
                                             </p>
@@ -263,6 +264,23 @@
                                                 {{ (menu2.price).toLocaleString() }} MMKs
                                             </p>
                                         </div>
+
+
+                                        <!-- <div v-for="menu2 in menu.order_items" class="contents" :key="menu2">
+                                            <p class=" col-span-4 text-sm">
+                                                {{ menu2.menu.name }}
+                                            </p>
+                                            <p class=" col-span-1 text-center text-sm">
+                                                {{ menu2.quantity }}
+                                            </p>
+                                            <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                                class=" col-span-2 text-center text-xs pt-0.5">
+                                                {{ menu2.status }}
+                                            </p>
+                                            <p class=" col-span-3 text-sm text-right">
+                                                {{ (menu2.price).toLocaleString() }} MMKs
+                                            </p>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -1798,6 +1816,9 @@
             btnClickAddMenu() {
                 this.invoiceId = this.selectedRoom.invoice.id;
                 console.log('invoice id ' + this.invoiceId)
+                this.menuQuantity = null;
+                this.selectedMenu = null;
+                this.remark = null;
                 this.getMenuList();
             },
             btnConfirmAddMenu() {
@@ -2081,7 +2102,15 @@
             async getCashAccounts(){
                 let response = await getApiData({url: `/api/get_cash_account`, token: this.getToken()});
                 if(response.success){
-                    this.cashAccounts = response.data;
+                    let posCashAccount = response.data.find(account => account.account_code === '2-1011');
+                    if (posCashAccount) {
+                        this.cashAccounts.push(posCashAccount);
+                    }
+                    let posBankAccount = response.data.find(account => account.account_code === '2-1012');
+                    if (posBankAccount) {
+                        this.cashAccounts.push(posBankAccount);
+                    }
+                    // this.cashAccounts = response.data;
                 }
             },
 
@@ -2107,6 +2136,22 @@
                     this.deposit = null;
                     this.selectedCashAccount = null;
                 }
+            },
+        },
+        computed: {
+            combinedMenuList() {
+                const map = {};
+                this.purchaseMenuList[0].order_items.forEach(item => {
+                    const key = item.menu_id + '-' + item.status;
+                    if (!map[key]) {
+                        map[key] = { ...item };
+                    } 
+                    else {
+                        map[key].quantity += item.quantity;
+                        map[key].price += item.price;
+                    }
+                });
+                return Object.values(map);
             },
         },
         created(){
