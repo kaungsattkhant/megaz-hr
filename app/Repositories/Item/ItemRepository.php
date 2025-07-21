@@ -37,6 +37,7 @@ class ItemRepository implements ItemRepositoryInterface
     public function listAllData(Request $request)
     {
         $category_id = $request->category_id;
+        $tag_id = $request->tag_id;
         $searchInput = $request->search_input;
         if ($request->per_page || $request->page) {
             return Item::with([
@@ -48,6 +49,9 @@ class ItemRepository implements ItemRepositoryInterface
             ])
                 ->when($category_id, function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
+                })
+                ->when($tag_id, function ($q) use ($tag_id) {
+                    $q->where('items.tag_id', $tag_id);
                 })
                 ->when($searchInput, function ($q) use ($searchInput) {
                     $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
@@ -65,6 +69,9 @@ class ItemRepository implements ItemRepositoryInterface
             ])
                 ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
+                })
+                ->when((isset($request->tag_id) && $tag_id), function ($q) use ($tag_id) {
+                    $q->where('items.tag_id', $tag_id);
                 })
                 ->when($searchInput, function ($q) use ($searchInput) {
                     $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
@@ -147,8 +154,8 @@ class ItemRepository implements ItemRepositoryInterface
                 ['items.id' => $data['id']],
                 $data
             );
-          
-            //create uom converion 
+
+            //create uom converion
             $uomConversion = $this->createUomConversion($item, $data);
             if (!empty($brand_suppliers)) {
                 foreach ($brand_suppliers as $bs) {
@@ -158,7 +165,7 @@ class ItemRepository implements ItemRepositoryInterface
                         $bs['id'] = null;
                     }
 
-                    //check edit when uom change 
+                    //check edit when uom change
                     if (($isBaseUomChange && $bs['uom_id'] == $baseUomId) || ($isUomChange && $bs['uom_id'] == $uomId)) {
                         ResponseMessage('Need to update uom_price for uom changes', 419);
                     }

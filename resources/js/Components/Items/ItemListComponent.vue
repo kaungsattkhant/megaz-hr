@@ -22,7 +22,14 @@
                         </select>
                     </div>
 
-
+                    <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter by tag"
+                            data-te-select-filter="true" v-model="searchTag">
+                            <option :value="tag" v-for="tag in itemTagList">
+                                {{ tag.name }}
+                            </option>
+                        </select>
+                    </div>
 
                     <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
                     <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
@@ -463,7 +470,7 @@
                             Create
                         </button>
                     </div>
-                </div>    
+                </div>
                 <div v-show="step == '2'">
                     <div class="relative flex justify-between py-2 px-6 border-b">
                         <button @click="[step = 1, brandName = null]">
@@ -663,6 +670,9 @@ export default {
     },
     data() {
         return {
+            itemTagList: [],
+            selectedTag: null,
+
             itemCategoryList: [],
             itemList: [],
             uomList: [],
@@ -684,6 +694,7 @@ export default {
             selectedCategory: null,
             searchInput: null,
             searchCategory: null,
+            searchTag: null,
 
             updatePriceItem: null,
             updatedPrice: null,
@@ -755,6 +766,13 @@ export default {
             }
         },
 
+        getItemTagList() {
+            getApiData({ url: `/api/tags`, token: this.getToken() }).then((response)=>{
+                if(response.data){
+                    this.itemTagList = response.data;
+                }
+            });
+        },
 
         async getItemTypeList()
         {
@@ -800,7 +818,7 @@ export default {
         },
 
 
-        
+
         async createBrand(){
             if(!this.brandName){
                 this.alertValiationMessage('Brand Name');
@@ -916,16 +934,25 @@ export default {
         },
 
         async searchBtnClicked() {
-            let url = null;
-            if (this.searchInput && this.searchCategory) {
-                url = `/api/items?search_input=${this.searchInput}&category_id=${this.searchCategory.id}&page=1`;
+            let url = `/api/items?page=1`;
+            if(this.searchInput){
+                url = `${url}&search_input=${this.searchInput}`;
             }
-            if (this.searchInput && !this.searchCategory) {
-                url = `/api/items?search_input=${this.searchInput}&page=1`;
+            if(this.searchCategory){
+                url = `${url}&category_id=${this.searchCategory.id}`;
             }
-            if ((!this.searchInput) && this.searchCategory) {
-                url = `/api/items?category_id=${this.searchCategory.id}&page=1`;
+            if(this.searchTag){
+                url = `${url}&tag_id=${this.searchTag.id}`;
             }
+            // if (this.searchInput && this.searchCategory) {
+            //     url = `/api/items?search_input=${this.searchInput}&category_id=${this.searchCategory.id}&page=1`;
+            // }
+            // if (this.searchInput && !this.searchCategory) {
+            //     url = `/api/items?search_input=${this.searchInput}&page=1`;
+            // }
+            // if ((!this.searchInput) && this.searchCategory) {
+            //     url = `/api/items?category_id=${this.searchCategory.id}&page=1`;
+            // }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.itemList = response.data.data;
@@ -935,6 +962,7 @@ export default {
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.searchCategory = null;
+            this.searchTag = null;
             this.getItemList(1);
         },
         handleFileChange(event) {
@@ -1034,6 +1062,7 @@ export default {
         this.getItemList(1);
         this.getItemTypeList();
         this.getbrandList();
+        this.getItemTagList();
     },
 
     mounted() {
