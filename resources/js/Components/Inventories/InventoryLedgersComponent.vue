@@ -83,7 +83,7 @@
                                     <td>
                                         {{ ++index }}
                                     </td>
-                                    <td>
+                                    <td @click="isShowToggle(ledger)">
                                         {{ ledger.name }}
                                     </td>
                                     <td>
@@ -125,10 +125,37 @@
                                         </button>
                                     </td>
                                 </tr>
+                                <tr v-if="ledger.isShow" v-for="(batch,batchIndex) in ledger.ledgers" :key="batchIndex">
+                                    
+                                    <td colspan="2">
+                                        {{ batch.batch_no }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.opening_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.in_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.out_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.closing_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        <!-- {{ ledger.base_balance }} {{ ledger.conversion_balance }} -->
+                                    </td>
+                                    <td>
+                                        {{ (batch.total_value).toLocaleString() }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        
+                                    </td>
+                                </tr>
                             </div>
 
                             <!-- <div class="contents" > -->
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                <!-- <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                     <td colspan="7" class=" px-6 py-4 font-medium ">
                                         &nbsp;
                                     </td>
@@ -138,7 +165,7 @@
                                     <td class=" px-6 py-4 font-medium ">
                                         &nbsp;
                                     </td>
-                                </tr>
+                                </tr> -->
                             <!-- </div> -->
 
                             <!-- looping end -->
@@ -551,7 +578,16 @@ export default {
 
                     this.totalValuation += ledger.total_value;
                 });
+
+                this.inventoryLegderList = this.inventoryLegderList.map(item => ({
+                    ...item,
+                    isShow: false
+                }));
             }
+        },
+        isShowToggle(item) {
+            // this.inventoryLegderList[index].isShow = !this.inventoryLegderList[index].isShow;
+            item.isShow = !item.isShow;
         },
         async getInventoryList() {
             const response = await getApiData({ url: '/api/inventories', token: this.getToken() });
