@@ -22,6 +22,7 @@ use App\Events\KitchenNotificationRequest;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
+use App\Models\Inventory;
 use App\Models\OrderItemExtra;
 use App\Models\SellingExtra;
 
@@ -463,7 +464,12 @@ class OrderService
 
     public function checkInventoryEnough($menuId, $quantity)
     {
-        $inventoryId = 8;
+        // $inventoryId = UserData()->department->inventory->inventory_id;
+        $inventory=Inventory::where('name' , 'Kitchen Inventory')->first();
+        if(!$inventory){
+            ResponseMessage('Kitchen Inv not found',404);
+        }
+        $inventoryId=$inventory->id;
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
