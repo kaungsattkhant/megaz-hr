@@ -1,5 +1,5 @@
 <template>
-
+    <notifications position="top center" />
     <div>
         <button
             class=" focus:outline-none focus:ring-0 hidden" id="open_noti_modal"
@@ -491,7 +491,7 @@
                 formData.append("invoice_id", id);
                 formData.append('entity_type', entity.entity_type);
                 formData.append('entity_id', entity.entity_id);
-                
+
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')
@@ -502,7 +502,7 @@
                     this.sessionRequests2[index].status = 'confirmed';
                     this.sessionRequests2.splice(index, 1);
                 }
-                
+
                 this.emitRoomListUpdate();
 
                 this.notiModalOpen2();
@@ -513,7 +513,7 @@
                 formData.append("invoice_id", id);
                 formData.append('entity_type', entity.entity_type);
                 formData.append('entity_id', entity.entity_id);
-                
+
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('reject success')
@@ -524,7 +524,7 @@
                     this.sessionRequests2[index].status = 'rejected';
                     this.sessionRequests2.splice(index, 1);
                 }
-                
+
                 this.emitRoomListUpdate();
 
                 this.notiModalOpen2();
