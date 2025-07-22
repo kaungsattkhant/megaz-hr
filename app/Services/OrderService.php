@@ -169,7 +169,7 @@ class OrderService
                     $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
                     // dd($createdOrderItem);
                 }
-                // dd('incorrect');
+                dd('incorrect');
                 // $orderItems=OrderItem::insert($insertData);
                 // dd($orderItems);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
@@ -452,7 +452,7 @@ class OrderService
             }
 
             //Let
-            // $item->total_quantity = 15000;
+            $item->total_quantity = 15000;
             $inventoryItems = InventoryLedgerItem::where('item_id', $item->item_id)
                 ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
                 ->where('inventory_ledgers.inventory_id', $inventoryId)
