@@ -8,14 +8,18 @@ use App\Models\SellingExtra;
 
 class SellingExtraRepository implements SellingExtraRepositoryInterface
 {
-    public function listAllData(Request $request)
+    public function listAllData(Request $request, bool $isPosQuerying = false)
     {
+        $query = SellingExtra::query()->with(['item.uom','item.base_uom','uom']);
+        if($isPosQuerying){
+            $query->where('is_active',1);
+        }
         if ($request->per_page || $request->page) {
-            return SellingExtra::with(['item.uom','item.base_uom','uom'])
+            return $query
             ->orderByDesc('id')
             ->paginate(config('common.list_count'));
         }else{
-            return SellingExtra::with(['item.uom','item.base_uom','uom'])
+            return $query
             ->orderByDesc('id')
             ->get();
         }

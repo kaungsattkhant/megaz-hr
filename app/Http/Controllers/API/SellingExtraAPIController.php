@@ -35,4 +35,9 @@ class SellingExtraAPIController extends Controller
         $data = $request->all();
         ResponseData($this->repo->update($data,$id));
     }
+
+    public function getSellingExtrasFromPos(Request $request)
+    {
+        ResponseData($this->repo->listAllData($request, true));
+    }
 }

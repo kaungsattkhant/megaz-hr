@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface SellingExtraRepositoryInterface
 {
-    public function listAllData(Request $request);
+    public function listAllData(Request $request, bool $isPosQuerying = false);
 
     public function find($id);
 

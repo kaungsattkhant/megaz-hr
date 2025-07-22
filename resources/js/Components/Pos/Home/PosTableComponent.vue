@@ -23,7 +23,7 @@
                                 </p>
                             </div>
                         </button>
-                    </div>                            
+                    </div>
                 </div>
             </div>
 
@@ -169,7 +169,7 @@
                         <div class="flex justify-between padding-section border-b">
                             <div>
                                 <p class="text-black text-xl" v-if="selectedRoom">
-                                    {{ selectedRoom ? selectedRoom.name : '' }} 
+                                    {{ selectedRoom ? selectedRoom.name : '' }}
                                 </p>
                             </div>
                             <div class="flex gap-x-3">
@@ -214,7 +214,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit" v-if="selectedRoom">
-                                        
+
                                         {{ selectedRoom.name ? selectedRoom.name : ''}}
                                     </p>
                                 </div>
@@ -317,7 +317,7 @@
                                     </div>
                                 </div>
                             </div>
-    
+
                                     <!-- accessories -->
                             <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
@@ -373,18 +373,18 @@
                                     {{
                                         (selectedRoom ?
                                             (
-                                                (purchaseMenuList.length > 0 ? 
-                                                    ( 
+                                                (purchaseMenuList.length > 0 ?
+                                                    (
                                                         purchaseMenuList[0].total - (selectedRoom.invoice.package ? selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0)
                                                     )
                                                     :
                                                     (
                                                         selectedRoom.invoice.package ? selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0
                                                     )
-                                                ) 
+                                                )
                                                 + selectedRoom.total_service_value+selectedRoom.total_accessory_value
                                             ).toLocaleString()
-                                            
+
                                         : 0 )
 
 
@@ -443,14 +443,14 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-4"
                                     v-show="discount_type != 'customer_level' && discount_type != 'birthday_discount'">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Discount
                                     </label>
                                     <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
-                                        
+
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <!-- <div class="mb-4">
@@ -593,7 +593,7 @@
                                     {{  (  (printInvoiceData.total ? printInvoiceData.total : 0)
                                         + (printInvoiceData.service_charge == true ? (printInvoiceData.service_tax ?
                                             printInvoiceData.service_tax : 0) : 0)
-                                        + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) 
+                                        + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0)
                                         - foodDiscount
                                         ).toLocaleString()
                                     }} MMKs
@@ -645,7 +645,7 @@
                                             <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
                                                 <td class=" py-4 text-sm  ">
                                                     {{ pm.name }}
-                                                </td>                                                
+                                                </td>
                                                 <td class=" py-4 text-sm  ">
                                                     <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
                                                         class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
@@ -749,7 +749,7 @@
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select> -->
-                            
+
                         </div>
                         <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
@@ -758,14 +758,50 @@
                             </select>
                         </div> -->
                         <div class="mb-4">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    v-model="hasSellingExtras"
+                                    class="sr-only peer"/>
+                                <div class="w-5 h-5 bg-gray-300 rounded-sm peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-blue-400 flex items-center justify-center transition-colors">
+                                    <svg
+                                    class="w-4 h-4 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                        <path d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            </label>
+                            <span class="text-sm mx-2" > Add Extras? </span>
+                        </div>
+
+                        <div class="mb-4" v-if="hasSellingExtras">
+                            <multiselect v-model="selectedTableSellingExtras" :options="sellingExtras" :close-on-select="false"
+                                class=" h-10" :multiple="true"
+                                :clear-on-select="false" :preserve-search="true"
+                                placeholder="Select Extras"
+                                :custom-label="sellingExtraName"
+                                track-by="id" :preselect-first="false"></multiselect>
+                        </div>
+
+                        <div class="mb-4">
                             <input type="number" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-                        <div>
+
+                        <div class="mb-4">
+                            <multiselect v-model="selectedTableRemark" :options="remarks" :close-on-select="true"
+                                class=" h-10"
+                                :clear-on-select="false" :preserve-search="true" placeholder="Remark" label="name"
+                                track-by="id" :preselect-first="false"></multiselect>
+                        </div>
+                        <!-- <div>
                             <textarea v-model="remark"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                 name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -1071,6 +1107,14 @@
             area:{
                 type: Object,
                 required: true
+            },
+            sellingExtras: {
+                type: Array,
+                required: true
+            },
+            remarks: {
+                type: Array,
+                required: true
             }
         },
         components:{
@@ -1224,6 +1268,14 @@
                 currentTime: getCurretDateTime(),
                 isShowSidebar:false,
                 entityType:null,
+
+                tableSellingExtras: [],
+                selectedTableSellingExtras: [],
+                hasSellingExtras: false,
+
+                tableRemarks: [],
+                selectedTableRemark: null,
+
             };
         },
 
@@ -1435,7 +1487,7 @@
                         if (this.selectedRoom.invoice.orders.length > 0) {
                             this.getPurchaseMenuList();
                         }
-                    
+
                         else if (this.selectedRoom.invoice.orders.length < 1) {
                             this.purchaseMenuList = [];
                         }
@@ -1578,7 +1630,7 @@
                     this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
                 }
             },
-            
+
             birthdayDiscountSelectChanged() {
                 this.printInvoiceData.discount = this.birthday_discount.discount_value
                 if (this.selectedRoom.invoice.invoice_type == 'package') {
@@ -1591,7 +1643,7 @@
                 this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount - this.foodDiscount
             },
 
-            
+
             discountChanged() {
                 // let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
                 let roomTotalAmount = this.printInvoiceData.food - this.printInvoiceData.package_discount - this.foodDiscount
@@ -1831,11 +1883,22 @@
                 // formData.append('area_id', this.selectedMenuArea.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
-                formData.append('remark', this.remark);
+                // formData.append('remark', this.remark);
                 formData.append('selling_area_id', this.area.id);
+                if(this.hasSellingExtras){
+                    this.selectedTableSellingExtras.forEach(extra => {
+                        formData.append('selling_extra_id[]', extra.id);
+                    });
+                }
+                if(this.selectedTableRemark){
+                    formData.append('remark_id',this.selectedTableRemark.id);
+                }
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
+                    this.hasSellingExtras = false;
+                    this.selectedTableSellingExtras = [];
+                    this.selectedTableRemark = null;
                     this.closeModal('closeAddMenuTableModal');
                     this.clearMenuForm();
                     // this.getPurchaseMenuList();
@@ -1930,7 +1993,7 @@
                     else{
                         this.ladyList = response.data;
                     }
-                    
+
                 }
             },
             btnConfirmAddService() {
@@ -1966,7 +2029,7 @@
             },
             btnClickedEndService(service){
                 this.serviceEnd = service;
-            },  
+            },
             async btnConfirmEndService(){
                 let formData = new FormData();
                 formData.append('invoice_service_id', this.serviceEnd.id);
@@ -2116,15 +2179,19 @@
 
             nameWithPrice ({name, prices}) {
                 return `${name} (${prices[0].price}Ks)`
-            }
+            },
+
+            sellingExtraName(sellingExtra){
+                return `${sellingExtra.item.name}`;
+            },
 
         },
-        
+
         watch: {
             selectedRoom(val, oldVal) {
                 console.log(`new: ${val}, old: ${oldVal}`)
             },
-        
+
             // tableAreaId(newId) {
             //     this.getTableList(newId);
             // },
@@ -2145,7 +2212,7 @@
                     const key = item.menu_id + '-' + item.status;
                     if (!map[key]) {
                         map[key] = { ...item };
-                    } 
+                    }
                     else {
                         map[key].quantity += item.quantity;
                         map[key].price += item.price;
@@ -2165,6 +2232,8 @@
             // this.getLadyList();
 
             // this.getAccessoryCategoryList();
+            this.tableSellingExtras = this.sellingExtras;
+            this.tableRemarks = this.remarks;
         },
         mounted()
         {
