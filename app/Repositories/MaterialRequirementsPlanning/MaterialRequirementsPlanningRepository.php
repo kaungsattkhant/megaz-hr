@@ -6,6 +6,7 @@ use Exception;
 use App\Models\Area;
 use App\Models\Menu;
 use App\Models\Role;
+use App\Models\Remark;
 use App\Models\SubMenu;
 use App\Models\MenuArea;
 use App\Models\MenuStep;
@@ -412,5 +413,16 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+
+  public function getRemarks()
+  {
+    return Remark::all();
+  }
+
+  public function createRemark($data)
+  {
+    $remark = Remark::create($data);
+    ResponseData($remark);
   }
 }

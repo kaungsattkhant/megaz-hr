@@ -2,11 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Staff;
 use App\Models\Objective;
 use App\Models\ObjectiveKey;
-use App\Models\ObjectivekeyStaff;
-use App\Models\Staff;
+use App\Models\ObjectiveStaff;
 use Illuminate\Console\Command;
+use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\Log;
 
 class AssignObjectivesToStaffs extends Command
@@ -30,33 +31,35 @@ class AssignObjectivesToStaffs extends Command
      */
     public function handle()
     {
-        $dayName = now()->format('l');
-
         try {
-            $objectiveKeys = ObjectiveKey::whereRaw("FIND_IN_SET(?, assigned_days)", [$dayName])
+
+            $today = now()->format('Y-m-d');
+            $objectives = Objective::where('type', 'daily')
                 ->get();
 
-            foreach ($objectiveKeys as $objectiveKey) {
-                $roleId = $objectiveKey->role_id;
+            foreach ($objectives as $objective) {
+                $roleId = $objective->role_id;
 
                 $staffLists = Staff::staffByRole($roleId);
 
                 foreach ($staffLists as $staff) {
 
-                    ObjectivekeyStaff::firstOrCreate(
+                    ObjectiveStaff::firstOrCreate(
                         [
                             'staff_id' => $staff->id,
-                            'objective_key_id' => $objectiveKey->id,
+                            'objective_id' => $objective->id,
+                            'start_date' => $today,
                         ],
                         [
+                            'end_date' => $today,
                             'status' => 'not_started',
-                            'okr_point' => $objectiveKey->okr_point,
+                            'okr_point' => $objective->okr_point,
                         ]
                     );
                 }
             }
 
-            $this->info('Objective Keys have been successfully assigned to relevant staff.');
+            $this->info('Daily Objective  have been successfully assigned to relevant staff.');
         } catch (\Exception $e) {
             Log::error('Error assigning Objective Keys to staff.', ['message' => $e->getMessage()]);
             $this->error('An error occurred while assigning Objective Keys to staff.');

@@ -260,6 +260,8 @@ class GetInventoryStockAction
                     'total_value' => $items->sum('total_value'),
                     'conversion_uom_name' => $items->first()->conversion_uom_name,
                     'base_uom_name' => $items->first()->base_uom_name,
+                    'base_unit_id' => $items->first()->base_unit_id,
+                    'item_uom_id' => $items->first()->item_uom_id,
                     'conversion' => $items->first()->conversion,
                     'batch_nos' => $closing_balance > 0
                         ? $items->pluck('batch_no')->unique()->filter()->values()->implode(', ')

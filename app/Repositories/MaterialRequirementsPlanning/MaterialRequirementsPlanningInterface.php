@@ -33,4 +33,8 @@ interface MaterialRequirementsPlanningInterface
   public function getMenuPrices($menuId);
 
   public function updateMenuPrices(int $menuId, array $data);
+
+  public function getRemarks();
+
+  public function createRemark($data);
 }
