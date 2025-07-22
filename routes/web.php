@@ -430,9 +430,9 @@ Route::middleware(['departments:okr-duty'])->group(function () {
     Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
 
 });
-Route::middleware(['departments:okr-duty.create'])->group(function () {
+// Route::middleware(['departments:okr-duty.create'])->group(function () {
     Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
-});
+// });
 Route::middleware(['departments:okr-duty.edit'])->group(function () {
     Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
 });
@@ -675,6 +675,9 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
     Route::view('/SOP', 'SOP.index')->name('SOP.index');
     Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+    Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+    Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
 // });
 
 // =======

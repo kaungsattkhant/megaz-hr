@@ -243,6 +243,9 @@ import JsListComponent from './Components/JobSpecification/JsListComponent.vue';
 import JsCreateComponent from './Components/JobSpecification/JsCreateComponent.vue';
 import SopListComponent from './Components/SOP/SopListComponent.vue';
 import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
+import OkrAssignComponent from './Components/OkrAssign/OkrAssignComponent.vue';
+import OkrAssignCreateComponent from './Components/OkrAssign/OkrAssignCreateComponent.vue';
+import OkrAssignEditComponent from './Components/OkrAssign/OkrAssignEditComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -466,6 +469,9 @@ app.component('JsListComponent',JsListComponent);
 app.component('JsCreateComponent',JsCreateComponent);
 app.component('SopListComponent',SopListComponent);
 app.component('SopCreateComponent',SopCreateComponent);
+app.component('OkrAssignComponent',OkrAssignComponent);
+app.component('OkrAssignCreateComponent',OkrAssignCreateComponent);
+app.component('OkrAssignEditComponent',OkrAssignEditComponent);
 
 
 app.use(store);

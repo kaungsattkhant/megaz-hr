@@ -14,12 +14,14 @@ use App\Models\MenuArea;
 use App\Models\OrderItem;
 use App\Models\Department;
 use App\Models\RoomSession;
+use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
 use App\Traits\CheckMenuPack;
 use App\Models\InvoiceSession;
 use App\Services\OrderService;
 use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
+use App\Models\InventoryLedgerItem;
 use Illuminate\Support\Facades\Hash;
 use App\Services\InvoiceModelService;
 use App\Events\WaiterNotificationRequest;
@@ -120,8 +122,8 @@ class OrderRepository implements OrderRepositoryInterface
                     // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                     if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
                         $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')
-                        ->where('expired_at', '>', CurrentTime())
-                        ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                            ->where('expired_at', '>', CurrentTime())
+                            ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                         if (count($packs) < $orderItem->quantity) {
                             ResponseMessage('Not enough packs to sell', 402);
                         }
@@ -138,6 +140,7 @@ class OrderRepository implements OrderRepositoryInterface
                     elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                         $orderItem->progressed_at = now();
                         $orderItem->progressed_by = UserData()->id;
+                        // $this->actionInventoryItem($orderItem, 'order_item', 'out');
                     } elseif ($data['status'] == 'cancelled') {
                         $orderItem->cancelled_at = now();
                         $orderItem->cancelled_by = UserData()->id;
@@ -161,6 +164,35 @@ class OrderRepository implements OrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function actionInventoryItem($orderItem, $morphMapName, $action)
+    {
+        $inventoryId = UserData()->department->inventory->inventory_id;
+        $menuId = $orderItem->menu_id;
+        $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
+            ->whereHas('menuStep', function ($q) use ($menuId) {
+                $q->where('menu_id', $menuId)
+                    ->where('type', 'ready_to_sale');
+            })
+            ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
+            ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
+            ->get();
+        foreach ($menuStepItemByMenu as $item) {
+            $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
+                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                ->selectRaw("
+                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+            ")
+                ->where('inventory_ledgers.inventory_id', $inventoryId)
+                ->first();
+            dd($itemInventory);
+            // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
+        }
+
     }
 
     public function getOrderItemData(Request $request)
@@ -405,7 +437,7 @@ class OrderRepository implements OrderRepositoryInterface
                     )
                 ) as order_items_details')
             )
-            ->whereNotIn('order_items.status',['placed'])
+            ->whereNotIn('order_items.status', ['placed'])
             ->groupBy('menus.id', 'menus.name', 'group_order_id');
         if ($request->has('area_id') && $request->area_id) {
             $groupedOrderItem->where('order_items.area_id', $request->area_id);

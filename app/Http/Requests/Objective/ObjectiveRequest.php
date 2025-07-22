@@ -23,9 +23,9 @@ class ObjectiveRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'objective_name' => 'required',
-            'is_active' => 'nullable|boolean',
-            'objective_key' => 'nullable',
+            // 'objective_name' => 'required',
+            // 'is_active' => 'nullable|boolean',
+            // 'objective_key' => 'nullable',
         ];
     }
 

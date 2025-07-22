@@ -90,6 +90,7 @@ class PackRepository implements PackRepositoryInterface
                         ")
                         ->where('inventory_ledgers.inventory_id', $inventoryId)
                         ->first();
+                        
                     $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
                     if ((float)$stockInInventory < (float)$item->total_quantity) {
                         return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
