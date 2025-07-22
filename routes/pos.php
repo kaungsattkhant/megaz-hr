@@ -8,6 +8,7 @@ use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
+use App\Http\Controllers\API\SellingExtraAPIController;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(EntityAPIController::class)->group(function () {
@@ -55,5 +56,8 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::prefix('pos')->controller(RoomDiscountAPIController::class)->group(function () {
         Route::get('/get_room_discount_list', 'getRoomDiscountList');
+    });
+    Route::prefix('pos')->controller(SellingExtraAPIController::class)->group(function () {
+        Route::get('/selling_extras', 'getSellingExtrasFromPos');
     });
 });

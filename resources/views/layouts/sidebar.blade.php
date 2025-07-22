@@ -393,6 +393,14 @@
                             Items
                         </a>
                     </li>
+
+                    <li>
+                        <a href="{{ route('selling_extras') }}" class="flex items-center @yield('selling_extras') sidebar-gap-x">
+                            <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-item-48.png') }}" alt=""> -->
+                            <i class="fal fa-hand-receiving"></i>
+                            Selling Extras
+                        </a>
+                    </li>
                     @endif
                     @if (checkFeaturePermission('uom-conversion'))
                     <li>
@@ -493,7 +501,7 @@
                     </li>
                     @endif
                     @endif
-                    
+
                     @if (checkFeaturePermission('complaint') || checkFeaturePermission('inventory') || checkFeaturePermission('supplier'))
 
                     <li>
@@ -657,7 +665,7 @@
                     @endif
 
 
-                    @if (checkFeaturePermission('purchase-order') || checkFeaturePermission('confirm-purchase-order-item.list') 
+                    @if (checkFeaturePermission('purchase-order') || checkFeaturePermission('confirm-purchase-order-item.list')
                         || checkFeaturePermission('purchase-order-item-left') || checkFeaturePermission('po-order')
                         || checkFeaturePermission('arrival-item') || checkFeaturePermission('po-order-invoice'))
                     <li>
@@ -737,7 +745,7 @@
                     </li>
 
 
-                    @if (checkFeaturePermission('asset-item') || checkFeaturePermission('asset') 
+                    @if (checkFeaturePermission('asset-item') || checkFeaturePermission('asset')
                         || checkFeaturePermission('fixed-asset') || checkFeaturePermission('account-payable'))
                     <li>
                         <p class="sidebar-title">
@@ -784,7 +792,7 @@
                     </li> --}}
                     @endif
 
-                    @if (checkFeaturePermission('inventory-stock') || checkFeaturePermission('inventory-transfer-history') 
+                    @if (checkFeaturePermission('inventory-stock') || checkFeaturePermission('inventory-transfer-history')
                         || checkFeaturePermission('inventory-transfer-receive') || checkFeaturePermission('inventory-transfer'))
                     <li>
                         <p class="sidebar-title">
@@ -843,7 +851,7 @@
                     </li>
                     @endif
 
-                    @if (checkFeaturePermission('room-discount') || checkFeaturePermission('menu-service-discount') 
+                    @if (checkFeaturePermission('room-discount') || checkFeaturePermission('menu-service-discount')
                         || checkFeaturePermission('package') || checkFeaturePermission('inventory-transfer'))
                     <li>
                         <p class="sidebar-title">
@@ -927,7 +935,7 @@
                         </div>
                     </li>
 
-                    
+
                     @if (checkFeaturePermission('accessory'))
                     <li>
                         <a href="/accessories" class="flex items-center @yield('accessories') sidebar-gap-x">

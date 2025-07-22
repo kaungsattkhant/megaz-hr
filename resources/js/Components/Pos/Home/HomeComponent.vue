@@ -16,13 +16,15 @@
                     <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         bar
                     </button> -->
-                    <PosTableComponent v-if="selectedAreaId" :table-area-id="selectedAreaId" :area="selectedArea" ref="posTable" @callParent="parentFunction" />
+                    <PosTableComponent v-if="selectedAreaId" :table-area-id="selectedAreaId" :area="selectedArea" ref="posTable" @callParent="parentFunction"
+                    :selling-extras="sellingExtras" :remarks="orderRemarks" />
                 </div>
                 <div v-show="areaType == 'ktv'" class="contents">
                     <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         ktv
                     </button> -->
-                    <PosRoomComponent v-if="selectedAreaId" :room-area-id="selectedAreaId" :area="selectedArea" ref="posRoom" @callParent="parentFunction" />
+                    <PosRoomComponent v-if="selectedAreaId" :room-area-id="selectedAreaId" :area="selectedArea" ref="posRoom" @callParent="parentFunction"
+                    :selling-extras="sellingExtras" />
                 </div>
 
                 <div class="mb-6 hidden">
@@ -569,7 +571,7 @@
                                                         <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
                                                             <td class=" py-4 text-sm  ">
                                                                 {{ pm.name }}
-                                                            </td>                                                
+                                                            </td>
                                                             <td class=" py-4 text-sm  ">
                                                                 <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
                                                                     class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
@@ -637,8 +639,8 @@
             </div>
         </div>
 
-        
-        
+
+
         <!-- Create Customer modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -891,11 +893,32 @@
                 // testbro:null,
 
                 areaType:null,
+
+                orderRemarks: [],
+                sellingExtras: [],
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
+
+            getPosSellingExtras(){
+                getApiData({url: `/api/pos/selling_extras`, token: this.getToken()})
+                .then((response)=>{
+                    if(response.success){
+                        this.sellingExtras = response.data;
+                    }
+                });
+            },
+
+            getRemarks(){
+                getApiData({url: `/api/remarks`, token: this.getToken()})
+                .then((response)=>{
+                    if(response.success){
+                        this.orderRemarks = response.data;
+                    }
+                });
+            },
             // callTest(){
             //     if(this.areaType == 'bar_and_restaurant'){
             //         this.$refs.posTable.getTableList()
@@ -946,7 +969,7 @@
                             }
                         });
                     }
-                    
+
                 }
             },
             btnClickedArea(areaId,areaType,area){
@@ -1776,7 +1799,7 @@
             //         this.$nextTick(() => {
             //             if (this.$refs.posRoom) { // Check if posRoom is defined
             //                 this.$refs.posRoom.getRoomList(this.selectedAreaId);
-            //             } 
+            //             }
             //             else {
             //                 console.warn("posRoom component is not available in $refs.");
             //             }
@@ -1793,10 +1816,11 @@
             // this.getMenuList();
             // this.getDivisionList();
             // this.testtime();
+            this.getPosSellingExtras();
+            this.getRemarks();
         },
         mounted()
         {
-            
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
