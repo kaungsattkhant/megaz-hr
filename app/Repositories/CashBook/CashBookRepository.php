@@ -13,8 +13,23 @@ class CashBookRepository implements CashBookInterface
 {
     public function list($request)
     {
+        $isPos = $request->is_pos;
+        $is_closing_column = null;
+        $closing_date_column = null;
+
+        if ($isPos) {
+            $is_closing_column = 'is_pos_closing';
+            $closing_date_column = 'pos_closing_date';
+        }
+        if (!$isPos) {
+            $is_closing_column = 'is_closing';
+            $closing_date_column = 'closing_date';
+        }
+        if ($is_closing_column == null && $closing_date_column == null) {
+            ResponseMessage('Something went wrong in cashbook', 419);
+        }
         $cashAccountId = $request->cash_account_id;
-        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($request, $cashAccountId);
+        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($request, $cashAccountId,$is_closing_column);
         $cashbookTransactions = Transaction::with(['ledgers.account', 'transactionable'])
             ->isConfirmed(1)
             ->select(['id', 'date', 'description', 'transactionable_id', 'transactionable_type'])
@@ -63,6 +78,22 @@ class CashBookRepository implements CashBookInterface
     {
         DB::beginTransaction();
         try {
+            $isPos = $request->is_pos;
+            $is_closing_column = null;
+            $closing_date_column = null;
+
+            if ($isPos) {
+                $is_closing_column = 'is_pos_closing';
+                $closing_date_column = 'pos_closing_date';
+            }
+            if (!$isPos) {
+                $is_closing_column = 'is_closing';
+                $closing_date_column = 'closing_date';
+            }
+            if ($is_closing_column == null && $closing_date_column == null) {
+                ResponseMessage('Something went wrong in cashbook', 419);
+            }
+
             $cashAccountId = $request->cash_account_id;
             $openingBalance = (new CashBookTransaction())->getOpeningBalance($request);
             $closingBalance = (new CashBookTransaction())->getClosingBalance($openingBalance->opening_balance, $request);
@@ -89,8 +120,8 @@ class CashBookRepository implements CashBookInterface
                 ->latest()
                 ->first();
             if ($latestTransaction) {
-                $latestTransaction->is_closing = 1;
-                $latestTransaction->closing_date = now();
+                $latestTransaction->$is_closing_column = 1;
+                $latestTransaction->$closing_date_column = now();
                 $latestTransaction->save();
             }
             if ($cashbookBalance) {
