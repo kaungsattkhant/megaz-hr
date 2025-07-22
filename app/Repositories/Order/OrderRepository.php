@@ -403,8 +403,45 @@ class OrderRepository implements OrderRepositoryInterface
     }
     public function getOrderItemGroupList($request)
     {
+        // $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
+        //     ->join('menus', 'order_items.menu_id', 'menus.id')
+        //     ->join('orders', 'order_items.order_id', 'orders.id')
+        //     ->join('areas', 'order_items.area_id', 'areas.id')
+        //     ->join('invoices', 'orders.invoice_id', 'invoices.id')
+        //     ->join('entities', 'invoices.entity_id', 'entities.id')
+        //     ->select(
+        //         'menus.id as menu_id',
+        //         'menus.name as menu_name',
+        //         DB::raw('MIN(order_items.date) as date'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
+        //         DB::raw('SUM(order_items.quantity) as total_quantity'),
+        //         // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
+        //         DB::raw('JSON_ARRAYAGG(
+        //             JSON_OBJECT(
+        //                 "order_item_id", order_items.id,
+        //                 "order_id", order_items.order_id,
+        //                 "date", order_items.date,
+        //                 "menu_id", order_items.menu_id,
+        //                 "menu_name", menus.name,
+        //                 "quantity", order_items.quantity,
+        //                 "area_id", order_items.area_id,
+        //                 "area_name", areas.name,
+        //                 "room_id", entities.id,
+        //                 "room_name", entities.name,
+        //                 "status", order_items.status,
+        //                 "remark", IFNULL(order_items.remark, ""),
+        //                 "group_order_id", order_items.group_order_id
+        //             )
+        //         ) as order_items_details')
+        //     )
+        //     ->whereNotIn('order_items.status', ['placed'])
+        //     ->groupBy('menus.id', 'menus.name', 'group_order_id');
         $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
             ->join('menus', 'order_items.menu_id', 'menus.id')
+            // ->join('remarks', 'order_items.remark_id', 'remarks.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
             ->join('invoices', 'orders.invoice_id', 'invoices.id')
@@ -415,27 +452,35 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('MIN(order_items.date) as date'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
+
+                // 👇 Add extra_item_names via subquery
                 DB::raw('JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        "order_item_id", order_items.id,
-                        "order_id", order_items.order_id,
-                        "date", order_items.date,
-                        "menu_id", order_items.menu_id,
-                        "menu_name", menus.name,
-                        "quantity", order_items.quantity,
-                        "area_id", order_items.area_id,
-                        "area_name", areas.name,
-                        "room_id", entities.id,
-                        "room_name", entities.name,
-                        "status", order_items.status,
-                        "remark", IFNULL(order_items.remark, ""),
-                        "group_order_id", order_items.group_order_id
-                    )
-                ) as order_items_details')
+            JSON_OBJECT(
+                "order_item_id", order_items.id,
+                "order_id", order_items.order_id,
+                "date", order_items.date,
+                "menu_id", order_items.menu_id,
+                "menu_name", menus.name,
+                "quantity", order_items.quantity,
+                "area_id", order_items.area_id,
+                "area_name", areas.name,
+                "room_id", entities.id,
+                "room_name", entities.name,
+                "status", order_items.status,
+                "remark", IFNULL(order_items.remark, ""),
+                "group_order_id", order_items.group_order_id,
+                "extra_item_names", (
+                    SELECT GROUP_CONCAT(items.name SEPARATOR ", ")
+                    FROM order_item_extras
+                    JOIN selling_extras ON selling_extras.id = order_item_extras.selling_extra_id
+                    JOIN items ON items.id = selling_extras.item_id
+                    WHERE order_item_extras.order_item_id = order_items.id
+                )
+            )
+        ) as order_items_details')
             )
             ->whereNotIn('order_items.status', ['placed'])
             ->groupBy('menus.id', 'menus.name', 'group_order_id');
@@ -453,6 +498,39 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getOrderItemsGroupByMenu($request)
     {
+        // $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
+        //     ->join('orders', 'order_items.order_id', 'orders.id')
+        //     ->join('areas', 'order_items.area_id', 'areas.id')
+        //     ->join('invoices', 'orders.invoice_id', 'invoices.id')
+        //     ->join('entities', 'invoices.entity_id', 'entities.id')
+
+        //     ->select(
+        //         'menus.id as menu_id',
+        //         'menus.name as menu_name',
+        //         DB::raw('MIN(order_items.date) as date'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
+        //         DB::raw('SUM(order_items.quantity) as total_quantity'),
+        //         // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
+        //         // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
+        //         DB::raw('JSON_ARRAYAGG( JSON_OBJECT(
+        //         "order_item_id", order_items.id,
+        //         "order_id", order_items.order_id,
+        //         "date", order_items.date,
+        //         "menu_id", order_items.menu_id,
+        //         "menu_name", menus.name,
+        //         "quantity", order_items.quantity,
+        //         "area_id", order_items.area_id,
+        //         "area_name", areas.name,
+        //         "room_id", entities.id,
+        //         "room_name", entities.name,
+        //         "status", order_items.status,
+        //         "remark", IFNULL(order_items.remark, "")
+        //     )) as order_items_details')
+        //     )
+        //     ->whereNull('order_items.group_order_id')
+        //     ->groupBy('menus.id', 'menus.name')
+        //     ->paginate(config('common.list_count'));
         $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
@@ -465,23 +543,30 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('MIN(order_items.date) as date'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
-                // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
-                DB::raw('JSON_ARRAYAGG( JSON_OBJECT(
-                "order_item_id", order_items.id,
-                "order_id", order_items.order_id,
-                "date", order_items.date,
-                "menu_id", order_items.menu_id,
-                "menu_name", menus.name,
-                "quantity", order_items.quantity,
-                "area_id", order_items.area_id,
-                "area_name", areas.name,
-                "room_id", entities.id,
-                "room_name", entities.name,
-                "status", order_items.status,
-                "remark", IFNULL(order_items.remark, "")
-            )) as order_items_details')
+
+                // 👇 JSON object for order items including extra item names
+                DB::raw('JSON_ARRAYAGG(JSON_OBJECT(
+            "order_item_id", order_items.id,
+            "order_id", order_items.order_id,
+            "date", order_items.date,
+            "menu_id", order_items.menu_id,
+            "menu_name", menus.name,
+            "quantity", order_items.quantity,
+            "area_id", order_items.area_id,
+            "area_name", areas.name,
+            "room_id", entities.id,
+            "room_name", entities.name,
+            "status", order_items.status,
+            "remark", IFNULL(order_items.remark, ""),
+            "extra_item_names", (
+                SELECT GROUP_CONCAT(items.name SEPARATOR ", ")
+                FROM order_item_extras
+                JOIN selling_extras ON selling_extras.id = order_item_extras.selling_extra_id
+                JOIN items ON items.id = selling_extras.item_id
+                WHERE order_item_extras.order_item_id = order_items.id
+            )
+        )) as order_items_details')
             )
             ->whereNull('order_items.group_order_id')
             ->groupBy('menus.id', 'menus.name')

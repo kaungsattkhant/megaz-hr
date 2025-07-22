@@ -22,6 +22,8 @@ use App\Events\KitchenNotificationRequest;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
+use App\Models\OrderItemExtra;
+use App\Models\SellingExtra;
 
 class OrderService
 {
@@ -77,10 +79,19 @@ class OrderService
                 $defaultDiscountAmont = $latestMenuServiceDiscount->discount_price * $defaultQuantity;
 
             }
+            $totalExtraPrice = 0;
+            $sellingExtraIds = null;
+            if (isset($data['selling_extra_id']) && !empty($data['selling_extra_id'])) {
+                $sellingExtraIds = $data['selling_extra_id'];
+                foreach ($data['selling_extra_id'] as $sellingExtraId) {
+                    $sellingExtra = SellingExtra::find($sellingExtraId);
+                    $totalExtraPrice += $sellingExtra->price;
+                }
+            }
             if ($order) {
                 //add menu for existing order
-                $order = $this->updateOrderItemAmountToOrder('add', $order, $data['original_price'], $data['quantity'], $discountAmount);
-                $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
+                $order = $this->updateOrderItemAmountToOrder('add', $order, ($data['original_price'] + $totalExtraPrice), $data['quantity'], $discountAmount);
+                $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, ($data['original_price'] + $totalExtraPrice), $data['quantity'], $discountAmount);
                 // $data['date'] = currentTime();
                 // $data['order_id'] = $order->id;
                 // $data['price'] = $data['original_price'] * $data['quantity'];
@@ -89,12 +100,13 @@ class OrderService
                 $data['date'] = currentTime();
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $defaultQuantity;
-                $data['sub_total_price'] = ($data['original_price'] * $defaultQuantity) - $defaultDiscountAmont;
+                $data['sub_total_price'] = (($data['original_price'] + $totalExtraPrice) * $defaultQuantity) - $defaultDiscountAmont;
+                $data['total_extra_price'] = $totalExtraPrice;
                 $orderItemData['order_id'] = $order->id;
                 $orderItemData['menu_id'] = $data['menu_id'];
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
-                $orderItemData['remark'] = $data['remark'];
+                $orderItemData['remark_id'] = $data['remark_id'];
                 $orderItemData['status'] = 'pos_confirmed'; //default
                 $orderItemData['area_id'] = $cookingAreaId;
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
@@ -108,10 +120,13 @@ class OrderService
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
+                    if (isset($data['selling_extra_id']) && !empty($data['selling_extra_id'])) {
+                        $this->createOrderItemExtra($createdOrderItem, $data['selling_extra_id']);
+                    }
                     $createdOrderItem->order = $createdOrderItem->order;
                     $createdOrderItem->menu = $createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
-                    // $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
+                    $this->actionInventoryItem($createdOrderItem, 'order_item', 'out', $sellingExtraIds);
                 }
                 // OrderItem::insert($insertData);
                 // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
@@ -128,10 +143,11 @@ class OrderService
                 // $invoice->order_discount_value += $discountAmount;
                 // $invoice->total_discount+=$discountAmount;
             } else {
-                //new order
+                //new orderf
                 $data['date'] = currentTime();
-                $data['total'] = $data['original_price'] * $data['quantity'];
-                $data['order_sub_total'] = ($data['original_price'] * $data['quantity']) - $discountAmount;
+                $data['total'] = ($data['original_price'] + $totalExtraPrice) * $data['quantity'];
+                $data['order_sub_total'] = (($data['original_price'] + $totalExtraPrice) * $data['quantity']) - $discountAmount;
+                $data['total_extra_price'] = $totalExtraPrice * $data['quantity'];
                 $data['total_quantity'] = $data['quantity'];
                 $data['total_discount_price'] = $discountAmount;
                 $order = Order::create($data);
@@ -144,14 +160,13 @@ class OrderService
                 //end
 
                 //update order amount to invoice   
-                $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
+                $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, ($data['original_price'] + $totalExtraPrice), $data['quantity'], $discountAmount);
                 // change order item creat depend on quantity , like quantity=2 , create order two time, quantity=3 ,creat 3 time
-
                 $orderItemData['order_id'] = $order->id;
                 $orderItemData['menu_id'] = $data['menu_id'];
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
-                $orderItemData['remark'] = $data['remark'];
+                $orderItemData['remark_id'] = $data['remark_id'];
                 $orderItemData['area_id'] = $cookingAreaId;
                 $orderItemData['status'] = 'pos_confirmed'; //defulat
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
@@ -164,11 +179,15 @@ class OrderService
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
+                    if (isset($data['selling_extra_id']) && !empty($data['selling_extra_id'])) {
+                        $this->createOrderItemExtra($createdOrderItem, $sellingExtraIds);
+                    }
                     $createdOrderItem->order = $createdOrderItem->order;
                     $createdOrderItem->menu = $createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
-                    // $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
+                    // $this->actionInventoryItem($createdOrderItem, 'order_item', 'out',$data['selling_extra_id']);
                     // dd($createdOrderItem);
+
                 }
                 // $orderItems=OrderItem::insert($insertData);
                 // dd($orderItems);
@@ -421,6 +440,27 @@ class OrderService
         }
     }
 
+    public function createOrderItemExtra($orderItem, $sellingExtraIds)
+    {
+        $totalExtraPrice = 0;
+        foreach ($sellingExtraIds as $sellingExtraId) {
+            $sellingExtra = SellingExtra::find($sellingExtraId);
+            $orderItemExtra = OrderItemExtra::create([
+                'order_item_id' => $orderItem->id,
+                'selling_extra_id' => $sellingExtraId,
+            ]);
+            $totalExtraPrice += $sellingExtra->price;
+        }
+        $orderItem->sub_total_price = $orderItem->sub_total_price + $totalExtraPrice;
+        $orderItem->save();
+        // $this->addOrderExtraPriceToOrder($orderItem->order, $totalExtraPrice);
+    }
+
+    public function addOrderExtraPriceToOrder($order, $totalExtraPrice)
+    {
+
+    }
+
     public function checkInventoryEnough($menuId, $quantity)
     {
         $inventoryId = 8;
@@ -452,7 +492,7 @@ class OrderService
 
     }
 
-    public function actionInventoryItem($orderItem, $morphMapName, $action)
+    public function actionInventoryItem($orderItem, $morphMapName, $action, $sellingExtraIds)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
         $inventoryId = 8;
@@ -465,22 +505,81 @@ class OrderService
             ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
             ->get();
+
+        //check extra selling item inventory exist
+        foreach ($sellingExtraIds as $extraId) {
+            $sellingExtra = SellingExtra::with('item')
+                ->find($extraId);
+            if ($sellingExtra->uom_id == $sellingExtra->item->base_uom_id) {
+                $quantity = $sellingExtra->quantity * $sellingExtra->item->uom_conversion;
+            }
+            if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
+                $quantity = $sellingExtra->quantity;
+            }
+            $itemInventory = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
+                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                ->selectRaw("
+        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+    ")
+                ->where('inventory_ledgers.inventory_id', $inventoryId)
+                ->first();
+            $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
+            if ((float) $stockInInventory < $quantity) {
+                return ResponseMessage("Stock is not enough for extra Item ,{$sellingExtra->item->name}", 422);
+            }
+        }
+        //end
+
+        foreach ($sellingExtraIds as $extraId) {
+            $sellingExtra = SellingExtra::with('item')
+                ->find($extraId);
+            if ($sellingExtra->uom_id == $sellingExtra->item->base_uom_id) {
+                $quantity = $sellingExtra->quantity * $sellingExtra->item->uom_conversion;
+            }
+            if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
+                $quantity = $sellingExtra->quantity;
+            }
+            $inventoryItems = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
+                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                ->where('inventory_ledgers.inventory_id', $inventoryId)
+                ->select('inventory_ledger_items.quantity', 'inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
+                ->groupBy('inventory_ledgers.batch_no')
+                ->orderBy('inventory_ledgers.created_at', 'asc')
+                ->get();
+            $remainingQuantity = $quantity;
+            foreach ($inventoryItems as $inventory_item) {
+                if ($remainingQuantity <= 0) {
+                    break;
+                }
+
+                $availableQty = (float) $inventory_item->quantity;
+
+                // Determine how much to take from this batch
+                $quantityToTake = min($remainingQuantity, $availableQty);
+
+                $inventoryLedger = InventoryLedger::create([
+                    'batch_no' => $inventory_item->batch_no,
+                    'date' => now(),
+                    'ledgerable_id' => $orderItem->id,
+                    'ledgerable_type' => 'selling_extra',
+                    'inventory_id' => $inventoryId,
+                    'action' => $action,//out
+                ]);
+                // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
+                $inventoryLedger->inventory_ledger_items()->create([
+                    'item_id' => $sellingExtra->item_id,
+                    'quantity' => $quantityToTake,
+                    'inventory_ledger_id' => $inventoryLedger->id,
+                ]);
+                $remainingQuantity -= $quantityToTake;
+                $array[] = $quantityToTake;
+            }
+        }
+        
         foreach ($menuStepItemByMenu as $item) {
-            // $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
-            //     ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-            //     ->selectRaw("
-            //     SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
-            //     SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
-            //     SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
-            //     SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
-            // ")
-            //     ->where('inventory_ledgers.inventory_id', $inventoryId)
-            //     ->first();
-            // $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
-            // // dd($stockInInventory);
-            // if ((float) $stockInInventory < (float) $item->total_quantity) {
-            //     return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
-            // }
 
             //Let
             $inventoryItems = InventoryLedgerItem::where('item_id', $item->item_id)
@@ -522,6 +621,9 @@ class OrderService
                 $array[] = $quantityToTake;
             }
         }
+
+
+
 
     }
     public function createOrderOld(array $data)
