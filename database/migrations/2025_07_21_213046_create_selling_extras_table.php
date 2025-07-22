@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('selling_extras', function (Blueprint $table) {
             $table->id();
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('uom_id')->constrained()->onDelete('set null');
+            $table->foreignId('uom_id')->constrained()->onDelete('cascade');
             $table->integer('quantity')->default(0);
             $table->double('price')->default(0);
             $table->boolean('is_active')->default(1);
