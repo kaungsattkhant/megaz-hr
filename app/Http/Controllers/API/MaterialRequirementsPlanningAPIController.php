@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\MRP\MenuToggleRequest;
-use App\Http\Requests\MRP\MrpStoreRequest;
-use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\MRP\MrpStoreRequest;
+use App\Http\Requests\MRP\MenuToggleRequest;
+use App\Http\Requests\Menu\StoreRemarkRequest;
+use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 
 class MaterialRequirementsPlanningAPIController extends Controller
 {
@@ -100,6 +101,17 @@ class MaterialRequirementsPlanningAPIController extends Controller
     public function updateMenuPrices(int $menuId, Request $request)
     {
         $data = $this->MaterialRequirementsPlanningRepository->updateMenuPrices($menuId, $request->all());
+        ResponseData($data);
+    }
+
+    public function getRemarks()
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->getRemarks();
+        ResponseData($data);
+    }
+    public function createRemark(StoreRemarkRequest $request)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->createRemark($request->all());
         ResponseData($data);
     }
 }

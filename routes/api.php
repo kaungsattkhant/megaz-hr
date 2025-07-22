@@ -429,6 +429,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/menu_selling_areas', 'getSellingAreas');
         Route::get('/menus/{id}/prices', 'getMenuPrices');
         Route::post('/menus/{id}/prices', 'updateMenuPrices');
+        Route::get('/remarks', 'getRemarks');
+        Route::post('/remarks', 'createRemark');
     });
 
     Route::controller(CreditorController::class)->group(function () {

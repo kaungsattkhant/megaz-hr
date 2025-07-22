@@ -51,7 +51,7 @@ class AssignObjectivesToStaffs extends Command
                             'start_date' => $today,
                         ],
                         [
-                            'end_date' => 'null',
+                            'end_date' => $today,
                             'status' => 'not_started',
                             'okr_point' => $objective->okr_point,
                         ]
