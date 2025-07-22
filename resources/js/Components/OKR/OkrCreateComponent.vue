@@ -75,12 +75,13 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-3">
+            <div class="col-span-3" v-if="selectedType?.value === 'daily'">
                 <label for="" class="label-form mb-3">
                     Repetition
                 </label>
                 <input type="number" v-model="selectedRepition" class="input-ui ">
             </div>
+            <div class="col-span-3" v-else></div>
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Key Result
@@ -232,8 +233,8 @@ export default {
             sopList: [],
             selectedSop: null,
             typeList: [
-                { name: 'daily', value: 'daily' },
-                { name: 'occasionally', value: 'occasionally' },
+                { name: 'Daily', value: 'daily' },
+                { name: 'Occasionally', value: 'occasionally' },
             ],
             selectedType: null,
             selectedRepition: null,
@@ -332,7 +333,7 @@ export default {
                 return 1;
             }
 
-            else if(!this.selectedRepition){
+            else if(this.selectedType.value === 'daily' && !this.selectedRepition){
                 this.alertValidationMessage(`Repitition`);
                 return 1;
             }
@@ -355,7 +356,10 @@ export default {
             formData.append('objective_name', this.objName);
             formData.append('okr_point', this.selectedOkrPoint);
             formData.append('type', this.selectedType.value);
-            formData.append('repetition', this.selectedRepition);
+            if(this.selectedType.value === 'daily'){
+                formData.append('repetition', this.selectedRepition);
+            }
+            
             formData.append('role_id', this.selectedRole.id);
             formData.append('sop_id', this.selectedSop.id);
             // formData.append('assigned_days', JSON.stringify(selectedDate));
