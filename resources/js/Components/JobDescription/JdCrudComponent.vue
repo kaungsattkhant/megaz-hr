@@ -52,9 +52,9 @@
                                 <th scope="col" class="">
                                     JD
                                 </th>
-                                <th scope="col" class="">
+                                <!-- <th scope="col" class="">
                                     Position
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
                                     Department
                                 </th>
@@ -64,7 +64,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(ot, index) in allowanceList" :key="index">
+                            <div class="contents" v-for="(ot, index) in primaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
@@ -73,9 +73,9 @@
                                     <td class="whitespace-nowrap">
                                         {{ ot.job_description }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         --
-                                    </td>
+                                    </td> -->
                                     <td class="whitespace-nowrap">
                                         {{ ot.role.department.name }}
                                     </td>
@@ -252,7 +252,7 @@ export default {
     },
     data() {
         return {
-            allowanceList: [],
+            primaryList: [],
 
             searchDepartmentList:[],
             searchRoleList:[],
@@ -293,7 +293,7 @@ export default {
             let url = this.url + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.allowanceList = response.data.data;
+                this.primaryList = response.data;
             }
         },
         async getDepartmentList(){
