@@ -126,7 +126,7 @@ class OrderService
                     $createdOrderItem->order = $createdOrderItem->order;
                     $createdOrderItem->menu = $createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
-                    $this->actionInventoryItem($createdOrderItem, 'order_item', 'out', $sellingExtraIds);
+                    // $this->actionInventoryItem($createdOrderItem, 'order_item', 'out', $sellingExtraIds);
                 }
                 // OrderItem::insert($insertData);
                 // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
@@ -494,8 +494,8 @@ class OrderService
 
     public function actionInventoryItem($orderItem, $morphMapName, $action, $sellingExtraIds)
     {
-        // $inventoryId = UserData()->department->inventory->inventory_id;
-        $inventoryId = 8;
+        $inventoryId = UserData()->department->inventory->inventory_id;
+        // $inventoryId = 8;
         $menuId = $orderItem->menu_id;
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
@@ -578,7 +578,7 @@ class OrderService
                 $array[] = $quantityToTake;
             }
         }
-        
+
         foreach ($menuStepItemByMenu as $item) {
 
             //Let
