@@ -797,7 +797,7 @@ export default {
             }
             formData.append('uom_id', this.selectedUom.id);
             formData.append('base_uom_id', this.transferItem.base_unit_id);
-            formData.append('conversion_uom_id', this.transferItem.conversion_unit_id);
+            formData.append('conversion_uom_id', this.ledger.conversion_unit_id);
             formData.append('uom_conversion', this.transferItem.conversion);
 
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
