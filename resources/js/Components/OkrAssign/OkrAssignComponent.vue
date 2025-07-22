@@ -204,6 +204,7 @@ export default {
             totalData: 0,
 
             searchInput: null,
+            
 
             overtime: null,
 
