@@ -952,15 +952,15 @@
                         </a>
                     </li>
                     @endif
-                    @if (checkFeaturePermission('okr-duty'))
+                    <!-- @if (checkFeaturePermission('okr-duty')) -->
                     <li>
-                        <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
+                        <a href="/okr_assign" class="flex items-center @yield('okr_assign') sidebar-gap-x">
                             <i class="fal fa-poll-people"></i>
                             <!-- <img class="sidebar-img " src="{{ asset('img/icons8-career-64.png') }}" alt=""> -->
-                            OKR Duty
+                            OKR Assign
                         </a>
                     </li>
-                    @endif
+                    <!-- @endif -->
                     @if (checkFeaturePermission('okr-dashboard'))
                     <li>
                         <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">

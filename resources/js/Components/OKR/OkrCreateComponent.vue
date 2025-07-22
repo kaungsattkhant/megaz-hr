@@ -26,7 +26,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="roleChanged()"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black">
                         <option :value="role" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
@@ -44,7 +44,7 @@
                     <select data-te-select-init data-te-select-placeholder="Select SOP"
                         data-te-select-filter="true" name="" id="" v-model="selectedSop" class="input-ui !text-black">
                         <option :value="sop" v-for="(sop, index) in sopList"
-                            :key="index"> {{ sop.name }} </option>
+                            :key="index"> {{ sop.sop }} </option>
                     </select>
                 </div>
             </div>
@@ -118,7 +118,7 @@
                     </select>
                 </div> -->
             <!-- </div> -->
-            <div class="col-span-6"></div>
+            <!-- <div class="col-span-6"></div> -->
 
 
             
@@ -162,15 +162,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(obj, objIndex) in objective_List"
-                            :key="objIndex">
+                        <tr class="" v-for="(keyResult, keyResultIndex) in key_result_list"
+                            :key="keyResultIndex">
                             
                             <td class="text-left">
-                                {{ obj.name }}
+                                {{ keyResult.name }}
                             </td>
                             
                             <td class="">
-                                <button @click="deleteObj(objIndex)">
+                                <button @click="deleteKey(keyResultIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
@@ -225,7 +225,7 @@ export default {
             selectedDate:null,
             duration:null,
 
-            objective_List:[],
+            key_result_list:[],
             selected_obj_keys:[],
             testKey:[],
 
@@ -248,7 +248,7 @@ export default {
                 return 1;
             }
             else{
-                this.objective_List.push({ 
+                this.key_result_list.push({ 
                     name: this.key_result,
                     // department_name:this.selectedDepartment.name,
                     // role_id:this.selectedRole.id,
@@ -265,8 +265,8 @@ export default {
                 // this.duration = null;
             }
         },
-        deleteObj(index) {
-            this.objective_List.splice(index, 1);
+        deleteKey(index) {
+            this.key_result_list.splice(index, 1);
         },
 
 
@@ -285,10 +285,18 @@ export default {
                 this.roleList = response.data;
             }
         },
+        roleChanged(){
+            this.getSopList();
+        },
         async getSopList(){
-            let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+            let response = await getApiData({url: `/api/sops?role_id=` + this.selectedRole.id, token: this.getToken()});
             if(response.data){
-                this.sopList = response.data;
+                // this.sopList = response.data;
+                response.data.forEach(sops => {
+                    sops.sops.forEach(sop => {
+                        this.sopList.push(sop)
+                    })
+                });
             }
         },
         
@@ -298,7 +306,7 @@ export default {
             //     this.alertValidationMessage(`Objective Name`);
             //     return 1;
             // }
-            // else if(this.objective_list < 1){
+            // else if(this.key_result_list < 1){
             //     this.alertValidationMessage(`Objective Key`);
             //     return 1;
             // }
@@ -328,7 +336,7 @@ export default {
                 this.alertValidationMessage(`Repitition`);
                 return 1;
             }
-            else if(this.objective_list < 1){
+            else if(this.key_result_list < 1){
                 this.alertValidationMessage(`Objective Key`);
                 return 1;
             }
@@ -351,7 +359,7 @@ export default {
             formData.append('role_id', this.selectedRole.id);
             formData.append('sop_id', this.selectedSop.id);
             // formData.append('assigned_days', JSON.stringify(selectedDate));
-            formData.append('objective_key', JSON.stringify(this.objective_List));
+            formData.append('objective_key', JSON.stringify(this.key_result_list));
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
@@ -383,7 +391,7 @@ export default {
 
     async created() {
         this.getDepartment();
-        this.getSopList();
+        // this.getSopList();
 
     },
 

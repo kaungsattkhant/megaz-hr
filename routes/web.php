@@ -673,6 +673,9 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
     Route::view('/SOP', 'SOP.index')->name('SOP.index');
     Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+    Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+    Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
 // });
 
 // =======

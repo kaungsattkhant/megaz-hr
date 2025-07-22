@@ -1,52 +1,37 @@
 <template>
-    
     <div class="mt-4 bg-white">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
-                    Objective Key Results
+                    OKR Assign
                 </p>
             </div>
             <div class="btn-container">
                 <notifications position="top center" />
-
-                <!-- <div class=" flex">
-                    <label for="search" class="search-input">
-                        <input type="text" class="input-search" placeholder="Search">
-                        <i class="fal fa-search"></i>
-                    </label>
-                </div>
-                <div class="flex justify-end flex-col">
-
-                    <a href="/OKR/create"
-                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                        Add New
-                    </a>
-                </div> -->
                 <div class=" flex gap-x-4">
                     <label for="search" class="search-input">
                         <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                         <i class="fal fa-search"></i>
                     </label>
-                    <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
                     <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
                 <div class="flex pr-0 gap-x-4">
-                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
-                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDeparment" class="input-ui">
                             <option :value="department" v-for="(department, departmentIndex) in searchDepartmentList"
                                 :key="departmentIndex"> {{ department.name }} </option>
                         </select>
                     </div>
-                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange()"
                             data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
-                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
-                    <a href="/OKR/create" v-if="feature.includes('okr.create')"
+                    <a href="/okr_assign/create"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
                     </a>
@@ -62,45 +47,55 @@
                                 <th scope="col" class="">
                                     #
                                 </th>
-                                <th scope="col" class="">
-                                    Objective Name
+                                <th scope="col" class=" text-left">
+                                    Staff
                                 </th>
-                                <!-- <th scope="col" class="">
-                                    Department
-                                </th>
-
                                 <th scope="col" class="">
                                     Role
-                                </th> -->
+                                </th>
                                 <th scope="col" class="">
-                                    
+                                    Department
+                                </th>
+                                <th scope="col" class="">
+                                    Objective
+                                </th>
+                                <th scope="col" class="">
+                                    Due
+                                </th>
+                                <th scope="col" class="">
+
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- looping start -->
-                            <div class="contents" v-for="(okr, index) in okrList" :key="index">
+                            <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ okr.objective_name }}
-                                    </td>
-                                    <!-- <td class="whitespace-nowrap">
-                                        {{ departmentList.find(department=>department.id = okr.role.department_id)?.name }}
+                                    <td class="whitespace-nowrap text-left">
+                                        {{ item.staff?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.role.name }}
-                                    </td> -->
-
+                                        {{ item.staff?.roles[0].name }}
+                                    </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/OKR/' + okr.id + '/edit'" v-if="feature.includes('okr.edit')">
-                                            <i class="far fa-pen cursor-pointer mr-3"></i>
-                                        </a>
-                                        <button @click="deleteBtnClicked(okr.id)" v-show="feature.includes('okr.delete')"
-                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                        {{ item.staff?.department.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.objective?.objective_name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.end_date === '0000-00-00 00:00:00' ? item.end_date : formatDateToShort(item.end_date) }}
+                                    </td>
+                                    
+                                    <td class="whitespace-nowrap" >
+                                        <!-- <a :href="'/okr_assign/'+item.id+'/edit'" class="pr-3">
+                                            <i class="fal fa-pen"></i>
+                                        </a> -->
+                                        <button @click="deleteBtnClicked(item.id)" data-te-toggle="modal"
+                                            data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
@@ -115,7 +110,8 @@
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
                                 @click="getPrimaryList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
-                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
@@ -142,24 +138,20 @@
                             Delete ?
                         </h5>
                         <!--Close button-->
-                        <button type="button"
+                        <button type="button" id="close_delete_modal"
                             class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-6 w-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
-
-                    <!--Modal body-->
                     <div class="relative flex-auto p-4" data-te-modal-body-ref>
                         <p>
                             Are you sure ?
                         </p>
                     </div>
-
-                    <!--Modal footer-->
                     <div
                         class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
                         <button type="button"
@@ -167,8 +159,7 @@
                             data-te-modal-dismiss>
                             Close
                         </button>
-                        <button @click="deleteOkr" type="button" data-te-toggle="modal"
-                            data-te-target="#deleteModal"
+                        <button @click="deleteItem()" type="button"
                             class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                             Delete
                         </button>
@@ -176,52 +167,78 @@
                 </div>
             </div>
         </div>
-    </div>
+        
 
+    </div>
+    
+    <button data-te-toggle="modal"
+        data-te-target="#deleteModal" id="delete-btn" class="pr-1 hidden">
+    </button>
 
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
 
 export default {
+    components: {
+        Multiselect
+    },
     data() {
         return {
-            okrList: [],
-            departmentList:[],
-            roleList:[],
-            dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+            primaryList: [],
             
+            searchDepartmentList: [],
+            roleList: [],
             
-
-            searchInput:null,
-            searchDepartmentList:[],
-            searchRoleList:[],
-            selectedSearchDepartment: null,
-            selectedSearchRole: null,
-            
-
-            url:'/api/objectives',
-            url_search:'',
-            url_department:'',
-            url_role:'',
-
-            deleteId:null,
+            selectedSearchDeparment:null,
+            selectedSearchRole:null,
 
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData: 0,
 
+            searchInput: null,
+
+            overtime: null,
+
+            url:'/api/okr-assigns',
+            url_search:'',
+            url_department:'',
+            url_role:'',
+            deleteId:null,
 
             feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken', 'getFeature']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
+
+        async getPrimaryList(pageNumber) {
+            // let url = this.url + this.url_search + this.url_department + this.url_role;
+            let url = this.url
+            if(pageNumber){
+                url = this.url + '?page=' + pageNumber
+            }
+            else{
+                url = this.url + this.url_role
+            }
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                if(response.data.data){
+                    this.primaryList = response.data.data;
+                }
+                else{
+                    this.primaryList = response.data;
+                }
+            }
+        },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -229,12 +246,11 @@ export default {
             }
         },
         searchDepartmentChange(){
-            // this.url_department = '?department_id='+this.searchDepartment.id;
-            this.searchRoleList = this.selectedSearchDepartment.roles;
+            this.roleList = this.selectedSearchDeparment.roles;
             this.selectedSearchRole = null;
         },
         searchRoleChange(){
-            this.url_role = '?roleId='+this.selectedSearchRole.id;
+            this.url_role = '?role_id='+this.selectedSearchRole.id;
             // this.selectedType = null;
             // this.url_type = '';
             this.searchInput = null;
@@ -242,70 +258,15 @@ export default {
             this.getPrimaryList();
         },
 
-        async getPrimaryList(pageNumber) {
-            let url = null;
-            if(pageNumber){
-                url = this.url + '?page=' + pageNumber;
-            }
-            else{
-                url = this.url + this.url_search + this.url_role;
-            }
-            
-            // let url = `/api/objectives?page=${pageNumber}`;
-            // if (this.searchInput && this.searchCategory) {
-            //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
-            // }
-            // if (this.searchInput && !this.searchCategory) {
-            //     url = `/api/objectives?search_input=${this.searchInput}&page=${pageNumber}`;
-            // }
-            // if ((!this.searchInput) && this.searchCategory) {
-            //     url = `/api/objectives?menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
-            // }
-            // let url = `/api/objectives`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                if(response.data.data){
-                    this.okrList = response.data.data;
-                    this.lastPage = response.data.last_page;
-                    this.currentPage = pageNumber;
-                    this.perPage = response.data.per_page;
-                    
-                    this.totalData = response.data.total;
-                }
-                else{
-                    this.okrList = response.data;
-                }
-            }
-        },
-        
-        async searchBtnClicked() {
-            this.url_search = '&search=' + this.searchInput
-            this.getPrimaryList(1);
-        },
-        clearSearchBtnClicked() {
-            this.searchInput = null;
-            this.url_search = '';
-            this.getPrimaryList(1);
-        },
 
-        // async getDepartment(){
-        //     let response = await getApiData({url: `/api/departments`, token: this.getToken()});
-        //     if(response.data){
-        //         this.departmentList = response.data;
-        //     }
-        // },
-        // changeDepartment(){
-        //     this.getRoleList();
+        
+        // async searchBtnClicked() {
+        //     this.url_search = '&search=' + this.searchInput
         //     this.getPrimaryList(1);
-        //     console.log('hello bro')
         // },
-        // async getRoleList(){
-        //     let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
-        //     if(response.data){
-        //         this.roleList = response.data;
-        //     }
-        // },
-        // selectedRoleChange(){
+        // clearSearchBtnClicked() {
+        //     this.searchInput = null;
+        //     this.url_search = '';
         //     this.getPrimaryList(1);
         // },
 
@@ -314,10 +275,11 @@ export default {
         deleteBtnClicked(id) {
             this.deleteId = id;
         },
-        async deleteOkr() {
-            let response = await deleteApiData({ url: `/api/objectives/` + this.deleteId, token: this.getToken() });
+        async deleteItem() {
+            let response = await deleteApiData({ url: `/api/sops/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getPrimaryList(1);
+                document.getElementById('close_delete_modal').click();
             }
             else {
                 this.$notify({
@@ -327,10 +289,24 @@ export default {
                 });
             }
         },
+        
 
+        alertValidationMessage(field) {
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: 'warn'
+                });
+            },
+
+            formatDateToShort(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
+        
     },
     created() {
         this.getPrimaryList(1);
