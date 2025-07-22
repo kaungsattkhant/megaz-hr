@@ -126,7 +126,6 @@ class TransferRepository implements TransferRepositoryInterface
                 ['id' => $data['id']],
                 $data
             );
-            dd($transfer);
             DB::commit();
             return $transfer;
         } catch (\Exception $e) {
@@ -195,7 +194,7 @@ class TransferRepository implements TransferRepositoryInterface
                     'ledgerable_id'=>$transfer->id,
                     'ledgerable_type'=>'transfer',
                     'inventory_id'=>$inventoryId,
-                    'action'=>'out',
+                    'action'=>'in',
                     'batch_no'=>$transfer->batch_no,
                 ]);
                 // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');

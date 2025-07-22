@@ -812,7 +812,7 @@
                         </a>
                     </li>
                     @endif
-                    @if (checkFeaturePermission('inventory-transfer-receive'))
+                    @if (checkFeaturePermission('inventory-receive'))
                     <li>
                         <a href="{{ route('transfers.receives') }}"
                             class="flex items-center @yield('inventory_receives') sidebar-gap-x">
