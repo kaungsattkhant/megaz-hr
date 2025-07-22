@@ -52,6 +52,9 @@
                                     Item
                                 </th>
                                 <th scope="col">
+                                    Batch No
+                                </th>
+                                <th scope="col">
                                     Opening
                                 </th>
                                 <th scope="col">
@@ -87,6 +90,9 @@
                                         {{ ledger.name }}
                                     </td>
                                     <td>
+                                        {{ ledger.batch_nos }}
+                                    </td>
+                                    <td>
                                         <!-- {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }} -->
                                         {{ balanceFormat(ledger.opening_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
@@ -111,7 +117,7 @@
                                         {{ (ledger.total_value).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
+                                        <!-- <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
                                             data-te-toggle="modal" data-te-target="#transfer_modal">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
@@ -122,12 +128,13 @@
                                         <button class="pl-2" @click="btnClickedAddMinimum(ledger,index-1)"
                                         data-te-toggle="modal" data-te-target="#add_minimum_modal">
                                             <i class="fas fa-plus"></i>
-                                        </button>
+                                        </button> -->
                                     </td>
                                 </tr>
                                 <tr v-if="ledger.isShow" v-for="(batch,batchIndex) in ledger.ledgers" :key="batchIndex">
-                                    
                                     <td colspan="2">
+                                    </td>
+                                    <td>
                                         {{ batch.batch_no }}
                                     </td>
                                     <td>
@@ -149,7 +156,18 @@
                                         {{ (batch.total_value).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        
+                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(batch, index-1, batchIndex)"
+                                            data-te-toggle="modal" data-te-target="#transfer_modal">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </button>
+                                        <button class="pl-2" @click="addDefectBtnClicked(batch.item_id, index-1, batchIndex)"
+                                        data-te-toggle="modal" data-te-target="#add_defect_modal">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                        <button class="pl-2" @click="btnClickedAddMinimum(batch,index-1, batchIndex)"
+                                        data-te-toggle="modal" data-te-target="#add_minimum_modal">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </div>
@@ -766,6 +784,7 @@ export default {
         },
         async transferInventory() {
             let formData = new FormData();
+            formData.append('batch_no', this.ledger.batch_no);
             formData.append('source_inventory_id', this.selectedSourceInventory);
             formData.append('destination_inventory_id', this.selectedDestinationInventory);
             formData.append('quantity', this.quantity);
