@@ -422,7 +422,15 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
   public function createRemark($data)
   {
-    $remark = Remark::create($data);
-    ResponseData($remark);
+    DB::beginTransaction();
+    try {
+      $remark = Remark::create($data);
+      DB::commit();
+      ResponseData($remark, 201, 'Remark created successfully!');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
   }
 }
