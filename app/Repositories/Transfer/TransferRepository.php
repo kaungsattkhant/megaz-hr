@@ -5,6 +5,7 @@ namespace App\Repositories\Transfer;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
 use App\Models\InventoryLedger;
+use App\Http\Action\Inventory\InventoryLedger as InventoryLedgerAction;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Common\Conversion;
 use App\Http\Action\Inventory\StoreInventory;
@@ -110,8 +111,7 @@ class TransferRepository implements TransferRepositoryInterface
             // $uom_conversion = (new Conversion($request->uom_id, $request->base_uom_id))->run();
             #check is enough transfer quantity
             $quantity=$data['type']=='base_uom' ? $data['uom_conversion'] * $request->quantity : $request->quantity;
-            (new InventoryLedger($request->source_inventory_id))->isEnoughQuantityByItem($request->item_id, $quantity);
-
+            (new InventoryLedgerAction($request->source_inventory_id))->isEnoughQuantityByItem($data['item_id'], $quantity);
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'transfer_id', $count);
             $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['transfer_id'] = $transfer_id;
@@ -122,11 +122,11 @@ class TransferRepository implements TransferRepositoryInterface
             $data['transfer_quantity'] = $request->quantity;
             $data['uom_conversion_id'] = $data['conversion_uom_id'];
             $data['uom_id'] = $request->uom_id;
-            $data['batch_no'] = $request->batch_no;
             $transfer = Transfer::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );
+            dd($transfer);
             DB::commit();
             return $transfer;
         } catch (\Exception $e) {
