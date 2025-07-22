@@ -121,18 +121,18 @@ class OrderRepository implements OrderRepositoryInterface
                     // $entity = $latestRoomSession->entitySession->entity;
                     // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                     if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
-                        $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')
-                            ->where('expired_at', '>', CurrentTime())
-                            ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
-                        if (count($packs) < $orderItem->quantity) {
-                            ResponseMessage('Not enough packs to sell', 402);
-                        }
-                        foreach ($packs as $pack) {
-                            if ($pack->status == 'ready') {
-                                $pack->status = 'sold';
-                                $pack->save();
-                            }
-                        }
+                        // $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')
+                        //     ->where('expired_at', '>', CurrentTime())
+                        //     ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                        // if (count($packs) < $orderItem->quantity) {
+                        //     ResponseMessage('Not enough packs to sell', 402);
+                        // }
+                        // foreach ($packs as $pack) {
+                        //     if ($pack->status == 'ready') {
+                        //         $pack->status = 'sold';
+                        //         $pack->save();
+                        //     }
+                        // }
                         $orderItem->completed_at = now();
                         $orderItem->completed_by = UserData()->id;
                     }
@@ -140,7 +140,7 @@ class OrderRepository implements OrderRepositoryInterface
                     elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                         $orderItem->progressed_at = now();
                         $orderItem->progressed_by = UserData()->id;
-                        // $this->actionInventoryItem($orderItem, 'order_item', 'out');
+                        $this->actionInventoryItem($orderItem, 'order_item', 'out');
                     } elseif ($data['status'] == 'cancelled') {
                         $orderItem->cancelled_at = now();
                         $orderItem->cancelled_by = UserData()->id;

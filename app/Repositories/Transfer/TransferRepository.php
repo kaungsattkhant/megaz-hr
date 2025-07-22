@@ -2,13 +2,13 @@
 
 namespace App\Repositories\Transfer;
 
-use App\Http\Action\Common\Conversion;
-use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
-use App\Http\Action\Inventory\InventoryLedger;
-use App\Http\Action\Inventory\StoreInventory;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
+use App\Models\InventoryLedger;
 use Illuminate\Support\Facades\DB;
+use App\Http\Action\Common\Conversion;
+use App\Http\Action\Inventory\StoreInventory;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class TransferRepository implements TransferRepositoryInterface
 {
@@ -122,6 +122,7 @@ class TransferRepository implements TransferRepositoryInterface
             $data['transfer_quantity'] = $request->quantity;
             $data['uom_conversion_id'] = $data['conversion_uom_id'];
             $data['uom_id'] = $request->uom_id;
+            $data['batch_no'] = $request->batch_no;
             $transfer = Transfer::updateOrCreate(
                 ['id' => $data['id']],
                 $data
@@ -177,12 +178,28 @@ class TransferRepository implements TransferRepositoryInterface
 
                 #out
                 $inventoryId = $transfer->source_inventory_id;
-                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
-                (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+                $sourceLedger=InventoryLedger::create([
+                    'date'=>now(),
+                    'ledgerable_id'=>$transfer->id,
+                    'ledgerable_type'=>'transfer',
+                    'inventory_id'=>$inventoryId,
+                    'action'=>'out',
+                    'batch_no'=>$transfer->batch_no,
+                ]);
+                // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
+                (new StoreInventory($inventoryId))->storeItemToInventory($sourceLedger, $transfer);
                 #in
                 $inventoryId = $transfer->destination_inventory_id;
-                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
-                (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+                $destinationLedger=InventoryLedger::create([
+                    'date'=>now(),
+                    'ledgerable_id'=>$transfer->id,
+                    'ledgerable_type'=>'transfer',
+                    'inventory_id'=>$inventoryId,
+                    'action'=>'out',
+                    'batch_no'=>$transfer->batch_no,
+                ]);
+                // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
+                (new StoreInventory($inventoryId))->storeItemToInventory($destinationLedger, $transfer);
                 #store inventory
                 DB::commit();
                 ResponseMessage('Update Successfully', 200);

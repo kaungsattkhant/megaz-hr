@@ -104,14 +104,14 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
 
                 $insertData = [];
+                $this->checkInventoryEnough($data['menu_id'], $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
                     $createdOrderItem->order = $createdOrderItem->order;
                     $createdOrderItem->menu = $createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
-                    $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
-
+                    // $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
                 }
                 // OrderItem::insert($insertData);
                 // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
@@ -160,16 +160,16 @@ class OrderService
                 $orderItemData['sub_total_price'] = ($data['original_price']) - $defaultDiscountAmont; //after  
                 $orderItemData['price'] = $data['original_price']; //after  
                 $insertData = [];
+                $this->checkInventoryEnough($data['menu_id'], $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
                     $createdOrderItem->order = $createdOrderItem->order;
                     $createdOrderItem->menu = $createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
-                    $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
+                    // $this->actionInventoryItem($createdOrderItem, 'order_item', 'out');
                     // dd($createdOrderItem);
                 }
-                dd('incorrect');
                 // $orderItems=OrderItem::insert($insertData);
                 // dd($orderItems);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
@@ -421,6 +421,37 @@ class OrderService
         }
     }
 
+    public function checkInventoryEnough($menuId, $quantity)
+    {
+        $inventoryId = 8;
+        $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
+            ->whereHas('menuStep', function ($q) use ($menuId) {
+                $q->where('menu_id', $menuId)
+                    ->where('type', 'ready_to_sale');
+            })
+            ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
+            ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
+            ->get();
+        foreach ($menuStepItemByMenu as $item) {
+            $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
+                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                ->selectRaw("
+        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+    ")
+                ->where('inventory_ledgers.inventory_id', $inventoryId)
+                ->first();
+            $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
+            $menuCostQuantity = $item->total_quantity * $quantity;
+            if ((float) $stockInInventory < $menuCostQuantity) {
+                return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
+            }
+        }
+
+    }
+
     public function actionInventoryItem($orderItem, $morphMapName, $action)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
@@ -435,24 +466,23 @@ class OrderService
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
             ->get();
         foreach ($menuStepItemByMenu as $item) {
-            $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
-                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-                ->selectRaw("
-                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
-                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
-                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
-                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
-            ")
-                ->where('inventory_ledgers.inventory_id', $inventoryId)
-                ->first();
-            $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
-            // dd($stockInInventory);
-            if ((float) $stockInInventory < (float) $item->total_quantity) {
-                return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
-            }
+            // $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
+            //     ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+            //     ->selectRaw("
+            //     SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+            //     SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+            //     SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+            //     SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+            // ")
+            //     ->where('inventory_ledgers.inventory_id', $inventoryId)
+            //     ->first();
+            // $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
+            // // dd($stockInInventory);
+            // if ((float) $stockInInventory < (float) $item->total_quantity) {
+            //     return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
+            // }
 
             //Let
-            $item->total_quantity = 15000;
             $inventoryItems = InventoryLedgerItem::where('item_id', $item->item_id)
                 ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
                 ->where('inventory_ledgers.inventory_id', $inventoryId)
@@ -463,14 +493,14 @@ class OrderService
             // dd($itemInventory);
             $totalOutQuantity = $item->total_quantity; // e.g. 15000
             $remainingQuantity = $totalOutQuantity;
-            $array=[];
+            $array = [];
             foreach ($inventoryItems as $inventory_item) {
                 if ($remainingQuantity <= 0) {
                     break;
                 }
-            
+
                 $availableQty = (float) $inventory_item->quantity;
-            
+
                 // Determine how much to take from this batch
                 $quantityToTake = min($remainingQuantity, $availableQty);
 
@@ -489,7 +519,7 @@ class OrderService
                     'inventory_ledger_id' => $inventoryLedger->id,
                 ]);
                 $remainingQuantity -= $quantityToTake;
-                $array[]=$quantityToTake;
+                $array[] = $quantityToTake;
             }
         }
 

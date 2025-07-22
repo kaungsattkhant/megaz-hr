@@ -17,7 +17,7 @@ class Transfer extends BaseModel
         'transfer_id','source_inventory_id','destination_inventory_id',
         'quantity','item_id', 'date','created_by', 'confirmed_at',
         'confirmed_by', 'status','uom_id','uom_conversion_id',
-        'transfer_quantity',
+        'transfer_quantity','batch_no',
     ];
 
     public function confirmed_by()
