@@ -27,6 +27,7 @@ use App\Http\Resources\KtvObjectiveRsource;
 use App\Http\Resources\dailyObjectiveByStaffId;
 use App\Http\Resources\DailyObjKeyStaffResource;
 use App\Http\Resources\KtvProductTreeEditResource;
+use App\Models\CompletedObjectiveKey;
 
 class ObjectiveRepository implements ObjectiveInterface
 {
@@ -189,7 +190,9 @@ class ObjectiveRepository implements ObjectiveInterface
                     ObjectiveStaff::whereIn('id', $delIds)->delete();
                 }
                 foreach ($okrAssigns as $okrAssign) {
+
                     $objective = Objective::findOrFail($okrAssign['objective_id']);
+                    
                     $objectiveStaff = ObjectiveStaff::updateOrCreate(
                         [
                             'id' => $okrAssign['id'] ?? null,
@@ -291,25 +294,18 @@ class ObjectiveRepository implements ObjectiveInterface
         $currentDate = now()->toDateString();
         $staffId = UserData()->id;
 
+        $objectiveStaffFilter = function ($query) use ($staffId, $currentDate) {
+            $query->where('staff_id', $staffId)
+                ->whereDate('start_date', $currentDate);
+        };
         $objectives = Objective::with([
-            'objectiveKeys.objKeyStaff' => function ($query) use ($staffId) {
-                $query->where('staff_id', $staffId);
-            },
+            'objectiveStaff' => $objectiveStaffFilter,
             'objectiveKeys'
-        ])
-            ->whereHas('objectiveKeys', function ($query) use ($currentDate, $staffId) {
-                $query->whereHas('objKeyStaff', function ($query) use ($currentDate, $staffId) {
-                    $query->whereHas('objectiveKeyDuty', function ($query) use ($currentDate) {
-                        $query->whereRaw("DATE(assign_date) = ?", [$currentDate]);
-                    })
-                        ->where('staff_id', $staffId);
-                });
-            })
-            ->paginate();
-        return ObjectiveResource::collection($objectives);
+        ])->whereHas('objectiveStaff',$objectiveStaffFilter)
+        ->get();
+        return $objectives;
+        // return ObjectiveResource::collection($objectives);
     }
-
-
 
     //objkeylistwithstaff assigns 
     public function getdailyObjectives(Request $request, $objId)
@@ -321,14 +317,11 @@ class ObjectiveRepository implements ObjectiveInterface
             'objStaffImg'
         ])
             ->where('staff_id', UserData()->id)
-            // ->whereHas('objectiveKeyDuty', function ($query) use ($currentDate) {
-            //     $query->whereRaw('DATE(assign_date) = ?', [$currentDate]);
-            // })
+            ->whereDate('start_date', $currentDate)
             ->whereHas('objective', function ($query) use ($objId) {
                 $query->where('id', $objId);
             })
             ->get();
-
         return DailyObjKeyStaffResource::collection($objectives);
     }
 
@@ -340,11 +333,9 @@ class ObjectiveRepository implements ObjectiveInterface
         //     return;
         // }
         // if (checkRoles(['Supervisor']) || checkRoles(['Manager'])) {
-        // $dutyDateIds = ObjectiveKeyDuty::where('assign_date', $currentDate)->pluck('id');
         $objectiveKeyStaff = ObjectiveStaff::with([
-            'objective.objectiveKeys',
-        ])->where('staff_id', $staffId)
-            ->get();
+            'objective.objectiveKeys','objective.sop','objective.role'
+        ])->where('staff_id', $staffId)->whereDate('start_date', $currentDate)->get();
         return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
         // }
     }
@@ -417,8 +408,7 @@ class ObjectiveRepository implements ObjectiveInterface
         return $data;
     }
 
-
-    public function updateDailyObjective($data, $objStaffId)
+    public function updateDailyObjective($data,$objStaffId)
     {
         $objStaff =  ObjectiveStaff::findOrFail($objStaffId);
         $updateData = [];
@@ -440,7 +430,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
         $objStaff->update($updateData);
 
-        return $updateData;
+        return $objStaff;
     }
 
     private function getSupervisorUpdateData($data, $userId)
@@ -468,7 +458,6 @@ class ObjectiveRepository implements ObjectiveInterface
     private function getManagerUpdateData($data, $userId)
     {
         $updateData = ['status' => $data['status']];
-
         if ($data['status'] === 'approved') {
             $updateData['manager_checked_at'] = now();
             $updateData['okr_point'] = $data['okr_point'];
@@ -504,6 +493,35 @@ class ObjectiveRepository implements ObjectiveInterface
         }
 
         return $updateData;
+    }
+
+    public function storeCompletedObjKeys($data)
+    {
+        DB::beginTransaction();
+        try {
+            if (isset($data['complete_okr_keys'])) {
+                $completeOkrKeys = json_decode($data['complete_okr_keys'], true);
+                if (!is_array($completeOkrKeys)) {
+                    return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
+                }
+                foreach($completeOkrKeys as $completeOkrKey){
+                    CompletedObjectiveKey::updateOrCreate(
+                        [
+                            'id' => $completeOkrKey['id'] ?? null
+                        ],
+                        [
+                            'objective_key_id' => $completeOkrKey['objective_key_id'],
+                            'objective_staff_id' => $completeOkrKey['objective_staff_id'],
+                        ]
+                    );
+                }
+            }
+            DB::commit();
+            return $completeOkrKeys;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     //ktv

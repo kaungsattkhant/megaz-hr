@@ -1100,6 +1100,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function storePoArrivalItems($validatedData)
   {
+    // dd('abc');
     DB::beginTransaction();
     try {
       if (isset($validatedData['is_new_invoice']) && $validatedData['is_new_invoice'] == 1) {
@@ -1241,12 +1242,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ResponseMessage('Main Inventory not found.', 404);
     }
     $inventoryLedger = InventoryLedger::create([
-      'inventory_id' =>  $inventoryId,
+      'inventory_id' => $inventoryId,
       'date' => now()->format('Y-m-d'),
       'ledgerable_id' => $arrivalItem->id,
       'ledgerable_type' => 'arrival_item',
       'action' => 'in'
     ]);
+    $batchNo = now()->format('YmdHis') .'_'. $arrivalItem->item_id .'_'. $inventoryLedger->id;
+    $inventoryLedger->batch_no = $batchNo;
+    $inventoryLedger->save();
 
     InventoryLedgerItem::create([
       'inventory_ledger_id' => $inventoryLedger->id,

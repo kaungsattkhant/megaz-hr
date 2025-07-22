@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Objective;
+use App\Models\CompletedObjectiveKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
