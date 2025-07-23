@@ -181,6 +181,9 @@
                 selectedDate: null,
                 selectedArea: null,
 
+                total_quantity: 0,
+                total_amount: 0,
+
                 url_date: '',
                 url_area: '',
                 url: '/api/sale-reports'
@@ -195,7 +198,9 @@
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     if(response.data.data){
-                        this.primaryList = response.data.data.data;
+                        this.primaryList = response.data.data;
+                        // this.total_amount = response.total_amount;
+                        // this.total_quantity = response.total_quantity;
                     }
                     else{
                         this.primaryList = response.data
