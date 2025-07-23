@@ -3,6 +3,7 @@
 namespace App\Repositories\MaterialRequirementsPlanning;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Area;
 use App\Models\Menu;
 use App\Models\Role;
@@ -11,6 +12,7 @@ use App\Models\SubMenu;
 use App\Models\MenuArea;
 use App\Models\MenuStep;
 use App\Models\MenuPrice;
+use App\Models\OrderItem;
 use App\Models\Department;
 use App\Models\AreaCategory;
 use App\Models\CookingPlace;
@@ -422,7 +424,53 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
   public function createRemark($data)
   {
-    $remark = Remark::create($data);
-    ResponseData($remark);
+    DB::beginTransaction();
+    try {
+      $remark = Remark::create($data);
+      DB::commit();
+      ResponseData($remark, 201, 'Remark created successfully!');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function saleReport($request)
+  {
+    $query = OrderItem::select(
+      'menu_id',
+      DB::raw('SUM(quantity) as total_quantity'),
+      DB::raw('SUM(sub_total_price) as total_amount')
+  )
+  ->with('menu')
+  ->groupBy('menu_id');
+
+  if ($request->has('area_id')) {
+    $query->where('area_id', $request->input('area_id'));
+  }
+
+  if ($request->has('date')) {
+    $date = Carbon::parse($request->input('date'))->startOfDay();
+    $query->whereDate('date', $date);
+  } elseif ($request->has('start_date') && $request->has('end_date')) {
+    $start = Carbon::parse($request->input('start_date'))->startOfDay();
+    $end = Carbon::parse($request->input('end_date'))->endOfDay();
+    $query->whereBetween('date', [$start, $end]);
+  }
+
+  $paginated = $query->paginate(config('common.list_count'));
+  $paginated->getCollection()->transform(function ($item) {
+      $item->menu = Menu::find($item->menu_id);
+      return $item;
+    });   
+    $totalQuantity = $paginated->getCollection()->sum('total_quantity');
+    $totalAmount = $paginated->getCollection()->sum('total_amount');
+
+    return [
+      'data' => $paginated,
+      'total_quantity' => $totalQuantity,
+      'total_amount' => $totalAmount,
+    ];
   }
 }

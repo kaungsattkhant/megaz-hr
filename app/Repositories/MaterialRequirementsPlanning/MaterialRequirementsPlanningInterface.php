@@ -37,4 +37,6 @@ interface MaterialRequirementsPlanningInterface
   public function getRemarks();
 
   public function createRemark($data);
+
+  public function saleReport($request);
 }
