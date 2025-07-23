@@ -63,6 +63,21 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <!-- pagination -->
+                        <div class="flex justify-center">
+                            <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                                <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                    @click="getPrimaryList(currentPage - 1)">«</button>
+                                <button class=" text-sm px-5 border">
+                                    Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                        class="text-gray-400">{{
+                                        lastPage }}</span>
+                                </button>
+                                <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                    :disabled="currentPage === lastPage" @click="getPrimaryList(currentPage + 1)">
+                                    »</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,99 +85,7 @@
         </div>
 
 
-        <!-- <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="create_cashbook_modal" tabindex="-1" aria-labelledby="createCashbookModalLabel" aria-modal="true"
-            role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <p class="text-xl w-full text-center">
-                            Create Cashbook
-                        </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-16 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Parent Account
-                            </label>
-                            <select name="" id="" v-model="selectedSubAccount"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                @change="subAccountSelectChanged">
-                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in subAccountList"
-                                    :key="subAccountIndex">
-                                    {{ subAccount.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Title
-                            </label>
-                            <select name="" id="" v-model="selectedAccount"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="account.id" v-for="(account, accountIndex) in accountList"
-                                    :key="accountIndex">
-                                    {{ account.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Account Type
-                            </label>
-                            <select name="" id="" v-model="accType"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="account" v-for="account in cashAccountList"> {{ account.name }}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Type
-                            </label>
-                            <select name="" id="" v-model="action"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="debit">Debit</option>
-                                <option value="credit">Credit</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Amount
-                            </label>
-                            <input type="text" placeholder="Amount" v-model="amount"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Remark
-                            </label>
-                            <textarea v-model="description"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                name="" id="" cols="30" rows="10"></textarea>
-                        </div>
-
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button @click="createBtnClicked" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
-                            Create
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
+        
 
 
 
@@ -186,6 +109,11 @@
                 total_quantity: 0,
                 total_amount: 0,
 
+                currentPage: 0,
+                perPage: 0,
+                lastPage: 0,
+                totalData: 0,
+                
                 url_date: '',
                 url_area: '',
                 url: '/api/sale-reports'
@@ -196,7 +124,9 @@
             ...mapGetters(['getToken']),
 
             async getPrimaryList(pageNumber){
-                let url = this.url + this.url_date + this.url_area;
+                this.total_quantity = 0;
+                this.total_amount = 0;
+                let url = this.url + '?page=' + pageNumber + this.url_date + this.url_area;
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     if(response.data.data){
@@ -205,7 +135,10 @@
                             this.total_quantity += item.total_quantity;
                             this.total_amount += item.total_amount;
                         });
-                        console.log('Total Quantity =', this.total_quantity);
+                        this.currentPage = response.data.current_page;
+                        this.perPage = response.data.per_page;
+                        this.lastPage = response.data.last_page;
+                        this.totalData = response.data.total;
                     }
                     else{
                         this.primaryList = response.data;
@@ -221,19 +154,20 @@
                 this.selectedArea = null;
                 this.url_area = '';
                 if(this.selectedDate){
-                    this.url_date = '?date=' + this.selectedDate;
-                    this.getPrimaryList();
+                    this.url_date = '&date=' + this.selectedDate;
+                    this.getPrimaryList(1);
                 }
                 
             },
             areaChanged(){
-                if(this.selectedDate){
-                    this.url_area = '&area_id=' + this.selectedArea.id;
-                }
-                else{
-                    this.url_area = '?area_id=' + this.selectedArea.id;
-                }
-                this.getPrimaryList();
+                // if(this.selectedDate){
+                //     this.url_area = '&area_id=' + this.selectedArea.id;
+                // }
+                // else{
+                //     this.url_area = '?area_id=' + this.selectedArea.id;
+                // }
+                this.url_area = '&area_id=' + this.selectedArea.id;
+                this.getPrimaryList(1);
             },
             
 
@@ -270,7 +204,7 @@
         },
 
         created(){
-            this.getPrimaryList();
+            this.getPrimaryList(1);
             this.getAreaList();
         }
     }

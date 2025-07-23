@@ -29,7 +29,7 @@
                     <li>
                         <a href="/pos/customer_deposit"
                             class="flex items-center flex-col  rounded-lg px-0 py-12 @yield('customer_deposit')">
-                            <i class="fas fa-users mb-1.5 text-2xl"></i>
+                            <i class="fas fa-money-check-edit-alt mb-1.5 text-2xl"></i>
                             <span class="">
                                 Customer Deposit
                             </span>
@@ -64,7 +64,7 @@
                     <li>
                         <a href="/pos/invoices"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('invoices')">
-                            <i class="fas fa-users mb-1.5 text-2xl"></i>
+                            <i class="far fa-file-invoice mb-1.5 text-2xl"></i>
                             <span class="">
                                 Invoices
                             </span>
@@ -75,7 +75,7 @@
                     <li>
                         <a href="/pos/cashbook"
                             class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('cashbook')">
-                            <i class="fas fa-users mb-1.5 text-2xl"></i>
+                            <i class="fas fa-book mb-1.5 text-2xl"></i>
                             <span class="">
                                 Cashbook
                             </span>
@@ -121,6 +121,14 @@
                         </a>
                     </li>
                 @endif
+                <li>
+                    <a href="/pos/sale_report" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('sale_report')">
+                        <i class="fas fa-chart-bar mb-1.5 text-2xl"></i>
+                        <span class="">
+                            Sale Report
+                        </span>
+                    </a>
+                </li>
             </ul>
         </div>
 
