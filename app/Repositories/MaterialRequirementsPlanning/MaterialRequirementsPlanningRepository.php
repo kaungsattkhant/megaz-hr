@@ -440,7 +440,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   {
     $query = OrderItem::select(
       'menu_id',
-      DB::raw('SUM(quantity) as total_quantity'),
+      DB::raw('CAST(SUM(quantity) AS UNSIGNED) as total_quantity'),
       DB::raw('SUM(sub_total_price) as total_amount')
   )
   ->with('menu')
@@ -463,14 +463,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   $paginated->getCollection()->transform(function ($item) {
       $item->menu = Menu::find($item->menu_id);
       return $item;
-    });   
-    $totalQuantity = $paginated->getCollection()->sum('total_quantity');
-    $totalAmount = $paginated->getCollection()->sum('total_amount');
-
-    return [
-      'data' => $paginated,
-      'total_quantity' => $totalQuantity,
-      'total_amount' => $totalAmount,
-    ];
+    });
+    return $paginated;
   }
 }
