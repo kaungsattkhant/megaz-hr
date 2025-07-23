@@ -465,11 +465,11 @@ class OrderService
     public function checkInventoryEnough($menuId, $quantity)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
-        $inventory=Inventory::where('name' , 'Kitchen Inventory')->first();
-        if(!$inventory){
-            ResponseMessage('Kitchen Inv not found',404);
+        $inventory = Inventory::where('name', 'Kitchen Inventory')->first();
+        if (!$inventory) {
+            ResponseMessage('Kitchen Inv not found', 404);
         }
-        $inventoryId=$inventory->id;
+        $inventoryId = $inventory->id;
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
@@ -513,77 +513,79 @@ class OrderService
             ->get();
 
         //check extra selling item inventory exist
-        foreach ($sellingExtraIds as $extraId) {
-            $sellingExtra = SellingExtra::with('item')
-                ->find($extraId);
-            if ($sellingExtra->uom_id == $sellingExtra->item->base_uom_id) {
-                $quantity = $sellingExtra->quantity * $sellingExtra->item->uom_conversion;
-            }
-            if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
-                $quantity = $sellingExtra->quantity;
-            }
-            $itemInventory = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
-                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-                ->selectRaw("
-        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
-        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
-        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
-        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
-    ")
-                ->where('inventory_ledgers.inventory_id', $inventoryId)
-                ->first();
-            $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
-            if ((float) $stockInInventory < $quantity) {
-                return ResponseMessage("Stock is not enough for extra Item ,{$sellingExtra->item->name}", 422);
-            }
-        }
-        //end
+    //     foreach ($sellingExtraIds as $extraId) {
+    //         $sellingExtra = SellingExtra::with('item')
+    //             ->find($extraId);
+    //         if ($sellingExtra->uom_id == $sellingExtra->item->base_uom_id) {
+    //             $quantity = $sellingExtra->quantity * $sellingExtra->item->uom_conversion;
+    //         }
+    //         if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
+    //             $quantity = $sellingExtra->quantity;
+    //         }
+    //         $itemInventory = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
+    //             ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+    //             ->selectRaw("
+    //     SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+    //     SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+    //     SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+    //     SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+    // ")
+    //             ->where('inventory_ledgers.inventory_id', $inventoryId)
+    //             ->first();
+    //         $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
+    //         if ((float) $stockInInventory < $quantity) {
+    //             return ResponseMessage("Stock is not enough for extra Item ,{$sellingExtra->item->name}", 422);
+    //         }
+    //     }
+    //     //end
 
-        foreach ($sellingExtraIds as $extraId) {
-            $sellingExtra = SellingExtra::with('item')
-                ->find($extraId);
-            if ($sellingExtra->uom_id == $sellingExtra->item->base_uom_id) {
-                $quantity = $sellingExtra->quantity * $sellingExtra->item->uom_conversion;
-            }
-            if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
-                $quantity = $sellingExtra->quantity;
-            }
-            $inventoryItems = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
-                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-                ->where('inventory_ledgers.inventory_id', $inventoryId)
-                ->select('inventory_ledger_items.quantity', 'inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
-                ->groupBy('inventory_ledgers.batch_no')
-                ->orderBy('inventory_ledgers.created_at', 'asc')
-                ->get();
-            $remainingQuantity = $quantity;
-            foreach ($inventoryItems as $inventory_item) {
-                if ($remainingQuantity <= 0) {
-                    break;
-                }
+    //     foreach ($sellingExtraIds as $extraId) {
+    //         $sellingExtra = SellingExtra::with('item')
+    //             ->find($extraId);
+    //         if ($sellingExtra->uom_id == $sellingExtra->item->base_uom_id) {
+    //             $quantity = $sellingExtra->quantity * $sellingExtra->item->uom_conversion;
+    //         }
+    //         if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
+    //             $quantity = $sellingExtra->quantity;
+    //         }
+    //         $inventoryItems = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
+    //             ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+    //             ->where('inventory_ledgers.inventory_id', $inventoryId)
+    //             ->select('inventory_ledger_items.quantity', 'inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
+    //             ->groupBy('inventory_ledgers.batch_no')
+    //             ->orderBy('inventory_ledgers.created_at', 'asc')
+    //             ->get();
+    //         $remainingQuantity = $quantity;
+    //         foreach ($inventoryItems as $inventory_item) {
+    //             if ($remainingQuantity <= 0) {
+    //                 break;
+    //             }
 
-                $availableQty = (float) $inventory_item->quantity;
+    //             $availableQty = (float) $inventory_item->quantity;
 
-                // Determine how much to take from this batch
-                $quantityToTake = min($remainingQuantity, $availableQty);
+    //             // Determine how much to take from this batch
+    //             $quantityToTake = min($remainingQuantity, $availableQty);
 
-                $inventoryLedger = InventoryLedger::create([
-                    'batch_no' => $inventory_item->batch_no,
-                    'date' => now(),
-                    'ledgerable_id' => $orderItem->id,
-                    'ledgerable_type' => 'selling_extra',
-                    'inventory_id' => $inventoryId,
-                    'action' => $action,//out
-                ]);
-                // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
-                $inventoryLedger->inventory_ledger_items()->create([
-                    'item_id' => $sellingExtra->item_id,
-                    'quantity' => $quantityToTake,
-                    'inventory_ledger_id' => $inventoryLedger->id,
-                ]);
-                $remainingQuantity -= $quantityToTake;
-                $array[] = $quantityToTake;
-            }
-        }
+    //             $inventoryLedger = InventoryLedger::create([
+    //                 'batch_no' => $inventory_item->batch_no,
+    //                 'date' => now(),
+    //                 'ledgerable_id' => $orderItem->id,
+    //                 'ledgerable_type' => 'selling_extra',
+    //                 'inventory_id' => $inventoryId,
+    //                 'action' => $action,//out
+    //             ]);
+    //             // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
+    //             $inventoryLedger->inventory_ledger_items()->create([
+    //                 'item_id' => $sellingExtra->item_id,
+    //                 'quantity' => $quantityToTake,
+    //                 'inventory_ledger_id' => $inventoryLedger->id,
+    //             ]);
+    //             $remainingQuantity -= $quantityToTake;
+    //             $array[] = $quantityToTake;
+    //         }
+    //     }
+
+    //end_extra
 
         foreach ($menuStepItemByMenu as $item) {
 
