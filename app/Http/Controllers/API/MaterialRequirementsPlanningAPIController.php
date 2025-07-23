@@ -117,7 +117,6 @@ class MaterialRequirementsPlanningAPIController extends Controller
 
     public function saleReport(Request $request)
     {
-        $data = $this->MaterialRequirementsPlanningRepository->saleReport($request);
-        ResponseData($data);
+       return $this->MaterialRequirementsPlanningRepository->saleReport($request);
     }
 }
