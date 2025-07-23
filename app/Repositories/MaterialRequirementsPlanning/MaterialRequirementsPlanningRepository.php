@@ -442,28 +442,30 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_id',
       DB::raw('CAST(SUM(quantity) AS UNSIGNED) as total_quantity'),
       DB::raw('SUM(sub_total_price) as total_amount')
-  )
-  ->with('menu')
-  ->groupBy('menu_id');
+    )
+      ->with('menu')
+      ->groupBy('menu_id');
 
-  if ($request->has('area_id')) {
-    $query->where('area_id', $request->input('area_id'));
-  }
+    if ($request->has('area_id')) {
+      $query->where('area_id', $request->input('area_id'));
+    }
 
-  if ($request->has('date')) {
-    $date = Carbon::parse($request->input('date'))->startOfDay();
-    $query->whereDate('date', $date);
-  } elseif ($request->has('start_date') && $request->has('end_date')) {
-    $start = Carbon::parse($request->input('start_date'))->startOfDay();
-    $end = Carbon::parse($request->input('end_date'))->endOfDay();
-    $query->whereBetween('date', [$start, $end]);
-  }
+    if ($request->has('date')) {
+      $date = Carbon::parse($request->input('date'))->startOfDay();
+      $query->whereDate('date', $date);
+    } elseif ($request->has('start_date') && $request->has('end_date')) {
+      $start = Carbon::parse($request->input('start_date'))->startOfDay();
+      $end = Carbon::parse($request->input('end_date'))->endOfDay();
+      $query->whereBetween('date', [$start, $end]);
+    }
 
-  $paginated = $query->paginate(config('common.list_count'));
-  $paginated->getCollection()->transform(function ($item) {
+    $paginated = $query->paginate(config('common.list_count'));
+    $paginated->getCollection()->transform(function ($item) {
       $item->menu = Menu::find($item->menu_id);
       return $item;
     });
-    return $paginated;
+    return [
+      'data' => $paginated
+    ];
   }
 }
