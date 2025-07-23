@@ -545,6 +545,7 @@ class OrderService
     public function actionInventoryItem($orderItem, $morphMapName, $action, $sellingExtraIds)
     {
         $inventoryId = UserData()->department->inventory->inventory_id;
+        // $inventoryId=6; //fix kitchen
         $menuId = $orderItem->menu_id;
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
@@ -566,11 +567,27 @@ class OrderService
             if ($sellingExtra->uom_id == $sellingExtra->item->uom_id) {
                 $quantity = $sellingExtra->quantity;
             }
-            $inventoryItems = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
+            // $inventoryItems = InventoryLedgerItem::where('item_id', $sellingExtra->item_id)
+            //     ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+            //     ->where('inventory_ledgers.inventory_id', $inventoryId)
+            //     ->select('inventory_ledger_items.quantity', 'inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
+            //     ->groupBy('inventory_ledgers.batch_no')
+            //     ->orderBy('inventory_ledgers.created_at', 'asc')
+            //     ->get();
+            $inventoryItems = InventoryLedgerItem::where('inventory_ledger_items.item_id', $sellingExtra->item_id)
                 ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
                 ->where('inventory_ledgers.inventory_id', $inventoryId)
-                ->select('inventory_ledger_items.quantity', 'inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
-                ->groupBy('inventory_ledgers.batch_no')
+                ->select(
+                    'inventory_ledger_items.item_id',
+                    'inventory_ledgers.batch_no'
+                )
+                ->selectRaw("
+        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+        SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+        SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+    ")
+                ->groupBy('inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
                 ->orderBy('inventory_ledgers.created_at', 'asc')
                 ->get();
             $remainingQuantity = $quantity;
@@ -579,7 +596,11 @@ class OrderService
                     break;
                 }
 
-                $availableQty = (float) $inventory_item->quantity;
+                $availableQty = (float) $inventory_item->in_stock_quantity;
+
+                if ($availableQty <= 0) {
+                    continue;
+                }
 
                 // Determine how much to take from this batch
                 $quantityToTake = min($remainingQuantity, $availableQty);
@@ -599,7 +620,6 @@ class OrderService
                     'inventory_ledger_id' => $inventoryLedger->id,
                 ]);
                 $remainingQuantity -= $quantityToTake;
-                $array[] = $quantityToTake;
             }
         }
 
@@ -645,7 +665,7 @@ class OrderService
                 if ($availableQty <= 0) {
                     continue;
                 }
-               
+
                 $quantityToTake = min($remainingQuantity, $availableQty);
 
                 $inventoryLedger = InventoryLedger::create([
