@@ -11,10 +11,12 @@
                         
                     </div>
                     <div class="flex gap-x-3">
-                        <select name="" id="" v-model="selectedArea"  placeholder="Select Area"
-                            class="text-sm border border-gray-300 input-ui w-full !bg-white rounded-lg focus:ring-0">
-                            <option :value="area" v-for="area in areaList"> {{ area.name }} </option>
-                        </select>
+                        <div class="w-full !text-sm bg-white h-fit" data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select Area" @change="areaChanged"
+                                data-te-select-filter="true" name="" id="" v-model="selectedArea" class="input-ui">
+                                <option :value="area" v-for="area in areaList"> {{ area.name }} </option>
+                            </select>
+                        </div>
                         <!-- <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
 
                             Add
@@ -51,7 +53,7 @@
                                     </td>
                                 </tr>
                                 <tr class="">
-                                    <td></td>
+                                    <td colspan="2"></td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ total_quantity }}
                                     </td>
@@ -199,28 +201,47 @@
                 if (response.data) {
                     if(response.data.data){
                         this.primaryList = response.data.data;
-                        // this.total_amount = response.total_amount;
-                        // this.total_quantity = response.total_quantity;
+                        this.primaryList.forEach(item => {
+                            this.total_quantity += item.total_quantity;
+                            this.total_amount += item.total_amount;
+                        });
+                        console.log('Total Quantity =', this.total_quantity);
                     }
                     else{
-                        this.primaryList = response.data
+                        this.primaryList = response.data;
+                        this.primaryList.forEach(item => {
+                            this.total_quantity += item.total_quantity;
+                            this.total_amount += item.total_amount;
+                        });
+                        console.log('Total Quantity =', this.total_quantity);
                     }
                 }
             },
             dateChanged(){
+                this.selectedArea = null;
+                this.url_area = '';
                 if(this.selectedDate){
                     this.url_date = '?date=' + this.selectedDate;
                     this.getPrimaryList();
                 }
                 
             },
+            areaChanged(){
+                if(this.selectedDate){
+                    this.url_area = '&area_id=' + this.selectedArea.id;
+                }
+                else{
+                    this.url_area = '?area_id=' + this.selectedArea.id;
+                }
+                this.getPrimaryList();
+            },
             
 
-            async getSubAccountList() {
-                let url = `/api/sub_accounts`;
+            async getAreaList() {
+                let url = `/api/sellings_areas`;
                 let response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
-                    this.subAccountList = response.data;
+                    this.areaList = response.data;
                 }
             },
 
@@ -250,6 +271,7 @@
 
         created(){
             this.getPrimaryList();
+            this.getAreaList();
         }
     }
 </script>
