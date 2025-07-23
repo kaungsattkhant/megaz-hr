@@ -14,17 +14,18 @@ class CashBookRepository implements CashBookInterface
     public function list($request)
     {
         $isPos = $request->is_pos;
-        $is_closing_column = null;
-        $closing_date_column = null;
-
-        if ($isPos) {
-            $is_closing_column = 'is_pos_closing';
-            $closing_date_column = 'pos_closing_date';
-        }
-        if (!$isPos) {
-            $is_closing_column = 'is_closing';
-            $closing_date_column = 'closing_date';
-        }
+        // $is_closing_column = null;
+        // $closing_date_column = null;
+        $is_closing_column = 'is_pos_closing';
+        $closing_date_column = 'pos_closing_date';
+        // if ($isPos) {
+        //     $is_closing_column = 'is_pos_closing';
+        //     $closing_date_column = 'pos_closing_date';
+        // }
+        // if (!$isPos) {
+        //     $is_closing_column = 'is_closing';
+        //     $closing_date_column = 'closing_date';
+        // }
         if ($is_closing_column == null && $closing_date_column == null) {
             ResponseMessage('Something went wrong in cashbook', 419);
         }
@@ -79,17 +80,18 @@ class CashBookRepository implements CashBookInterface
         DB::beginTransaction();
         try {
             $isPos = $request->is_pos;
-            $is_closing_column = null;
-            $closing_date_column = null;
-
-            if ($isPos) {
-                $is_closing_column = 'is_pos_closing';
-                $closing_date_column = 'pos_closing_date';
-            }
-            if (!$isPos) {
-                $is_closing_column = 'is_closing';
-                $closing_date_column = 'closing_date';
-            }
+            // $is_closing_column = null;
+            // $closing_date_column = null;
+            $is_closing_column = 'is_closing';
+            $closing_date_column = 'closing_date';
+            // if ($isPos) {
+            //     $is_closing_column = 'is_pos_closing';
+            //     $closing_date_column = 'pos_closing_date';
+            // }
+            // if (!$isPos) {
+            //     $is_closing_column = 'is_closing';
+            //     $closing_date_column = 'closing_date';
+            // }
             if ($is_closing_column == null && $closing_date_column == null) {
                 ResponseMessage('Something went wrong in cashbook', 419);
             }
