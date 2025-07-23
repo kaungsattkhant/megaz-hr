@@ -140,8 +140,8 @@ class OrderRepository implements OrderRepositoryInterface
                     elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                         $orderItem->progressed_at = now();
                         $orderItem->progressed_by = UserData()->id;
-                        // $sellingExtraIds=$orderItem->extras->pluck('id')->toArray();
-                        $sellingExtraIds=[];
+                        $sellingExtraIds=$orderItem->extras->pluck('selling_extra_id')->toArray();
+                        // $sellingExtraIds=[];
                         $this->orderService->actionInventoryItem($orderItem, 'order_item', 'out',$sellingExtraIds);
                     } elseif ($data['status'] == 'cancelled') {
                         $orderItem->cancelled_at = now();
@@ -158,7 +158,6 @@ class OrderRepository implements OrderRepositoryInterface
                     broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
                 }
             }
-
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {

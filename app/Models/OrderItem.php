@@ -65,6 +65,6 @@ class OrderItem extends Model
     }
 
     public function extras(){
-        return $this->hasMany(SellingExtra::class);
+        return $this->hasMany(OrderItemExtra::class);
     }
 }
