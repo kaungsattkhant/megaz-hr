@@ -49,9 +49,14 @@
                                 </div>
                                 <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
                                 <button @click="btnClickedOpenRoom"
-                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
-                                    Open Room
+                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3 mb-2">
+                                    Open Table
                                 </button>
+                                <button @click="confirmRoomBtnClicked"
+                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                                    Open Now
+                                </button>
+                                
                             </div>
                         </div>
                     </div>
@@ -1402,6 +1407,10 @@
                 if(this.selectedCustomer){
                     formData.append('customer_id', this.selectedCustomer.id);
                 }
+                else{
+                    formData.append('customer_id', null);
+                }
+
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
                     formData.append('orders', JSON.stringify(this.packageMenuList));
