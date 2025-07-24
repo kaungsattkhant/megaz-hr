@@ -338,18 +338,18 @@ class ObjectiveRepository implements ObjectiveInterface
             //     // ->orderBy('repetition_count', 'asc');
             // }
         ])->where('staff_id', $staffId)
-        ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
-            $query->whereDate('start_date', $currentDate);
-        })->get();
+            ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
+                $query->whereDate('start_date', $currentDate);
+            })->get();
 
-        foreach($objectiveAssigns as $objectiveAssign){
+        foreach ($objectiveAssigns as $objectiveAssign) {
             $objType = $objectiveAssign->objective->type;
-            if($objType == 'daily'){
+            if ($objType == 'daily') {
                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                ->orderBy('repetition_count', 'asc')
-                ->where('status', 'in_progress')
-                ->whereDate('start_date', $currentDate)
-                ->first();
+                    ->orderBy('repetition_count', 'asc')
+                    ->where('status', 'in_progress')
+                    ->whereDate('start_date', $currentDate)
+                    ->first();
                 if (!$objectiveStaff) {
                     $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
                         ->where('status', 'assigned')
@@ -363,7 +363,7 @@ class ObjectiveRepository implements ObjectiveInterface
                         ->whereDate('start_date', $currentDate)
                         ->where('status', 'completed')
                         ->max('repetition_count');
-                        if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
+                    if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
                         $nextRepetition = $lastCompletedRepetition + 1;
                         $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
                             ->whereDate('start_date', $currentDate)
@@ -375,13 +375,13 @@ class ObjectiveRepository implements ObjectiveInterface
                 if ($objectiveStaff) {
                     $objectiveStaffCollection = collect([$objectiveStaff]);
                     $objectiveAssign->setRelation('objectiveStaff', $objectiveStaffCollection);
-                    
+
                     $totalRepetition = $objectiveAssign->objective->repetition;
                     $completedRepetitions = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
                         ->whereDate('start_date', $currentDate)
                         ->whereIn('status', ['completed', 'approved'])
                         ->count();
-                        $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
+                    $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
                     foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
                         $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
                             ->where('objective_staff_id', $objectiveStaff->id)
@@ -391,11 +391,10 @@ class ObjectiveRepository implements ObjectiveInterface
                 } else {
                     $objectiveAssign->setRelation('objectiveStaff', collect([]));
                 }
-            }
-            else{
+            } else {
                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                ->whereDate('start_date', $currentDate)
-                ->get();
+                    ->whereDate('start_date', $currentDate)
+                    ->get();
                 $objectiveAssign->setRelation('objectiveStaff', $objectiveStaff);
 
                 foreach ($objectiveStaff as $objStaff) {
@@ -495,7 +494,7 @@ class ObjectiveRepository implements ObjectiveInterface
         } elseif (checkRoles(['Manager'])) {
             $updateData = $this->getManagerUpdateData($data, $userId);
         } else {
-            $updateData = $this->getStaffUpdateData($data, $userId,$objStaffId);
+            $updateData = $this->getStaffUpdateData($data, $userId, $objStaffId);
         }
 
         $objStaff->update($updateData);
@@ -546,7 +545,7 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    private function getStaffUpdateData($data, $userId,$objStaffId)
+    private function getStaffUpdateData($data, $userId, $objStaffId)
     {
         $updateData = ['status' => $data['status']];
         if ($data['status'] == 'in_progress') {
@@ -561,7 +560,8 @@ class ObjectiveRepository implements ObjectiveInterface
                 foreach ($completeOkrKeys as $completeOkrKey) {
                     CompletedObjectiveKey::updateOrCreate(
                         [
-                            'id' => $completeOkrKey['id'] ?? null
+                            'objective_key_id' => $completeOkrKey['objective_key_id'],
+                            'objective_staff_id' => $objStaffId
                         ],
                         [
                             'objective_key_id' => $completeOkrKey['objective_key_id'],
@@ -616,15 +616,15 @@ class ObjectiveRepository implements ObjectiveInterface
     {
         $objectives = Objective::with([
             'objectiveKeys',
-            'objectiveAssigns' => function($query) use ($staffId) {
+            'objectiveAssigns' => function ($query) use ($staffId) {
                 $query->where('staff_id', $staffId);
             },
-            'objectiveAssigns.objectiveStaff' => function($query) {
+            'objectiveAssigns.objectiveStaff' => function ($query) {
                 $query->whereIn('status', ['completed', 'approved']);
             }
-        ])->whereHas('objectiveAssigns', function($q) use ($staffId) {
+        ])->whereHas('objectiveAssigns', function ($q) use ($staffId) {
             $q->where('staff_id', $staffId);
-            $q->whereHas('objectiveStaff', function($query) {
+            $q->whereHas('objectiveStaff', function ($query) {
                 $query->whereIn('status', ['completed', 'approved']);
             });
         })->get();
