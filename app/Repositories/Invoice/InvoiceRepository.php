@@ -925,7 +925,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if ($invoice->order) {
             $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
         }
-        $customerTotal = $this->getCustomerTotal($invoice->customer_id);
+        $customerTotal =$invoice->customer_id ? $this->getCustomerTotal($invoice->customer_id) :0;
         $total = 0;
         $totalDiscount = 0;
         $invoiceServiceCollection = collect();
