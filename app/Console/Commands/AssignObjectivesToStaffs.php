@@ -6,6 +6,7 @@ use App\Models\Staff;
 use App\Models\Objective;
 use App\Models\ObjectiveKey;
 use App\Models\ObjectiveStaff;
+use App\Models\ObjectiveAssign;
 use Illuminate\Console\Command;
 use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\Log;
@@ -43,19 +44,32 @@ class AssignObjectivesToStaffs extends Command
                 $staffLists = Staff::staffByRole($roleId);
 
                 foreach ($staffLists as $staff) {
-
-                    ObjectiveStaff::firstOrCreate(
-                        [
-                            'staff_id' => $staff->id,
-                            'objective_id' => $objective->id,
-                            'start_date' => $today,
-                        ],
-                        [
-                            'end_date' => $today,
-                            'status' => 'not_started',
-                            'okr_point' => $objective->okr_point,
-                        ]
-                    );
+                    $existingAssign = ObjectiveAssign::where('objective_id', $objective->id)
+                    ->where('staff_id', $staff->id)
+                    ->whereHas('objectiveStaff', function($query) use ($today) {
+                        $query->whereDate('start_date', $today);
+                    })
+                    ->first();
+                    if (!$existingAssign) {
+                        $objectiveAssign = ObjectiveAssign::create(
+                            [
+                                'objective_id' => $objective->id,
+                                'staff_id' => $staff->id,
+                            ]
+                        );
+                        for ($i = 1; $i <= $objective->repetition; $i++) {
+                            ObjectiveStaff::create(
+                                [
+                                    'objective_assign_id' => $objectiveAssign->id,
+                                    'repetition_count' => $i,
+                                    'start_date' => $today,
+                                    'end_date' => $today,
+                                    'status' => 'assigned',
+                                    'okr_point' => $objective->okr_point,
+                                ]
+                            );
+                        }
+                    }
                 }
             }
 

@@ -18,13 +18,11 @@ class CompletedObjectiveKey extends Model
 
     public function objectiveKey(): BelongsTo
     {
-        return $this->belongsTo(ObjectiveKey::class,'objective_key_id');
+        return $this->belongsTo(ObjectiveKey::class, 'objective_key_id');
     }
 
     public function objectiveStaff(): BelongsTo
     {
-        return $this->belongsTo(ObjectiveStaff::class,'objective_staff_id');
+        return $this->belongsTo(ObjectiveStaff::class, 'objective_staff_id');
     }
-
-
 }

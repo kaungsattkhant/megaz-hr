@@ -14,11 +14,13 @@ use App\Models\ObjectiveKey;
 use Illuminate\Http\Request;
 use App\Models\KtvProductTree;
 use App\Models\ObjectiveStaff;
+use App\Models\ObjectiveAssign;
 use App\Models\ObjectiveKeyDuty;
 use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\DB;
 use App\Models\ObjectiveStaffImage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\CompletedObjectiveKey;
 use App\Http\Resources\AssignResource;
 use App\Models\ObjectiveKeyStaffImage;
 use Illuminate\Support\Facades\Storage;
@@ -27,7 +29,6 @@ use App\Http\Resources\KtvObjectiveRsource;
 use App\Http\Resources\dailyObjectiveByStaffId;
 use App\Http\Resources\DailyObjKeyStaffResource;
 use App\Http\Resources\KtvProductTreeEditResource;
-use App\Models\CompletedObjectiveKey;
 
 class ObjectiveRepository implements ObjectiveInterface
 {
@@ -182,26 +183,28 @@ class ObjectiveRepository implements ObjectiveInterface
                 if (!is_array($okrAssigns)) {
                     return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
                 }
-                if (isset($validatedData['del_ids'])) {
-                    $delIds = json_decode($validatedData['del_ids'], true);
-                    if (!is_array($delIds)) {
-                        return ResponseMessage('Invalid JSON format for delete IDs.', 400);
-                    }
-                    ObjectiveStaff::whereIn('id', $delIds)->delete();
-                }
+                // if (isset($validatedData['del_ids'])) {
+                //     $delIds = json_decode($validatedData['del_ids'], true);
+                //     if (!is_array($delIds)) {
+                //         return ResponseMessage('Invalid JSON format for delete IDs.', 400);
+                //     }
+                //     ObjectiveStaff::whereIn('id', $delIds)->delete();
+                // }
                 foreach ($okrAssigns as $okrAssign) {
 
                     $objective = Objective::findOrFail($okrAssign['objective_id']);
-                    
+                    $objectiveAssign = ObjectiveAssign::firstOrCreate([
+                        'objective_id' => $okrAssign['objective_id'],
+                        'staff_id' => $okrAssign['staff_id']
+                    ]);
+
                     $objectiveStaff = ObjectiveStaff::updateOrCreate(
                         [
-                            'id' => $okrAssign['id'] ?? null,
+                            'objective_assign_id' => $objectiveAssign->id,
                         ],
                         [
-                            'staff_id' => $okrAssign['staff_id'],
                             'start_date' => $okrAssign['start_date'],
                             'end_date' => $okrAssign['end_date'],
-                            'objective_id' => $okrAssign['objective_id'],
                             'okr_point' => $objective->okr_point,
                         ]
                     );
@@ -216,15 +219,15 @@ class ObjectiveRepository implements ObjectiveInterface
     }
     public function getOkrAssigns(Request $request)
     {
-        $query = ObjectiveStaff::with([
+        $query = ObjectiveAssign::with([
+            'objectiveStaff',
             'staff.department',
             'staff.roles',
             'objective.objectiveKeys',
-            'objective.role.department',
             'objective.sop'
         ]);
         if ($request->has('role_id')) {
-            $query->whereHas('objective.role', function ($query) use ($request) {
+            $query->whereHas('staff.roles', function ($query) use ($request) {
                 $query->where('id', $request->role_id);
             });
         }
@@ -240,7 +243,6 @@ class ObjectiveRepository implements ObjectiveInterface
             'staff.department',
             'staff.roles',
             'objective.objectiveKeys',
-            'objective.role.department',
             'objective.sop'
         ])->findOrFail($okrAssignId);
         return $okrAssign;
@@ -248,7 +250,8 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function deleteOkrAssignById(int $okrAssignId)
     {
-        $okrAssign = ObjectiveStaff::findOrFail($okrAssignId);
+        $okrAssign = ObjectiveAssign::findOrFail($okrAssignId);
+        $okrAssign->objectiveStaff()->delete();
         $okrAssign->delete();
         return $okrAssign;
     }
@@ -301,8 +304,8 @@ class ObjectiveRepository implements ObjectiveInterface
         $objectives = Objective::with([
             'objectiveStaff' => $objectiveStaffFilter,
             'objectiveKeys'
-        ])->whereHas('objectiveStaff',$objectiveStaffFilter)
-        ->get();
+        ])->whereHas('objectiveStaff', $objectiveStaffFilter)
+            ->get();
         return $objectives;
         // return ObjectiveResource::collection($objectives);
     }
@@ -328,16 +331,85 @@ class ObjectiveRepository implements ObjectiveInterface
     public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
         $currentDate = now()->toDateString();
-        // if (!checkRoles(['Supervisor', 'Manager'])) {
-        //     ResponseMessage('Permission is not allowed', 403);
-        //     return;
-        // }
-        // if (checkRoles(['Supervisor']) || checkRoles(['Manager'])) {
-        $objectiveKeyStaff = ObjectiveStaff::with([
-            'objective.objectiveKeys','objective.sop','objective.role'
-        ])->where('staff_id', $staffId)->whereDate('start_date', $currentDate)->get();
-        return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
-        // }
+        $objectiveAssigns = ObjectiveAssign::with([
+            'objective.objectiveKeys',
+            // 'objectiveStaff' =>function($query) use ($currentDate){
+            //     $query->whereDate('start_date', $currentDate);
+            //     // ->orderBy('repetition_count', 'asc');
+            // }
+        ])->where('staff_id', $staffId)
+        ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
+            $query->whereDate('start_date', $currentDate);
+        })->get();
+
+        foreach($objectiveAssigns as $objectiveAssign){
+            $objType = $objectiveAssign->objective->type;
+            if($objType == 'daily'){
+                $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                ->orderBy('repetition_count', 'asc')
+                ->where('status', 'in_progress')
+                ->whereDate('start_date', $currentDate)
+                ->first();
+                if (!$objectiveStaff) {
+                    $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                        ->where('status', 'assigned')
+                        ->whereDate('start_date', $currentDate)
+                        ->orderBy('repetition_count', 'asc')
+                        ->first();
+                }
+
+                if (!$objectiveStaff && $objectiveAssign->objective->repetition > 1) {
+                    $lastCompletedRepetition = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                        ->whereDate('start_date', $currentDate)
+                        ->where('status', 'completed')
+                        ->max('repetition_count');
+                        if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
+                        $nextRepetition = $lastCompletedRepetition + 1;
+                        $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                            ->whereDate('start_date', $currentDate)
+                            ->where('repetition_count', $nextRepetition)
+                            ->first();
+                    }
+                }
+
+                if ($objectiveStaff) {
+                    $objectiveStaffCollection = collect([$objectiveStaff]);
+                    $objectiveAssign->setRelation('objectiveStaff', $objectiveStaffCollection);
+                    
+                    $totalRepetition = $objectiveAssign->objective->repetition;
+                    $completedRepetitions = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                        ->whereDate('start_date', $currentDate)
+                        ->whereIn('status', ['completed', 'approved'])
+                        ->count();
+                        $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
+                    foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
+                        $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+                            ->where('objective_staff_id', $objectiveStaff->id)
+                            ->first();
+                        $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+                    }
+                } else {
+                    $objectiveAssign->setRelation('objectiveStaff', collect([]));
+                }
+            }
+            else{
+                $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                ->whereDate('start_date', $currentDate)
+                ->get();
+                $objectiveAssign->setRelation('objectiveStaff', $objectiveStaff);
+
+                foreach ($objectiveStaff as $objStaff) {
+                    foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
+                        $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+                            ->where('objective_staff_id', $objStaff->id)
+                            ->first();
+                        $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+                    }
+                }
+            }
+        }
+        return $objectiveAssigns;
+        // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
 
     public function getObjKeyStaffImage($objStaffId)
@@ -408,12 +480,11 @@ class ObjectiveRepository implements ObjectiveInterface
         return $data;
     }
 
-    public function updateDailyObjective($data,$objStaffId)
+    public function updateDailyObjective($data, $objStaffId)
     {
         $objStaff =  ObjectiveStaff::findOrFail($objStaffId);
         $updateData = [];
         $userId = UserData()->id;
-
         if (!checkRoles(['Supervisor', 'Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {
             ResponseMessage('Permission is not allowed', 403);
             return;
@@ -422,10 +493,9 @@ class ObjectiveRepository implements ObjectiveInterface
         if (checkRoles(['Supervisor'])) {
             $updateData = $this->getSupervisorUpdateData($data, $userId);
         } elseif (checkRoles(['Manager'])) {
-
             $updateData = $this->getManagerUpdateData($data, $userId);
         } else {
-            $updateData = $this->getStaffUpdateData($data, $userId);
+            $updateData = $this->getStaffUpdateData($data, $userId,$objStaffId);
         }
 
         $objStaff->update($updateData);
@@ -458,6 +528,7 @@ class ObjectiveRepository implements ObjectiveInterface
     private function getManagerUpdateData($data, $userId)
     {
         $updateData = ['status' => $data['status']];
+
         if ($data['status'] === 'approved') {
             $updateData['manager_checked_at'] = now();
             $updateData['okr_point'] = $data['okr_point'];
@@ -475,13 +546,30 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    private function getStaffUpdateData($data, $userId)
+    private function getStaffUpdateData($data, $userId,$objStaffId)
     {
         $updateData = ['status' => $data['status']];
-
         if ($data['status'] == 'in_progress') {
             $updateData['in_progressed_at'] = now();
             $updateData['in_progressed_by'] = $userId;
+
+            if (isset($data['complete_okr_keys'])) {
+                $completeOkrKeys = json_decode($data['complete_okr_keys'], true);
+                if (!is_array($completeOkrKeys)) {
+                    return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
+                }
+                foreach ($completeOkrKeys as $completeOkrKey) {
+                    CompletedObjectiveKey::updateOrCreate(
+                        [
+                            'id' => $completeOkrKey['id'] ?? null
+                        ],
+                        [
+                            'objective_key_id' => $completeOkrKey['objective_key_id'],
+                            'objective_staff_id' => $objStaffId,
+                        ]
+                    );
+                }
+            }
         }
 
         if ($data['status'] === 'completed') {
@@ -504,7 +592,7 @@ class ObjectiveRepository implements ObjectiveInterface
                 if (!is_array($completeOkrKeys)) {
                     return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
                 }
-                foreach($completeOkrKeys as $completeOkrKey){
+                foreach ($completeOkrKeys as $completeOkrKey) {
                     CompletedObjectiveKey::updateOrCreate(
                         [
                             'id' => $completeOkrKey['id'] ?? null
@@ -522,6 +610,25 @@ class ObjectiveRepository implements ObjectiveInterface
             DB::rollBack();
             throw $e;
         }
+    }
+
+    public function getCompletedObjKeysByStaffId($staffId)
+    {
+        $objectives = Objective::with([
+            'objectiveKeys',
+            'objectiveAssigns' => function($query) use ($staffId) {
+                $query->where('staff_id', $staffId);
+            },
+            'objectiveAssigns.objectiveStaff' => function($query) {
+                $query->whereIn('status', ['completed', 'approved']);
+            }
+        ])->whereHas('objectiveAssigns', function($q) use ($staffId) {
+            $q->where('staff_id', $staffId);
+            $q->whereHas('objectiveStaff', function($query) {
+                $query->whereIn('status', ['completed', 'approved']);
+            });
+        })->get();
+        return $objectives;
     }
 
     //ktv
