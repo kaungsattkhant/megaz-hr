@@ -54,9 +54,17 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+    public function remark()
+    {
+        return $this->belongsTo(Remark::class);
+    }
 
     public function menu()
     {
         return $this->belongsTo(Menu::class);
+    }
+
+    public function extras(){
+        return $this->hasMany(OrderItemExtra::class);
     }
 }

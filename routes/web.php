@@ -56,6 +56,8 @@ Route::middleware(['departments:item'])->group(function () {
     Route::view('/items/create', 'items.create')->name('items.create');
     Route::view('/items/{id}/edit', 'items.edit')->name('items.edit');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
+
+    Route::view('/selling_extras', 'selling_extras.index')->name('selling_extras');
 });
 Route::middleware(['departments:item.detail'])->group(function () {
     Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
