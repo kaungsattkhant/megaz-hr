@@ -20,6 +20,9 @@
                             class="text-sm border border-gray-300 input-ui w-full !bg-white rounded-lg focus:ring-0">
                             <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
                         </select>
+                        <button class="pos-add-btn !bg-[#F15181]" @click="closeCashBook()">
+                            Close
+                        </button>
                         <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
 
                             Add
@@ -357,6 +360,30 @@
                     window.location.reload();
                 }
             },
+            async closeCashBook() {
+                if(!this.bookType){
+                    this.alertValidationMessage(`Cash accout is required!`);
+                    return 1;
+                }
+                let formData = new FormData();
+                formData.append('cash_account_id', this.bookType.id);
+                formData.append('is_pos', 1);
+
+                let url = `/api/close_cashbook_transaction`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    window.location.reload();
+                }
+            },
+            alertValidationMessage(field) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: "warn"
+                });
+            },
+            
+
 
                 // for close transaction
             // let url = '/api/close_cashbook_transaction?cash_account_id=298';
