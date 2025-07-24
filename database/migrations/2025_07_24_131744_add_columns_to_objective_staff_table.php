@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('objective_staff', function (Blueprint $table) {
-            $table->dropColumn('staff_id');
-            $table->dropColumn('objective_id');
+            $table->unsignedBigInteger('objective_assign_id')->constrained('objective_assigns')
+            ->cascadeOnDelete();
+            $table->integer('repetition_count')->default(0);
         });
     }
 
