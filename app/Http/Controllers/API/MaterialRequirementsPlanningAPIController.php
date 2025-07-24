@@ -114,4 +114,9 @@ class MaterialRequirementsPlanningAPIController extends Controller
         $data = $this->MaterialRequirementsPlanningRepository->createRemark($request->all());
         ResponseData($data);
     }
+
+    public function saleReport(Request $request)
+    {
+       return $this->MaterialRequirementsPlanningRepository->saleReport($request);
+    }
 }

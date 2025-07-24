@@ -432,6 +432,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/menus/{id}/prices', 'updateMenuPrices');
         Route::get('/remarks', 'getRemarks');
         Route::post('/remarks', 'createRemark');
+        Route::get('/sale-reports', 'saleReport');
     });
 
     Route::controller(CreditorController::class)->group(function () {

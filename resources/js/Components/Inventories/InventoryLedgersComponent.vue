@@ -736,14 +736,14 @@ export default {
             this.type = null;
             this.defectItem = null;
         },
-        async transferBtnClicked(ledger, ledgerIndex) {
+        async transferBtnClicked(ledger, ledgerIndex, batchIndex) {
             this.selectedSourceInventory = null;
             this.selectedDestinationInventory = null;
             this.quantity = null;
             this.selectedUom = null;
             this.ledger = ledger
             this.itemId = ledger.item_id;
-            this.transferItem = this.inventoryLegderList[ledgerIndex];
+            this.transferItem = this.inventoryLegderList[ledgerIndex].ledgers[batchIndex];
             let url = `/api/inventory_list`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {

@@ -225,6 +225,7 @@ import EventCrudComponent from './Components/Events/EventCrudComponent.vue';
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
+import PosSaleReportComponent from './Components/Pos/SaleReports/PosSaleReportComponent.vue';
 
 
 import CvFormComponent from './Components/CV/CvFormComponent.vue';
@@ -451,6 +452,7 @@ app.component('EventCrudComponent',EventCrudComponent);
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
+app.component('PosSaleReportComponent',PosSaleReportComponent);
 
 
 app.component('CvFormComponent',CvFormComponent);

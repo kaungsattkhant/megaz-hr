@@ -1542,13 +1542,22 @@
             },
 
             async createRoom() {
-                if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
-                    this.showToastMessage(`deposit amount or cash account`);
-                    return;
-                }
+// <<<<<<< HEAD
+//                 if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
+//                     this.showToastMessage(`deposit amount or cash account`);
+//                     return;
+//                 }
+// =======
+                // if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
+                //     this.alertValiationMessage(`deposit amount or cash account`);
+                //     return;
+                // }
+// >>>>>>> origin/ui/teaology
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
-                formData.append('customer_id', this.selectedCustomer.id);
+                if(this.selectedCustomer){
+                    formData.append('customer_id', this.selectedCustomer.id);
+                }
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
                     formData.append('orders', JSON.stringify(this.packageMenuList));
