@@ -180,6 +180,12 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function getCompletedObjKeysByStaffId($staffId)
+    {
+        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($staffId);
+        ResponseData($data);
+    }
+
     //ktvProductTree
 
     public function getKtvRoom(Request $request)
@@ -187,8 +193,6 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getKtvRoom($request);
         ResponseData($data);
     }
-
-
 
     public function  getKtvObjectiveTree(Request $request)
     {

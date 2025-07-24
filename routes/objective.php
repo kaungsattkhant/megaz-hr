@@ -38,7 +38,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/objectives/key_staff/{objStaffId}/images/update', 'updateImages');
     Route::get('/objectives/key_staff/{objStaffId}/images', 'getObjKeyStaffImage');
     Route::delete('/objectives/key_staff/images/{objStaffId}', 'deleteObjKeystaffImage');
-    Route::post('/complete-obj-keys', 'storeCompletedObjKeys');
+    // Route::post('/complete-obj-keys', 'storeCompletedObjKeys');
+    Route::get('/complete-obj-keys/staff/{staffId}', 'getCompletedObjKeysByStaffId');
 
     //ktv-objective-tree
     Route::get('/ktv/entity_room', 'getKtvRoom');

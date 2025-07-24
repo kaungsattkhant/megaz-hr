@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Objective;
+use App\Models\ObjectiveAssign;
 use App\Models\CompletedObjectiveKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,8 +14,7 @@ class ObjectiveStaff extends Model
 
     protected $fillable =
     [
-        'staff_id',
-        'objective_id',
+        'objective_assign_id',
         'start_date',
         'end_date',
         'status',
@@ -29,7 +29,8 @@ class ObjectiveStaff extends Model
         'okr_point',
         'manager_checked_at',
         'manager_checked_by',
-        'remark'
+        'remark',
+        'repetition_count'
     ];
 
     public function staff()
@@ -42,8 +43,12 @@ class ObjectiveStaff extends Model
         return $this->hasMany(ObjectiveStaffImage::class);
     }
 
-    public function objective()
+    public function objectiveAssign()
     {
-        return $this->belongsTo(Objective::class, 'objective_id');
+        return $this->belongsTo(ObjectiveAssign::class, 'objective_assign_id');
+    }
+    public function completedObjectiveKeys()
+    {
+        return $this->hasMany(CompletedObjectiveKey::class, 'objective_staff_id');
     }
 }
