@@ -23,4 +23,9 @@ class ObjectiveKey extends Model
     // {
     //     return explode(',', $value);
     // }
+
+    public function completedObjectiveKeys(): HasMany
+    {
+        return $this->hasMany(CompletedObjectiveKey::class, 'objective_key_id');
+    }
 }
