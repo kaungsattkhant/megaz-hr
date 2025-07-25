@@ -65,7 +65,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $invoiceQuery = Invoice::with(['customer', 'entity'])
             ->whereIn('payment_status', ['checkout', 'paid'])
             ->when($date, function ($q) use ($date) {
-                $q->where('created_at', $date);
+                $q->whereDate('created_at', $date);
             })
             ->orderBy('created_at', 'desc');
         if (isset($request->page)) {

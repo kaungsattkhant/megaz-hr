@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('transactions', function (Blueprint $table) {
             //
             $table->boolean('is_pos_closing')->default(0);
-            $table->boolean('pos_closing_date')->nullable();
+            $table->dateTime('pos_closing_date')->nullable();
         });
     }
 
