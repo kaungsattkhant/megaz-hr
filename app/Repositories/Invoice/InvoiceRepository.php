@@ -982,7 +982,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $paidAmount = $request->paid_amount;
         $entity = $invoice->entity;
         $authUser = UserData();
-        $depositBalance = $this->getCustomerDepositBalance($customer->id);
+        $depositBalance = $customer ? $this->getCustomerDepositBalance($customer->id) : 0;
         try {
             DB::beginTransaction();
             if ($depositBalance < 1 && $request->paid_amount < 1) {
