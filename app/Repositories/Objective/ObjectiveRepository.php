@@ -583,50 +583,24 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    public function storeCompletedObjKeys($data)
-    {
-        DB::beginTransaction();
-        try {
-            if (isset($data['complete_okr_keys'])) {
-                $completeOkrKeys = json_decode($data['complete_okr_keys'], true);
-                if (!is_array($completeOkrKeys)) {
-                    return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
-                }
-                foreach ($completeOkrKeys as $completeOkrKey) {
-                    CompletedObjectiveKey::updateOrCreate(
-                        [
-                            'id' => $completeOkrKey['id'] ?? null
-                        ],
-                        [
-                            'objective_key_id' => $completeOkrKey['objective_key_id'],
-                            'objective_staff_id' => $completeOkrKey['objective_staff_id'],
-                        ]
-                    );
-                }
-            }
-            DB::commit();
-            return $completeOkrKeys;
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
     public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
     {
+        $today = now()->format('Y-m-d');
         $objectives = Objective::with([
             'objectiveKeys',
             'objectiveAssigns' => function ($query) use ($staffId) {
                 $query->where('staff_id', $staffId);
             },
-            'objectiveAssigns.objectiveStaff' => function ($query) {
-                $query->whereIn('status', ['completed', 'approved']);
+            'objectiveAssigns.objectiveStaff' => function ($query) use ($today) {
+                $query->whereIn('status',['completed','approved']);
+                $query->whereDate('start_date', $today);
             }
         ])->where('id',$objectiveId)
-        ->whereHas('objectiveAssigns', function ($q) use ($staffId) {
+        ->whereHas('objectiveAssigns', function ($q) use ($staffId,$today) {
             $q->where('staff_id', $staffId);
-            $q->whereHas('objectiveStaff', function ($query) {
-                $query->whereIn('status', ['completed', 'approved']);
+            $q->whereHas('objectiveStaff', function ($query) use ($today) {
+                $query->whereIn('status',['completed','approved']);
+                $query->whereDate('start_date', $today);
             });
         })->first();
         return $objectives;
