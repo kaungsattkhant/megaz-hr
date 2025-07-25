@@ -9,6 +9,7 @@ use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\Objective\ObjectiveRequest;
 use App\Repositories\Objective\ObjectiveInterface;
 use App\Http\Requests\Objective\KtvProductTreeRequest;
+use App\Http\Resources\CompleteObjectivesResource;
 
 class ObjectiveController extends Controller
 {
@@ -156,7 +157,6 @@ class ObjectiveController extends Controller
 
     public function updateDailyObjective(Request $request, $objKeyStaffId)
     {
-
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
         ResponseData($data);
     }
@@ -180,10 +180,10 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getCompletedObjKeysByStaffId($staffId)
+    public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
     {
-        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($staffId);
-        ResponseData($data);
+        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
+        ResponseData(new CompleteObjectivesResource($data));
     }
 
     //ktvProductTree

@@ -612,7 +612,7 @@ class ObjectiveRepository implements ObjectiveInterface
         }
     }
 
-    public function getCompletedObjKeysByStaffId($staffId)
+    public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
     {
         $objectives = Objective::with([
             'objectiveKeys',
@@ -622,12 +622,13 @@ class ObjectiveRepository implements ObjectiveInterface
             'objectiveAssigns.objectiveStaff' => function ($query) {
                 $query->whereIn('status', ['completed', 'approved']);
             }
-        ])->whereHas('objectiveAssigns', function ($q) use ($staffId) {
+        ])->where('id',$objectiveId)
+        ->whereHas('objectiveAssigns', function ($q) use ($staffId) {
             $q->where('staff_id', $staffId);
             $q->whereHas('objectiveStaff', function ($query) {
                 $query->whereIn('status', ['completed', 'approved']);
             });
-        })->get();
+        })->first();
         return $objectives;
     }
 
