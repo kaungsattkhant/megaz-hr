@@ -174,12 +174,6 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function storeCompletedObjKeys(Request $request)
-    {
-        $data = $this->objectiveRepository->storeCompletedObjKeys($request->all());
-        ResponseData($data);
-    }
-
     public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
     {
         $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
