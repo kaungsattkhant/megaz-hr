@@ -1190,6 +1190,7 @@
                 required: true
             }
         },
+        emits: ['callParent'],
         components:{
             Multiselect
         },
@@ -1230,7 +1231,7 @@
 
                 selectedCustomer:null,
                 invoice_date:null,
-                type:'session',
+                type: null,
                 selectedPackage:null,
                 isPreDeposit: false,
                 deposit:null,
@@ -1547,26 +1548,19 @@
             },
 
             async createRoom() {
-// <<<<<<< HEAD
-//                 if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
-//                     this.showToastMessage(`deposit amount or cash account`);
-//                     return;
-//                 }
-// =======
                 // if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
-                //     this.alertValiationMessage(`deposit amount or cash account`);
+                //     this.showToastMessage(`deposit amount or cash account`);
                 //     return;
                 // }
-// >>>>>>> origin/ui/teaology
+                let nullData = null;
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
                 if(this.selectedCustomer){
                     formData.append('customer_id', this.selectedCustomer.id);
                 }
                 else{
-                    formData.append('customer_id', null);
+                    formData.append('customer_id', nullData);
                 }
-
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
                     formData.append('orders', JSON.stringify(this.packageMenuList));
@@ -2257,7 +2251,7 @@
             },
             clearOpenRoomForm() {
                 this.selectedCustomer = null
-                this.type = 'session'
+                this.type = null;
                 this.selectedPackage = null
                 this.deposit = null
                 this.invoice_date = null
