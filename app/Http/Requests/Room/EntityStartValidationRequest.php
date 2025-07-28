@@ -14,7 +14,7 @@ class EntityStartValidationRequest extends APIRequest
         
         return [
             'start_time'=>$entityType=='room' ? 'required' : 'nullable',
-            'customer_id'=>'required',
+            'customer_id'=>$entityType=='room' ? 'required' : 'nullable',
             'entity_type'=>'required',
             'entity_id'=>'required|exists:entities,id',
             'session_duration'=>$type=='session' ? 'required' : 'nullable',

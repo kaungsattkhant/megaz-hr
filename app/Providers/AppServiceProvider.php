@@ -59,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'warning' => 'App\Models\Warning',
             'customer_deposit'=>'App\Models\CustomerDeposit',
             'role'=>'App\Models\Role',
+            'selling_extra'=>'App\Models\SellingExtra',
         ]);
     }
 }

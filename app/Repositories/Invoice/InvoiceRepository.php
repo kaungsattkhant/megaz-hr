@@ -65,7 +65,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $invoiceQuery = Invoice::with(['customer', 'entity'])
             ->whereIn('payment_status', ['checkout', 'paid'])
             ->when($date, function ($q) use ($date) {
-                $q->where('created_at', $date);
+                $q->whereDate('created_at', $date);
             })
             ->orderBy('created_at', 'desc');
         if (isset($request->page)) {
@@ -925,7 +925,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if ($invoice->order) {
             $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
         }
-        $customerTotal = $this->getCustomerTotal($invoice->customer_id);
+        $customerTotal =$invoice->customer_id ? $this->getCustomerTotal($invoice->customer_id) :0;
         $total = 0;
         $totalDiscount = 0;
         $invoiceServiceCollection = collect();
@@ -982,7 +982,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $paidAmount = $request->paid_amount;
         $entity = $invoice->entity;
         $authUser = UserData();
-        $depositBalance = $this->getCustomerDepositBalance($customer->id);
+        $depositBalance = $customer ? $this->getCustomerDepositBalance($customer->id) : 0;
         try {
             DB::beginTransaction();
             if ($depositBalance < 1 && $request->paid_amount < 1) {

@@ -52,6 +52,9 @@
                                     Item
                                 </th>
                                 <th scope="col">
+                                    Batch No
+                                </th>
+                                <th scope="col">
                                     Opening
                                 </th>
                                 <th scope="col">
@@ -83,8 +86,11 @@
                                     <td>
                                         {{ ++index }}
                                     </td>
-                                    <td>
+                                    <td @click="isShowToggle(ledger)">
                                         {{ ledger.name }}
+                                    </td>
+                                    <td>
+                                        {{ ledger.batch_nos }}
                                     </td>
                                     <td>
                                         <!-- {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }} -->
@@ -111,7 +117,7 @@
                                         {{ (ledger.total_value).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
+                                        <!-- <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
                                             data-te-toggle="modal" data-te-target="#transfer_modal">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
@@ -122,13 +128,52 @@
                                         <button class="pl-2" @click="btnClickedAddMinimum(ledger,index-1)"
                                         data-te-toggle="modal" data-te-target="#add_minimum_modal">
                                             <i class="fas fa-plus"></i>
+                                        </button> -->
+                                    </td>
+                                </tr>
+                                <tr v-if="ledger.isShow" v-for="(batch,batchIndex) in ledger.ledgers" :key="batchIndex">
+                                    <td colspan="2">
+                                    </td>
+                                    <td>
+                                        {{ batch.batch_no }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.opening_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.in_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.out_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.closing_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        <!-- {{ ledger.base_balance }} {{ ledger.conversion_balance }} -->
+                                    </td>
+                                    <td>
+                                        {{ (batch.total_value).toLocaleString() }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(batch, index-1, batchIndex)"
+                                            data-te-toggle="modal" data-te-target="#transfer_modal">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </button>
+                                        <button class="pl-2" @click="addDefectBtnClicked(batch.item_id, index-1, batchIndex)"
+                                        data-te-toggle="modal" data-te-target="#add_defect_modal">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                        <button class="pl-2" @click="btnClickedAddMinimum(batch,index-1, batchIndex)"
+                                        data-te-toggle="modal" data-te-target="#add_minimum_modal">
+                                            <i class="fas fa-plus"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
 
                             <!-- <div class="contents" > -->
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                <!-- <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                     <td colspan="7" class=" px-6 py-4 font-medium ">
                                         &nbsp;
                                     </td>
@@ -138,7 +183,7 @@
                                     <td class=" px-6 py-4 font-medium ">
                                         &nbsp;
                                     </td>
-                                </tr>
+                                </tr> -->
                             <!-- </div> -->
 
                             <!-- looping end -->
@@ -551,7 +596,16 @@ export default {
 
                     this.totalValuation += ledger.total_value;
                 });
+
+                this.inventoryLegderList = this.inventoryLegderList.map(item => ({
+                    ...item,
+                    isShow: false
+                }));
             }
+        },
+        isShowToggle(item) {
+            // this.inventoryLegderList[index].isShow = !this.inventoryLegderList[index].isShow;
+            item.isShow = !item.isShow;
         },
         async getInventoryList() {
             const response = await getApiData({ url: '/api/inventories', token: this.getToken() });
@@ -682,14 +736,14 @@ export default {
             this.type = null;
             this.defectItem = null;
         },
-        async transferBtnClicked(ledger, ledgerIndex) {
+        async transferBtnClicked(ledger, ledgerIndex, batchIndex) {
             this.selectedSourceInventory = null;
             this.selectedDestinationInventory = null;
             this.quantity = null;
             this.selectedUom = null;
             this.ledger = ledger
             this.itemId = ledger.item_id;
-            this.transferItem = this.inventoryLegderList[ledgerIndex];
+            this.transferItem = this.inventoryLegderList[ledgerIndex].ledgers[batchIndex];
             let url = `/api/inventory_list`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -730,6 +784,7 @@ export default {
         },
         async transferInventory() {
             let formData = new FormData();
+            formData.append('batch_no', this.ledger.batch_no);
             formData.append('source_inventory_id', this.selectedSourceInventory);
             formData.append('destination_inventory_id', this.selectedDestinationInventory);
             formData.append('quantity', this.quantity);
@@ -742,7 +797,7 @@ export default {
             }
             formData.append('uom_id', this.selectedUom.id);
             formData.append('base_uom_id', this.transferItem.base_unit_id);
-            formData.append('conversion_uom_id', this.transferItem.conversion_unit_id);
+            formData.append('conversion_uom_id', this.ledger.conversion_unit_id);
             formData.append('uom_conversion', this.transferItem.conversion);
 
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });

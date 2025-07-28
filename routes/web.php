@@ -56,6 +56,8 @@ Route::middleware(['departments:item'])->group(function () {
     Route::view('/items/create', 'items.create')->name('items.create');
     Route::view('/items/{id}/edit', 'items.edit')->name('items.edit');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
+
+    Route::view('/selling_extras', 'selling_extras.index')->name('selling_extras');
 });
 Route::middleware(['departments:item.detail'])->group(function () {
     Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
@@ -253,6 +255,7 @@ Route::group(['prefix' => 'pos'], function () {
     Route::view('/invoices/detail', 'pos.invoices.detail')->name('pos.invoices.detail');
     Route::view('/customer_deposit', 'pos.customer_deposit.index')->name('pos.customer_deposit');
     Route::view('/selling_areas', 'pos.areas.index')->name('pos.areas');
+    Route::view('/sale_report', 'pos.sale_reports.index')->name('pos.sale_reports');
     // });
 });
 
@@ -428,9 +431,9 @@ Route::middleware(['departments:okr-duty'])->group(function () {
     Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
 
 });
-Route::middleware(['departments:okr-duty.create'])->group(function () {
+// Route::middleware(['departments:okr-duty.create'])->group(function () {
     Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
-});
+// });
 Route::middleware(['departments:okr-duty.edit'])->group(function () {
     Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
 });
@@ -673,6 +676,9 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
     Route::view('/SOP', 'SOP.index')->name('SOP.index');
     Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+    Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+    Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
 // });
 
 // =======

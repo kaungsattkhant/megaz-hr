@@ -438,6 +438,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
   public function saleReport($request)
   {
+    $areaId=isset($request->area_id) ? $request->area_id :null;
     $query = OrderItem::select(
       'menu_id',
       DB::raw('CAST(SUM(quantity) AS UNSIGNED) as total_quantity'),
@@ -446,8 +447,11 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       ->with('menu')
       ->groupBy('menu_id');
 
-    if ($request->has('area_id')) {
-      $query->where('area_id', $request->input('area_id'));
+    if ($areaId) {
+      $query
+      ->whereHas('order.invoice',function($q)use($areaId){
+        $q->where('area_id', $areaId);
+      });
     }
 
     if ($request->has('date')) {

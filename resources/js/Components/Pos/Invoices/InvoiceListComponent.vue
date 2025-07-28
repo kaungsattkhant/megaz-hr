@@ -42,7 +42,7 @@
                                         {{ invoice.invoice_date }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.customer.name }}
+                                        {{ invoice.customer ? invoice.customer.name : 'Default' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span v-if="invoice.entity">{{ invoice.entity.name }}</span>
@@ -124,7 +124,7 @@
                                         Customer Name
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.customer.name }}
+                                        {{ invoiceDetail.customer  ? invoiceDetail.customer.name : "Default" }}
                                     </td>
                                 </tr>
                                 <tr class="">

@@ -60,6 +60,7 @@ import BrandCrudComponent from './Components/Brands/BrandCrudComponent.vue';
 import ItemListComponent from './Components/Items/ItemListComponent.vue';
 import ItemCreateComponent from './Components/Items/ItemCreateComponent.vue';
 import ItemEditComponent from './Components/Items/ItemEditComponent.vue';
+import SellingExtraListComponent from './Components/SellingExtras/SellingExtraListComponent.vue';
 import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
 import SupplierBrandsComponent from './Components/Items/SupplierBrandsComponent.vue';
 import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
@@ -224,6 +225,7 @@ import EventCrudComponent from './Components/Events/EventCrudComponent.vue';
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
+import PosSaleReportComponent from './Components/Pos/SaleReports/PosSaleReportComponent.vue';
 
 
 import CvFormComponent from './Components/CV/CvFormComponent.vue';
@@ -242,6 +244,9 @@ import JsListComponent from './Components/JobSpecification/JsListComponent.vue';
 import JsCreateComponent from './Components/JobSpecification/JsCreateComponent.vue';
 import SopListComponent from './Components/SOP/SopListComponent.vue';
 import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
+import OkrAssignComponent from './Components/OkrAssign/OkrAssignComponent.vue';
+import OkrAssignCreateComponent from './Components/OkrAssign/OkrAssignCreateComponent.vue';
+import OkrAssignEditComponent from './Components/OkrAssign/OkrAssignEditComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -330,6 +335,7 @@ app.component('BrandCrudComponent', BrandCrudComponent);
 app.component('ItemListComponent', ItemListComponent);
 app.component('ItemCreateComponent', ItemCreateComponent);
 app.component('ItemEditComponent', ItemEditComponent);
+app.component('SellingExtraListComponent', SellingExtraListComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
 app.component('ItemSuppliersComponent', ItemSuppliersComponent);
 app.component('SupplierBrandsComponent', SupplierBrandsComponent);
@@ -446,6 +452,7 @@ app.component('EventCrudComponent',EventCrudComponent);
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
+app.component('PosSaleReportComponent',PosSaleReportComponent);
 
 
 app.component('CvFormComponent',CvFormComponent);
@@ -464,6 +471,9 @@ app.component('JsListComponent',JsListComponent);
 app.component('JsCreateComponent',JsCreateComponent);
 app.component('SopListComponent',SopListComponent);
 app.component('SopCreateComponent',SopCreateComponent);
+app.component('OkrAssignComponent',OkrAssignComponent);
+app.component('OkrAssignCreateComponent',OkrAssignCreateComponent);
+app.component('OkrAssignEditComponent',OkrAssignEditComponent);
 
 
 app.use(store);
