@@ -24,6 +24,6 @@ class Sop extends Model
 
     public function jdSop()
     {
-      return $this->belongsTo(JdSop::class);
+        return $this->belongsTo(JdSop::class);
     }
 }
