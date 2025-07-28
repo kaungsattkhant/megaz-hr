@@ -1552,7 +1552,7 @@
                 //     this.showToastMessage(`deposit amount or cash account`);
                 //     return;
                 // }
-                let nullData = null;
+                let nullData = "";
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
                 if(this.selectedCustomer){
