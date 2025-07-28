@@ -263,7 +263,7 @@
                 // });
                 // url = url.substring(0, url.length - 1);
 
-                let url = '/api/cash_books?cash_account_id[]=' + this.cashAccId + this.url_date
+                let url = '/api/cash_books?cash_account_id[]=' + this.cashAccId + '&is_pos=1' + this.url_date
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
 

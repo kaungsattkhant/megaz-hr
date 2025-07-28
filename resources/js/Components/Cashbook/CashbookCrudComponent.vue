@@ -492,7 +492,7 @@
                 if(pageNumber){
                     this.currentPage = pageNumber;
                 }
-                let url = `/api/cash_books?cash_account_id[]=${cashAccountId}&page=${this.currentPage}`;
+                let url = `/api/cash_books?cash_account_id[]=${cashAccountId}&is_pos=0&page=${this.currentPage}`;
                 if(this.fromDate && this.toDate){
                     url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
                 }
@@ -574,9 +574,22 @@
             },
 
             async confirmCashBookCloseBtnClicked(){
-                let url = `/api/close_cashbook_transaction?cash_account_id=${this.cashAccountId}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.success){
+                // let url = `/api/close_cashbook_transaction?cash_account_id=${this.cashAccountId}`;
+                // let response = await getApiData({url: url, token: this.getToken()});
+                // if(response.success){
+                //     window.location.reload();
+                // }
+
+                if(!this.bookType){
+                    this.alertValidationMessage(`Cash accout is required!`);
+                    return 1;
+                }
+                let formData = new FormData();
+                formData.append('cash_account_id', this.bookType.id);
+                formData.append('is_pos', 0);
+                let url = `/api/close_cashbook_transaction`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
                     window.location.reload();
                 }
             },
