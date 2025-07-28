@@ -28,7 +28,6 @@ class CompleteObjectivesResource extends JsonResource
                         'id' => $key->id,
                         'objective_id' => $key->objective_id,
                         'name' => $key->name,
-                        'is_done' => $key->is_done,
                     ];
                 }) 
                 : [],
@@ -42,13 +41,18 @@ class CompleteObjectivesResource extends JsonResource
                             'status' => $objectiveStaff->status,
                             'completed_at' => $objectiveStaff->completed_at,
                             'completed_by' => $objectiveStaff->completed_by,
-                            // 'approved_at' => $staff->approved_at,
-                            // 'approved_by' => $staff->approved_by,
-                            // 'cancelled_at' => $staff->cancelled_at,
-                            // 'cancelled_by' => $staff->cancelled_by,
+                            'approved_at' => $objectiveStaff->approved_at,
+                            'approved_by' => $objectiveStaff->approved_by,
                             'okr_point' => $objectiveStaff->okr_point,
                             'remark' => $objectiveStaff->remark,
                             'repetition_count' => $objectiveStaff->repetition_count,
+                            'completed_objective_keys' => isset($objectiveStaff->completedObjectiveKeys) ? $objectiveStaff->completedObjectiveKeys->map(function($completedObjectiveKey) {
+                                return [
+                                    'id' => $completedObjectiveKey->id,
+                                    'objective_key_id' => $completedObjectiveKey->objective_key_id,
+                                    'objective_staff_id' => $completedObjectiveKey->objective_staff_id,
+                                ];
+                            }):[],
                         ];
                     });
                 })

@@ -365,19 +365,19 @@ class ObjectiveRepository implements ObjectiveInterface
                         ->first();
                 }
 
-                if (!$objectiveStaff && $objectiveAssign->objective->repetition > 1) {
-                    $lastCompletedRepetition = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->whereDate('start_date', $currentDate)
-                        ->where('status', 'completed')
-                        ->max('repetition_count');
-                    if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
-                        $nextRepetition = $lastCompletedRepetition + 1;
-                        $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                            ->whereDate('start_date', $currentDate)
-                            ->where('repetition_count', $nextRepetition)
-                            ->first();
-                    }
-                }
+                // if (!$objectiveStaff && $objectiveAssign->objective->repetition > 1) {
+                //     $lastCompletedRepetition = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                //         ->whereDate('start_date', $currentDate)
+                //         ->where('status', 'completed')
+                //         ->max('repetition_count');
+                //     if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
+                //         $nextRepetition = $lastCompletedRepetition + 1;
+                //         $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                //             ->whereDate('start_date', $currentDate)
+                //             ->where('repetition_count', $nextRepetition)
+                //             ->first();
+                //     }
+                // }
 
                 if ($objectiveStaff) {
                     $objectiveStaffCollection = collect([$objectiveStaff]);
@@ -595,6 +595,7 @@ class ObjectiveRepository implements ObjectiveInterface
         $today = now()->format('Y-m-d');
         $objectives = Objective::with([
             'objectiveKeys',
+            'objectiveAssigns.objectiveStaff.completedObjectiveKeys',
             'objectiveAssigns' => function ($query) use ($staffId) {
                 $query->where('staff_id', $staffId);
             },
@@ -610,26 +611,6 @@ class ObjectiveRepository implements ObjectiveInterface
                 $query->whereDate('start_date', $today);
             });
         })->first();
-
-        if($objectives){
-            foreach ($objectives->objectiveKeys as $objectiveKey) {
-                $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
-                ->whereHas('objectiveStaff', function ($query) use ($staffId, $today,$objectiveId) {
-                    $query->whereDate('start_date', $today);
-                    $query->whereIn('status', ['completed', 'approved']);
-                    $query->whereHas('objectiveAssign', function ($query) use ($staffId) {
-                        $query->where('staff_id', $staffId);
-                    });
-                    $query->whereHas('objectiveAssign.objective', function ($query) use ($objectiveId) {
-                        $query->where('id', $objectiveId);
-                    });
-                })
-                ->first();
-
-                $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
-            }
-        }
-        
         return $objectives;
     }
 
