@@ -177,7 +177,8 @@ class ObjectiveController extends Controller
     public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
     {
         $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
-        ResponseData(new CompleteObjectivesResource($data));
+        return $data;
+        // ResponseData(new CompleteObjectivesResource($data));
     }
 
     //ktvProductTree

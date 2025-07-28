@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\CompletedObjectiveKey;
 use App\Http\Resources\AssignResource;
 use App\Models\ObjectiveKeyStaffImage;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\ObjectiveResource;
 use App\Http\Resources\KtvObjectiveRsource;
@@ -40,46 +41,49 @@ class ObjectiveRepository implements ObjectiveInterface
         $staffId = $request->staff_id;
         $departmentId = $request->department_id;
 
-        $okrDashboard = ObjectiveStaff::join('objective_key_duties', 'objectivekey_staff.objective_key_duty_id', 'objective_key_duties.id')
-            ->join('staff', 'objectivekey_staff.staff_id', 'staff.id')
-            ->join('departments', 'staff.department_id', 'departments.id')
-            ->join('objective_keys', 'objectivekey_staff.objective_key_id', 'objective_keys.id')
+       $okrDashboard = ObjectiveStaff::join('objective_assigns', 'objective_staff.objective_assign_id', '=', 'objective_assigns.id')
+        ->join('staff', 'objective_assigns.staff_id', '=', 'staff.id')
+        ->join('objectives', 'objective_assigns.objective_id', '=', 'objectives.id')
+        ->join('departments', 'staff.department_id', '=', 'departments.id')
+        ->join('roles', 'objectives.role_id', '=', 'roles.id')
             ->select(
-                'objective_key_duties.assign_date',
-                'objective_key_duties.due_date',
-                'staff.name',
-                'objective_keys.name as objective_key_name',
+                'objective_staff.start_date as start_date',
+                'objective_staff.end_date as due_date',
+                'staff.name as staff_name',
+                'objectives.objective_name',
                 'departments.name as department_name',
-                DB::raw('SUM(objective_keys.okr_point) as okr_total_point'),
+                'roles.name as role_name',
+                'objective_staff.okr_point',
+                'objective_staff.status',
             )
-            ->when($departmentId, function ($q) use ($departmentId) {
-                $q->where('departments.id', $departmentId);
+            ->when($departmentId, function ($query) use ($departmentId) {
+                $query->where('departments.id', $departmentId);
             })
             ->when($staffId, function ($q) use ($staffId) {
                 $q->where('staff.id', $staffId);
             })
             ->when(($from_date && $to_date), function ($q) use ($from_date, $to_date) {
-                $q->whereBetween(DB::raw('DATE(objective_key_duties.assign_date)'), [$from_date, $to_date]);
+                $q->whereBetween(DB::raw('DATE(objective_staff.start_date)'), [$from_date, $to_date]);
             })
-            ->when(($from_date && $to_date == null), function ($q) use ($from_date) {
-                $q->whereDate('objective_key_duties.assign_date', '>=', $from_date);
+            ->when($from_date && !$to_date, function ($query) use ($from_date) {
+                $query->whereDate('objective_staff.start_date', '>=', $from_date);
             })
-            ->when(($from_date == null && $to_date), function ($q) use ($to_date) {
-                $q->whereBetween('objective_key_duties.assign_date', [now(), $to_date]);
+            ->when(!$from_date && $to_date, function ($query) use ($to_date) {
+                $query->whereDate('objective_staff.end_date', '<=', $to_date);
             })
-            ->where('objectivekey_staff.status', 'approved')
-            // ->whereNotNull('objectivekey_staff.completed_at')
+            ->whereIn('objective_staff.status', ['completed', 'approved', 'assigned', 'in_progress', 'cancelled'])
             ->groupBy(
-                'objectivekey_staff.staff_id',
-                'objectivekey_staff.objective_key_id',
-                'objective_key_duties.assign_date',
-                'objective_key_duties.due_date',
+                'objective_staff.start_date',
+                'objective_staff.end_date',
+                'staff.name',
+                'objectives.objective_name',
+                'departments.name',
+                'roles.name',
+                'objective_staff.okr_point',
+                'objective_staff.status'
             )
             ->paginate(20);
         return $okrDashboard;
-        // ->where('status')
-
-        // return Objec
     }
 
     public function getObjectives(Request $request)
@@ -152,6 +156,9 @@ class ObjectiveRepository implements ObjectiveInterface
                         ]
                     );
                 }
+            }
+            if ($objective->type === "daily") {
+                Artisan::call('app:assign-objectives-to-staffs');
             }
             DB::commit();
             return $objective;
@@ -603,6 +610,26 @@ class ObjectiveRepository implements ObjectiveInterface
                 $query->whereDate('start_date', $today);
             });
         })->first();
+
+        if($objectives){
+            foreach ($objectives->objectiveKeys as $objectiveKey) {
+                $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+                ->whereHas('objectiveStaff', function ($query) use ($staffId, $today,$objectiveId) {
+                    $query->whereDate('start_date', $today);
+                    $query->whereIn('status', ['completed', 'approved']);
+                    $query->whereHas('objectiveAssign', function ($query) use ($staffId) {
+                        $query->where('staff_id', $staffId);
+                    });
+                    $query->whereHas('objectiveAssign.objective', function ($query) use ($objectiveId) {
+                        $query->where('id', $objectiveId);
+                    });
+                })
+                ->first();
+
+                $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+            }
+        }
+        
         return $objectives;
     }
 

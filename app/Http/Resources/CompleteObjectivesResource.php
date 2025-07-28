@@ -28,6 +28,7 @@ class CompleteObjectivesResource extends JsonResource
                         'id' => $key->id,
                         'objective_id' => $key->objective_id,
                         'name' => $key->name,
+                        'is_done' => $key->is_done,
                     ];
                 }) 
                 : [],
