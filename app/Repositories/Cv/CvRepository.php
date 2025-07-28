@@ -233,6 +233,9 @@ class CvRepository implements CvRepositoryInterface
 
       if (isset($data['salary_allowances'])) {
         $salary_allowances = json_decode($data['salary_allowances'], true);
+        if (!is_array($salary_allowances)) {
+          return ResponseMessage('Invalid JSON format for salary allowances.', 400);
+        }
         foreach ($salary_allowances as $salary_allowance) {
           SalaryAllowance::updateOrCreate(
             [
