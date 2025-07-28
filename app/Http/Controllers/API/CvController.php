@@ -86,4 +86,22 @@ class CvController extends Controller
         $data = $this->cvRepository->updateCvStatus($id, $request->all());
         ResponseData($data);
     }
+
+    public function getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId)
+    {
+        $data = $this->cvRepository->getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId);
+        ResponseData($data);
+    }
+
+    public function createNewStaffSalary(Request $request)
+    {
+        $data = $this->cvRepository->createNewStaffSalary($request->all());
+        ResponseData($data);
+    }
+
+    public function storeNewStaffJoinDate(Request $request)
+    {
+        $data = $this->cvRepository->storeNewStaffJoinDate($request->all());
+        ResponseData($data);
+    }
 }
