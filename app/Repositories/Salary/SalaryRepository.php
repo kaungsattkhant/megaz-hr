@@ -79,12 +79,19 @@ class SalaryRepository implements SalaryRepositoryInterface
       }
 
       $staffIds = Staff::whereHas('roles', function ($query) use ($data) {
-        $query->where('id', $data['role_id']);
+        $query->where('id', $data['role_id'])->where('is_cv', 0);
       })->pluck('id');
       if ($staffIds->isEmpty()) {
         ResponseMessage('No staff found for this role', 402);
       }
+    
       foreach ($staffIds as $staffId) {
+        // $salaryExist = Salary::where('basic_salary', $data['basic_salary'])
+        // ->where('salary_setup_id', $salarySetup->id)
+        // ->where('staff_id', $staffId)->first();
+        // if ($salaryExist) {
+        //   ResponseMessage('Salary already exists for this staff', 402);
+        // }
         Salary::create([
           'basic_salary' => $data['basic_salary'],
           'staff_id' => $staffId,

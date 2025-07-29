@@ -4,6 +4,9 @@ namespace App\Repositories\Cv;
 
 use App\Models\Skill;
 use App\Models\Staff;
+use App\Models\Salary;
+use App\Models\SalarySetup;
+use App\Models\SalaryAllowance;
 use Illuminate\Support\Facades\DB;
 use App\Models\StaffEmergencyContact;
 
@@ -188,6 +191,87 @@ class CvRepository implements CvRepositoryInterface
         $staff->cancelled_at = now();
       }
       $staff->update($data);
+      DB::commit();
+      return $staff;
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+    }
+  }
+
+  public function getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId)
+  {
+    $salarySetup = SalarySetup::with('salaryAllowances.allowance','role.department')->where('role_id', $roleId)
+      ->whereHas('role.department', function ($query) use ($departmentId) {
+        $query->where('id', $departmentId);
+      })
+      ->first();
+    return $salarySetup;
+  }
+
+  public function createNewStaffSalary(array $data)
+  {
+    DB::beginTransaction();
+    try {
+      $data['created_by'] = UserData()->id;
+      $roleIds = Staff::find($data['staff_id'])->roles()->pluck('roles.id');
+
+      $roleId = $roleIds->first();
+      $salarySetup = SalarySetup::where('role_id', $roleId)->first();
+
+      if($data['basic_salary'] > $salarySetup->basic_salary){
+        ResponseMessage('Basic salary is greater than salary setup basic salary', 402);
+      }
+
+      $salary = Salary::updateOrCreate(
+        [
+          'staff_id' => $data['staff_id'],
+          'salary_setup_id' => $data['salary_setup_id'],
+        ],
+        $data
+      );
+
+      if (isset($data['salary_allowances'])) {
+        $salary_allowances = json_decode($data['salary_allowances'], true);
+        if (!is_array($salary_allowances)) {
+          return ResponseMessage('Invalid JSON format for salary allowances.', 400);
+        }
+        foreach ($salary_allowances as $salary_allowance) {
+          SalaryAllowance::updateOrCreate(
+            [
+              'salary_setup_id' =>$data['salary_setup_id'],
+              'allowance_id' => $salary_allowance['allowance_id'],
+            ],
+            [
+              'amount' => $salary_allowance['amount'],
+            ]
+          );
+        }
+      }
+      DB::commit();
+      return $salary;
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+    }
+  }
+  public function storeNewStaffJoinDate(array $data){
+    DB::beginTransaction();
+    try {
+      $data['created_by'] = UserData()->id;
+      $staff = Staff::find($data['staff_id']);
+      if (!$staff || $staff->status !== 'confirmed') {
+        ResponseMessage('Cannot create join date for staff. Staff must be confirmed first.', 403);
+      }
+      $staff = Staff::updateOrCreate(
+        [
+          'id' => $data['staff_id'],
+        ],
+        [
+        'joined_date' => $data['joined_date'],
+        'is_cv' => 0,
+        ]
+      );
       DB::commit();
       return $staff;
     } catch (\Exception $e) {
