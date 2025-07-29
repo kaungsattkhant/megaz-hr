@@ -396,7 +396,20 @@ class ObjectiveRepository implements ObjectiveInterface
                         $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
                     }
                 } else {
-                    $objectiveAssign->setRelation('objectiveStaff', collect([]));
+                    $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+                    ->where('status', 'completed')
+                    ->whereDate('start_date', $currentDate)
+                    ->orderBy('repetition_count', 'desc')
+                    ->first();
+                    $objectiveAssign->setRelation('objectiveStaff', collect([$objectiveStaff]));
+                    if($objectiveStaff){
+                        foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
+                            $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+                                ->where('objective_staff_id', $objectiveStaff->id)
+                                ->first();
+                            $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+                        }
+                    }
                 }
             } else {
                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
