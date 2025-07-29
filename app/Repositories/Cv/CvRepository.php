@@ -9,9 +9,11 @@ use App\Models\SalarySetup;
 use App\Models\SalaryAllowance;
 use Illuminate\Support\Facades\DB;
 use App\Models\StaffEmergencyContact;
+use App\Http\Action\SendNotification\SendNotification;
 
 class CvRepository implements CvRepositoryInterface
 {
+  use SendNotification;
   public function skillByRoleAndDepartment($depId, $roleId)
   {
     $skills = Skill::whereHas('role', function ($query) use ($roleId, $depId) {
@@ -272,6 +274,7 @@ class CvRepository implements CvRepositoryInterface
         'is_cv' => 0,
         ]
       );
+      $this->sendStaffJoinNotification($staff);
       DB::commit();
       return $staff;
     } catch (\Exception $e) {
