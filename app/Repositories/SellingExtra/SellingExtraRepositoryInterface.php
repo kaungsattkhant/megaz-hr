@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 
 interface SellingExtraRepositoryInterface
 {
+    public function listAllCategories(Request $request);
+
+    public function createCategory(array $data);
+
     public function listAllData(Request $request, bool $isPosQuerying = false);
 
     public function find($id);

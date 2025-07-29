@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('selling_extras', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('selling_extra_category_id')->constrained()->onDelete('cascade');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
             $table->foreignId('uom_id')->constrained()->onDelete('cascade');
             $table->integer('quantity')->default(0);
