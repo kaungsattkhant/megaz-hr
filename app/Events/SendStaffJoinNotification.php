@@ -30,13 +30,14 @@ class SendStaffJoinNotification
     public function broadcastOn(): array
     {
         return [
-            new Channel('staff-join-notifications'),
+            new Channel("staff-join-notifications.{$this->staff->id}"),
         ];
     }
     public function broadcastWith()
     {
         return [
             'staff_name' => $this->staff->name,
+            'staff_id' => $this->staff->id,
             'joined_date' => $this->staff->joined_date,
             'notification_title' => $this->notification->title,
             'notification_body' => $this->notification->preview,
