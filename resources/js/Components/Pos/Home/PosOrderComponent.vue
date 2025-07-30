@@ -229,6 +229,10 @@
                 selectedMenu: null,
 
                 total: 0,
+
+                extraCategoryList: [],
+
+                selectedExtraCategory: null,
             };
         },
 
@@ -311,6 +315,14 @@
             },
 
             // extra
+            async getExtraCategoryList() {
+                const response = await getApiData({ url: '/api/pos/selling_extra_categories', token: this.getToken() });
+                if (response.data) {
+                    this.extraCategoryList = response.data;
+                    // this.selectedExtraCategory = response.data[0].id;
+                    // this.getInitMenuList(response.data[0].id)
+                }
+            },
 
             showToastMessage(message, type="warn", title="Input Validation") {
                 this.$notify({
@@ -330,6 +342,7 @@
         },
         created(){
             this.getMenuCategoryList();
+            this.getExtraCategoryList();
 
         },
         mounted()
