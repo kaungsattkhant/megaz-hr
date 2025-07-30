@@ -26,7 +26,7 @@ class OrderItem extends Model
         'is_complete',
         'menu_service_discount_id',
         'price',
-        'remark',
+        'remark_id',
         'area_id',
         'progressed_at',
         'progressed_by',

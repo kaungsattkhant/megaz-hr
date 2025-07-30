@@ -253,7 +253,15 @@ class OrderService
             });
             $detaultQuantity = 1;
             foreach ($filteredMenu as $menuData) {
+                $totalExtraPrice = 0;
                 $this->checkInventoryEnough($menuData['menu_id'], $menuData['quantity']);
+                if (isset($menuData['selling_extra_id']) && !empty($menuData['selling_extra_id'])) {
+                    foreach ($menuData['selling_extra_id'] as $sellingExtraId) {
+                        $sellingExtra = SellingExtra::find($sellingExtraId);
+                        $totalExtraPrice += $sellingExtra->price;
+                    }
+                    $this->checkSellingExtraInventoryIsEnough($menuData['selling_extra_id']);
+                }
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
                 $menuData['invoice_id'] = $invoiceId;
@@ -325,16 +333,17 @@ class OrderService
                     // $order->update($menuData);
                     // if ($invoice->type != 'package') {
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
-                        $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                        $order = $this->updateOrderItemAmountToOrder('add', $order, ($menuData['original_price']), $menuData['quantity'], $discountAmount);
                     }
-                    if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time')) {
-                        $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-                    }
+
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
-                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time' || ($invoice->entity && $invoice->entity->entity_type == 'table'))) {
+                        $order = $this->updateOrderItemAmountToOrder('add', $order, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
+                    }
+                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time' || ($invoice->entity && $invoice->entity->entity_type == 'table')) {
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
                     }
                     // }
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
@@ -348,12 +357,13 @@ class OrderService
                     $menuData['area_id'] = $cookingAreaId;
                     $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
-                        : ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                        : ($menuData['original_price'] + $totalExtraPrice) - $defaultDiscountAmont; //after  
                     $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
                         : $menuData['original_price']; //after
                     // $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
                     $menuData['discount_value'] = $defaultDiscountAmont;
+                    $menuData['total_extra_price'] = $totalExtraPrice;
                     // $order_items = OrderItem::create($menuData);
                     // $orderItems = OrderItem::find($order_items->id);
                     // $orderItems->menu = $orderItems->menu;
@@ -364,20 +374,20 @@ class OrderService
                     $orderData['date'] = CurrentTime();
                     $orderData['total'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
-                        : $menuData['original_price'] * $menuData['quantity'];
+                        : ($menuData['original_price'] + $totalExtraPrice) * $menuData['quantity'];
                     $orderData['order_sub_total'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
-                        : ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
+                        : (($menuData['original_price'] + $totalExtraPrice) * $menuData['quantity']) - $discountAmount;
                     $orderData['total_quantity'] = $menuData['quantity'];
                     $orderData['total_discount_price'] = $discountAmount; // update total discount only for this order
-
+                    $orderData['total_extra_price'] = $totalExtraPrice;
                     $order = Order::create($orderData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
-                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time' || ($invoice->entity && $invoice->entity->entity_type == 'table')) {
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
                     }
                     $menuData['order_id'] = $order->id;
                     $menuData['date'] = now();
@@ -391,7 +401,7 @@ class OrderService
                     $menuData['area_id'] = $cookingAreaId;
                     $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
-                        : ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                        : ($menuData['original_price'] + $totalExtraPrice) - $defaultDiscountAmont; //after  
                     $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
                         : $menuData['original_price']; //after  
@@ -409,6 +419,9 @@ class OrderService
                     // $insertData[] = $orderItemData;
                     $menuData['quantity'] = $defaultQuantity;
                     $order_item = OrderItem::create($menuData);
+                    if (isset($data['selling_extra_id']) && !empty($data['selling_extra_id'])) {
+                        $this->createOrderItemExtra($order_item, $menuData['selling_extra_id']);
+                    }
                     $insertData[] = $order_item;
                     if ($order_item->is_foc == 1) {
                         $focTotal += $order_item->price;
