@@ -253,6 +253,7 @@ class OrderService
             });
             $detaultQuantity = 1;
             foreach ($filteredMenu as $menuData) {
+                $this->checkInventoryEnough($menuData['menu_id'], $menuData['quantity']);
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
                 $menuData['invoice_id'] = $invoiceId;
