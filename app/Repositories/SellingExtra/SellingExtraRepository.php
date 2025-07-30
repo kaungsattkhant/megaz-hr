@@ -11,7 +11,7 @@ class SellingExtraRepository implements SellingExtraRepositoryInterface
 {
     public function listAllCategories(Request $request)
     {
-        $query = SellingExtraCategory::query()->with(['extras']);
+        $query = SellingExtraCategory::query()->with(['extras.item']);
         if ($request->per_page || $request->page) {
             return $query
             ->orderByDesc('id')
