@@ -18,6 +18,18 @@ class SellingExtraAPIController extends Controller
         $this->repo = $repo;
     }
 
+    public function getSellingExtraCategories(Request $request)
+    {
+        $data = $this->repo->listAllCategories($request);
+        ResponseData($data);
+    }
+
+    public function createSellingExtraCategory(Request $request)
+    {
+        $data = $request->all();
+        ResponseData($this->repo->createCategory($data), 201);
+    }
+
     public function getSellingExtras(Request $request)
     {
         $data = $this->repo->listAllData($request);
