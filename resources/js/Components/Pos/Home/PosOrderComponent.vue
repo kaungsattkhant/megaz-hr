@@ -277,7 +277,7 @@
             
             async getInitMenuList(id) {
                 console.log(id)
-                const response = await getApiData({ url: '/api/menu_categories/' + id + '/menus', token: this.getToken() });
+                const response = await getApiData({ url: '/api/menu_categories/' + id + '/menus?selling_area_id=' + this.detail.area_id, token: this.getToken() });
                 if (response.data) {
                     this.menuList = response.data;
                 }
@@ -294,7 +294,7 @@
             },
             btnClickedAddOrder(menu){
                 this.selectedMenu = menu
-                let index = this.selectedOrderList.findIndex(item => item.id === menu.menu_id);
+                let index = this.selectedOrderList.findIndex(item => item.menu_id === menu.id);
                 if (index != -1) {
                     this.selectedOrderList[index].quantity += 1;
                     this.selectedOrderList[index].price += menu.prices[0].price;
@@ -309,6 +309,7 @@
                         unit_price: menu.prices[0].price,
                         original_price: menu.prices[0].price,
                         menu_category_id: this.selectedMenuCategory,
+                        cooking_area_id: menu.cooking_area_id,
                     })
                 }
                 this.getTotalAmount();
@@ -419,9 +420,9 @@
                     delete item.extras
                 });
             }
-            console.log('type' + typeof extraIds)
+            // console.log('type' + typeof this.selectedOrderList)
             
-            formData.append('menuArray', this.selectedOrderList)
+            formData.append('menuArray', JSON.stringify(this.selectedOrderList))
             formData.append('invoice_id', this.invoice_id);
             formData.append('selling_area_id', this.area_id);
             let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
