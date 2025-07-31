@@ -1,7 +1,7 @@
 <template>
     <div class="">
+        <!-- {{ selectedOrderList }} -->
         <div class="mb-6" v-if="!isExtra">
-            asdf
             <div class="w-full pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(category, index) in menuCategoryList" :key="index" role="presentation" @click="menuCategoryChange(category)">
@@ -63,7 +63,7 @@
                                         
                                     </div>
                                     <div v-for="(menu,index) in selectedOrderList" class="contents" :key="menu">
-                                        <button class=" col-span-4 text-sm text-right" @click="toggleStep">
+                                        <button class=" col-span-4 text-sm text-left" @click="toggleStep(menu,index)">
                                             {{ menu.name }}
                                         </button>
                                         <div class=" col-span-2 text-center text-sm flex justify-between items-center">
@@ -94,14 +94,14 @@
                                 <p class="">
                                     Total
                                     
-                                    {{ total }}
+                                    {{ total + extraTotal }}
                                     MMKs
                                 </p>
                             </div>
                             <div class="">
-                                <button @click="btnClickedDoneSession()"
-                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
-                                    Done Session
+                                <button @click="btnClickedAddMenuOrder()"
+                                    class="bg-[#D45E5E] text-white text-center text-sm font-semibold w-full py-3">
+                                    Order 
                                 </button>
                             </div>
                         </div>
@@ -115,9 +115,9 @@
         </div>
         <div v-else>
 
-            <div class="w-full pt-9 px-6 ">
+            <div class="w-full pt-9 px-6 h-[100vh] pb-16">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
-                    <li v-for="(category, index) in menuCategoryList" :key="index" role="presentation" @click="menuCategoryChange(category)">
+                    <li v-for="(category, index) in extraCategoryList" :key="index" role="presentation" @click="extraCategoryChange(category)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
                             hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]">
@@ -126,27 +126,38 @@
                     </li>
                 </ul>
                 <div class="opacity-100 transition-opacity duration-150 ease-linear"
-                    style="width:calc(100% - 410px)">
+                    style="width:calc(100% - 10px)">
+                    
                     <div class="flex flex-wrap gap-x-4 gap-y-4">
-                        <div v-for="(menu, menuIndex) in menuList" :key="menuIndex"
-                            class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
-                            <button @click="btnClickedAddOrder(menu, menuIndex)"
-                                class="relative flex flex-col justify-between h-full w-full">
-                                <img src="../../../../../public/img/order1.png" alt="Menu Image" />
-                                <div class="absolute bottom-0 w-full flex justify-end">
-                                    <p class="text-base text-black font-semibold">
-                                        {{ menu.name }}
-                                    </p>
+
+                        <label v-for="(extra, extraIndex) in extraList"
+                            :key="extraIndex" class="block w-64 h-max">
+                            <input type="checkbox" :id="'extra' + extraIndex"
+                                :value="extra" v-model="selectedExtras" class="peer hidden"/>
+
+                            <div class="bg-white peer-checked:bg-blue-200 transition-colors rounded-2xl shadow p-4 flex flex-col justify-between">
+                                <div class="text-lg font-medium text-gray-800 text-left">
+                                    {{ extra.item.name }}
                                 </div>
-                            </button>
-                        </div>
+                                <div class="text-3xl font-semibold text-black text-right">
+                                    {{ extra.price }}
+                                </div>
+                            </div>
+                        </label>
+                        
                     </div>
+                </div>
+                <div class=" fixed bottom-4 right-8 w-[410px]">
+                    <button @click="btnClikcedAddExtra()"
+                        class="bg-[#91D45E] text-black text-center text-sm font-semibold w-full py-3 px-4">
+                        Proceed
+                    </button>
                 </div>
 
                
             </div>
 
-            <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2"
+            <!-- <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2"
                 :class="isExtra === true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
                     <div class="relative h-full">
@@ -184,7 +195,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
         </div>
@@ -217,6 +228,7 @@
         components:{
             Multiselect
         },
+        props: ['orderId'],
         data() {
             return {
                 isExtra: false,
@@ -229,16 +241,31 @@
                 selectedMenu: null,
 
                 total: 0,
+                extraTotal: 0,
 
                 extraCategoryList: [],
+                extraList: [],
 
                 selectedExtraCategory: null,
+                selectedExtras: [],
+
+                selectedMenuForExtra: null,
+                selectedMenuForExtraIndex: null,
+
+                detail: null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
-
+            async getOrderDetail() {
+                const response = await getApiData({ url: '/api/entities/' + this.orderId, token: this.getToken() });
+                if (response.data) {
+                    this.detail = response.data;
+                    this.invoice_id = response.data.invoice.invoice_id;
+                    this.area_id = response.data.area_id;
+                }
+            },
             async getMenuCategoryList() {
                 const response = await getApiData({ url: '/api/menu_categories', token: this.getToken() });
                 if (response.data) {
@@ -247,6 +274,7 @@
                     this.getInitMenuList(response.data[0].id)
                 }
             },
+            
             async getInitMenuList(id) {
                 console.log(id)
                 const response = await getApiData({ url: '/api/menu_categories/' + id + '/menus', token: this.getToken() });
@@ -266,19 +294,21 @@
             },
             btnClickedAddOrder(menu){
                 this.selectedMenu = menu
-                let index = this.selectedOrderList.findIndex(item => item.id === menu.id);
+                let index = this.selectedOrderList.findIndex(item => item.id === menu.menu_id);
                 if (index != -1) {
                     this.selectedOrderList[index].quantity += 1;
                     this.selectedOrderList[index].price += menu.prices[0].price;
                 }
                 else{
                     this.selectedOrderList.push({
-                        id: menu.id,
+                        menu_id: menu.id,
                         name: menu.name,
                         code: menu.code,
                         quantity: 1,
                         price: menu.prices[0].price,
-                        unit_price: menu.prices[0].price
+                        unit_price: menu.prices[0].price,
+                        original_price: menu.prices[0].price,
+                        menu_category_id: this.selectedMenuCategory,
                     })
                 }
                 this.getTotalAmount();
@@ -291,6 +321,8 @@
             minusOrder(menu,index){
                 if(this.selectedOrderList[index].quantity === 1){
                     this.selectedOrderList.splice(index, 1);
+                    this.getTotalAmount();
+                    this.getTotalExtraPrice();
                 }
                 else{
                     this.selectedOrderList[index].quantity -= 1;
@@ -310,8 +342,19 @@
             },
 
 
-            toggleStep(){
+            toggleStep(menu,index){
                 this.isExtra = !this.isExtra;
+                // if(this.isExtra){
+                //     this.getExtraCategoryList();
+                // }
+                this.selectedMenuForExtra = menu;
+                this.selectedMenuForExtraIndex = index;
+                if(this.selectedOrderList[index].extras){
+                    this.selectedExtras = this.selectedOrderList[index].extras
+                }
+                else{
+                    this.selectedExtras = [];
+                }
             },
 
             // extra
@@ -319,9 +362,83 @@
                 const response = await getApiData({ url: '/api/pos/selling_extra_categories', token: this.getToken() });
                 if (response.data) {
                     this.extraCategoryList = response.data;
-                    // this.selectedExtraCategory = response.data[0].id;
+                    this.selectedExtraCategory = response.data[0].id;
+                    this.extraList = response.data[0].extras;
                     // this.getInitMenuList(response.data[0].id)
                 }
+            },
+            extraCategoryChange(category){
+                this.extraList = category.extras;
+            },
+            btnClikcedAddExtra(){
+                let selling_extra_id = [];
+                let extras = [];
+                let extra_price = 0;
+                let extra_origin_price = 0;
+                let allTotal = this.total;
+
+                this.selectedExtras.forEach(item => {
+                    extra_price += item.price;
+                    extra_origin_price += item.price;
+                    selling_extra_id.push(item.id);
+                    extras.push(item);
+                })
+                this.selectedOrderList[this.selectedMenuForExtraIndex].selling_extra_id = selling_extra_id;
+                this.selectedOrderList[this.selectedMenuForExtraIndex].extras = extras;
+                this.selectedOrderList[this.selectedMenuForExtraIndex].extra_price = extra_price;
+                this.selectedOrderList[this.selectedMenuForExtraIndex].extra_origin_price = extra_origin_price;
+                // this.selectedOrderList[this.selectedMenuForExtraIndex].push({
+                //     extra_price: this.selectedExtras.price,
+                //     extra_origin_price: this.selectedExtras.price
+                // })
+                // this.isExtra = !this.isExtra;
+
+                // let allTotal = this.total - extra_origin_price + extra_price
+
+
+                this.isExtra = !this.isExtra;
+                this.getTotalExtraPrice();
+            },
+            getTotalExtraPrice() {
+                this.extraTotal = this.selectedOrderList.reduce((extraTotal, item) => {
+                    const amount = Number(item.extra_price) || 0;
+                    return extraTotal + amount;
+                }, 0);
+            },
+
+            btnClickedAddMenuOrder(){
+                this.addMenu();
+            },
+            async addMenu(){
+            let formData = new FormData();
+            // formData.append('menuArray', JSON.stringify(this.selectedExtras));
+            // formData.append('menuArray', this.selectedExtras);
+            let extraIds = []; 
+            if(this.selectedOrderList.length > 0){
+                this.selectedOrderList.forEach(item => {
+                    delete item.extras
+                });
+            }
+            console.log('type' + typeof extraIds)
+            
+            formData.append('menuArray', this.selectedOrderList)
+            formData.append('invoice_id', this.invoice_id);
+            formData.append('selling_area_id', this.area_id);
+            let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                // window.location.replace('/pos/home');
+            }
+            else {
+                let message = `Some errors occured`;
+                if (response.message) {
+                    message = response.message;
+                }
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
+            }
+
             },
 
             showToastMessage(message, type="warn", title="Input Validation") {
@@ -341,6 +458,7 @@
             
         },
         created(){
+            this.getOrderDetail();
             this.getMenuCategoryList();
             this.getExtraCategoryList();
 
