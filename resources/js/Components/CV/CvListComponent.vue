@@ -99,6 +99,14 @@
                                     </td>
 
                                     <td class="whitespace-nowrap">
+                                        <!-- <button @click="addDateBtnClicked(item.id)" data-te-toggle="modal"
+                                            data-te-target="#add_date" id="date-btn" class="pr-1">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button> -->
+                                        <button @click="addSalaryBtnClicked(item)" data-te-toggle="modal"
+                                            data-te-target="#add_salary" id="salary-btn" class="">
+                                            <i class="fal fa-money-bill-wave pr-3"></i>
+                                        </button>
                                         <a :href="'/cv/' + item.id + '/detail'" class="pr-3">
                                             <i class="fal fa-pen"></i>
                                         </a>
@@ -130,6 +138,129 @@
                 </div>
             </div>
         </div>
+
+
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_salary" tabindex="-1" aria-labelledby="add_question_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[600px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_question_modalLabel">
+                            Salary And Allowances
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close" id="close_add_answer_modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="grid grid-cols-6 gap-x-5 gap-y-4 text-sm">
+                            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Salary
+                                </label>
+                                <input type="number" v-model="selectedSalary" autocomplete="off" :max="salarySetup?.basic_salary"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <p class="mt-2 text-xs">
+                                    Allowed Amount : <span class="pl-2">{{ salarySetup?.basic_salary.toLocaleString() }}</span>
+                                </p>
+                            </div><div class="col-span-3"></div>
+                            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Allowance
+                                </label>
+                                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                                    data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select Allowance" @change="allowanceChange"
+                                        data-te-select-filter="true" name="" id="" v-model="selectedAllowance" class="input-ui !text-black text-sm">
+                                        <option :value="allowance" v-for="(allowance, index) in allowanceList"
+                                            :key="index"> {{ allowance.name }} </option>
+                                    </select>
+                                </div>
+                                <!-- <input type="text" v-model="selectedAllowance" autocomplete="off"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                            </div>
+                            <div class="mb-4 col-span-2 pb-0 rounded-md">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Amount
+                                </label>
+                                <input type="number" v-model="selectedAmount" autocomplete="off"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            </div>
+                            
+                            <div class="col-span-1 mb-4">
+                                <label class="label-form mb-3">&nbsp;</label>
+                                <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10" @click="addAllowanceAmount()" >
+                                    Add
+                                </button>
+                            </div>
+
+
+                            <div class="col-span-3">
+                                <p>
+                                    Allowance
+                                </p>
+                            </div>
+                            <div class="col-span-1">
+                                <p>
+                                    Amount
+                                </p>
+                            </div>
+                            <div class="col-span-1">
+                                <p>
+                                    
+                                </p>
+                            </div>
+                            <div class="contents" v-if="selectedAllowanceAmountList.length > 0" v-for="(q,index) in selectedAllowanceAmountList">
+                                <div class="col-span-3">
+                                    <p>
+                                        {{ q.name }}
+                                    </p>
+                                </div>
+                                <div class="col-span-1">
+                                    <p>
+                                        {{ q.amount }}
+                                    </p>
+                                </div>
+                                <div class="col-span-1">
+                                    <button>
+                                        <i class="fal fa-times" @click="deleteSeleted(index,selectedAllowanceAmountList)" ></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-else class="col-span-6 text-center mb-3 pt-2">
+                                <p class="text-gray-500">
+                                    No Data Here!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" @click="addAnswerToQuestion()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <!--Delete Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -229,6 +360,13 @@ export default {
             url_status: '',
             deleteId: null,
 
+            salarySetup: null,
+            selectedItem: null,
+            selectedSalary: null,
+            allowanceList: [],
+            selectedAllowance: null,
+            selectedAmount: null,
+            selectedAllowanceAmountList: [],
         };
     },
 
@@ -294,7 +432,28 @@ export default {
         // },
 
 
-
+        async addSalaryBtnClicked(item){
+            this.selectedItem = item;
+            let response = await getApiData({ url: '/api/hr/salary_setup/department/' + item.department.id + '/role/' + item.roles[0].id, token: this.getToken() });
+            if (response.data) {
+                this.salarySetup = response.data;
+                response.data.salary_allowances.forEach(item => {
+                    this.allowanceList.push(item.allowance)
+                });
+            }
+        },
+        allowanceChange(){
+            this.selectedAmount = this.selectedAllowance.amount
+        },
+        async addAllowanceAmount(){
+            this.selectedAllowanceAmountList.push({
+                name: this.selectedAllowance ? this.selectedAllowance.name : null,
+                id: this.selectedAllowance ? this.selectedAllowance.id : null,
+                amount: this.selectedAmount,
+            })
+            this.selectedAllowance = null;
+            this.selectedAmount = null;
+        },
         deleteBtnClicked(id) {
             this.deleteId = id;
         },

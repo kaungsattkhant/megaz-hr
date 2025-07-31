@@ -226,6 +226,7 @@ import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComp
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
 import PosSaleReportComponent from './Components/Pos/SaleReports/PosSaleReportComponent.vue';
+import PosOrderComponent from './Components/Pos/Home/PosOrderComponent.vue';
 
 
 import CvFormComponent from './Components/CV/CvFormComponent.vue';
@@ -453,6 +454,7 @@ app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
 app.component('PosSaleReportComponent',PosSaleReportComponent);
+app.component('PosOrderComponent',PosOrderComponent);
 
 
 app.component('CvFormComponent',CvFormComponent);

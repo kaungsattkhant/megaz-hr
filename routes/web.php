@@ -256,6 +256,7 @@ Route::group(['prefix' => 'pos'], function () {
     Route::view('/customer_deposit', 'pos.customer_deposit.index')->name('pos.customer_deposit');
     Route::view('/selling_areas', 'pos.areas.index')->name('pos.areas');
     Route::view('/sale_report', 'pos.sale_reports.index')->name('pos.sale_reports');
+    Route::view('/pos_order/{id}', 'pos.home.order')->name('pos.home.order');
     // });
 });
 

@@ -58,6 +58,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/get_room_discount_list', 'getRoomDiscountList');
     });
     Route::prefix('pos')->controller(SellingExtraAPIController::class)->group(function () {
+        Route::get('/selling_extra_categories', 'getSellingExtraCategories');
         Route::get('/selling_extras', 'getSellingExtrasFromPos');
     });
 });

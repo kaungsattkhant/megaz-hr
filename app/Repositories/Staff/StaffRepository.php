@@ -24,6 +24,7 @@ class StaffRepository implements StaffRepositoryInterface
 
         $staffQuery = Staff::orderByDesc('id')
             ->with(['department', 'roles',  'bank','staffCertifications'])
+            ->where('is_cv', 0)
             ->when($request->search_input, function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search_input . '%');
             })
