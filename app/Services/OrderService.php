@@ -241,6 +241,7 @@ class OrderService
 
             $orderItemsArray = [];
             $focTotal = 0;
+            $data['menuArray']=json_decode($data['menuArray'], true);
             if ($invoice->invoice_type == 'package') {
                 $filteredMenu = array_filter($data['menuArray'], function ($menu) {
                     return isset($menu['is_package']) && in_array($menu['is_package'], [0, 1]);
