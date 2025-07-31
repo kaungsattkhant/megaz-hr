@@ -310,6 +310,7 @@
                         original_price: menu.prices[0].price,
                         menu_category_id: this.selectedMenuCategory,
                         cooking_area_id: menu.cooking_area_id,
+                        is_package: 0,
                     })
                 }
                 this.getTotalAmount();
