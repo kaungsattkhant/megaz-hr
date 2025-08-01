@@ -590,6 +590,8 @@ Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 
 Route::controller(SellingExtraAPIController::class)->group(function(){
+    Route::get('/selling_extra_categories', 'getSellingExtraCategories');
+    Route::post('/selling_extra_categories', 'createSellingExtraCategory');
     Route::get('/selling_extras', 'getSellingExtras');
     Route::post('/selling_extras', 'createSellingExtras');
     Route::post('/selling_extras/{id}', 'updateSellingExtras');
