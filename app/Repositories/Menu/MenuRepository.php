@@ -81,6 +81,7 @@ class MenuRepository implements MenuRepositoryInterface
                 ->where('menu_category_areas.selling_area_id', $sellingAreaId)
                 ->where('menu_areas.is_default', 1)
                 ->where('menus.is_active', 1)
+                ->where('menus.menu_category_id', $id)
                 ->select('menus.*', 'menu_areas.cooking_area_id')
                 ->get();
 
