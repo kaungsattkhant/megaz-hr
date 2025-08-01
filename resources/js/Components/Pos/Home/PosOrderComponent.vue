@@ -142,10 +142,10 @@
                         <label v-for="(extra, extraIndex) in extraList"
                             :key="extra.id" class="block w-64 h-max">
                             <input type="checkbox" :id="'extra' + extraIndex" :checked="selectedExtras.some(e => e.id === extra.id)"
-                                :value="extra" v-model="selectedExtras" class=" hidden"/>
+                                :value="extra" v-model="selectedExtras" class="peer hidden"/>
 
-                            <div class="bg-white  transition-colors rounded-2xl shadow p-4 flex flex-col justify-between"
-                                :class="{ 'bg-blue-200': selectedExtras.some(e => e.id === extra.id)}">
+                            <div class="bg-white  transition-colors rounded-2xl shadow p-4 flex flex-col justify-between peer-checked:bg-blue-200"
+                                >
                                 <div class="text-lg font-medium text-gray-800 text-left">
                                     {{ extra.item.name }}
                                 </div>
@@ -157,7 +157,7 @@
                         
                     </div>
                 </div>
-                <div class=" fixed bottom-4 right-0 w-[410px] bg-white px-6 pt-6 rounded">
+                <div class=" fixed bottom-0 pb-4 right-0 w-[410px] bg-white px-6 pt-6 rounded">
                     <div class="flex items-center justify-center mb-4 bg-white">
                         <!-- <div class="w-auto flex-grow">
                             <multiselect v-model="selectedRemark" :options="remarkList"
