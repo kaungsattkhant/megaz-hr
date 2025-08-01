@@ -241,7 +241,7 @@ class OrderService
 
             $orderItemsArray = [];
             $focTotal = 0;
-            $data['menuArray']=json_decode($data['menuArray'], true);
+            $data['menuArray'] = json_decode($data['menuArray'], true);
             if ($invoice->invoice_type == 'package') {
                 $filteredMenu = array_filter($data['menuArray'], function ($menu) {
                     return isset($menu['is_package']) && in_array($menu['is_package'], [0, 1]);
@@ -420,7 +420,7 @@ class OrderService
                     // $insertData[] = $orderItemData;
                     $menuData['quantity'] = $defaultQuantity;
                     $order_item = OrderItem::create($menuData);
-                    if (isset($data['selling_extra_id']) && !empty($data['selling_extra_id'])) {
+                    if (isset($menuData['selling_extra_id']) && !empty($menuData['selling_extra_id'])) {
                         $this->createOrderItemExtra($order_item, $menuData['selling_extra_id']);
                     }
                     $insertData[] = $order_item;
