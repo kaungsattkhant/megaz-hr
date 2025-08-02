@@ -41,15 +41,15 @@ class AssignObjectivesToStaffs extends Command
             foreach ($objectives as $objective) {
                 $roleId = $objective->role_id;
 
-                $staffLists = Staff::staffByRole($roleId);
+                $staffLists = Staff::staffByRole($roleId)->where('is_cv', 0);
 
                 foreach ($staffLists as $staff) {
                     $existingAssign = ObjectiveAssign::where('objective_id', $objective->id)
-                    ->where('staff_id', $staff->id)
-                    ->whereHas('objectiveStaff', function($query) use ($today) {
-                        $query->whereDate('start_date', $today);
-                    })
-                    ->first();
+                        ->where('staff_id', $staff->id)
+                        ->whereHas('objectiveStaff', function ($query) use ($today) {
+                            $query->whereDate('start_date', $today);
+                        })
+                        ->first();
                     if (!$existingAssign) {
                         $objectiveAssign = ObjectiveAssign::create(
                             [

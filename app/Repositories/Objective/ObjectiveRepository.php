@@ -3,6 +3,7 @@
 namespace App\Repositories\Objective;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Item;
 use App\Models\Role;
 use App\Models\Staff;
@@ -40,21 +41,25 @@ class ObjectiveRepository implements ObjectiveInterface
         $to_date = isset($request->to_date) ? convertDateFormat($request->to_date) : null;
         $staffId = $request->staff_id;
         $departmentId = $request->department_id;
-
-       $okrDashboard = ObjectiveStaff::join('objective_assigns', 'objective_staff.objective_assign_id', '=', 'objective_assigns.id')
-        ->join('staff', 'objective_assigns.staff_id', '=', 'staff.id')
-        ->join('objectives', 'objective_assigns.objective_id', '=', 'objectives.id')
-        ->join('departments', 'staff.department_id', '=', 'departments.id')
-        ->join('roles', 'objectives.role_id', '=', 'roles.id')
+        $status = $request->status;
+        $roleId = $request->role_id;
+        $currentDate = Carbon::now()->toDateString();
+        $okrDashboard = ObjectiveStaff::join('objective_assigns', 'objective_staff.objective_assign_id', '=', 'objective_assigns.id')
+            ->join('staff', 'objective_assigns.staff_id', '=', 'staff.id')
+            ->join('objectives', 'objective_assigns.objective_id', '=', 'objectives.id')
+            ->join('departments', 'staff.department_id', '=', 'departments.id')
+            ->join('roles', 'objectives.role_id', '=', 'roles.id')
             ->select(
-                'objective_staff.start_date as start_date',
-                'objective_staff.end_date as due_date',
+                'staff.id as staff_id',
                 'staff.name as staff_name',
-                'objectives.objective_name',
                 'departments.name as department_name',
                 'roles.name as role_name',
-                'objective_staff.okr_point',
-                'objective_staff.status',
+                DB::raw('COUNT(*) as total_assigned_tasks'),
+                DB::raw('COUNT(CASE WHEN objective_staff.status = "completed" THEN 1 END) as completed_tasks'),
+                DB::raw('COUNT(CASE WHEN objective_staff.status = "approved" THEN 1 END) as approved_tasks'),
+                DB::raw('COUNT(CASE WHEN objective_staff.status = "assigned" THEN 1 END) as assigned_tasks'),
+                DB::raw('COUNT(CASE WHEN objective_staff.status = "in_progress" THEN 1 END) as in_progress_tasks'),
+                DB::raw('COUNT(CASE WHEN objective_staff.status = "cancelled" THEN 1 END) as cancelled_tasks')
             )
             ->when($departmentId, function ($query) use ($departmentId) {
                 $query->where('departments.id', $departmentId);
@@ -63,24 +68,33 @@ class ObjectiveRepository implements ObjectiveInterface
                 $q->where('staff.id', $staffId);
             })
             ->when(($from_date && $to_date), function ($q) use ($from_date, $to_date) {
-                $q->whereBetween(DB::raw('DATE(objective_staff.start_date)'), [$from_date, $to_date]);
+                $q->whereBetween(DB::raw('DATE(objective_staff.start_date)'), [$from_date, $to_date])
+                    ->whereBetween(DB::raw('DATE(objective_staff.end_date)'), [$from_date, $to_date]);
             })
             ->when($from_date && !$to_date, function ($query) use ($from_date) {
-                $query->whereDate('objective_staff.start_date', '>=', $from_date);
+                $query->whereDate('objective_staff.start_date', '>=', $from_date)
+                    ->whereDate('objective_staff.end_date', '>=', $from_date);
             })
             ->when(!$from_date && $to_date, function ($query) use ($to_date) {
-                $query->whereDate('objective_staff.end_date', '<=', $to_date);
+                $query->whereDate('objective_staff.end_date', '<=', $to_date)
+                    ->whereDate('objective_staff.end_date', '<=', $to_date);
+            })
+            ->when($status, function ($query) use ($status) {
+                $query->where('objective_staff.status', $status);
+            })
+            ->when($roleId, function ($query) use ($roleId) {
+                $query->where('roles.id', $roleId);
+            })
+            ->when(!$from_date && !$to_date, function ($query) use ($currentDate) {
+                $query->whereDate('objective_staff.start_date', '<=', $currentDate)
+                    ->whereDate('objective_staff.end_date', '>=', $currentDate);
             })
             ->whereIn('objective_staff.status', ['completed', 'approved', 'assigned', 'in_progress', 'cancelled'])
             ->groupBy(
-                'objective_staff.start_date',
-                'objective_staff.end_date',
+                'staff.id',
                 'staff.name',
-                'objectives.objective_name',
                 'departments.name',
-                'roles.name',
-                'objective_staff.okr_point',
-                'objective_staff.status'
+                'roles.name'
             )
             ->paginate(20);
         return $okrDashboard;
@@ -397,12 +411,12 @@ class ObjectiveRepository implements ObjectiveInterface
                     }
                 } else {
                     $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                    ->where('status', 'completed')
-                    ->whereDate('start_date', $currentDate)
-                    ->orderBy('repetition_count', 'desc')
-                    ->first();
+                        ->where('status', 'completed')
+                        ->whereDate('start_date', $currentDate)
+                        ->orderBy('repetition_count', 'desc')
+                        ->first();
                     $objectiveAssign->setRelation('objectiveStaff', collect([$objectiveStaff]));
-                    if($objectiveStaff){
+                    if ($objectiveStaff) {
                         foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
                             $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
                                 ->where('objective_staff_id', $objectiveStaff->id)
@@ -603,7 +617,7 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
+    public function getCompletedObjKeysByStaffId($objectiveId, $staffId)
     {
         $today = now()->format('Y-m-d');
         $objectives = Objective::with([
@@ -613,17 +627,17 @@ class ObjectiveRepository implements ObjectiveInterface
                 $query->where('staff_id', $staffId);
             },
             'objectiveAssigns.objectiveStaff' => function ($query) use ($today) {
-                $query->whereIn('status',['completed','approved']);
+                $query->whereIn('status', ['completed', 'approved']);
                 $query->whereDate('start_date', $today);
             }
-        ])->where('id',$objectiveId)
-        ->whereHas('objectiveAssigns', function ($q) use ($staffId,$today) {
-            $q->where('staff_id', $staffId);
-            $q->whereHas('objectiveStaff', function ($query) use ($today) {
-                $query->whereIn('status',['completed','approved']);
-                $query->whereDate('start_date', $today);
-            });
-        })->first();
+        ])->where('id', $objectiveId)
+            ->whereHas('objectiveAssigns', function ($q) use ($staffId, $today) {
+                $q->where('staff_id', $staffId);
+                $q->whereHas('objectiveStaff', function ($query) use ($today) {
+                    $query->whereIn('status', ['completed', 'approved']);
+                    $query->whereDate('start_date', $today);
+                });
+            })->first();
         return $objectives;
     }
 

@@ -37,7 +37,7 @@ class SendStaffNotification
     {
         return [
             new Channel("send-notification.role.{$this->staff_id}"),
-        ];;
+        ];
     }
 
     public function broadcastWith()
