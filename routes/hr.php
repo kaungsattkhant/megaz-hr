@@ -9,6 +9,7 @@ use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\StaffTimeShiftController;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -117,6 +118,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/locations', 'createLocation');
     Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
     Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
+  });
+  Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
+    Route::post('/staff_time_shifts', 'createStaffTimeShift');
+    Route::get('/staff_time_shifts', 'getStaffTimeShifts');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

@@ -131,6 +131,7 @@ use App\Repositories\MenuCategory\MenuCategoryRepository;
 use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\RoomDiscount\RoomDiscountRepository;
 
+use App\Repositories\SellingExtra\SellingExtraRepository;
 use App\Repositories\StaffAdvance\StaffAdvanceRepository;
 use App\Repositories\Customer\CustomerRepositoryInterface;
 use App\Repositories\Location\LocationRepositoryInterface;
@@ -138,9 +139,9 @@ use App\Repositories\Transfer\TransferRepositoryInterface;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\AccountPayable\AccountPayableInterface;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
-use App\Repositories\FoodOrder\FoodOrderRepositoryInterface;
 
 // =======
+use App\Repositories\FoodOrder\FoodOrderRepositoryInterface;
 use App\Repositories\Interview\InterviewRepositoryInterface;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
 use App\Repositories\JobDescription\JobDescriptionInterface;
@@ -149,6 +150,7 @@ use App\Repositories\AccountPayable\AccountPayableRepository;
 use App\Repositories\DeliveryCharge\DeliveryChargeRepository;
 use App\Repositories\JobDescription\JobDescriptionRepository;
 use App\Repositories\SaleTargetMenu\SaleTargetMenuRepository;
+use App\Repositories\StaffTimeShift\StaffTimeShiftRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\MRPForecast\MRPForecastRepositoryInterface;
 use App\Repositories\Resignation\ResignationRepositoryInterface;
@@ -158,6 +160,7 @@ use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
 use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
 use App\Repositories\RoomDiscount\RoomDiscountRepositoryInterface;
+use App\Repositories\SellingExtra\SellingExtraRepositoryInterface;
 use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
 use App\Repositories\AccountReceivable\AccountReceivableRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepository;
@@ -169,6 +172,7 @@ use App\Repositories\SaleTargetPosition\SaleTargetPositionRepository;
 use App\Repositories\DeliveryCharge\DeliveryChargeRepositoryInterface;
 use App\Repositories\JobDescription\JobDescriptionRepositoryInterface;
 use App\Repositories\SaleTargetMenu\SaleTargetMenuRepositoryInterface;
+use App\Repositories\StaffTimeShift\StaffTimeShiftRepositoryInterface;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepository;
 use App\Repositories\AssetInventoryLedger\AssetInventoryLedgerInterface;
 use App\Repositories\AssetInventoryLedger\AssetInventoryLedgerRepository;
@@ -183,13 +187,11 @@ use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
+
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
-
-use App\Repositories\SellingExtra\SellingExtraRepositoryInterface;
-use App\Repositories\SellingExtra\SellingExtraRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -287,5 +289,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TagRepositoryInterface::class, TagRepository::class);
 
         $this->app->bind(SellingExtraRepositoryInterface::class, SellingExtraRepository::class);
+        $this->app->bind(StaffTimeShiftRepositoryInterface::class, StaffTimeShiftRepository::class);
     }
 }
