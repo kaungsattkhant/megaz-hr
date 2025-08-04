@@ -39,6 +39,4 @@ class SupplierItem extends Model
     {
         return $this->hasOne(ItemPrice::class)->orderBy('id', 'desc');
     }
-
-   
 }

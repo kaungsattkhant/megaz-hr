@@ -8,6 +8,7 @@ use App\Models\StaffFcmToken;
 use Illuminate\Support\Facades\Log;
 use App\Events\SendRoleNotification;
 use App\Events\SendStaffNotification;
+use App\Events\SendStaffJoinNotification;
 use App\Events\SendDepartmentNotification;
 use App\Events\SendNotification as EventsSendNotification;
 
@@ -150,6 +151,37 @@ trait SendNotification
         if ($notiDatas->isNotEmpty()) {
             $role_id = $users->pluck('roles.*.id')->flatten()[0];
             broadcast(new EventsSendNotification($notification, $role_id));
+        }
+    }
+
+    public function sendStaffJoinNotification($staff)
+    {
+        try {
+            $morphMapName = RelationMorphName($staff);
+            $joinDateFormatted = date('d M, Y', strtotime($staff->joined_date));
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $staff->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'New Staff Joined',
+                    'preview' => "Staff {$staff->name} has officially joined on {$joinDateFormatted}",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+            $allStaff = Staff::where('is_cv', 0)->get();
+            foreach ($allStaff as $user) {
+                $notification->notificationUsers()->updateOrCreate([
+                    'staff_id' => $user->id,
+                ],[
+                    'title' => 'New Staff Joined'
+                ]);
+            }
+            broadcast(new SendStaffJoinNotification($staff, $notification));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
         }
     }
 }
