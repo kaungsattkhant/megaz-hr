@@ -4,13 +4,12 @@
         <div class="mb-6" v-show="!isExtra">
             <div class="w-full pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
-                    <li v-for="(category, index) in menuCategoryList" :key="index" role="presentation" @click="menuCategoryChange(category)">
-                        <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
-                            pt-3 text-xs  hover:isolate 
-                            hover:bg-[#D45E5E] focus:isolate data-[te-nav-active]:bg-[#D45E5E]"
+                    <li v-for="(category, index) in menuCategoryList" :key="index" role="presentation">
+                        <button class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
+                            pt-3 text-xs  hover:isolate  focus:isolate" @click="menuCategoryChange(category)"
                             :class="category?.id === this.selectedMenuCategory ? 'bg-[#D45E5E]' : 'bg-[#c4c4c4]'">
                             {{ category.name }}
-                        </a>
+                        </button>
                     </li>
                 </ul>
                 <div class="opacity-100 transition-opacity duration-150 ease-linear"
@@ -537,11 +536,11 @@
             },
             async addMenu(){
             let formData = new FormData();
-            if(this.selectedOrderList.length > 0){
-                this.selectedOrderList.forEach(item => {
-                    delete item.extras
-                });
-            }
+            // if(this.selectedOrderList.length > 0){
+            //    this.selectedOrderList.forEach(item => {
+            //        delete item.extras
+            //    });
+            // }
             formData.append('menuArray', JSON.stringify(this.selectedOrderList))
             formData.append('invoice_id', this.invoice_id);
             formData.append('selling_area_id', this.area_id);

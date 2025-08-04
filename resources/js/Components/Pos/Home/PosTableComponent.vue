@@ -504,6 +504,9 @@
                                             Tax
                                         </label>
                                     </div>
+                                    <input type="number" v-show="printInvoiceData.isTax" placeholder="Discount" v-model="selectedTaxPercent"
+                                    @change="btnClickedTax()"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0 mt-2">
                                 </div>
                                 <div class="mb-4">
                                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
@@ -1352,6 +1355,7 @@
                 selectedTableRemark: null,
 
                 newRemarkText: null,
+                selectedTaxPercent: 5
             };
         },
 
@@ -1737,7 +1741,9 @@
             },
             btnClickedTax(){
                 if (this.isTax = true) {
-                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
+                    // this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
+                    let tax = this.selectedTaxPercent * 0.01
+                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * tax
                 }
             },
 
