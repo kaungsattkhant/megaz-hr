@@ -29,6 +29,11 @@ class FeatureAPIController extends Controller
         ResponseData($features);
     }
 
+    public function getFeatureByModule(){
+        $features = $this->featureRepo->getFeatureByModule();
+        ResponseData($features);
+    }
+
     public function featureImport(Request $request)
     {
         $file = $request->file('feature_import');
