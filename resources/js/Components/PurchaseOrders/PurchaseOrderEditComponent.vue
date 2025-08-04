@@ -207,7 +207,7 @@
                                     {{ purchaseOrderItem.uom_name }}
                                 </td> -->
                                 <td class="">
-                                    {{ purchaseOrderItem.unit_price.toLocaleString() }}
+                                    {{ purchaseOrderItem.unit_price.toLocaleString() }} ({{ purchaseOrderItem.base_uom_name }})
                                 </td>
                                 <td class="">
                                     <!-- {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }} -->
@@ -611,7 +611,8 @@
                         brand_name: this.selectedBrand.name,
                         quantity: quantity,
                         amount: price,
-                        unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                        // unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                        unit_price: this.unitPrice,
                         uom_id: this.selectedUom.id,
                         uom_quantity: this.quantity,
                         uom_name: this.selectedUom.name,

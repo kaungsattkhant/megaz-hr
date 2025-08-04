@@ -220,7 +220,7 @@
                                     {{ purchaseOrderItem.uom_name }}
                                 </td> -->
                                 <td class="">
-                                    {{ purchaseOrderItem.unit_price.toLocaleString() }}
+                                    {{ purchaseOrderItem.unit_price.toLocaleString() }} ({{ purchaseOrderItem.base_uom_name }})
                                 </td>
                                 <td class="">
                                     <!-- {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }} -->
@@ -471,6 +471,7 @@ import { find } from "lodash";
                 let response = await postApiData({ url: '/api/purchase_orders_items/check_limitation', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     isLimitExceed = 0;
+                    
                     // document.getElementById('close_create_modal').click();
                     // this.limitWarning = null;
                 }
@@ -502,7 +503,8 @@ import { find } from "lodash";
                             quantity: quantity,
                             // amount: this.selectedItem.average_price,
                             amount:price,
-                            unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                            // unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                            unit_price:this.unitPrice,
                             uom_id: this.selectedUom.id,
                             uom_quantity: this.quantity,
                             uom_name: this.selectedUom.name,
@@ -513,7 +515,6 @@ import { find } from "lodash";
                             name: this.selectedItem.name,
                             remark: this.remark,
                             is_exceed_max_limitation: isLimitExceed
-                            // unit_price:this.unitPrice,
                             // total_unit_price:this.unitPrice*quantity
                         });
                     }

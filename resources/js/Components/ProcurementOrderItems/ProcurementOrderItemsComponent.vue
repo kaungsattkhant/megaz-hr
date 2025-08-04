@@ -190,7 +190,7 @@
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-auto outline-none"
         id="check_modal" tabindex="-1" aria-labelledby="check_modalLabel" aria-hidden="true">
         <div data-te-modal-dialog-ref
-            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[700px]">
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
@@ -275,25 +275,26 @@
                     </div>
 
                     <div class="mb-4 text-xs">
-                        <table class="min-w-full divide-y divide-gray-200">
+                        <table class="min-w-full divide-y divide-gray-200 text-center">
                             <thead class="bg-gray-100">
-                                <tr>
-                                    <th> Supplier Name </th>
-                                    <th> Brand </th>
-                                    <th> Price </th>
-                                    <th> UOM </th>
-                                    <th> Average Lead Time </th>
-                                    <th> Average Quality </th>
-                                    <th> Payment Date </th>
+                                <tr >
+                                    <th class="py-2"> Supplier Name </th>
+                                    <th class="py-2"> Brand </th>
+                                    <th class="py-2"> Price </th>
+                                    <th class="py-2"> UOM </th>
+                                    <th class="py-2"> Average Lead Time </th>
+                                    <th class="py-2"> Average Quality </th>
+                                    <th class="py-2"> Payment Date </th>
                                     <th> &nbsp; </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="(supplier,index) in itemSuppliers" :key="index">
+                                <tr v-for="(supplier,index) in itemSuppliers" :key="index" class="py-2">
                                     <td class="px-6 py-4 text-sm text-gray-900">{{ supplier.supplier.name }}</td>
                                     <td> {{ supplier.brand.name }} </td>
                                     <td> {{ supplier.item_price.price.toLocaleString() }} </td>
-                                    <td> {{ baseUomQty }} {{ baseUomName }} {{ uomQty }} {{ uomName }} </td>
+                                    <!-- <td> {{ baseUomQty }} {{ baseUomName }} {{ uomQty }} {{ uomName }} </td> -->
+                                    <td> {{ baseUomName }}  </td>
                                     <td> {{ (supplier.lead_time)? supplier.lead_time: 'Unknown' }} </td>
                                     <td> {{ (supplier.average_quality)? supplier.average_quality: 0 }} % </td>
                                     <td> {{ supplier.payment_date[0] }} </td>
@@ -531,7 +532,8 @@ export default {
                             itemSupplier.payment_date = itemSupplier.supplier.exact_date;
                         }
                         if(itemSupplier.supplier.credit_term_type == 'day'){
-                            itemSupplier.payment_date[0] = `${itemSupplier.supplier.day} days`;
+                            // itemSupplier.payment_date[0] = `${itemSupplier.supplier.day} days`;
+                            itemSupplier.payment_date[0] = this.formatDate(itemSupplier.supplier.day);
                         }
                         console.log(itemSupplier.payment_date);
                     });
@@ -676,6 +678,25 @@ export default {
                 type: 'warn'
             });
         },
+        formatDate(daysToAdd){
+            const today = new Date();
+            console.log('today' + today)
+            let formattedDate = null;
+            console.log('daysToAdd ' + daysToAdd)
+            const future = new Date(today);
+
+            console.log('future1' + future)
+            // future.setDate(future.getDate() + daysToAdd);
+            future.setUTCDate(today.getUTCDate() + daysToAdd);
+
+            console.log('future2' + future)
+
+            formattedDate = future.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+            });
+            return formattedDate
+        }
 
     },
     mounted() {
