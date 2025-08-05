@@ -268,15 +268,7 @@
                         </p>
                     </li>
                     @endif
-                    @if (checkFeaturePermission('ar'))
-                    <li>
-                        <a href="{{ route('account_receivable') }}"
-                            class="flex items-center @yield('ar') sidebar-gap-x">
-                            <i class="fas fa-coins"></i>
-                            AR
-                        </a>
-                    </li>
-                    @endif
+                   
 
                     @if (checkFeaturePermission('skill'))
                     <li>
@@ -746,7 +738,7 @@
 
 
                     @if (checkFeaturePermission('asset-item') || checkFeaturePermission('asset')
-                        || checkFeaturePermission('fixed-asset') || checkFeaturePermission('account-payable'))
+                        || checkFeaturePermission('fixed-asset') || checkFeaturePermission('ap-balance')|| checkFeaturePermission('ar'))
                     <li>
                         <p class="sidebar-title">
                             ASSET
@@ -777,20 +769,30 @@
                         </a>
                     </li>
                     @endif
-                    @if (checkFeaturePermission('account-payable'))
+                    @if (checkFeaturePermission('ap-balance'))
                     <li>
                         <a href="{{ route('AP.index') }}" class="flex items-center @yield('account_payables') sidebar-gap-x">
                             <i class="fal fa-envelope-open-dollar"></i>
                             AP
                         </a>
                     </li>
+                    @endif
                     {{-- <li>
                             <a href="{{ route('AP.history') }}" class="flex items-center @yield('ap_history')">
                     <i class="fal fa-truck-loading  pr-3"></i>
                     AP Transactions
                     </a>
                     </li> --}}
+                    @if (checkFeaturePermission('ar'))
+                    <li>
+                        <a href="{{ route('account_receivable') }}"
+                            class="flex items-center @yield('ar') sidebar-gap-x">
+                            <i class="fas fa-coins"></i>
+                            AR
+                        </a>
+                    </li>
                     @endif
+                    
 
                     @if (checkFeaturePermission('inventory-stock') || checkFeaturePermission('inventory-transfer-history')
                         || checkFeaturePermission('inventory-transfer-receive') || checkFeaturePermission('inventory-transfer'))
