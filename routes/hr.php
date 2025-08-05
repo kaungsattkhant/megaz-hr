@@ -10,6 +10,7 @@ use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
 use App\Http\Controllers\API\StaffTimeShiftController;
+use App\Http\Controllers\API\AssetItemEquipmentAssignController;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -122,6 +123,12 @@ Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
     Route::post('/staff_time_shifts', 'createStaffTimeShift');
     Route::get('/staff_time_shifts', 'getStaffTimeShifts');
+  });
+  Route::prefix('hr')->controller(AssetItemEquipmentAssignController::class)->group(function () {
+    Route::post('/asset-assignments', 'createAssetAssign');
+    Route::get('/asset-assignments', 'getAssetAssigns');
+    Route::post('/equipment-assignments', 'createEquipmentAssign');
+    Route::get('/equipment-assignments', 'getEquipmentAssigns');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

@@ -187,11 +187,13 @@ use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
-
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
+
+use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
+use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -290,5 +292,6 @@ class RepositoryServiceProvider extends ServiceProvider
 
         $this->app->bind(SellingExtraRepositoryInterface::class, SellingExtraRepository::class);
         $this->app->bind(StaffTimeShiftRepositoryInterface::class, StaffTimeShiftRepository::class);
+        $this->app->bind(AssetItemEquipmentAssignRepositoryInterface::class, AssetItemEquipmentAssignRepository::class);
     }
 }
