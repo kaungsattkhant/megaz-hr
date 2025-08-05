@@ -481,6 +481,8 @@ Route::controller(FeatureAPIController::class)->group(function () {
     Route::get('/features', 'getFeatureData');
     Route::post('/feature_import', 'featureImport');
     Route::get('feature_by_department/{department_id}','getFeatureByDepartment');
+    Route::get('feature_by_module','getFeatureByModule');
+
 });
 Route::controller(AdsAPIController::class)->group(function () {
     Route::get('/ads', 'getAds');

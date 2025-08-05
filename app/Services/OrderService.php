@@ -267,7 +267,7 @@ class OrderService
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
                 $menuData['invoice_id'] = $invoiceId;
-                if (!isset($menuData['cooking_area_id'])) {
+                if (!isset($menuData['cooking_area_id'])) {                                                                                                                                                                             
                     ResponseMessage('Cooking Area  is required', 419);
                 } elseif (isset($menuData['cooking_area_id']) && ($menuData['cooking_area_id'] == null || $menuData['cooking_area_id'] == "null")) {
 
