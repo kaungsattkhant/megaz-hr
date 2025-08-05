@@ -63,6 +63,7 @@
                                     </td> -->
                                     <td>
                                         <div class="relative inline-block">
+                                            
                                             <span class=""
                                                 v-for="(item, itemIndex) in getVisibleItems(department.features, index)"
                                                 :key="itemIndex">
@@ -76,12 +77,12 @@
                                         </div>
                                         <button
                                             v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)"
-                                            @click="expandRow(index)" class="see-more-button pt-2">
+                                            @click="expandRow(index)" class="see-more-button pt-2 font-semibold text-gray-700">
                                             ... See More
                                         </button>
                                         <!-- "See Less" button for expanded rows -->
                                         <button v-if="expandedRows.includes(index)" @click="collapseRow(index)"
-                                            class="see-less-button pt-2">
+                                            class="see-less-button pt-2 font-semibold pl-2 text-gray-700">
                                             See Less
                                         </button>
                                     </td>
