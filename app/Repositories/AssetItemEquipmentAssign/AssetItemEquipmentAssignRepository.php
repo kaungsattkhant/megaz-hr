@@ -18,7 +18,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
     return (isset(request()->per_page) || isset(request()->page))
       ? $assetAssigns->paginate(config('common.list_count'))
       : $assetAssigns->get();
-    return $assetAssigns;
+    // return $assetAssigns;
   }
 
   public function createAssetAssign(array $data)

@@ -12,8 +12,13 @@ class HandBook extends Model
     protected $fillable = [
         'title',
         'description',
-        'file_path',
-        'created_by',
-        'updated_by',
+        'detail',
+        'image_url',
+        'image_path',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
     ];
 }
