@@ -63,7 +63,6 @@
                                     </td> -->
                                     <td>
                                         <div class="relative inline-block">
-                                            
                                             <span class=""
                                                 v-for="(item, itemIndex) in getVisibleItems(department.features, index)"
                                                 :key="itemIndex">
