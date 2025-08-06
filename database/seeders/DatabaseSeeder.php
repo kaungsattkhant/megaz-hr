@@ -15,6 +15,7 @@ use Database\Seeders\InventorySeeder;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\NrcTownshipSeeder;
 use Database\Seeders\ComplaintCategorySeeder;
+use Database\Seeders\ExtraTagSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -57,6 +58,7 @@ class DatabaseSeeder extends Seeder
             GpsSeeder::class,
             DepartmentFeatureSeeder::class,
             NrcTownshipSeeder::class,
+            ExtraTagSeeder::class
         ]);
     }
 }

@@ -42,7 +42,7 @@
                                         {{ invoice.invoice_date }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.customer.name }}
+                                        {{ invoice.customer ? invoice.customer.name : 'Default' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span v-if="invoice.entity">{{ invoice.entity.name }}</span>
@@ -57,7 +57,7 @@
                                         Service?
                                     </td> -->
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.total }}
+                                        {{ invoice.sub_total }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span :class="invoice.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800 '" class="px-2 py-1 rounded capitalize font-semibold text-sm">
@@ -124,7 +124,7 @@
                                         Customer Name
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.customer.name }}
+                                        {{ invoiceDetail.customer  ? invoiceDetail.customer.name : "Default" }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -338,7 +338,7 @@
             confirmBtnClicked(invoice){
                 this.selectedInvoice = invoice;
                 this.selectedPayment = null;
-                this.paidAmount = 0;
+                this.paidAmount = invoice.total;
             },
             async confirmInvoice(){
                 console.log('test confirm invoice')

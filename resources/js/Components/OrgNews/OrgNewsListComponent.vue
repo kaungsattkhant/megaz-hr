@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Org News
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Org News
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/org_news/create" class="add-btn " v-if="feature.includes('org-new.create')">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/org_news/create" class="add-btn " v-if="feature.includes('org-new.create')">
+                        Add New
+                    </a>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">

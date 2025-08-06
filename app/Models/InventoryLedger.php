@@ -11,7 +11,7 @@ use App\Models\InventoryLedgerItem;
 class InventoryLedger extends BaseModel
 {
     use HasFactory;
-    protected $fillable = ['inventory_id', 'date', 'ledgerable_id', 'ledgerable_type','action'];
+    protected $fillable = ['inventory_id', 'date', 'ledgerable_id', 'ledgerable_type','action','batch_no'];
 
     public function inventory()
     {

@@ -67,7 +67,7 @@
                                         
                                     </td>
                                 </tr>
-                                <tr class="">
+                                <!-- <tr class="">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
                                         one
                                     </td>
@@ -97,7 +97,7 @@
                                             <i class="fal fa-times text-sm"></i>
                                         </button>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </tbody>
                         </table>
                     </div>

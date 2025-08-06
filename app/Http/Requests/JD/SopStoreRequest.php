@@ -4,6 +4,7 @@ namespace App\Http\Requests\JD;
 
 use Illuminate\Contracts\Validation\Validator;
 use App\Http\Requests\APIRequest;
+
 class SopStoreRequest extends APIRequest
 {
     /**
@@ -22,13 +23,13 @@ class SopStoreRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'id'                 => 'nullable|integer|exists:sops,id',
-            'sop'                => 'required|string',
-            'role_id'            => 'required|integer|exists:roles,id',
-            'job_description_id' => 'required|integer|exists:job_descriptions,id',
+            // 'id'                 => 'nullable|integer|exists:sops,id',
+            // 'sop'                => 'required|string',
+            // 'role_id'            => 'required|integer|exists:roles,id',
+            // 'jd_sop_id'          => 'required|integer|exists:jd_sops,id',
         ];
     }
-    
+
     public function failedValidation(Validator $validator)
     {
         parent::failedValidation($validator);

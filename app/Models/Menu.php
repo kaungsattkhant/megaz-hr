@@ -38,7 +38,7 @@ class Menu extends BaseModel
 
     public function price()
     {
-        return $this->hasOne(MenuPrice::class)->orderBy('id', 'desc');
+        return $this->hasOne(MenuPrice::class)->latestOfMany();
     }
 
     public function items()

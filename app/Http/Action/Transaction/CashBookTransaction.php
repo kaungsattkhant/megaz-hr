@@ -17,7 +17,7 @@ class CashBookTransaction
     public function getOpeningBalanceOriginal($data)
     {
         $cashAccountId = $data->cash_account_id;
-        $latestClosedTransaction = $this->getLatestClosedTransaction($data, $cashAccountId);
+        $latestClosedTransaction = $this->getLatestClosedTransaction($data, $cashAccountId,'is_closing');
         if ($latestClosedTransaction) {
             $balance = DB::table('ledgers')
                 ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
@@ -81,7 +81,7 @@ class CashBookTransaction
         return $closingBalance;
     }
 
-    public function getLatestClosedTransaction($data, $cashAccountId)
+    public function getLatestClosedTransaction($data, $cashAccountId,$is_closing_column)
     {
         $fromDate = convertDateFormat($data->from_date);
         return Transaction::with(['ledgers.account'])
@@ -89,7 +89,8 @@ class CashBookTransaction
             ->select(['id', 'date', 'description'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
-            })->where('is_closing', 1)
+            })
+            ->where($is_closing_column, 1)
             ->orderByDesc('date')
             ->isConfirmed(1)
             ->when(($data->from_date), function ($q) use ($fromDate) {

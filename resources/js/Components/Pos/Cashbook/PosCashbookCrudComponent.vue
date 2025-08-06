@@ -4,18 +4,25 @@
             <div class="w-full pt-9 px-6">
                 <div class="flex justify-between mb-4">
                     <div class="flex gap-x-3">
-                        <button class="pos-add-btn">
-                            Date
-                        </button>
-                        <select name="" id="" v-model="bookType" @change="cashOrBank"
-                            class="text-sm border border-gray-300 input-ui w-full bg-white rounded-lg focus:ring-0">
-                            <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
-                        </select>
+                        <div class=" flex gap-x-4">
+                            <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate" @change="dateChanged()">
+                            <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate" @change="dateChanged()">
+                            <!-- <button class="add-btn " @click="searchBtnClicked">Search</button>
+                            <button class="add-btn " @click="clearSearchBtnClicked">Clear</button> -->
+                        </div>
+                        
                     </div>
                     <div class="flex gap-x-3">
                         <!-- <button class="pos-add-btn !bg-[#F15181]">
                             Close
                         </button> -->
+                        <select name="" id="" v-model="bookType" @change="cashOrBank" placeholder="Select Account"
+                            class="text-sm border border-gray-300 input-ui w-full !bg-white rounded-lg focus:ring-0">
+                            <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
+                        </select>
+                        <button class="pos-add-btn !bg-[#F15181]" @click="closeCashBook()">
+                            Close
+                        </button>
                         <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
 
                             Add
@@ -53,12 +60,13 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <div v-if="cashbook.transactionable">
+                                        {{ cashbook.title }}
+                                        <!-- <div v-if="cashbook.transactionable">
                                             {{ cashbook.transactionable.invoice_id }}
                                         </div>
                                         <div v-else>
                                             {{ cashbook.title }}
-                                        </div>
+                                        </div> -->
 
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
@@ -220,6 +228,9 @@
                 remainingBalance: 0,
                 currentBalance: 0,
 
+                fromDate: null,
+                toDate: null,
+                url_date: '',
             };
         },
 
@@ -252,7 +263,7 @@
                 // });
                 // url = url.substring(0, url.length - 1);
 
-                let url = '/api/cash_books?cash_account_id[]=' + this.cashAccId
+                let url = '/api/cash_books?cash_account_id[]=' + this.cashAccId + '&is_pos=1' + this.url_date
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
 
@@ -277,6 +288,17 @@
 
                     });
                 }
+            },
+            dateChanged(){
+                if(this.fromDate && this.toDate){
+                    this.openingBalance = 0;
+                    this.remainingBalance = 0;
+                    this.currentBalance = 0;
+                    this.cashbookList = [];
+                    this.url_date = '&from_date=' + this.fromDate + '&to_date=' + this.toDate;
+                    this.getCashbookList();
+                }
+                
             },
             async cashOrBank(){
                 let url = `/api/cash_books?cash_account_id[]=` + this.bookType.id;
@@ -339,6 +361,30 @@
                     window.location.reload();
                 }
             },
+            async closeCashBook() {
+                if(!this.bookType){
+                    this.alertValidationMessage(`Cash accout is required!`);
+                    return 1;
+                }
+                let formData = new FormData();
+                formData.append('cash_account_id', this.bookType.id);
+                formData.append('is_pos', 1);
+
+                let url = `/api/close_cashbook_transaction`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    window.location.reload();
+                }
+            },
+            alertValidationMessage(field) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: "warn"
+                });
+            },
+            
+
 
                 // for close transaction
             // let url = '/api/close_cashbook_transaction?cash_account_id=298';

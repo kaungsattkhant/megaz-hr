@@ -14,7 +14,7 @@ class Order extends Model
         'order_id','total_quantity','date','total', 'foc_total',
         'order_sub_total',
         'total_discount_price',
-        'invoice_id','is_complete'
+        'invoice_id','is_complete','total_extra_price',
     ];
 
     public function invoice()

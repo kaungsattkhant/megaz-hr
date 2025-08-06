@@ -325,7 +325,7 @@ class LeaveRepository implements LeaveRepositoryInterface
     );
     $leaveAllowances = $allAllowances->groupBy('leave_category_id')->map(function ($group) {
       return $group->sortByDesc('day')->first();
-    });    
+    });
     $confirmedLeaveRecords = Leave::where('staff_id', $staffId)
       ->where('status', '!=', 'cancelled')
       ->whereNotNull('confirmed_at')
@@ -533,6 +533,7 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->where('department_id', $departmentId)
       ->with(['department', 'roles'])
       ->orderByDesc('id')
+      ->where('is_cv', 0)
       ->paginate(config('common.list_count'));
     ResponseData($staffs);
   }

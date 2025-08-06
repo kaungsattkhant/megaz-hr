@@ -17,9 +17,21 @@ class ObjectiveResource extends JsonResource
         return [
             'id' => $this->id,
             'objective_name' => $this->objective_name,
-            // 'is_active' => $this->is_active,
-            // 'created_at' => $this->created_at,
-            // 'updated_at' => $this->updated_at,
+            'role_id' => $this->role_id,
+            'role_name' => $this->role->name ?? null,
+            'is_active' => $this->is_active,
+            'okr_point' => $this->okr_point,
+            'type' => $this->type,
+            'repetition' => $this->repetition,
+            'sop_id' => $this->sop_id,
+            'sop_name' => $this->sop->sop ?? null,
+            'objective_keys' => $this->objectiveKeys ? $this->objectiveKeys->map(function($key) {
+        return [
+            'id' => $key->id,
+            'objective_id' => $key->objective_id,
+            'name' => $key->name,
+        ];
+    }) : [],
         ];
     }
 }

@@ -65,7 +65,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $invoiceQuery = Invoice::with(['customer', 'entity'])
             ->whereIn('payment_status', ['checkout', 'paid'])
             ->when($date, function ($q) use ($date) {
-                $q->where('created_at', $date);
+                $q->whereDate('created_at', $date);
             })
             ->orderBy('created_at', 'desc');
         if (isset($request->page)) {
@@ -925,7 +925,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if ($invoice->order) {
             $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
         }
-        $customerTotal = $this->getCustomerTotal($invoice->customer_id);
+        $customerTotal =$invoice->customer_id ? $this->getCustomerTotal($invoice->customer_id) :0;
         $total = 0;
         $totalDiscount = 0;
         $invoiceServiceCollection = collect();
@@ -982,7 +982,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $paidAmount = $request->paid_amount;
         $entity = $invoice->entity;
         $authUser = UserData();
-        $depositBalance = $this->getCustomerDepositBalance($customer->id);
+        $depositBalance = $customer ? $this->getCustomerDepositBalance($customer->id) : 0;
         try {
             DB::beginTransaction();
             if ($depositBalance < 1 && $request->paid_amount < 1) {
@@ -1034,11 +1034,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'action' => 'debit',
                     'is_cashier_confirmed' => 0
                 ]);
-            }
+            }   
             $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
-            if ($paidAmount > $invoiceCost) {
-                ResponseMessage('Paid amount is invalid', 419);
+            if ($depositBalance>1 && (int)$paidAmount > $invoiceCost) {
+                ResponseMessage('Deposit balance is enough.Customer Deposit Balance is '.$depositBalance.'.Paid Amount does not require.Invoice cost is '.$invoiceCost, 419);
             }
+            if($depositBalance>1 && $invoiceCost>$paidAmount){
+                ResponseMessage('Paid amount is required '. $invoiceCost,419);
+            }   
+            if($depositBalance < 1 && $invoiceCost>$paidAmount){
+                ResponseMessage('Paid amount is invalid!',419);
+            }   
             $arAmount = $invoiceCost - $paidAmount;
             if ($arAmount > 0) {
                 // dd('Have ar amount '.$arAmount);
@@ -1083,12 +1089,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     'transactionable_type' => 'invoice',
             //     'is_confirmed' => 1,
             // ]);
-
-            $ledgerTransactionWriter->storeLedger([
-                'value' => $request->paid_amount,
-                'action' => 'debit',
-                'account_id' => $cashAccount->id
-            ], $transaction->id);
+            if($paidAmount>0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $request->paid_amount,
+                    'action' => 'debit',
+                    'account_id' => $cashAccount->id
+                ], $transaction->id);
+            }
+           
             if ($invoice->total_session_price > 0) {
                 $ledgerTransactionWriter->storeLedger([
                     'value' => $invoice->total_session_price,

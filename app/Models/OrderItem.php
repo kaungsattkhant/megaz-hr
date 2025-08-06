@@ -26,7 +26,7 @@ class OrderItem extends Model
         'is_complete',
         'menu_service_discount_id',
         'price',
-        'remark',
+        'remark_id',
         'area_id',
         'progressed_at',
         'progressed_by',
@@ -54,9 +54,17 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+    public function remark()
+    {
+        return $this->belongsTo(Remark::class);
+    }
 
     public function menu()
     {
         return $this->belongsTo(Menu::class);
+    }
+
+    public function extras(){
+        return $this->hasMany(OrderItemExtra::class);
     }
 }

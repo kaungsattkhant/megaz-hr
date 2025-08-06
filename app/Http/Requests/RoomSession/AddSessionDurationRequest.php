@@ -24,7 +24,10 @@ class AddSessionDurationRequest extends FormRequest
         return [
             //
             'invoice_id' => 'required',
-            'session_duration' => 'required'
+            'session_duration' => 'required',
+            // 'session_duration_time'=>'requried',
+            // 'session_duration_minute'=>'requried',
+
         ];
     }
 }

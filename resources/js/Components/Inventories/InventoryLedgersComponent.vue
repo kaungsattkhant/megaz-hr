@@ -1,38 +1,40 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Inventory Stocks
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        
-        <div class="btn-container pt-10">
-           
-            <div class=" flex pr-0 gap-x-4">
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded">
-                </div>
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
-                    <input type="date" v-model="toDate" class="search-input rounded">
-                </div>
-                <div class="ml-2 px-2">
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
-                </div>
-
-            </div>
-            <div>
-
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
-                        data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
-                        <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
-                            :key="inventoryIndex"> {{ inventory.name }} </option>
-                    </select>
-                </div>
     
+    <div class="mt-4 bg-white">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Inventory Stocks
+                </p>
+            </div>
+            <div class="btn-container pt-10">
+            
+                <div class=" flex pr-0 gap-x-4">
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
+                        <input type="date" v-model="fromDate" class="search-input rounded">
+                    </div>
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
+                        <input type="date" v-model="toDate" class="search-input rounded">
+                    </div>
+                    <div class="ml-2 px-2">
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                    </div>
+
+                </div>
+                <div>
+
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
+                            data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
+                            <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
+                                :key="inventoryIndex"> {{ inventory.name }} </option>
+                        </select>
+                    </div>
+        
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -48,6 +50,9 @@
                                 </th>
                                 <th scope="col">
                                     Item
+                                </th>
+                                <th scope="col">
+                                    Batch No
                                 </th>
                                 <th scope="col">
                                     Opening
@@ -73,26 +78,37 @@
                             </tr>
                         </thead>
                         <tbody>
-
+                            <!-- <tr>
+                                {{ balanceFormat(2010, 1000, 'kg', 'g') }}
+                            </tr> -->
                             <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
                                 <tr>
                                     <td>
                                         {{ ++index }}
                                     </td>
-                                    <td>
+                                    <td @click="isShowToggle(ledger)">
                                         {{ ledger.name }}
                                     </td>
                                     <td>
-                                        {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }}
+                                        {{ ledger.batch_nos }}
                                     </td>
                                     <td>
-                                        {{ ledger.in_balance }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }} -->
+                                        {{ balanceFormat(ledger.opening_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
-                                        {{ (ledger.out_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ ledger.in_balance }} {{ ledger.conversion_uom_name }} -->
+
+                                        {{ balanceFormat(ledger.in_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
-                                        {{ (ledger.closing_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
+                                        <!-- {{ (ledger.out_balance).toLocaleString() }} {{ ledger.conversion_uom_name }} -->
+                                        {{ balanceFormat(ledger.out_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        <!-- {{ (ledger.closing_balance).toLocaleString() }} {{ ledger.conversion_uom_name }} -->
+
+                                        {{ balanceFormat(ledger.closing_balance, ledger.conversion, ledger.base_uom_name, ledger.conversion_uom_name) }}
                                     </td>
                                     <td>
                                         {{ ledger.base_balance }} {{ ledger.conversion_balance }}
@@ -101,7 +117,7 @@
                                         {{ (ledger.total_value).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
+                                        <!-- <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
                                             data-te-toggle="modal" data-te-target="#transfer_modal">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
@@ -112,13 +128,52 @@
                                         <button class="pl-2" @click="btnClickedAddMinimum(ledger,index-1)"
                                         data-te-toggle="modal" data-te-target="#add_minimum_modal">
                                             <i class="fas fa-plus"></i>
+                                        </button> -->
+                                    </td>
+                                </tr>
+                                <tr v-if="ledger.isShow" v-for="(batch,batchIndex) in ledger.ledgers" :key="batchIndex">
+                                    <td colspan="2">
+                                    </td>
+                                    <td>
+                                        {{ batch.batch_no }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.opening_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.in_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.out_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        {{ balanceFormat(batch.closing_balance, batch.conversion, batch.base_uom_name, batch.conversion_uom_name) }}
+                                    </td>
+                                    <td>
+                                        <!-- {{ ledger.base_balance }} {{ ledger.conversion_balance }} -->
+                                    </td>
+                                    <td>
+                                        {{ (batch.total_value).toLocaleString() }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(batch, index-1, batchIndex)"
+                                            data-te-toggle="modal" data-te-target="#transfer_modal">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </button>
+                                        <button class="pl-2" @click="addDefectBtnClicked(batch.item_id, index-1, batchIndex)"
+                                        data-te-toggle="modal" data-te-target="#add_defect_modal">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                        <button class="pl-2" @click="btnClickedAddMinimum(batch,index-1, batchIndex)"
+                                        data-te-toggle="modal" data-te-target="#add_minimum_modal">
+                                            <i class="fas fa-plus"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
 
                             <!-- <div class="contents" > -->
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                <!-- <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                     <td colspan="7" class=" px-6 py-4 font-medium ">
                                         &nbsp;
                                     </td>
@@ -128,7 +183,7 @@
                                     <td class=" px-6 py-4 font-medium ">
                                         &nbsp;
                                     </td>
-                                </tr>
+                                </tr> -->
                             <!-- </div> -->
 
                             <!-- looping end -->
@@ -223,7 +278,7 @@
             </div>
         </div>
     </div>
-    <!--Check Modal -->
+    <!--used/defect Modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
         id="add_defect_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -258,8 +313,11 @@
                         <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                             <select data-te-select-init data-te-select-placeholder="Select Type"
                             data-te-select-filter="true" v-model="type">
-                                <option value="defect"> Defect </option>
-                                <option value="used"> Used </option>
+                                <option :value="type" v-for="(type,index) in typeList">
+                                    {{ type.name }}
+                                </option>
+                                <!-- <option value="defect" key="defect"> Defect </option>
+                                <option value="used" key="used"> Used </option> -->
                             </select>
                         </div>
                     </div>
@@ -442,6 +500,7 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import 'tw-elements';
 
 export default {
     data() {
@@ -492,6 +551,10 @@ export default {
             url_inventory:'',
             url_date:'',
             
+            typeList: [
+                { name: 'Defect', value: 'defect'},
+                { name: 'Used', value: 'used'}
+            ]
         };
     },
     // props: ['inventory_id'],
@@ -533,7 +596,16 @@ export default {
 
                     this.totalValuation += ledger.total_value;
                 });
+
+                this.inventoryLegderList = this.inventoryLegderList.map(item => ({
+                    ...item,
+                    isShow: false
+                }));
             }
+        },
+        isShowToggle(item) {
+            // this.inventoryLegderList[index].isShow = !this.inventoryLegderList[index].isShow;
+            item.isShow = !item.isShow;
         },
         async getInventoryList() {
             const response = await getApiData({ url: '/api/inventories', token: this.getToken() });
@@ -541,8 +613,6 @@ export default {
                 this.inventoryList = response.data;
             }
         },
-
-
         async getUomList() {
             let url = `/api/uoms`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -550,8 +620,9 @@ export default {
                 this.uomList = response.data;
             }
         },
-
         btnClickedAddMinimum(ledger, index){
+            this.base_min_amount = 0;
+            this.min_amount = 0;
             this.minimumLedger = ledger;
         },
         async addMinimumAmount(){
@@ -588,6 +659,22 @@ export default {
             }
         },
         addDefectBtnClicked(id, ledgerIndex){
+            this.type = null;
+            this.selectedUom = null;
+            this.defectQuantity = null;
+            this.defectRemark = null;
+            this.$nextTick(() => {
+                // now modal content is in DOM
+                const el = this.$el.querySelector('[data-te-select-init]');
+                if (el) {
+                    const selectInstance = window.te?.Select?.getInstance(el);
+                    if (selectInstance) {
+                        selectInstance.setValue('');
+                    }
+                }
+            });
+
+
             this.defectItemId = id;
             this.defectItem = this.inventoryLegderList[ledgerIndex];
 
@@ -603,7 +690,6 @@ export default {
                 this.itemUoms.push(itemUom);
             }
         },
-
         async confirmAddDefectBtnClicked(){
             if(!this.type){
                 this.alertValidationMessage(`defect type`);
@@ -622,7 +708,7 @@ export default {
             // formData.append('inventory_id', this.inventory_id);/
             formData.append('quantity', this.defectQuantity);
             formData.append('uom_id', this.selectedUom.id);
-            formData.append('type', this.type);
+            formData.append('type', this.type.value);
             formData.append('base_uom_id', this.defectItem.base_unit_id);
             if(this.defectRemark){
                 formData.append('remark', this.defectRemark);
@@ -650,11 +736,14 @@ export default {
             this.type = null;
             this.defectItem = null;
         },
-
-        async transferBtnClicked(ledger, ledgerIndex) {
+        async transferBtnClicked(ledger, ledgerIndex, batchIndex) {
+            this.selectedSourceInventory = null;
+            this.selectedDestinationInventory = null;
+            this.quantity = null;
+            this.selectedUom = null;
             this.ledger = ledger
             this.itemId = ledger.item_id;
-            this.transferItem = this.inventoryLegderList[ledgerIndex];
+            this.transferItem = this.inventoryLegderList[ledgerIndex].ledgers[batchIndex];
             let url = `/api/inventory_list`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -674,7 +763,6 @@ export default {
                 this.itemUoms.push(itemUom);
             }
         },
-
         confirmTransferBtnClicked() {
             if (!this.selectedSourceInventory) {
                 this.alertValidationMessage(`source inventory`);
@@ -694,9 +782,9 @@ export default {
             }
             this.transferInventory();
         },
-
         async transferInventory() {
             let formData = new FormData();
+            formData.append('batch_no', this.ledger.batch_no);
             formData.append('source_inventory_id', this.selectedSourceInventory);
             formData.append('destination_inventory_id', this.selectedDestinationInventory);
             formData.append('quantity', this.quantity);
@@ -709,7 +797,7 @@ export default {
             }
             formData.append('uom_id', this.selectedUom.id);
             formData.append('base_uom_id', this.transferItem.base_unit_id);
-            formData.append('conversion_uom_id', this.transferItem.conversion_unit_id);
+            formData.append('conversion_uom_id', this.ledger.conversion_unit_id);
             formData.append('uom_conversion', this.transferItem.conversion);
 
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
@@ -733,14 +821,15 @@ export default {
 
             
         },
-
-
         async getSearchInventoryList(){
             const response = await getApiData({ url: '/api/get_inventory', token: this.getToken() });
             if (response.data) {
                 this.searchInventoryList = response.data;
                 this.searchInventory = response.data[0]
-                this.url_inventory = 'inventory_id=' + this.searchInventory.id
+                if(this.searchInventory){
+                    this.url_inventory = 'inventory_id=' + this.searchInventory.id
+                }
+                
                 this.getInventoryLegderList();
             }
         },
@@ -771,6 +860,24 @@ export default {
             this.selectedInventory = null,
                 this.quantity = null
         },
+
+
+
+
+        balanceFormat(amount, conversion, base_uom_name, uom_name) {
+            if (!conversion || isNaN(amount)) return '-';
+            // return Math.floor(amount / conversion) + ' ' + uom;
+            let balance = Math.floor(amount / conversion);
+            let base_balance = balance + '' + (balance > 0 ? base_uom_name : '');
+            let conversion_balance = '';
+            let conversionBalance = amount % conversion;
+            if(conversionBalance > 0){
+                conversion_balance = conversionBalance + '' + uom_name;
+            }
+
+            return conversion_balance ? base_balance + ' ' + conversion_balance : base_balance;
+            // return amount + ' ' + conversion + ' ' + base_uom_name + ' ' + uom_name
+        }
     },
 
     created() {

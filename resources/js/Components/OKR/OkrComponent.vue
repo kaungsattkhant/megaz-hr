@@ -1,46 +1,56 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Objective Key Results
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-
-            <!-- <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Objective Key Results
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <notifications position="top center" />
 
-                <a href="/OKR/create"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
-            </div> -->
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-            </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Date" v-model="selectedDate" @change="dateChange(1)"
-                    data-te-select-filter="true" class="input-ui w-full">
-                        <option value="">All</option>
-                        <option v-for="(date,index) in dateList" :key="index" :value="date"> {{ date }} </option>
-                    </select>
+                <!-- <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
                 </div>
-                <a href="/OKR/create" v-if="feature.includes('okr.create')"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-                </a>
+                <div class="flex justify-end flex-col">
+
+                    <a href="/OKR/create"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+                        Add New
+                    </a>
+                </div> -->
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in searchDepartmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                    <a href="/OKR/create" v-if="feature.includes('okr.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -103,13 +113,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getPrimaryList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getPrimaryList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -184,21 +194,27 @@ export default {
             roleList:[],
             dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
             
+            
+
+            searchInput:null,
+            searchDepartmentList:[],
+            searchRoleList:[],
+            selectedSearchDepartment: null,
+            selectedSearchRole: null,
+            
+
+            url:'/api/objectives',
+            url_search:'',
+            url_department:'',
+            url_role:'',
+
+            deleteId:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData: 0,
 
-            searchInput:null,
-            selectedDepartment:null,
-            selectedRole:null,
-            selectedDate:null,
-
-            url:'/api/objectives?page=',
-            url_search:'',
-            url_date:'',
-
-            deleteId:null,
 
             feature: this.getFeature(),
         };
@@ -206,10 +222,35 @@ export default {
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
-        
+        async getDepartmentList(){
+            let response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.searchDepartmentList = response.data;
+            }
+        },
+        searchDepartmentChange(){
+            // this.url_department = '?department_id='+this.searchDepartment.id;
+            this.searchRoleList = this.selectedSearchDepartment.roles;
+            this.selectedSearchRole = null;
+        },
+        searchRoleChange(){
+            this.url_role = '?roleId='+this.selectedSearchRole.id;
+            // this.selectedType = null;
+            // this.url_type = '';
+            this.searchInput = null;
+            this.url_search = '';
+            this.getPrimaryList();
+        },
 
-        async getOkrList(pageNumber) {
-            let url = this.url + pageNumber + this.url_search + this.url_date;
+        async getPrimaryList(pageNumber) {
+            let url = null;
+            if(pageNumber){
+                url = this.url + '?page=' + pageNumber;
+            }
+            else{
+                url = this.url + this.url_search + this.url_role;
+            }
+            
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -223,55 +264,49 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.okrList = response.data.data;
-                this.lastPage = response.data.last_page;
-                this.currentPage = pageNumber;
-                this.perPage = response.data.per_page;
-                
-                this.totalData = response.data.total;
+                if(response.data.data){
+                    this.okrList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    
+                    this.totalData = response.data.total;
+                }
+                else{
+                    this.okrList = response.data;
+                }
             }
         },
         
-        dateChange(){
-            this.url_search = '';
-            this.searchInput = null;
-            if(this.selectedDate == 'all'){
-                this.url_date = ''
-            }
-            else{
-                this.url_date = '&days=' + this.selectedDate;
-            }
-            this.getOkrList(1);
-        },
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
-            this.getOkrList(1);
+            this.getPrimaryList(1);
         },
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.url_search = '';
-            this.getOkrList(1);
+            this.getPrimaryList(1);
         },
 
-        async getDepartment(){
-            let response = await getApiData({url: `/api/departments`, token: this.getToken()});
-            if(response.data){
-                this.departmentList = response.data;
-            }
-        },
+        // async getDepartment(){
+        //     let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+        //     if(response.data){
+        //         this.departmentList = response.data;
+        //     }
+        // },
         // changeDepartment(){
         //     this.getRoleList();
-        //     this.getOkrList(1);
+        //     this.getPrimaryList(1);
         //     console.log('hello bro')
         // },
-        async getRoleList(){
-            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
-            if(response.data){
-                this.roleList = response.data;
-            }
-        },
+        // async getRoleList(){
+        //     let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
+        //     if(response.data){
+        //         this.roleList = response.data;
+        //     }
+        // },
         // selectedRoleChange(){
-        //     this.getOkrList(1);
+        //     this.getPrimaryList(1);
         // },
 
 
@@ -282,7 +317,7 @@ export default {
         async deleteOkr() {
             let response = await deleteApiData({ url: `/api/objectives/` + this.deleteId, token: this.getToken() });
             if (response.success) {
-                this.getOkrList(1);
+                this.getPrimaryList(1);
             }
             else {
                 this.$notify({
@@ -298,8 +333,8 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getOkrList(1);
-        this.getDepartment();
+        this.getPrimaryList(1);
+        this.getDepartmentList();
     }
 }
 </script>

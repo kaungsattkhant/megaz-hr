@@ -1,30 +1,32 @@
 <template>
-    <div>
-        <p class=" page-title">
-            Accounting
-        </p>
-    </div>
     
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <button class="add-btn" @click="searchBtnClicked">Search</button>
-                <button class="add-btn" @click="clearSearchBtnClicked">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Accounting
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
 
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('account.create')">
-                    Add New
-                </button>
+                    <button class="add-btn" @click="searchBtnClicked">Search</button>
+                    <button class="add-btn" @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('account.create')">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="block rounded-xl">
+        <div class="box-container-table">
 
             <div class="overflow-x-auto">
                 <div class="overflow-hidden ">

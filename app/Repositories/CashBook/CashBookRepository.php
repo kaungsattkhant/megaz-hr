@@ -9,13 +9,29 @@ use Illuminate\Support\Facades\DB;
 use stdClass;
 
 
-class CashBookRepository implements CashBookInterface  
-
+class CashBookRepository implements CashBookInterface
 {
     public function list($request)
     {
+        $isPos = $request->is_pos;
+        $is_closing_column = 'is_pos_closing';
+        $closing_date_column = 'pos_closing_date';
+
+        $is_closing_column = null;
+        $closing_date_column = null;
+        if ($isPos) {
+            $is_closing_column = 'is_pos_closing';
+            $closing_date_column = 'pos_closing_date';
+        }
+        if (!$isPos) {
+            $is_closing_column = 'is_closing';
+            $closing_date_column = 'closing_date';
+        }
+        if ($is_closing_column == null && $closing_date_column == null) {
+            ResponseMessage('Something went wrong in cashbook', 419);
+        }
         $cashAccountId = $request->cash_account_id;
-        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($request, $cashAccountId);
+        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($request, $cashAccountId, $is_closing_column);
         $cashbookTransactions = Transaction::with(['ledgers.account', 'transactionable'])
             ->isConfirmed(1)
             ->select(['id', 'date', 'description', 'transactionable_id', 'transactionable_type'])
@@ -32,7 +48,7 @@ class CashBookRepository implements CashBookInterface
                 // dd($transaction->transactionable);
             }
             foreach ($transaction->ledgers as $ledger) {
-                if (in_array(config('common.pos_cash'), $cashAccountId) || in_array(config('common.pos_cash'), $cashAccountId)) {
+                if (in_array(config('common.pos_cash'), $cashAccountId) && in_array($ledger->account_id, $cashAccountId)) {
                     $ledger->action == 'debit' ? $current_debit_amount += $transaction->amount : $current_credit_amount += $transaction->amount;
                     $transaction->title = $transaction->transactionable_type == 'invoice' ? $ledger->account->name . '(' . $transaction->transactionable->invoice_id . ')' : $ledger->account->name;
                     $transaction->type = $ledger->account->name;
@@ -64,6 +80,23 @@ class CashBookRepository implements CashBookInterface
     {
         DB::beginTransaction();
         try {
+            $isPos = $request->is_pos;
+            // $is_closing_column = 'is_closing';
+            // $closing_date_column = 'closing_date';
+            $is_closing_column = null;
+            $closing_date_column = null;
+            if ($isPos) {
+                $is_closing_column = 'is_pos_closing';
+                $closing_date_column = 'pos_closing_date';
+            }
+            if (!$isPos) {
+                $is_closing_column = 'is_closing';
+                $closing_date_column = 'closing_date';
+            }
+            if ($is_closing_column == null && $closing_date_column == null) {
+                ResponseMessage('Something went wrong in cashbook', 419);
+            }
+
             $cashAccountId = $request->cash_account_id;
             $openingBalance = (new CashBookTransaction())->getOpeningBalance($request);
             $closingBalance = (new CashBookTransaction())->getClosingBalance($openingBalance->opening_balance, $request);
@@ -79,18 +112,19 @@ class CashBookRepository implements CashBookInterface
                     'opening_balance' => $openingBalance->opening_balance,
                     'closing_balance' => $closingBalance,
                     'cash_account_id' => $cashAccountId,
-                ]);
+                ]
+            );
 
             $latestTransaction = Transaction::
                 whereHas('ledgers', function ($query) use ($cashAccountId) {
-                $query->where('account_id', $cashAccountId); #transaction close depend on transaction
-            })
+                    $query->where('account_id', $cashAccountId); #transaction close depend on transaction
+                })
                 ->isConfirmed(1)
                 ->latest()
                 ->first();
             if ($latestTransaction) {
-                $latestTransaction->is_closing = 1;
-                $latestTransaction->closing_date = now();
+                $latestTransaction->$is_closing_column = 1;
+                $latestTransaction->$closing_date_column = now();
                 $latestTransaction->save();
             }
             if ($cashbookBalance) {
@@ -103,9 +137,8 @@ class CashBookRepository implements CashBookInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
         // ResponseMessage('Transaction closing is fail', 422);
     }
 
-    
+
 }

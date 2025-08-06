@@ -6,14 +6,13 @@ use App\Models\UomConversion;
 
 class ItemService
 {
-  public function calculateMinimumHoldingAmount($minHoldingBaseUomQuantity, $minHoldingUomQuantity, $conversionRate)
+  public function calculateMinimumHoldingAmount($minHoldingQuantity, $conversionRate)
   {
     if ($conversionRate > 0) {
-      $minHoldingBaseUomQuantity = (float) $minHoldingBaseUomQuantity;
-      $minHoldingUomQuantity = (float) $minHoldingUomQuantity;
+      $minHoldingQuantity = (float) $minHoldingQuantity;
       $conversionRate = (float) $conversionRate;
 
-      return ($minHoldingBaseUomQuantity * $conversionRate) + $minHoldingUomQuantity;
+      return ($minHoldingQuantity * $conversionRate);
     }
     return 0;
   }

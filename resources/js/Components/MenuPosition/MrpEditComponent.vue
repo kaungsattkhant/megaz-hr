@@ -11,13 +11,13 @@
                 <label for="" class="label-form mb-3">
                     Menu Name
                 </label>
-                <input type="text" v-model="menuName" class="input-ui">
+                <input type="text" v-model="menuName" placeholder="Menu Name" class="input-ui">
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Selling Price
                 </label>
-                <input type="text" v-model="sellingPrice" class="input-ui">
+                <input type="number" v-model="sellingPrice" disabled placeholder="Price" class="input-ui">
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -95,7 +95,7 @@
                     </select>
                 </div>
             </div>
-            
+
             <div class="contents" v-show="selectedMenuType == 'menu'">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -117,7 +117,7 @@
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
-                         
+
                             data-te-select-filter="true" name="" id="" v-model="selectedMenu" class="input-ui">
                             <option :value="menu" v-for="(menu, menuIndex) in menuList"
                                 :key="menuIndex"> {{ menu.name }} </option>
@@ -157,10 +157,10 @@
                 </div>
                 <div class="contents" v-show="isReadyToSale">
                     <div class="mb-4 col-span-3 rounded-md">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Expire Date
+                        <label for="" class="label-form mb-3">
+                            Expiry Date
                         </label>
-                        <input type='date' v-model="expireDate" class="input-ui w-full !p-1 text-xs" />
+                        <input type='number' v-model="expireDate" class="input-ui " min="0"/>
                     </div>
                     <div class="col-span-3"  v-show="isReadyToSale"></div>
                 </div>
@@ -192,7 +192,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Duration
@@ -207,7 +207,7 @@
                         </label>
                         <input type="number" v-model="orderTime" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                     </div>
-                
+
                     <div class="mb-4 col-span-3 rounded-md">
                         <label for="" class="label-form mb-3">
                             Expected Quantity
@@ -264,7 +264,7 @@
                 </div>
             </div>
             <div class="col-span-12"></div>
-            
+
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -276,14 +276,14 @@
 
 
         </div>
-        
+
 
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
 
             <div v-if="menuLevel.item_menu.length > 0">
                 <div class="flex mb-2">
                     <p v-if="menuLevel.level">
-                        {{ menuLevel.level }} : 
+                        {{ menuLevel.level }} :
                     </p>
                     <p>
                         &nbsp;{{ menuLevel.type }}
@@ -292,7 +292,7 @@
                 <div class="flex gap-x-8 mb-4">
                     <div class="flex mb-2">
                         <p>
-                            Position : 
+                            Position :
                         </p>
                         <p>
                             &nbsp;{{ menuLevel.role_name }}
@@ -300,7 +300,7 @@
                     </div>
                     <div class="flex mb-2">
                         <p>
-                            Duration : 
+                            Duration :
                         </p>
                         <p>
                             &nbsp;{{ menuLevel.duration }} min
@@ -349,14 +349,14 @@
             </div>
             <div class="flex gap-x-4">
                 <button class="add-btn" @click="clearMenuLevel()">
-                    Clear 
+                    Clear
                 </button>
                 <button class="add-btn" @click="addLevelBtnClicked()">
-                    Add 
+                    Add
                 </button>
             </div>
 
-            
+
 
         </div>
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
@@ -403,7 +403,7 @@
                             </td>
                         </tr>
                         <tr class="" v-for="(submenu, submenuIndex) in subMenuList"
-                            :key="submenuIndex">    
+                            :key="submenuIndex">
                             <td class="" colspan="4">
                                 {{ submenu.name }}
                             </td>
@@ -418,17 +418,17 @@
                 </table>
             </div>
 
-            
+
 
         </div>
 
 
         <div>
             <button class="add-btn" @click="createMenuBtnClicked">
-                Create Menu
+                Update Menu
             </button>
         </div>
-        
+
     </div>
 </template>
 
@@ -544,6 +544,7 @@ export default {
         },
         addDetail(detail){
             this.menuName = detail.name;
+            this.description = detail.description;
             this.sellingPrice = detail.price.price;
             this.selectedCookingArea = detail.menu_places;
             this.code = detail.code;
@@ -552,7 +553,7 @@ export default {
             // this.menuLevel.level = this.selectedLevel.id;
             // this.menuLevel.type = this.selectedType.id;
             // this.menuLevel.position = this.selectedPosition;
-            // this.menuLevel.role_id = this.selectedRole.id;        
+            // this.menuLevel.role_id = this.selectedRole.id;
             // this.menuLevel.role_name = this.selectedRole.name;
             // this.menuLevel.duration = this.duration;
             // this.menuLevel.order_time = this.orderTime;
@@ -569,6 +570,7 @@ export default {
             // });
 
             let sampleMenuLevel = {
+                id: null,
                 level : null,
                 type : null,
                 position : null,
@@ -579,8 +581,11 @@ export default {
                 expected_quantity : null,
                 menu_id : null,
                 item_menu:[],
+                menu_step_item: []
             };
             detail.menu_steps.forEach(step => {
+                // console.log(step);
+                sampleMenuLevel.id = step.id;
                 sampleMenuLevel.level = step.level
                 sampleMenuLevel.type = step.type
                 // sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
@@ -593,6 +598,7 @@ export default {
                 sampleMenuLevel.menu_id = step.menu_id
                 step.menu_step_item.forEach(item => {
                     sampleMenuLevel.item_menu.push({
+                        id: item.id,
                         item_id: item.item_id,
                         menu_step_id: item.menu_step_id,
                         price: item.item.average_price,
@@ -605,10 +611,11 @@ export default {
                     });
                 })
                 this.testtestmenu = sampleMenuLevel
-                console.log(sampleMenuLevel)
+                // console.log(sampleMenuLevel);
                 this.levelTable.push(sampleMenuLevel)
-                console.log(this.levelTable)
+                // console.log(this.levelTable);
                 sampleMenuLevel = {
+                    id: null,
                     level : null,
                     type : null,
                     position : null,
@@ -620,9 +627,9 @@ export default {
                     menu_id : null,
                     item_menu:[],
                 };
-            })    
+            })
             this.getMenuList();
-            
+
             // this.subMenu = detail.sub_menus
             detail.sub_menus.forEach(menu => {
                 // let menuName = this.menuList.find(item => item.id === menu).name
@@ -707,7 +714,7 @@ export default {
 
         itemSelectChanged() {
             this.itemUoms = [];
-            console.log(this.selectedItem)
+            // console.log(this.selectedItem);
             this.itemUoms.push(
                 {
                     id:this.selectedItem.base_uom_id,
@@ -772,7 +779,7 @@ export default {
             else{
                 this.addCustom();
             }
-            console.log(this.selectedMenuType)
+            // console.log(this.selectedMenuType)
         },
         async addCustom() {
             if(!this.selectedLevel){
@@ -900,8 +907,8 @@ export default {
                 this.selectedUom = null;
                 this.amount = null;
                 this.is_disable_custom = true;
-                this.selectedDepartment = null;
-                this.selectedRole = null;
+                // this.selectedDepartment = null;
+                // this.selectedRole = null;
             }
             // this.updateItemPriceTotal(this.ingredientItems);
 
@@ -925,6 +932,8 @@ export default {
             this.orderTime = null;
             this.expectedQuantity = null;
             this.is_disable_custom = false;
+            this.selectedDepartment = null;
+            this.selectedRole = null;
         },
         addLevelBtnClicked(){
             this.levelTable.push(
@@ -947,10 +956,10 @@ export default {
                 this.alertValidationMessage(`menu name`);
                 return 1;
             }
-            else if(!this.sellingPrice){
-                this.alertValidationMessage(`menu price`);
-                return 1;
-            }
+            // else if(!this.sellingPrice){
+            //     this.alertValidationMessage(`menu price`);
+            //     return 1;
+            // }
             else if(!this.selectedMenuCategory){
                 this.alertValidationMessage(`menu category`);
                 return 1;
@@ -980,7 +989,7 @@ export default {
                 this.subMenuList.forEach((submenu) => {
                     sub_menu_id.push(submenu.id)
                 })
-                console.log('array ' ,cookingPlaceId)
+                // console.log('array ' ,cookingPlaceId);
                 let formData = new FormData();
                 formData.append('name', this.menuName);
                 formData.append('menu_category_id', this.selectedMenuCategory.id);
@@ -988,8 +997,10 @@ export default {
                 if(this.selectedImage){
                     formData.append('image',this.selectedImage);
                 }
-                // formData.append('description',this.description);
-                formData.append('price', this.sellingPrice);
+                if(this.description){
+                    formData.append('description',this.description);
+                }
+                // formData.append('price', this.sellingPrice);
                 formData.append('Menu_type', this.selectedMenuType);
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
 
@@ -997,7 +1008,7 @@ export default {
                 if(sub_menu_id.length > 0){
                     formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
-                
+
                 let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     window.location.replace(`/mrp`);
@@ -1023,7 +1034,7 @@ export default {
             this.menuLevel.item_menu=[];
         },
 
-        
+
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
@@ -1043,7 +1054,7 @@ export default {
     //     }
     // },
 
-    
+
     async created() {
         let response = await getApiData({url: `/api/departments`, token: this.getToken()});
         if(response.data){
