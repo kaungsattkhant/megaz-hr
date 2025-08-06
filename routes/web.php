@@ -439,9 +439,9 @@ Route::middleware(['departments:okr-duty.edit'])->group(function () {
     Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
 });
 
-// Route::middleware(['departments:okr-dashboard'])->group(function () {
+Route::middleware(['departments:okr-dashboard'])->group(function () {
     Route::view('/okr_dashboard', 'okr_dashboard.index')->name('okr_dashboard');
-// });
+});
 
 // okr
 Route::middleware(['departments:okr'])->group(function () {
