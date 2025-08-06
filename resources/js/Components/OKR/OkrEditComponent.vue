@@ -7,61 +7,53 @@
         </div>
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Objective Name
-                </label>
-                <input type="text" v-model="objName" class="input-ui ">
-            </div><div class="col-span-9"></div>
-            <div class="col-span-10 border-b mt-4 mb-6"></div><div class="col-span-2"></div>
-            <div class="mb-4 col-span-3">
+            <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
-
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
                         data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black">
-                        <option :value="department.id" v-for="(department, index) in departmentList"
+                        <option :value="department" v-for="(department, index) in departmentList"
                             :key="index"> {{ department.name }} </option>
                     </select>
                 </div>
             </div>
-            <div class="mb-4 col-span-3">
+            <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
                     Role
                 </label>
-
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="roleChanged()"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black">
-                        <option :value="role.id" v-for="(role, index) in roleList"
+                        <option :value="role" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
-            </div>
-            <!-- <div class="mb-4 col-span-3">
+            </div><div class="col-span-6"></div>
+            <div class="mb-6 col-span-6">
                 <label for="" class="label-form mb-3">
-                    Date Assigned
+                    SOP
                 </label>
-                <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                    :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single"
-                            v-if="values.length"
-                            v-show="!isOpen">{{ values.length }} Date selected</span>
-                    </template>
-                </multiselect>
-            </div> -->
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select SOP"
+                        data-te-select-filter="true" name="" id="" v-model="selectedSop" class="input-ui !text-black">
+                        <option :value="sop" v-for="(sop, index) in sopList"
+                            :key="index"> {{ sop.sop }} </option>
+                    </select>
+                </div>
+            </div>
             <div class="col-span-6"></div>
+
 
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
-                    Key Result
+                    Objective
                 </label>
-                <input type="text" v-model="key_result" class="input-ui ">
+                <input type="text" v-model="objName" class="input-ui ">
             </div>
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
@@ -69,14 +61,35 @@
                 </label>
                 <input type="number" v-model="selectedOkrPoint" class="input-ui ">
             </div>
-            
-            <div class="col-span-3">
+            <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
-                    Duration ( minutes )
+                    Type
                 </label>
-                <input type="number" v-model="duration" class="input-ui ">
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black">
+                        <option :value="type" v-for="(type, index) in typeList"
+                            :key="index"> {{ type.name }} </option>
+                    </select>
+                </div>
             </div>
-            <div class="    ">
+            <div class="col-span-3" v-if="selectedType?.value === 'daily'">
+                <label for="" class="label-form mb-3">
+                    Repetition
+                </label>
+                <input type="number" v-model="selectedRepition" class="input-ui ">
+            </div>
+            <div class="col-span-3" v-else></div>
+
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Key Result
+                </label>
+                <input type="text" v-model="key_result" class="input-ui ">
+            </div>
+            
+            <div class="">
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
@@ -84,14 +97,6 @@
                     Add Obj
                 </button>
             </div>
-
-
-
-            
-
-
-
-
         </div>
 
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
@@ -99,20 +104,8 @@
                 <table class="primary-table">
                     <thead class="">
                         <tr>
-                            <th scope="col" class="">
-                                Role
-                            </th>
-                            <th scope="col" class="">
+                            <th scope="col" class="text-left">
                                 Key Results
-                            </th>
-                            <th scope="col" class="">
-                                OKR Points
-                            </th>
-                            <!-- <th scope="col" class="">
-                                Date
-                            </th> -->
-                            <th scope="col" class="">
-                                Duration ( minutes )
                             </th>
                             <th scope="col" class="">
 
@@ -120,27 +113,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(obj, objIndex) in objective_List"
-                            :key="objIndex">
-                            <td class="">
-                                {{ obj.role_name }} ({{ obj.department_name }})
+                        <tr class="" v-for="(keyResult, keyResultIndex) in key_result_list"
+                            :key="keyResultIndex">
+                            
+                            <td class="text-left">
+                                {{ keyResult.name }}
                             </td>
+                            
                             <td class="">
-                                {{ obj.name }}
-                            </td>
-                            <td class="">
-                                {{ obj.okr_point }}
-                            </td>
-                            <!-- <td class="">
-                                <span class="after:content-[','] last:after:content-[''] pr-1" v-for="day in obj.assigned_days">
-                                    {{ day }}
-                                </span>
-                            </td> -->
-                            <td class="">
-                                {{ obj.duration }}
-                            </td>
-                            <td class="">
-                                <button @click="deleteObj(objIndex)">
+                                <button @click="deleteKey(keyResultIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
@@ -176,15 +157,6 @@ export default {
             departmentList:[],
             roleList:[],
             dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
-            // dateList: [
-            //     { name: 'Monday', value: 'Monday' },
-            //     { name: 'Tuesday', value: 'Tuesday' },
-            //     { name: 'Wednesday', value: 'Wednesday' },
-            //     { name: 'Thursday', value: 'Thursday' },
-            //     { name: 'Friday', value: 'Friday' },
-            //     { name: 'Saturday', value: 'Saturday' },
-            //     { name: 'Sunday', value: 'Sunday' }
-            // ],
             objName:null,
             selectedDepartment:null,
             selectedRole:null,
@@ -193,11 +165,20 @@ export default {
             selectedOkrPoint:null,
             duration:null,
 
-            objective_List:[],
+            key_result_list:[],
             selected_obj_keys:[],
 
             okrDetail:null,
             test:[],
+
+            sopList: [],
+            selectedSop: null,
+            typeList: [
+                { name: 'Daily', value: 'daily' },
+                { name: 'Occasionally', value: 'occasionally' },
+            ],
+            selectedType: null,
+            selectedRepition: null,
         };
     },
 
@@ -212,40 +193,28 @@ export default {
                 }
             }
         },
-        addDetail(detail){
-            // this.selectedDepartment = detail.role.department_id;
-            // this.getRoleList();
-            // this.selectedRole = detail.role_id;
-            this.objName = detail.objective_name;
-            // this.objective_List = detail.objective_keys;
-            detail.objective_keys.forEach(obj => {
-                this.objective_List.push({ 
-                    name: obj.name,
-                    department_name: obj.role.department.name,
-                    role_id: obj.role_id,
-                    role_name: obj.role.name,
-                    okr_point: obj.okr_point,
-                    // assigned_days: obj.assigned_days, 
-                    duration: obj.duration
+        async addDetail(detail){
+            this.selectedDepartment = this.departmentList.find(dep => dep.id === detail.role.department_id);
+            this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = this.roleList.find(role => role.id === detail.role_id);
+
+            let response = await getApiData({url: `/api/sops?role_id=` + detail.role_id, token: this.getToken()});
+            if(response.data){
+                // this.sopList = response.data;
+                response.data.forEach(sops => {
+                    sops.sops.forEach(sop => {
+                        this.sopList.push(sop)
+                    })
                 });
-            });
-
-
-            // detail.assigned_days.forEach(day => {
-            //     this.selectedDate.push(
-            //         this.dateList.find(date => date.name == day )
-            //         // day
-                    
-            //     )
-            //     let testing = this.dateList.find(date => date.name = day )
-            //     console.log(testing)
-                 
-            // })
-            // this.test.push(
-            //     detail.assigned_days.forEach(day => {
-            //         this.dateList.find(date => date.name = day )
-            //     })
-            // )
+                this.selectedSop = this.sopList.find(sop => sop.id === detail.sop_id);
+            }
+            this.objName = detail.objective_name;
+            this.selectedOkrPoint = detail.okr_point;
+            this.selectedType = this.typeList.find(type => type.value === detail.type)
+            if(detail.type === 'daily'){
+                this.selectedRepition = detail.repetition;
+            }
+            this.key_result_list = detail.objective_keys;
         },
 
         async getDepartment(){
@@ -262,8 +231,21 @@ export default {
             if(response.data){
                 this.roleList = response.data;
             }
-            // console.log(department)
         },
+        roleChanged(){
+            this.getSopList();
+        },
+        async getSopList(){
+            let response = await getApiData({url: `/api/sops?role_id=` + this.selectedRole.id, token: this.getToken()});
+            if(response.data){
+                response.data.forEach(sops => {
+                    sops.sops.forEach(sop => {
+                        this.sopList.push(sop)
+                    })
+                });
+            }
+        },
+        
         
         
         async getMenuCategoryList(){
@@ -278,7 +260,30 @@ export default {
                 this.menuList = response.data;
             }
         },
-        
+        addObj() {
+            if (!this.key_result) {
+                this.alertValidationMessage(`Key Result`);
+                return 1;
+            }
+            else{
+                this.key_result_list.push({ 
+                    name: this.key_result,
+                    // department_name: this.departmentList.find(depart => depart.id === this.selectedDepartment).name,
+                    // role_id:this.selectedRole,
+                    // role_name:this.roleList.find(role => role.id === this.selectedRole).name,
+                    // okr_point: this.selectedOkrPoint,
+                    // assigned_days: this.selectedDate, 
+                    // duration: this.duration 
+                });
+                this.key_result = null;
+                // this.selectedOkrPoint = null;
+                // this.selectedDate = null;
+                // this.duration = null;
+            }
+        },
+        deleteKey(index) {
+            this.key_result_list.splice(index, 1);
+        },
         
 
         btnclickedCreateOkr(){
@@ -286,7 +291,28 @@ export default {
                 this.alertValidationMessage(`Objective Name`);
                 return 1;
             }
-            else if(this.objective_list < 1){
+            else if(!this.selectedRole){
+                this.alertValidationMessage(`Role`);
+                return 1;
+            }
+            else if(!this.selectedSop){
+                this.alertValidationMessage(`SOP`);
+                return 1;
+            }
+            else if(!this.selectedOkrPoint){
+                this.alertValidationMessage(`OKR Point`);
+                return 1;
+            }
+            else if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+
+            else if(this.selectedType.value === 'daily' && !this.selectedRepition){
+                this.alertValidationMessage(`Repitition`);
+                return 1;
+            }
+            else if(this.key_result_list < 1){
                 this.alertValidationMessage(`Objective Key`);
                 return 1;
             }
@@ -295,18 +321,18 @@ export default {
             }
         },
         async createOkr(){
-            // let selectedDate = [];
-            // this.selectedDate.forEach(date => {
-            //     selectedDate.push(date.value)
-            // });
-            // console.log(selectedDate)
             let formData = new FormData();
             formData.append('objective_name', this.objName);
-            // formData.append('role_id', this.selectedRole);
-            // formData.append('assigned_days', JSON.stringify(this.selectedDate));
-            // formData.append('assigned_days', JSON.stringify(selectedDate));
-            formData.append('objective_key', JSON.stringify(this.objective_List));
-            let response = await postApiData({ url: '/api/objectives/'+this.okrId, form_data: formData, token: this.getToken() });
+            formData.append('okr_point', this.selectedOkrPoint);
+            formData.append('type', this.selectedType.value);
+            if(this.selectedType.value === 'daily'){
+                formData.append('repetition', this.selectedRepition);
+            }
+            formData.append('role_id', this.selectedRole.id);
+            formData.append('sop_id', this.selectedSop.id);
+            formData.append('objective_key', JSON.stringify(this.key_result_list));
+            formData.append('id', +this.okrId);
+            let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
                 console.log('success')
@@ -325,46 +351,7 @@ export default {
 
         },
 
-        addObj() {
-            if (!this.key_result) {
-                this.alertValidationMessage(`Key Result`);
-                return 1;
-            }
-            else if (!this.selectedOkrPoint) {
-                this.alertValidationMessage(`OKR Point`);
-                return 1;
-            }
-            else if (!this.selectedRole) {
-                this.alertValidationMessage(`Role`);
-                return 1;
-            }
-            // else if (!this.selectedDate) {
-            //     this.alertValidationMessage(`Date`);
-            //     return 1;
-            // }
-            else if (!this.duration) {
-                this.alertValidationMessage(`Duration`);
-                return 1;
-            }
-            else{
-                this.objective_List.push({ 
-                    name: this.key_result,
-                    department_name: this.departmentList.find(depart => depart.id === this.selectedDepartment).name,
-                    role_id:this.selectedRole,
-                    role_name:this.roleList.find(role => role.id === this.selectedRole).name,
-                    okr_point: this.selectedOkrPoint,
-                    // assigned_days: this.selectedDate, 
-                    duration: this.duration 
-                });
-                this.key_result = null;
-                this.selectedOkrPoint = null;
-                // this.selectedDate = null;
-                this.duration = null;
-            }
-        },
-        deleteObj(index) {
-            this.objective_List.splice(index, 1);
-        },
+        
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,

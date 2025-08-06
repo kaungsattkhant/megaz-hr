@@ -30,7 +30,7 @@
 
                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" 
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="changeRole"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                         <option :value="role" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
@@ -272,8 +272,12 @@ export default {
         changeDepartment(){
             this.roleList = this.selectedDepartment.roles;
         },
+        changeRole(){
+            this.getAllowanceTypeList();
+        },
         async getAllowanceTypeList(){
-            let response = await getApiData({ url: '/api/hr/salary_allowances', token: this.getToken() });
+            // let response = await getApiData({ url: '/api/hr/salary_allowances', token: this.getToken() });
+            let response = await getApiData({ url: '/api/hr/salary_allowances?role_id=' + this.selectedRole.id, token: this.getToken() });
             if (response.data) {
                 this.allowanceTypeList = response.data.data;
             }

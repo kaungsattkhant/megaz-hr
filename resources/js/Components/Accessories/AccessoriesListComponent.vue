@@ -1,36 +1,39 @@
 <template>
-    <div>
-        <p class=" page-title">
-            Accessories list
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Accessories list
+                </p>
+            </div>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
 
-                <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter by category" class="text-xs"
-                        data-te-select-filter="true" v-model="searchCategory">
-                        <option :value="category" v-for="category in accessoriesCategoryList" :key="category.id">
-                            {{ category.name }}
-                        </option>
-                    </select>
+                    <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter by category" class="text-xs"
+                            data-te-select-filter="true" v-model="searchCategory">
+                            <option :value="category" v-for="category in accessoriesCategoryList" :key="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <button class="add-btn " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
                 </div>
 
-                <button class="add-btn " @click="searchBtnClicked">Search</button>
-                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
-            </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/accessories/create" class="add-btn " v-if="feature.includes('accessory.store')">
+                        Add New
+                    </a>
 
-            <div class="flex justify-end flex-col">
-                <a href="/accessories/create" class="add-btn " v-if="feature.includes('accessory.store')">
-                    Add New
-                </a>
-
+                </div>
             </div>
         </div>
         <!-- {{ accessoriesList }} -->

@@ -1,24 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            CashBook
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate">
-                <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate">
-
-                <button class="add-btn " @click="searchBtnClicked">Search</button>
-                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class="page-title">
+                    CashBook
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate">
+                    <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate">
 
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button class="add-btn " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -489,7 +492,7 @@
                 if(pageNumber){
                     this.currentPage = pageNumber;
                 }
-                let url = `/api/cash_books?cash_account_id[]=${cashAccountId}&page=${this.currentPage}`;
+                let url = `/api/cash_books?cash_account_id[]=${cashAccountId}&is_pos=0&page=${this.currentPage}`;
                 if(this.fromDate && this.toDate){
                     url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
                 }
@@ -571,9 +574,22 @@
             },
 
             async confirmCashBookCloseBtnClicked(){
-                let url = `/api/close_cashbook_transaction?cash_account_id=${this.cashAccountId}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.success){
+                // let url = `/api/close_cashbook_transaction?cash_account_id=${this.cashAccountId}`;
+                // let response = await getApiData({url: url, token: this.getToken()});
+                // if(response.success){
+                //     window.location.reload();
+                // }
+
+                if(!this.bookType){
+                    this.alertValidationMessage(`Cash accout is required!`);
+                    return 1;
+                }
+                let formData = new FormData();
+                formData.append('cash_account_id', this.bookType.id);
+                formData.append('is_pos', 0);
+                let url = `/api/close_cashbook_transaction`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
                     window.location.reload();
                 }
             },

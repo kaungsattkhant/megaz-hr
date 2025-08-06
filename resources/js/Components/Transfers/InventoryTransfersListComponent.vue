@@ -1,30 +1,31 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Inventory Transfer
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-
-        <div class="btn-container">
-            <div class=" flex">
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded">
-                </div>
-
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
-                    <input type="date" v-model="toDate" class="search-input rounded">
-                </div>
-                <div class="ml-2 px-2">
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter"
-                        @click="clearSearchBtnClicked">Clear</button>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Inventory Transfer
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <div>
+                        <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+                        <input type="date" v-model="fromDate" class="search-input rounded">
+                    </div>
 
+                    <div>
+                        <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                        <input type="date" v-model="toDate" class="search-input rounded">
+                    </div>
+                    <div class="ml-2 px-2">
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter"
+                            @click="clearSearchBtnClicked">Clear</button>
+                    </div>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                </div>
             </div>
         </div>
         <div class="box-container-table">

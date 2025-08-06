@@ -1,40 +1,43 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Allowance Management
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Allowance Management
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
-                        <option :value="department.value" v-for="(department, departmentIndex) in searchDepartmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
-                        <option :value="role.value" v-for="(role, roleIndex) in searchRoleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
+                <div class="flex pr-0 gap-x-4">
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
+                            <option :value="department.value" v-for="(department, departmentIndex) in searchDepartmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
+                            <option :value="role.value" v-for="(role, roleIndex) in searchRoleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                    <button type="button" v-show="feature.includes('allowance.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
+                        Add New
+                    </button>
                 </div>
-                <button type="button" v-show="feature.includes('allowance.create')"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
-                    Add New
-                </button>
             </div>
         </div>
         <div class="box-container-table">

@@ -11,29 +11,34 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/objectives', 'getObjectives');
     Route::get('/roles_department/{departmentId}', 'getRolesByDepartmentId');
     Route::post('/objectives', 'store');
-    Route::post('/objectives/{id}', 'update');
+    // Route::post('/objectives/{id}', 'update');
     Route::get('/objectives/{id}', 'getObjectiveById');
     Route::delete('/objectives/{id}', 'deleteObjective');
-    Route::get('dashboard_okr', 'dashboardOkr');
+    Route::get('dashboard-okr', 'dashboardOkr');
 
-    //assign duties by objkeystaff
+    //okr assign duties by objective staff
     Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
     Route::get('/assign_duties', 'getAssignDutiesByObjectiveKeys');
     Route::get('/assign_duties/{id}', 'showAssignDutiesById');
     Route::delete('/assign_duties/{id}', 'deleteAssignDutiesById');
     Route::delete('/assign_duties/objective_key_staff/{id}', 'deleteAssignObjKeyStaffById');
-    Route::post('/assign_duties', 'storeAssignDutiesByObjectiveKeys');
-    Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
+
+    //okr assign modified api
+    Route::post('/okr-assigns', 'storeAssignDutiesByObjectives');
+    Route::get('/okr-assigns', 'getOkrAssigns');
+    Route::get('/okr-assigns/{okrAssignId}', 'getOkrAssignById');
+    Route::delete('/okr-assigns/{okrAssignId}', 'deleteOkrAssignById');
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
     Route::get('/daily/objectives/{staffId}', 'getdailyObjectivesByStaffId');
-    Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
-    Route::post('/objectives/key_staff/{id}/images', 'storeImages');
-    Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');
-    Route::get('/objectives/key_staff/{objKeystaffId}/images', 'getObjKeyStaffImage');
-    Route::delete('/objectives/key_staff/images/{id}', 'deleteObjKeystaffImage');
+    Route::post('/daily/objectives_key_staff/{objStaffId}', 'updateDailyObjective');
+    Route::post('/objectives/key_staff/{objStaffId}/images', 'storeImages');
+    Route::post('/objectives/key_staff/{objStaffId}/images/update', 'updateImages');
+    Route::get('/objectives/key_staff/{objStaffId}/images', 'getObjKeyStaffImage');
+    Route::delete('/objectives/key_staff/images/{objStaffId}', 'deleteObjKeystaffImage');
+    Route::get('/complete-objective/{objectiveId}/staff/{staffId}', 'getCompletedObjKeysByStaffId');
 
     //ktv-objective-tree
     Route::get('/ktv/entity_room', 'getKtvRoom');
@@ -86,8 +91,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/sops', 'storeSop');
     Route::get('/sops', 'getSop');
-    Route::get('/sops/{id}', 'showSop');
-    Route::delete('/sops/{id}', 'deleteSop');
+    Route::get('/sop-jd/{jdSopId}', 'showSop');
+    Route::delete('/sop-jd/{jdSopId}', 'deleteJdSopById');
   });
-  
 });

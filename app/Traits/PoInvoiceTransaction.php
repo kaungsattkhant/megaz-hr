@@ -23,24 +23,25 @@ trait PoInvoiceTransaction
         $transaction = (new StoreTransactionLedger())->createTransaction($data);
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
             $category_id = $po_category->category_id;
-            $account_code = null;
-            switch ($category_id) {
-                case "1":
-                    $account_code = '2-1021'; #Inventory Food
-                    break;
-                case "2":
-                    $account_code = '2-1023'; #Inventory Tobacco
-                    break;
-                case "3":
-                    $account_code = '2-1024'; #Inventory General
-                    break;
-                case "4":
-                    $account_code = '2-1022'; #Inventory Beverage
-                    break;
-                case "5":
-                    $account_code = '2-1025'; #Inventory Stationery
-                    break;
-            }
+            // $account_code = null;
+            $account_code = '2-1021'; #Inventory Food
+            // switch ($category_id) {
+            //     case "1":
+            //         $account_code = '2-1021'; #Inventory Food
+            //         break;
+            //     case "2":
+            //         $account_code = '2-1023'; #Inventory Tobacco
+            //         break;
+            //     case "3":
+            //         $account_code = '2-1024'; #Inventory General
+            //         break;
+            //     case "4":
+            //         $account_code = '2-1022'; #Inventory Beverage
+            //         break;
+            //     case "5":
+            //         $account_code = '2-1025'; #Inventory Stationery
+            //         break;
+            // }
             if ($account_code == null) {
                 ResponseMessage('Transaction fail', 419);
             }

@@ -14,12 +14,14 @@ use App\Models\MenuArea;
 use App\Models\OrderItem;
 use App\Models\Department;
 use App\Models\RoomSession;
+use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
 use App\Traits\CheckMenuPack;
 use App\Models\InvoiceSession;
 use App\Services\OrderService;
 use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
+use App\Models\InventoryLedgerItem;
 use Illuminate\Support\Facades\Hash;
 use App\Services\InvoiceModelService;
 use App\Events\WaiterNotificationRequest;
@@ -119,16 +121,18 @@ class OrderRepository implements OrderRepositoryInterface
                     // $entity = $latestRoomSession->entitySession->entity;
                     // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                     if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
-                        $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
-                        if (count($packs) < $orderItem->quantity) {
-                            ResponseMessage('Not enough packs to sell', 402);
-                        }
-                        foreach ($packs as $pack) {
-                            if ($pack->status == 'ready') {
-                                $pack->status = 'sold';
-                                $pack->save();
-                            }
-                        }
+                        // $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')
+                        //     ->where('expired_at', '>', CurrentTime())
+                        //     ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                        // if (count($packs) < $orderItem->quantity) {
+                        //     ResponseMessage('Not enough packs to sell', 402);
+                        // }
+                        // foreach ($packs as $pack) {
+                        //     if ($pack->status == 'ready') {
+                        //         $pack->status = 'sold';
+                        //         $pack->save();
+                        //     }
+                        // }
                         $orderItem->completed_at = now();
                         $orderItem->completed_by = UserData()->id;
                     }
@@ -136,6 +140,9 @@ class OrderRepository implements OrderRepositoryInterface
                     elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                         $orderItem->progressed_at = now();
                         $orderItem->progressed_by = UserData()->id;
+                        $sellingExtraIds=$orderItem->extras->pluck('selling_extra_id')->toArray();
+                        // $sellingExtraIds=[];
+                        $this->orderService->actionInventoryItem($orderItem, 'order_item', 'out',$sellingExtraIds);
                     } elseif ($data['status'] == 'cancelled') {
                         $orderItem->cancelled_at = now();
                         $orderItem->cancelled_by = UserData()->id;
@@ -151,7 +158,6 @@ class OrderRepository implements OrderRepositoryInterface
                     broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
                 }
             }
-
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {
@@ -159,6 +165,35 @@ class OrderRepository implements OrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function actionInventoryItem($orderItem, $morphMapName, $action)
+    {
+        $inventoryId = UserData()->department->inventory->inventory_id;
+        $menuId = $orderItem->menu_id;
+        $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
+            ->whereHas('menuStep', function ($q) use ($menuId) {
+                $q->where('menu_id', $menuId)
+                    ->where('type', 'ready_to_sale');
+            })
+            ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
+            ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
+            ->get();
+        foreach ($menuStepItemByMenu as $item) {
+            $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
+                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                ->selectRaw("
+                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+            ")
+                ->where('inventory_ledgers.inventory_id', $inventoryId)
+                ->first();
+            dd($itemInventory);
+            // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
+        }
+
     }
 
     public function getOrderItemData(Request $request)
@@ -369,8 +404,45 @@ class OrderRepository implements OrderRepositoryInterface
     }
     public function getOrderItemGroupList($request)
     {
+        // $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
+        //     ->join('menus', 'order_items.menu_id', 'menus.id')
+        //     ->join('orders', 'order_items.order_id', 'orders.id')
+        //     ->join('areas', 'order_items.area_id', 'areas.id')
+        //     ->join('invoices', 'orders.invoice_id', 'invoices.id')
+        //     ->join('entities', 'invoices.entity_id', 'entities.id')
+        //     ->select(
+        //         'menus.id as menu_id',
+        //         'menus.name as menu_name',
+        //         DB::raw('MIN(order_items.date) as date'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
+        //         DB::raw('SUM(order_items.quantity) as total_quantity'),
+        //         // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
+        //         DB::raw('JSON_ARRAYAGG(
+        //             JSON_OBJECT(
+        //                 "order_item_id", order_items.id,
+        //                 "order_id", order_items.order_id,
+        //                 "date", order_items.date,
+        //                 "menu_id", order_items.menu_id,
+        //                 "menu_name", menus.name,
+        //                 "quantity", order_items.quantity,
+        //                 "area_id", order_items.area_id,
+        //                 "area_name", areas.name,
+        //                 "room_id", entities.id,
+        //                 "room_name", entities.name,
+        //                 "status", order_items.status,
+        //                 "remark", IFNULL(order_items.remark, ""),
+        //                 "group_order_id", order_items.group_order_id
+        //             )
+        //         ) as order_items_details')
+        //     )
+        //     ->whereNotIn('order_items.status', ['placed'])
+        //     ->groupBy('menus.id', 'menus.name', 'group_order_id');
         $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
             ->join('menus', 'order_items.menu_id', 'menus.id')
+            // ->join('remarks', 'order_items.remark_id', 'remarks.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
             ->join('invoices', 'orders.invoice_id', 'invoices.id')
@@ -381,29 +453,37 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('MIN(order_items.date) as date'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
+
+                // 👇 Add extra_item_names via subquery
                 DB::raw('JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        "order_item_id", order_items.id,
-                        "order_id", order_items.order_id,
-                        "date", order_items.date,
-                        "menu_id", order_items.menu_id,
-                        "menu_name", menus.name,
-                        "quantity", order_items.quantity,
-                        "area_id", order_items.area_id,
-                        "area_name", areas.name,
-                        "room_id", entities.id,
-                        "room_name", entities.name,
-                        "status", order_items.status,
-                        "remark", IFNULL(order_items.remark, ""),
-                        "group_order_id", order_items.group_order_id
-                    )
-                ) as order_items_details')
+            JSON_OBJECT(
+                "order_item_id", order_items.id,
+                "order_id", order_items.order_id,
+                "date", order_items.date,
+                "menu_id", order_items.menu_id,
+                "menu_name", menus.name,
+                "quantity", order_items.quantity,
+                "area_id", order_items.area_id,
+                "area_name", areas.name,
+                "room_id", entities.id,
+                "room_name", entities.name,
+                "status", order_items.status,
+                "remark", IFNULL(order_items.remark, ""),
+                "group_order_id", order_items.group_order_id,
+                "extra_item_names", (
+                    SELECT GROUP_CONCAT(items.name SEPARATOR ", ")
+                    FROM order_item_extras
+                    JOIN selling_extras ON selling_extras.id = order_item_extras.selling_extra_id
+                    JOIN items ON items.id = selling_extras.item_id
+                    WHERE order_item_extras.order_item_id = order_items.id
+                )
             )
-            ->whereNotIn('order_items.status',['placed'])
+        ) as order_items_details')
+            )
+            ->whereNotIn('order_items.status', ['placed'])
             ->groupBy('menus.id', 'menus.name', 'group_order_id');
         if ($request->has('area_id') && $request->area_id) {
             $groupedOrderItem->where('order_items.area_id', $request->area_id);
@@ -419,6 +499,39 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getOrderItemsGroupByMenu($request)
     {
+        // $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
+        //     ->join('orders', 'order_items.order_id', 'orders.id')
+        //     ->join('areas', 'order_items.area_id', 'areas.id')
+        //     ->join('invoices', 'orders.invoice_id', 'invoices.id')
+        //     ->join('entities', 'invoices.entity_id', 'entities.id')
+
+        //     ->select(
+        //         'menus.id as menu_id',
+        //         'menus.name as menu_name',
+        //         DB::raw('MIN(order_items.date) as date'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
+        //         DB::raw('SUM(order_items.quantity) as total_quantity'),
+        //         // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
+        //         // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
+        //         DB::raw('JSON_ARRAYAGG( JSON_OBJECT(
+        //         "order_item_id", order_items.id,
+        //         "order_id", order_items.order_id,
+        //         "date", order_items.date,
+        //         "menu_id", order_items.menu_id,
+        //         "menu_name", menus.name,
+        //         "quantity", order_items.quantity,
+        //         "area_id", order_items.area_id,
+        //         "area_name", areas.name,
+        //         "room_id", entities.id,
+        //         "room_name", entities.name,
+        //         "status", order_items.status,
+        //         "remark", IFNULL(order_items.remark, "")
+        //     )) as order_items_details')
+        //     )
+        //     ->whereNull('order_items.group_order_id')
+        //     ->groupBy('menus.id', 'menus.name')
+        //     ->paginate(config('common.list_count'));
         $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
@@ -431,23 +544,30 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('MIN(order_items.date) as date'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
-                // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
-                DB::raw('JSON_ARRAYAGG( JSON_OBJECT(
-                "order_item_id", order_items.id,
-                "order_id", order_items.order_id,
-                "date", order_items.date,
-                "menu_id", order_items.menu_id,
-                "menu_name", menus.name,
-                "quantity", order_items.quantity,
-                "area_id", order_items.area_id,
-                "area_name", areas.name,
-                "room_id", entities.id,
-                "room_name", entities.name,
-                "status", order_items.status,
-                "remark", IFNULL(order_items.remark, "")
-            )) as order_items_details')
+
+                // 👇 JSON object for order items including extra item names
+                DB::raw('JSON_ARRAYAGG(JSON_OBJECT(
+            "order_item_id", order_items.id,
+            "order_id", order_items.order_id,
+            "date", order_items.date,
+            "menu_id", order_items.menu_id,
+            "menu_name", menus.name,
+            "quantity", order_items.quantity,
+            "area_id", order_items.area_id,
+            "area_name", areas.name,
+            "room_id", entities.id,
+            "room_name", entities.name,
+            "status", order_items.status,
+            "remark", IFNULL(order_items.remark, ""),
+            "extra_item_names", (
+                SELECT GROUP_CONCAT(items.name SEPARATOR ", ")
+                FROM order_item_extras
+                JOIN selling_extras ON selling_extras.id = order_item_extras.selling_extra_id
+                JOIN items ON items.id = selling_extras.item_id
+                WHERE order_item_extras.order_item_id = order_items.id
+            )
+        )) as order_items_details')
             )
             ->whereNull('order_items.group_order_id')
             ->groupBy('menus.id', 'menus.name')

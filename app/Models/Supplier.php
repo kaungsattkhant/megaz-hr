@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\SupplierItem;
 use App\Models\SupplierPhone;
+use App\Models\AccountPayable;
 use App\Models\SupplierBankAccount;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -65,5 +66,10 @@ class Supplier extends Model
     public function supplierBankAccount()
     {
         return $this->hasMany(SupplierBankAccount::class, 'supplier_id');
+    }
+
+    public function accountPayables()
+    {
+        return $this->hasMany(AccountPayable::class);
     }
 }

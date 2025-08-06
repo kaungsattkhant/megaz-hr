@@ -147,6 +147,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
+                $supplierExist = SupplierItem::where('item_id', $item->item_id)
+                    ->where('is_active', 1)
+                    ->exists();
+                if (!$supplierExist) {
+                    return ResponseMessage('Supplier not found for this item', 422);
+                }
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
                 } else {
@@ -521,31 +527,21 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function getAvgPriceByBrand($itemId, $brandId)
     {
-        $avgItemPrice = SupplierItem::where('item_id', $itemId)
+        $totalPrice = 0;
+        $count = 0;
+
+        $supplierItems = SupplierItem::with('item_price')
+            ->where('item_id', $itemId)
             ->where('brand_id', $brandId)
-            ->whereHas('item_price') // Ensure related item_price exists
-            ->with('item_price') // Load the related item_price
-            ->join('item_prices', 'supplier_items.id', '=', 'item_prices.supplier_item_id') // Join with item_prices
-            ->avg('item_prices.price'); // Calculate average price
-        return $avgItemPrice ? (float) $avgItemPrice : 0;
-
-        // $supplierItems = SupplierItem::where('item_id', $itemId)
-        //     ->where('brand_id', $brandId)
-        //     ->get();
-
-        // $totalPrice = 0;
-        // $totalCount = 0;
-        // foreach ($supplierItems as $supplierItem) {
-        //     $itemPrice = $supplierItem->item_price;
-
-        //     if ($itemPrice) {
-        //         $totalPrice += $itemPrice->price;
-        //         $totalCount++;
-        //     }
-        // }
-
-        // $avgItemPrice = $totalCount > 0 ? $totalPrice / $totalCount : 0;
-
-        // return $avgItemPrice;
+            ->get();
+        foreach ($supplierItems as $supplierItem) {
+            $itemPrice = $supplierItem->item_price;
+            if ($itemPrice) {
+                $totalPrice +=  $itemPrice->price;
+                $count++;
+            }
+        }
+        $averagePrice = $count > 0 ? $totalPrice / $count : 0;
+        return $averagePrice;
     }
 }

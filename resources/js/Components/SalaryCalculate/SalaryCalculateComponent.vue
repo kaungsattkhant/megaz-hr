@@ -1,13 +1,15 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Calculate Salary
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white ">
-        <div class="border-b py-3 px-8 mb-5" v-if="feature.includes('salary-calculate.create')">
+
+        <div class="card-shadow" v-if="feature.includes('salary-calculate.create')">
             <notifications position="top center" />
-            <div class="grid grid-cols-4 pr-0 gap-x-4">
+            <div>
+                <p class=" page-title">
+                    Calculate Salary
+                </p>
+            </div>
+            <div class="grid grid-cols-4 pr-0 gap-x-4 px-4 pt-2">
                 
                 <div class="mb-4">
                     <label for="" class="label-form mb-3">
@@ -121,7 +123,7 @@
                         </tbody>
                     </table>
                     <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
-                        class=" opacity-0 w-0 h-0">
+                        class=" opacity-0 w-0 h-0 mx-4">
                     </button>
 
                     <!-- pagination -->

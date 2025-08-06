@@ -1100,6 +1100,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function storePoArrivalItems($validatedData)
   {
+    // dd('abc');
     DB::beginTransaction();
     try {
       if (isset($validatedData['is_new_invoice']) && $validatedData['is_new_invoice'] == 1) {
@@ -1241,12 +1242,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ResponseMessage('Main Inventory not found.', 404);
     }
     $inventoryLedger = InventoryLedger::create([
-      'inventory_id' =>  $inventoryId,
+      'inventory_id' => $inventoryId,
       'date' => now()->format('Y-m-d'),
       'ledgerable_id' => $arrivalItem->id,
       'ledgerable_type' => 'arrival_item',
       'action' => 'in'
     ]);
+    $batchNo = now()->format('YmdHis') .'_'. $arrivalItem->item_id .'_'. $inventoryLedger->id;
+    $inventoryLedger->batch_no = $batchNo;
+    $inventoryLedger->save();
 
     InventoryLedgerItem::create([
       'inventory_ledger_id' => $inventoryLedger->id,
@@ -1445,7 +1449,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
     DB::beginTransaction();
     try {
-      $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId,$supplierId);
+      $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId, $supplierId);
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
         $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
       }
@@ -1494,31 +1498,45 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
   }
 
-  public function getSuppliersListsByItem($itemId){
+  public function getSuppliersListsByItem($itemId)
+  {
     $latestSupplierItemIds = SupplierItem::select(DB::raw('MAX(id) as id'))
-        ->where('item_id', $itemId)
-        ->groupBy('supplier_id');
-        $supplierByItem = SupplierItem::with(['supplier', 'brand', 'item', 'item_price'])
-        ->whereIn('id', $latestSupplierItemIds)
-        ->get();
-        foreach($supplierByItem as $supplier){
-            $averageQuality = ArrivalItem::where('item_id', $itemId)
-                ->where('supplier_id', $supplier->supplier_id)
-                ->avg('quality');
-            $supplier->average_quality = $averageQuality ? round($averageQuality, 2) : null;
+      ->where('item_id', $itemId)
+      ->groupBy('supplier_id');
+    $supplierByItem = SupplierItem::with(['supplier', 'brand', 'item', 'item_price'])
+      ->whereIn('id', $latestSupplierItemIds)
+      ->get();
+    foreach ($supplierByItem as $supplier) {
+      $averageQuality = ArrivalItem::where('item_id', $itemId)
+        ->where('supplier_id', $supplier->supplier_id)
+        ->avg('quality');
+      $supplier->average_quality = $averageQuality ? round($averageQuality, 2) : null;
 
-            $leadTimeData = $this->getSupplierLeadTime($supplier->supplier_id);
-            $leadTime = null;
-            if (isset($leadTimeData['details'])) {
-                foreach ($leadTimeData['details'] as $detail) {
-                    if ($detail['item_id'] == $itemId) {
-                        $leadTime = $detail['average_order_time'];
-                        break;
-                    }
-                }
-            }
-            $supplier->lead_time = $leadTime;
+      $leadTimeData = $this->getSupplierLeadTime($supplier->supplier_id);
+      $leadTime = null;
+      if (isset($leadTimeData['details'])) {
+        foreach ($leadTimeData['details'] as $detail) {
+          if ($detail['item_id'] == $itemId) {
+            $leadTime = $detail['average_order_time'];
+            break;
+          }
         }
-        return $supplierByItem;
+      }
+      $supplier->lead_time = $leadTime;
+      if ($supplier->supplier->credit_term_type === 'amount_limitation') {
+        $creditInfo = DB::table('account_payables')
+          ->where('supplier_id', $supplier->supplier_id)
+          ->select(
+            DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) 
+                      - SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) 
+                      as total_credit_amount')
+          )
+          ->first();
+        $supplier->remaining_credit_limitation = $supplier->supplier->amount_limitation - $creditInfo->total_credit_amount;
+      } else {
+        $supplier->remaining_credit_limitation = null;
+      }
+    }
+    return $supplierByItem;
   }
 }

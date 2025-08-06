@@ -6,7 +6,7 @@
 @section('content')
 
 <div id="app">
-    <item-crud-component/>
+    <item-list-component/>
 </div>
 
 @endsection

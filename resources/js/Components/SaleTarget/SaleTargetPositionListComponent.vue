@@ -1,24 +1,26 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Sale Target Position
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <button class="add-btn h-8 text-[13px] font-inter">Search</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Sale Target Position
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/sale_target_position/create" class="add-btn text-[13px] font-inter">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
 
+                    <button class="add-btn h-8 text-[13px] font-inter">Search</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/sale_target_position/create" class="add-btn text-[13px] font-inter">
+                        Add New
+                    </a>
+
+                </div>
             </div>
         </div>
         <div class="box-container-table">

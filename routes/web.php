@@ -53,7 +53,11 @@ Route::middleware(['departments:uom-conversion'])->group(function () {
 // item
 Route::middleware(['departments:item'])->group(function () {
     Route::view('/items', 'items.index')->name('items');
+    Route::view('/items/create', 'items.create')->name('items.create');
+    Route::view('/items/{id}/edit', 'items.edit')->name('items.edit');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
+
+    Route::view('/selling_extras', 'selling_extras.index')->name('selling_extras');
 });
 Route::middleware(['departments:item.detail'])->group(function () {
     Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
@@ -225,7 +229,7 @@ Route::middleware(['departments:asset-item'])->group(function () {
 Route::middleware(['departments:asset-item.create'])->group(function () {
     Route::view('/asset_items/create', 'fixed_assets.asset_items')->name('fixed_assets.asset_items');
 });
-Route::middleware(['departments:account-payable'])->group(function () {
+Route::middleware(['departments:ap-balance'])->group(function () {
     Route::view('/account_payables', 'AP.index')->name('AP.index');
     Route::view('/account_payables/suppliers/{supplierId}/transactions', 'AP.history')->name('AP.history');
 });
@@ -251,6 +255,8 @@ Route::group(['prefix' => 'pos'], function () {
     Route::view('/invoices/detail', 'pos.invoices.detail')->name('pos.invoices.detail');
     Route::view('/customer_deposit', 'pos.customer_deposit.index')->name('pos.customer_deposit');
     Route::view('/selling_areas', 'pos.areas.index')->name('pos.areas');
+    Route::view('/sale_report', 'pos.sale_reports.index')->name('pos.sale_reports');
+    Route::view('/pos_order/{id}', 'pos.home.order')->name('pos.home.order');
     // });
 });
 
@@ -426,9 +432,9 @@ Route::middleware(['departments:okr-duty'])->group(function () {
     Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
 
 });
-Route::middleware(['departments:okr-duty.create'])->group(function () {
+// Route::middleware(['departments:okr-duty.create'])->group(function () {
     Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
-});
+// });
 Route::middleware(['departments:okr-duty.edit'])->group(function () {
     Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
 });
@@ -474,15 +480,15 @@ Route::middleware(['departments:ktv-forecasting.edit'])->group(function () {
 
 
 // ktv product tree
-Route::middleware(['departments:ktv-product-tree'])->group(function () {
+// Route::middleware(['departments:ktv-product-tree'])->group(function () {
     Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
-});
-Route::middleware(['departments:ktv-product-tree.create'])->group(function () {
+// });
+// Route::middleware(['departments:ktv-product-tree.create'])->group(function () {
     Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
-});
-Route::middleware(['departments:ktv-product-tree.edit'])->group(function () {
+// });
+// Route::middleware(['departments:ktv-product-tree.edit'])->group(function () {
     Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
-});
+// });
 
 
 Route::middleware(['departments:po-order'])->group(function () {
@@ -663,6 +669,17 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::middleware(['departments:event'])->group(function () {
         Route::view('/events', 'event.index')->name('event.index');
     });
+
+
+
+    Route::view('/JD', 'job_description.index')->name('job_description.index');
+    Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
+    Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
+    Route::view('/SOP', 'SOP.index')->name('SOP.index');
+    Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+    Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+    Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
 // });
 
 // =======
