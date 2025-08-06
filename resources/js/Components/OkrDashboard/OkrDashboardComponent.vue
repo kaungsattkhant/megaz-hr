@@ -184,7 +184,7 @@ export default {
 
             searchInput:null,
 
-            url:'/api/dashboard_okr',
+            url:'/api/dashboard-okr',
             url_department:'',
             url_role:'',
             url_staff:'',
