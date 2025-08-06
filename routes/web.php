@@ -229,7 +229,7 @@ Route::middleware(['departments:asset-item'])->group(function () {
 Route::middleware(['departments:asset-item.create'])->group(function () {
     Route::view('/asset_items/create', 'fixed_assets.asset_items')->name('fixed_assets.asset_items');
 });
-Route::middleware(['departments:account-payable'])->group(function () {
+Route::middleware(['departments:ap-balance'])->group(function () {
     Route::view('/account_payables', 'AP.index')->name('AP.index');
     Route::view('/account_payables/suppliers/{supplierId}/transactions', 'AP.history')->name('AP.history');
 });

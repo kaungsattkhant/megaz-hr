@@ -19,7 +19,7 @@ class AuthController extends Controller
         }
         if (Auth::attempt(['phone_number' => $request->phone_number, 'password' => $request->password], $remember)) {
             // $this->storeFcmToken($request->fcm_token);
-            $firstFeaturePermission = UserData()->features->first();    
+            $firstFeaturePermission = UserData()->features->first();   
             if ($firstFeaturePermission) {
                 $routeName = config('feature_route.' . $firstFeaturePermission->module);
                 if ($routeName) {
