@@ -962,7 +962,7 @@
                         </a>
                     </li>
                     @endif
-                    <!-- @if (checkFeaturePermission('okr-duty')) -->
+                    @if (checkFeaturePermission('okr-duty'))
                     <li>
                         <a href="/okr_assign" class="flex items-center @yield('okr_assign') sidebar-gap-x">
                             <i class="fal fa-poll-people"></i>
@@ -970,7 +970,7 @@
                             OKR Assign
                         </a>
                     </li>
-                    <!-- @endif -->
+                    @endif
                     @if (checkFeaturePermission('okr-dashboard'))
                     <li>
                         <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
