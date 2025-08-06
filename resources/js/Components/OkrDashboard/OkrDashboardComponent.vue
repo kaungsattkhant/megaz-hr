@@ -46,10 +46,10 @@
                         </select>
                     </div> -->
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Staff" @change="selectedStaffChanged()"
-                            data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui">
-                            <option :value="staff" v-for="(staff, staffIndex) in staffList"
-                                :key="staffIndex"> {{ staff.name }} </option>
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
                 </div>
@@ -71,22 +71,22 @@
                                     Department
                                 </th>
                                 <th scope="col" class="">
-                                    Key Results
+                                    Position
                                 </th>
                                 <th scope="col" class="">
-                                    Assigned Date
+                                    Assigned Task
                                 </th>
                                 <th scope="col" class="">
-                                    Due Date
+                                    In progess Task
                                 </th>
                                 <th scope="col" class="">
-                                    Start Date
+                                    Completed Task
                                 </th>
                                 <th scope="col" class="">
-                                    End Date
+                                    Approve Task
                                 </th>
                                 <th scope="col" class="">
-                                    Okr Point
+                                    
                                 </th>
                             </tr>
                         </thead>
@@ -99,28 +99,28 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.name }}
+                                        {{ okr.staff_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ okr.department_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.objective_key_name }}
+                                        {{ okr.role_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.assign_date }}
+                                        {{ okr.assigned_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.due_date }}
+                                        {{ okr.in_progress_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.assign_date }}
+                                        {{ okr.completed_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.due_date }}
+                                        {{ okr.approved_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.okr_total_point }}
+                                        <!-- {{ okr.okr_total_point }} -->
                                     </td>
                                     
                                     <!-- <td class="whitespace-nowrap">
@@ -201,7 +201,7 @@ export default {
         
         async getOkrList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
-            let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department;
+            let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.okrList = response.data.data;
@@ -224,15 +224,17 @@ export default {
             }
         },
         selectedDepartmentChange(){
-            this.getRoleList();
+            // this.getRoleList();
+            this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = null;
             this.url_from = '';
             this.url_to = '';
-            this.url_staff = '';
+            this.url_role = '';
             this.url_department = '?department_id=' + this.selectedDepartment.id;
             this.getOkrList();
             this.fromDate = null;
             this.toDate = null;
-            this.selectedStaff = null;
+            // this.selectedStaff = null;
         },
         async getRoleList(){
             let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
@@ -244,7 +246,7 @@ export default {
             this.url_from = '';
             this.url_to = '';
             this.url_staff = '';
-            this.url_role = '?role_id=' + this.selectedRole.id;
+            this.url_role = '&role_id=' + this.selectedRole.id;
             this.getOkrList();
             this.fromDate = null;
             this.toDate = null;
