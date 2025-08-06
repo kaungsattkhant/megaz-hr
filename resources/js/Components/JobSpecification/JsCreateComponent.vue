@@ -30,7 +30,7 @@
 
                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="getSkillList"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="roleChange"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                         <option :value="role" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
@@ -234,12 +234,12 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-        async getJdList(){
-            let response = await getApiData({ url: '/api/job-descriptions', token: this.getToken() });
-            if (response.data) {
-                this.jdList = response.data.data;
-            }
-        },
+        // async getJdList(){
+        //     let response = await getApiData({ url: '/api/job-descriptions', token: this.getToken() });
+        //     if (response.data) {
+        //         this.jdList = response.data.data;
+        //     }
+        // },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -256,6 +256,14 @@ export default {
         getRoleByDepartment(){
             this.selectedRoleForSkill = null;
             this.roleListForSkill = this.selectedDepartmentForSkill.roles;
+        },
+        async roleChange(){
+            this.selectedJd = null;
+            let response = await getApiData({ url: '/api/job-descriptions?role_id=' + this.selectedRole.id, token: this.getToken() });
+            if (response.data) {
+                this.jdList = response.data;
+            }
+            this.getSkillList();
         },
         async getSkillList(){
             this.selectedSkill = null;
@@ -391,7 +399,7 @@ export default {
 
     mounted() {
         this.getDepartmentList();
-        this.getJdList();
+        // this.getJdList();
         initTE({ Modal, Select, Tab, Ripple });
     }
 }
