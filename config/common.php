@@ -301,6 +301,7 @@ return [
         "asset.create",
         "fix-asset",
         "fix-asset.create",
+        "asset-depreciation-balance",
         'account-payableaccount.edit', // This looks like a typo, possibly should be two items?
         'account.delete',
         'financial-transaction',
