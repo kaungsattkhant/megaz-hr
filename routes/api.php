@@ -398,7 +398,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () { });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -480,7 +480,7 @@ Route::middleware('auth:api')->group(function () {
 Route::controller(FeatureAPIController::class)->group(function () {
     Route::get('/features', 'getFeatureData');
     Route::post('/feature_import', 'featureImport');
-    Route::get('feature_by_department/{department_id}','getFeatureByDepartment');
+    Route::get('feature_by_department/{department_id}', 'getFeatureByDepartment');
 });
 Route::controller(AdsAPIController::class)->group(function () {
     Route::get('/ads', 'getAds');
@@ -562,6 +562,8 @@ Route::controller(BankController::class)->group(function () {
     Route::post('/banks', 'createBank');
 });
 
+Route::get('/staff_lists', [StaffAPIController::class, 'staffList']);
+
 
 // Route::get('/tasks', [TaskController::class, 'getTaskData']);
 // Route::post('/tasks', [TaskController::class, 'createTask']);
@@ -589,7 +591,7 @@ Route::get('/items/{id}', [ItemAPIController::class, 'detail']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 
-Route::controller(SellingExtraAPIController::class)->group(function(){
+Route::controller(SellingExtraAPIController::class)->group(function () {
     Route::get('/selling_extra_categories', 'getSellingExtraCategories');
     Route::post('/selling_extra_categories', 'createSellingExtraCategory');
     Route::get('/selling_extras', 'getSellingExtras');
@@ -689,4 +691,3 @@ Route::controller(TagController::class)->group(function () {
     Route::get('/tags', 'getTags');
     Route::post('/tags', 'createTag');
 });
-

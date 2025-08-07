@@ -127,6 +127,10 @@ class CvRepository implements CvRepositoryInterface
         }
       }
 
+      if (isset($data['profile_image_path']) && $staff->profile_image_path) {
+        DeleteFileFromServer($staff->profile_image_path);
+      }
+
       $staff->update($data);
       $staff->emergencyContacts()->updateOrCreate(['staff_id' => $staff->id], $data);
       DB::commit();
@@ -203,7 +207,7 @@ class CvRepository implements CvRepositoryInterface
 
   public function getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId)
   {
-    $salarySetup = SalarySetup::with('salaryAllowances.allowance','role.department')->where('role_id', $roleId)
+    $salarySetup = SalarySetup::with('salaryAllowances.allowance', 'role.department')->where('role_id', $roleId)
       ->whereHas('role.department', function ($query) use ($departmentId) {
         $query->where('id', $departmentId);
       })
@@ -221,7 +225,7 @@ class CvRepository implements CvRepositoryInterface
       $roleId = $roleIds->first();
       $salarySetup = SalarySetup::where('role_id', $roleId)->first();
 
-      if($data['basic_salary'] > $salarySetup->basic_salary){
+      if ($data['basic_salary'] > $salarySetup->basic_salary) {
         ResponseMessage('Basic salary is greater than salary setup basic salary', 402);
       }
 
@@ -241,7 +245,7 @@ class CvRepository implements CvRepositoryInterface
         foreach ($salary_allowances as $salary_allowance) {
           SalaryAllowance::updateOrCreate(
             [
-              'salary_setup_id' =>$data['salary_setup_id'],
+              'salary_setup_id' => $data['salary_setup_id'],
               'allowance_id' => $salary_allowance['allowance_id'],
             ],
             [
@@ -257,7 +261,8 @@ class CvRepository implements CvRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
     }
   }
-  public function storeNewStaffJoinDate(array $data){
+  public function storeNewStaffJoinDate(array $data)
+  {
     DB::beginTransaction();
     try {
       $data['created_by'] = UserData()->id;
@@ -270,8 +275,8 @@ class CvRepository implements CvRepositoryInterface
           'id' => $data['staff_id'],
         ],
         [
-        'joined_date' => $data['joined_date'],
-        'is_cv' => 0,
+          'joined_date' => $data['joined_date'],
+          'is_cv' => 0,
         ]
       );
       $this->sendStaffJoinNotification($staff);

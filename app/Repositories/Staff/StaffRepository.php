@@ -12,6 +12,7 @@ use App\Models\StaffBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\StaffResource;
 use App\Models\StaffEmergencyContact;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,7 +24,7 @@ class StaffRepository implements StaffRepositoryInterface
         $roleIds = $request->role_id;
 
         $staffQuery = Staff::orderByDesc('id')
-            ->with(['department', 'roles',  'bank','staffCertifications'])
+            ->with(['department', 'roles',  'bank', 'staffCertifications'])
             ->where('is_cv', 0)
             ->when($request->search_input, function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search_input . '%');
@@ -41,6 +42,17 @@ class StaffRepository implements StaffRepositoryInterface
             });
         $staff = isset($request->page) ? $staffQuery->paginate(config('common.list_count')) : $staffQuery->get();
         return $staff;
+    }
+
+    //for mobile app
+    public function staffList($request)
+    {
+        $departmentId = $request->department_id;
+        $data = Staff::with(['department', 'roles'])->where('is_cv', 0)
+            ->when($departmentId, function ($query) use ($departmentId) {
+                $query->where('department_id', $departmentId);
+            })->orderByDesc('id')->get();
+        return StaffResource::collection($data);
     }
 
     public function staffBalanceList(Request $request)
@@ -94,7 +106,6 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function createData(array $data)
     {
-        // dd($data);
         DB::beginTransaction();
         try {
             $data['is_active'] = 1;
@@ -120,15 +131,15 @@ class StaffRepository implements StaffRepositoryInterface
                 $staff->roles()->attach($data['role_id']);
             }
 
-            foreach($data['feature_ids'] as $featureId){
+            foreach ($data['feature_ids'] as $featureId) {
                 $staff->features()->attach($featureId);
             }
 
-            foreach($data['inventory_ids'] as $inventoryId){
+            foreach ($data['inventory_ids'] as $inventoryId) {
                 $staff->inventories()->attach($inventoryId);
             }
 
-            foreach($data['skill_ids'] as $skillId){
+            foreach ($data['skill_ids'] as $skillId) {
                 $staff->skills()->attach($skillId);
             }
 
@@ -180,6 +191,10 @@ class StaffRepository implements StaffRepositoryInterface
                     }
                 }
 
+                if (isset($data['profile_image_path']) && $staff->profile_image_path) {
+                    DeleteFileFromServer($staff->profile_image_path);
+                }
+
                 if (isset($data['certificate_images']) && is_array($data['certificate_images'])) {
                     foreach ($staff->staffCertifications as $oldCertification) {
                         if ($oldCertification->certificate_file_path) {
@@ -188,6 +203,7 @@ class StaffRepository implements StaffRepositoryInterface
                         $oldCertification->delete();
                     }
                 }
+
                 if (isset($data['certificate_images']) && is_array($data['certificate_images'])) {
                     foreach ($data['certificate_images'] as $certificateImage) {
                         if ($certificateImage instanceof \Illuminate\Http\UploadedFile) {
@@ -203,22 +219,21 @@ class StaffRepository implements StaffRepositoryInterface
                         }
                     }
                 }
-
                 $staff->update($data);
 
                 if (isset($data['role_id'])) {
                     $staff->roles()->sync($data['role_id']);
                 }
 
-                if(isset($data['feature_ids']) && is_array($data['feature_ids'])){
+                if (isset($data['feature_ids']) && is_array($data['feature_ids'])) {
                     $staff->features()->sync($data['feature_ids']);
                 }
 
-                if(isset($data['inventory_ids']) && is_array($data['inventory_ids'])){
+                if (isset($data['inventory_ids']) && is_array($data['inventory_ids'])) {
                     $staff->inventories()->sync($data['inventory_ids']);
                 }
 
-                if(isset($data['skill_ids']) && is_array($data['skill_ids'])){
+                if (isset($data['skill_ids']) && is_array($data['skill_ids'])) {
                     $staff->skills()->sync($data['skill_ids']);
                 }
             }
@@ -233,9 +248,18 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories',
-        'emergencyContacts', 'gender', 'completed_tasks',
-        'features', 'skills', 'bank','staffCertifications')->find($id);
+        $staff = Staff::with(
+            'department',
+            'roles',
+            'inventories',
+            'emergencyContacts',
+            'gender',
+            'completed_tasks',
+            'features',
+            'skills',
+            'bank',
+            'staffCertifications'
+        )->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }

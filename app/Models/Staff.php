@@ -60,7 +60,9 @@ class Staff extends Authenticatable
         'confirmed_by',
         'cancelled_at',
         'cancelled_by',
-        'is_cv'
+        'is_cv',
+        'profile_image_url',
+        'profile_image_path',
     ];
 
     protected $hidden = [

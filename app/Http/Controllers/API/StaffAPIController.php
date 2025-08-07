@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Staff;
+
 use Illuminate\Http\Request;
 
+use Psy\Readline\Hoa\_Protocol;
 use App\Http\Controllers\Controller;
+
+use Illuminate\Support\Facades\Storage;
 
 use App\Http\Requests\Staff\StaffCreateRequest;
 use App\Http\Requests\Staff\StaffUpdateRequest;
-
-use App\Models\Staff;
-
 use App\Repositories\Staff\StaffRepositoryInterface;
-use Psy\Readline\Hoa\_Protocol;
 
 class StaffAPIController extends Controller
 {
@@ -43,7 +44,7 @@ class StaffAPIController extends Controller
 
     public function createStaff(Request $request)
     {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -59,11 +60,16 @@ class StaffAPIController extends Controller
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
+        }
         // $data['roles'] = explode(',', $request->roles);
         $data['role_id'] = $request->role_id;
         $data['feature_ids'] = json_decode($request->feature_ids);
-        $data['inventory_ids'] = ($request->inventory_ids)? json_decode($request->inventory_ids): [];
-        $data['skill_ids'] = ($request->skill_ids)? json_decode($request->skill_ids): [];
+        $data['inventory_ids'] = ($request->inventory_ids) ? json_decode($request->inventory_ids) : [];
+        $data['skill_ids'] = ($request->skill_ids) ? json_decode($request->skill_ids) : [];
         $staff = $this->staffRepo->createData($data);
 
         ResponseData($staff);
@@ -71,7 +77,7 @@ class StaffAPIController extends Controller
 
     public function updateStaff(Request $request, $id)
     {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -87,10 +93,15 @@ class StaffAPIController extends Controller
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
+        }
         $data['role_id'] = $request->role_id;
         $data['feature_ids'] = json_decode($request->feature_ids);
-        $data['inventory_ids'] = ($request->inventory_ids)? json_decode($request->inventory_ids): [];
-        $data['skill_ids'] = ($request->skill_ids)? json_decode($request->skill_ids): [];
+        $data['inventory_ids'] = ($request->inventory_ids) ? json_decode($request->inventory_ids) : [];
+        $data['skill_ids'] = ($request->skill_ids) ? json_decode($request->skill_ids) : [];
         $staff = $this->staffRepo->updateData($data, $id);
 
         if (!$staff) {
@@ -185,5 +196,11 @@ class StaffAPIController extends Controller
     public function nrcLists(Request $request)
     {
         $staff = $this->staffRepo->nrcLists($request);
+    }
+
+    public function staffList(Request $request)
+    {
+        $staff = $this->staffRepo->staffList($request);
+        ResponseData($staff);
     }
 }
