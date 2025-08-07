@@ -451,11 +451,6 @@
                             :preselect-first="true"
                             @close="itemCategorySelectChanged"
                         >
-                            <!-- <template #selection="{ values, search, isOpen }">
-                                <span class="multiselect__single"
-                                    v-if="values.length"
-                                    v-show="!isOpen">{{ values.length }} Cooking Place selected</span>
-                            </template> -->
                         </multiselect>
                     </div>
                 </div>
@@ -467,7 +462,20 @@
                         class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref
                     >
-                        <select
+                    <multiselect
+                        v-model="selectedItem"
+                        :options="itemList"
+                        :multiple="false"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Item"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="true"
+                        @select="itemSelectChanged"
+                    ></multiselect>
+                        <!-- <select
                             data-te-select-init
                             data-te-select-placeholder="Select Category"
                             @change="itemSelectChanged()"
@@ -484,12 +492,12 @@
                             >
                                 {{ itemList.name }}
                             </option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3"> Qty </label>
-                    <input type="text" v-model="amount" class="input-ui" />
+                    <input type="number" v-model="amount" class="input-ui" />
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
@@ -1079,7 +1087,7 @@ export default {
                         item_id: this.selectedItem.id,
                         price: price,
                         name: this.selectedItem.name,
-                        weight: this.amount,
+                        weight: parseFloat(this.amount),
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
                         uom_name: this.selectedUom.name,
@@ -1093,7 +1101,7 @@ export default {
                         item_id: this.selectedItem.id,
                         price: price,
                         name: this.selectedItem.name,
-                        weight: this.amount,
+                        weight: parseFloat(this.amount),
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
                         uom_name: this.selectedUom.name,
@@ -1181,10 +1189,12 @@ export default {
             } else if (!this.selectedMenuType) {
                 this.alertValidationMessage(`Type`);
                 return 1;
-            } else if (!this.description) {
-                this.alertValidationMessage(`Description`);
-                return 1;
-            } else {
+            }
+            // else if (!this.description) {
+            //     this.alertValidationMessage(`Description`);
+            //     return 1;
+            // }
+            else {
                 let cookingPlaceId = [];
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id);
