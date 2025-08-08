@@ -37,7 +37,7 @@ class OffDayRepository implements OffDayRepositoryInterface
         }
       }
 
-      if ($validatedData['offdayable_id']) {
+      if (isset($validatedData['offdayable_id'])) {
         $dayoffdayableIds = json_decode($validatedData['offdayable_id'], true);
         foreach ($dayoffdayableIds as $dayoffdayableId) {
           OffDayAssignment::create([

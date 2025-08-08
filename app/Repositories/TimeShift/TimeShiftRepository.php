@@ -45,7 +45,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function storeShifts($data)
   {
-    return Shift::create($data);
+    return Shift::updateOrCreate(
+      ['id' => $data['id']],
+      $data
+    );
   }
 
   public function getTimeShift($request)
