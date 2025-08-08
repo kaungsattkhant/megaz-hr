@@ -644,9 +644,7 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::view('/resignations', 'resignations.index')->name('resignations.index');
 
 
-    Route::view('/cv/form', 'CV.form')->name('CV.form');
-    Route::view('/cv', 'CV.index')->name('CV.index');
-    Route::view('/cv/{id}/detail', 'CV.detail');
+    
     Route::view('/exams', 'exams.index');
     Route::view('/exam/create', 'exams.create')->name('exams.create');
     Route::view('/exam/{id}/edit', 'exams.edit');
@@ -672,11 +670,28 @@ Route::middleware(['departments:time-shift'])->group(function () {
 
 
 
-    Route::view('/JD', 'job_description.index')->name('job_description.index');
-    Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
-    Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
-    Route::view('/SOP', 'SOP.index')->name('SOP.index');
-    Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    Route::middleware(['departments:jd'])->group(function () {
+        Route::view('/JD', 'job_description.index')->name('job_description.index');
+    });
+    Route::middleware(['departments:js'])->group(function () {
+        Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
+    });
+    Route::middleware(['departments:js.create'])->group(function () {
+        Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
+    });
+    Route::middleware(['departments:sop'])->group(function () {
+        Route::view('/SOP', 'SOP.index')->name('SOP.index');
+    });
+    Route::middleware(['departments:sop.create'])->group(function () {
+        Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    });
+    Route::middleware(['departments:cv'])->group(function () {
+        Route::view('/cv', 'CV.index')->name('CV.index');
+    });
+
+
+    Route::view('/cv/form', 'CV.form')->name('CV.form');
+    Route::view('/cv/{id}/detail', 'CV.detail');
     Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
     Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
     Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');

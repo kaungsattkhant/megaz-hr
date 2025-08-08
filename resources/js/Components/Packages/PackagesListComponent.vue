@@ -17,7 +17,8 @@
                     <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
                 <div class="flex justify-end flex-col">
-                    <a href="/packages/create" class="add-btn text-[13px] font-inter">
+                    <a href="/packages/create" class="add-btn text-[13px] font-inter"
+                        v-show="feature.includes('package.create')">
                         Add New
                     </a>
 
@@ -198,13 +199,15 @@ export default {
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
-            totalData:0
+            totalData:0,
+
+            feature: this.getFeature(),
 
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getPromotionPackageList(pageNumber) {
             let url = `/api/packages?page=${pageNumber}`;

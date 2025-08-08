@@ -83,7 +83,7 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ item.joined_date ? item.joined_date : '-' }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
@@ -99,18 +99,22 @@
                                     </td>
 
                                     <td class="whitespace-nowrap">
-                                        <!-- <button @click="addDateBtnClicked(item.id)" data-te-toggle="modal"
-                                            data-te-target="#add_date" id="date-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button> -->
+                                        <button @click="addJoinedDateBtnClicked(item)" data-te-toggle="modal"
+                                            
+                                            data-te-target="#add_date" id="date-btn" class="pr-3">
+                                            <i class="fal fa-calendar-check"></i>
+                                        </button>
                                         <button @click="addSalaryBtnClicked(item)" data-te-toggle="modal"
+                                            v-show="feature.includes('cv-salary.create')"
                                             data-te-target="#add_salary" id="salary-btn" class="">
                                             <i class="fal fa-money-bill-wave pr-3"></i>
                                         </button>
-                                        <a :href="'/cv/' + item.id + '/detail'" class="pr-3">
+                                        <a :href="'/cv/' + item.id + '/detail'" class="pr-3"
+                                            v-show="feature.includes('cv.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
                                         <button @click="deleteBtnClicked(item.id)" data-te-toggle="modal"
+                                            v-show="feature.includes('cv.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -154,7 +158,7 @@
                             Salary And Allowances
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close" id="close_add_answer_modal">
+                            aria-label="Close" id="close_add_salary_modal">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -162,18 +166,22 @@
                         </button>
                     </div>
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                        <div class="grid grid-cols-6 gap-x-5 gap-y-4 text-sm">
-                            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                        <div class="grid grid-cols-6 gap-x-5 gap-y-1 text-sm">
+                            <div class="mb-0 col-span-3 pb-0 rounded-md">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Salary
                                 </label>
-                                <input type="number" v-model="selectedSalary" autocomplete="off" :max="salarySetup?.basic_salary"
+                                <input type="number" v-model="selectedSalary" autocomplete="off" :max="salarySetup?.basic_salary" @change="salaryChange"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <p class="mt-2 text-xs">
                                     Allowed Amount : <span class="pl-2">{{ salarySetup?.basic_salary.toLocaleString() }}</span>
                                 </p>
+                                
                             </div><div class="col-span-3"></div>
-                            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                            <p v-if="isExceed" class="col-span-6 mb-0 text-sm text-red-600">
+                                The entered salary exceeds the role-based Salary
+                            </p>
+                            <div class="mb-8 mt-8 col-span-3 pb-0 rounded-md">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Allowance
                                 </label>
@@ -188,7 +196,7 @@
                                 <!-- <input type="text" v-model="selectedAllowance" autocomplete="off"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
                             </div>
-                            <div class="mb-4 col-span-2 pb-0 rounded-md">
+                            <div class="mb-8 mt-8 col-span-2 pb-0 rounded-md">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Amount
                                 </label>
@@ -196,7 +204,7 @@
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             
-                            <div class="col-span-1 mb-4">
+                            <div class="col-span-1 mb-8 mt-8">
                                 <label class="label-form mb-3">&nbsp;</label>
                                 <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10" @click="addAllowanceAmount()" >
                                     Add
@@ -250,15 +258,61 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="addAnswerToQuestion()"
+                        <button type="button" @click="addSalaryAndAllowance"
                             class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
+                            Add
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- joined date -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_date" tabindex="-1" aria-labelledby="add_question_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_question_modalLabel">
+                            Add Joined Date
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close" id="close_add_joined_date_modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-0 col-span-3 pb-0 rounded-md">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Date
+                            </label>
+                            <input type="date" v-model="selectedJoinedDate" autocomplete="off"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" @click="addJoinedDate"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <!--Delete Modal -->
@@ -367,11 +421,16 @@ export default {
             selectedAllowance: null,
             selectedAmount: null,
             selectedAllowanceAmountList: [],
+
+            isExceed: false,
+            selectedJoinedDate: null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment', 'getToken']),
+        ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
             let url = '';
@@ -434,11 +493,20 @@ export default {
 
         async addSalaryBtnClicked(item){
             this.selectedItem = item;
+            this.selectedSalary = null;
+            this.selectedAllowanceAmountList = [];
             let response = await getApiData({ url: '/api/hr/salary_setup/department/' + item.department.id + '/role/' + item.roles[0].id, token: this.getToken() });
             if (response.data) {
                 this.salarySetup = response.data;
                 response.data.salary_allowances.forEach(item => {
                     this.allowanceList.push(item.allowance)
+                });
+            }
+            else{
+                this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
                 });
             }
         },
@@ -448,12 +516,84 @@ export default {
         async addAllowanceAmount(){
             this.selectedAllowanceAmountList.push({
                 name: this.selectedAllowance ? this.selectedAllowance.name : null,
-                id: this.selectedAllowance ? this.selectedAllowance.id : null,
+                allowance_id: this.selectedAllowance ? this.selectedAllowance.id : null,
                 amount: this.selectedAmount,
             })
             this.selectedAllowance = null;
             this.selectedAmount = null;
         },
+        salaryChange(){
+            if(this.selectedSalary > this.salarySetup.basic_salary){
+                this.isExceed = true;
+            }
+            else{
+                this.isExceed = false;
+            }
+        },
+        async addSalaryAndAllowance(){
+            if(!this.selectedSalary){
+                this.alertValidationMessage(`Salary `);
+                return 1;
+            }
+            else{
+                let formData = new FormData();
+                formData.append('basic_salary',this.selectedSalary);
+                formData.append('role_id',this.selectedItem.roles[0].id);
+                formData.append('staff_id',this.selectedItem.id);
+                formData.append('salary_setup_id',this.salarySetup.id);
+                formData.append('salary_allowances',JSON.stringify(this.selectedAllowanceAmountList));
+                let response = await postApiData({url:`/api/hr/new-staff-salary`, form_data:formData, token:this.getToken()})
+                if(response.success){
+                    this.getPrimaryList();
+                    document.getElementById('close_add_salary_modal').click();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            }
+        },
+
+
+        async addJoinedDateBtnClicked(item){
+            this.selectedJoinedDate = null;
+            this.selectedItem = item;
+            // let response = await getApiData({ url: '/api/hr/new-staff-join-date/', token: this.getToken() });
+            // if (response.data) {
+            //     this.salarySetup = response.data;
+            //     response.data.salary_allowances.forEach(item => {
+            //         this.allowanceList.push(item.allowance)
+            //     });
+            // }
+        },
+        async addJoinedDate(){
+            if(!this.selectedJoinedDate){
+                this.alertValidationMessage(`Join Date `);
+                return 1;
+            }
+            else{
+                let formData = new FormData();
+                formData.append('staff_id',this.selectedItem.id);
+                formData.append('joined_date',this.selectedJoinedDate);
+                let response = await postApiData({url:`/api/hr/new-staff-join-date`, form_data:formData, token:this.getToken()})
+                if(response.success){
+                    this.getPrimaryList();
+                    document.getElementById('close_add_joined_date_modal').click();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            }
+        },
+
+
         deleteBtnClicked(id) {
             this.deleteId = id;
         },

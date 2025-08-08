@@ -19,16 +19,16 @@
                 </div>
                 <div class="flex pr-0 gap-x-4">
                     <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Department"
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange"
                             data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
-                            <option :value="department.value" v-for="(department, departmentIndex) in searchDepartmentList"
+                            <option :value="department" v-for="(department, departmentIndex) in searchDepartmentList"
                                 :key="departmentIndex"> {{ department.name }} </option>
                         </select>
                     </div>
                     <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange"
                             data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
-                            <option :value="role.value" v-for="(role, roleIndex) in searchRoleList"
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
@@ -331,7 +331,19 @@ export default {
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
+                this.searchDepartmentList = response.data;
             }
+        },
+        searchDepartmentChange(){
+            this.searchRoleList = this.selectedSearchDepartment.roles;
+            this.selectedSearchRole = null;
+            this.url_role = '';
+            // this.url_department = '?department_id=' + this.selectedSearchDepartment.id;
+            // this.getAllowanceList();
+        },
+        searchRoleChange(){
+            this.url_role = '?role_id=' + this.selectedSearchRole.id;
+            this.getAllowanceList();
         },
         selectedDepartmentChange(){
             console.log('dep change')
