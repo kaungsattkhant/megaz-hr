@@ -15,7 +15,7 @@ return [
         'customer.create',
         'customer-deposit',
         'customer-deposit.confirm',
-        'invoice.list',
+        'invoice.list', 
         'pos-cashbook',
 
         'inventory-stock',

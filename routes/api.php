@@ -608,6 +608,8 @@ Route::post('/import/item_types', [ItemAPIController::class, 'importItemType']);
 Route::post('/import/categories', [ItemAPIController::class, 'importCategory']);
 Route::post('/import/uoms', [ItemAPIController::class, 'importUom']);
 Route::post('/import/items', [ItemAPIController::class, 'itemImport']);
+Route::post('/import/item_prices', [ItemAPIController::class, 'itemPriceImport']);
+
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
