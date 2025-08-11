@@ -1034,7 +1034,7 @@
                     @endif
                     @if (checkFeaturePermission('gps'))
                     <li>
-                        <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">
+                        <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">   
                             <i class="fal fa-map-marker-alt "></i>
                             <!-- <img class="sidebar-img " src="{{ asset('img/icons8-gps-48.png') }}" alt=""> -->
                             GPS

@@ -60,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
             'customer_deposit'=>'App\Models\CustomerDeposit',
             'role'=>'App\Models\Role',
             'selling_extra'=>'App\Models\SellingExtra',
+            'staff_advance'=>'App\Models\StaffAdvance',
         ]);
     }
 }

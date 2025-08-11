@@ -193,26 +193,13 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Menu
                     </label>
-                    <div
-                        class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
-                        data-te-select-wrapper-ref
-                    >
-                        <select
-                            data-te-select-init
-                            data-te-select-placeholder="Select Category"
-                            data-te-select-filter="true"
-                            name=""
-                            id=""
-                            v-model="selectedMenu"
-                            class="input-ui"
-                        >
-                            <option
-                                :value="menu"
-                                v-for="(menu, menuIndex) in menuList"
-                                :key="menuIndex"
-                            >
-                                {{ menu.name }}
-                            </option>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category"
+
+                            data-te-select-filter="true" name="" id="" v-model="selectedMenu" class="input-ui">
+                            <option :value="menu" v-for="(menu, menuIndex) in menuList"
+                                :key="menuIndex"> {{ menu.name }} </option>
                         </select>
                     </div>
                 </div>
@@ -436,7 +423,7 @@
                     <div class="col-span-6"></div>
                 </div>
 
-                <div v-show="!is_show" class="col-span-3"></div>
+                <div  v-show="!is_show" class="col-span-3"></div>
                 <div class="mb-0 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Item Category
@@ -464,11 +451,6 @@
                             :preselect-first="true"
                             @close="itemCategorySelectChanged"
                         >
-                            <!-- <template #selection="{ values, search, isOpen }">
-                                <span class="multiselect__single"
-                                    v-if="values.length"
-                                    v-show="!isOpen">{{ values.length }} Cooking Place selected</span>
-                            </template> -->
                         </multiselect>
                     </div>
                 </div>
@@ -480,7 +462,20 @@
                         class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref
                     >
-                        <select
+                    <multiselect
+                        v-model="selectedItem"
+                        :options="itemList"
+                        :multiple="false"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Item"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="true"
+                        @select="itemSelectChanged"
+                    ></multiselect>
+                        <!-- <select
                             data-te-select-init
                             data-te-select-placeholder="Select Category"
                             @change="itemSelectChanged()"
@@ -497,12 +492,12 @@
                             >
                                 {{ itemList.name }}
                             </option>
-                        </select>
+                        </select> -->
                     </div>
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3"> Qty </label>
-                    <input type="text" v-model="amount" class="input-ui" />
+                    <input type="number" v-model="amount" class="input-ui" />
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
@@ -545,17 +540,29 @@
         <div class="bg-white py-4 px-8 rounded-md shadow-md mb-8">
             <div v-if="menuLevel.item_menu.length > 0">
                 <div class="flex mb-2">
-                    <p v-if="menuLevel.level">{{ menuLevel.level }} :</p>
-                    <p>&nbsp;{{ menuLevel.type }}</p>
+                    <p v-if="menuLevel.level">
+                        {{ menuLevel.level }} :
+                    </p>
+                    <p>
+                        &nbsp;{{ menuLevel.type }}
+                    </p>
                 </div>
                 <div class="flex gap-x-8 mb-4">
                     <div class="flex mb-2">
-                        <p>Position :</p>
-                        <p>&nbsp;{{ menuLevel.role_name }}</p>
+                        <p>
+                            Position :
+                        </p>
+                        <p>
+                            &nbsp;{{ menuLevel.role_name }}
+                        </p>
                     </div>
                     <div class="flex mb-2">
-                        <p>Duration :</p>
-                        <p>&nbsp;{{ menuLevel.duration }} min</p>
+                        <p>
+                            Duration :
+                        </p>
+                        <p>
+                            &nbsp;{{ menuLevel.duration }} min
+                        </p>
                     </div>
                 </div>
             </div>
@@ -570,12 +577,9 @@
                         </tr>
                     </thead>
                     <tbody v-if="menuLevel">
-                        <tr
-                            v-if="menuLevel.item_menu.length > 0"
-                            class=""
-                            v-for="(menu, menuIndex) in menuLevel.item_menu"
-                            :key="menuIndex"
-                        >
+
+                        <tr v-if="menuLevel.item_menu.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item_menu"
+                            :key="menuIndex">
                             <td class="">
                                 {{ menu.name }}
                             </td>
@@ -602,11 +606,16 @@
                 </table>
             </div>
             <div class="flex gap-x-4 mt-8 mb-4">
-                <button class="add-btn" @click="clearMenuLevel()">Clear</button>
+                <button class="add-btn" @click="clearMenuLevel()">
+                    Clear
+                </button>
                 <button class="add-btn" @click="addLevelBtnClicked()">
                     Add
                 </button>
             </div>
+
+
+
         </div>
         <div class="bg-white py-4 px-8 rounded-md shadow-md mb-8">
             <div class="table-container">
@@ -646,11 +655,8 @@
                                 </button>
                             </td>
                         </tr>
-                        <tr
-                            class=""
-                            v-for="(submenu, submenuIndex) in subMenuList"
-                            :key="submenuIndex"
-                        >
+                        <tr class="" v-for="(submenu, submenuIndex) in subMenuList"
+                            :key="submenuIndex">
                             <td class="" colspan="4">
                                 {{ submenu.name }}
                             </td>
@@ -672,6 +678,9 @@
                     </tbody>
                 </table>
             </div>
+
+
+
         </div>
 
         <div>
@@ -776,7 +785,9 @@ export default {
     },
 
     methods: {
-        ...mapGetters(["getToken"]),
+        ...mapGetters(['getToken']),
+
+
 
         async getCookingAreaList() {
             let response = await getApiData({
@@ -950,8 +961,12 @@ export default {
             const selectedFile = event.target.files[0];
             this.selectedImage = selectedFile;
         },
-        btnClickedAddMenuLevel() {
-            if (this.selectedMenuType == "menu") {
+        btnClickedAddMenuLevel(){
+            if(this.selectedMenuType == 'menu'){
+                if(!this.selectedMenu){
+                    this.alertValidationMessage('menu');
+                    return;
+                }
                 this.subMenuList.push({
                     name: this.selectedMenu.name,
                     id: this.selectedMenu.id,
@@ -969,8 +984,13 @@ export default {
             if (!this.selectedLevel) {
                 this.alertValidationMessage("Level");
                 return 1;
-            } else if (!this.selectedType) {
-                this.alertValidationMessage("Type");
+            }
+            else if (!this.selectedType) {
+                this.alertValidationMessage('Type');
+                return 1;
+            }
+            else if(!this.selectedRole){
+                this.alertValidationMessage('Role');
                 return 1;
             } else if (!this.selectedRole) {
                 this.alertValidationMessage("Role");
@@ -1067,19 +1087,21 @@ export default {
                         item_id: this.selectedItem.id,
                         price: price,
                         name: this.selectedItem.name,
-                        weight: this.amount,
+                        weight: parseFloat(this.amount),
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
                         uom_name: this.selectedUom.name,
                         uom_type: uom_type,
                         uom_conversion: this.selectedUom.uom_conversion,
                     });
-                } else {
+
+                }
+                else{
                     this.menuLevel.item_menu.push({
                         item_id: this.selectedItem.id,
                         price: price,
                         name: this.selectedItem.name,
-                        weight: this.amount,
+                        weight: parseFloat(this.amount),
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
                         uom_name: this.selectedUom.name,
@@ -1167,10 +1189,12 @@ export default {
             } else if (!this.selectedMenuType) {
                 this.alertValidationMessage(`Type`);
                 return 1;
-            } else if (!this.description) {
-                this.alertValidationMessage(`Description`);
-                return 1;
-            } else {
+            }
+            // else if (!this.description) {
+            //     this.alertValidationMessage(`Description`);
+            //     return 1;
+            // }
+            else {
                 let cookingPlaceId = [];
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id);
