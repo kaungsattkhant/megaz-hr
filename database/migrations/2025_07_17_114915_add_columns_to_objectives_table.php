@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::table('objectives', function (Blueprint $table) {
-        // $table->double('okr_point')->after('is_active');
-        // $table->enum('type', ['daily', 'occasionally'])->after('okr_point');
-        // $table->integer('repetition')->nullable()->after('type');
-        // $table->foreignId('role_id')->after('okr_point');
-        // $table->foreignId('sop_id')->after('role_id');
-        // });
+        Schema::table('objectives', function (Blueprint $table) {
+        $table->double('okr_point')->after('is_active');
+        $table->enum('type', ['daily', 'occasionally'])->after('okr_point');
+        $table->integer('repetition')->nullable()->after('type');
+        $table->foreignId('role_id')->after('okr_point');
+        $table->foreignId('sop_id')->after('role_id');
+        });
     }
 
     /**
