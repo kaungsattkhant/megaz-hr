@@ -12,10 +12,9 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class ShiftAssignedEvent implements ShouldBroadcast
-{
+class StaffTimeshiftNotification implements ShouldBroadcast
+{ 
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
     public $staffTimeshift;
     public $notification;
     public function __construct(StaffTimeshift $staffTimeshift, Notification $notification)
@@ -24,15 +23,10 @@ class ShiftAssignedEvent implements ShouldBroadcast
         $this->notification = $notification;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
         return [
-            new Channel("staff-timeshift-status-updated.{$this->staffTimeshift->created_by}"),
+            new Channel("staff-timeshift-assigned.{$this->staffTimeshift->staff_id}"),
         ];
     }
 

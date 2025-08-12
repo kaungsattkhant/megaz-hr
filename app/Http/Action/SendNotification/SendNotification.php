@@ -12,6 +12,7 @@ use App\Events\SendRoleNotification;
 use App\Events\SendStaffNotification;
 use App\Events\SendStaffJoinNotification;
 use App\Events\SendDepartmentNotification;
+use App\Events\StaffTimeshiftNotification;
 use App\Events\SendNotification as EventsSendNotification;
 
 trait SendNotification
@@ -208,7 +209,7 @@ trait SendNotification
                 'title' => 'Shift Assigned',
                 'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
             ]);
-            broadcast(new ShiftAssignedEvent($staffTimeshift, $notification));
+            broadcast(new StaffTimeshiftNotification($staffTimeshift, $notification));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);
