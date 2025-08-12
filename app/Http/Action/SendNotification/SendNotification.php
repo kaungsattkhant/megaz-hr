@@ -5,6 +5,8 @@ namespace App\Http\Action\SendNotification;
 use App\Models\Staff;
 use App\Models\Notification;
 use App\Models\StaffFcmToken;
+use App\Models\NotificationUser;
+use App\Events\ShiftAssignedEvent;
 use Illuminate\Support\Facades\Log;
 use App\Events\SendRoleNotification;
 use App\Events\SendStaffNotification;
@@ -179,6 +181,63 @@ trait SendNotification
                 ]);
             }
             broadcast(new SendStaffJoinNotification($staff, $notification));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+    public function sendShiftAssignedNotification($staffTimeshift)
+    {
+        try {
+            $morphMapName = RelationMorphName($staffTimeshift);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $staffTimeshift->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Shift Assigned',
+                    'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staffTimeshift->staff_id,
+            ],[
+                'title' => 'Shift Assigned',
+                'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
+            ]);
+            broadcast(new ShiftAssignedEvent($staffTimeshift, $notification));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+    public function sendShiftStatusNotificationToAdmin($staffTimeshift , $status)
+    {
+        try {
+            $morphMapName = RelationMorphName($staffTimeshift);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $staffTimeshift->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Shift Status ' . ucfirst($status),
+                    'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staffTimeshift->created_by,
+            ],[
+                'title' => 'Shift Status ' . ucfirst($status),
+                'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
+            ]);
+            broadcast(new ShiftAssignedEvent($staffTimeshift, $notification));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);

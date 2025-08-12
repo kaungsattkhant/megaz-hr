@@ -1127,37 +1127,104 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getallNoties($request, $staffId)
   {
 
+    // $type = $request->query('type');
+    // $notifications = NotificationUser::with([
+    //   'notification.notificationable',
+    //   'notification.notificationable.participants',
+    //   'notification.notificationable.participants.department.roles',
+    //   'notification.notificationable.participants.role.department',
+    //   'notification.notificationable.participants.staff.department',
+    //   'notification.notificationable.participants.staff.roles',
+    // ])
+    //   ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
+    //   ->where('notification_users.staff_id', '=', $staffId)
+    //   ->when($type, function ($query) use ($type) {
+    //     return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew'])
+    //       ->where('notifications.notificationable_type', $type);
+    //   }, function ($query) {
+    //     return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew']);
+    //   })->orderBy('notifications.created_at', 'desc')
+    //   ->get();
+    // foreach ($notifications as $notification) {
+    //   $notificationable = $notification->notification->notificationable;
+    //   if ($notificationable) {
+    //     switch ($notification->notification->notificationable_type) {
+    //       case 'meeting':
+    //         $notificationable->load('chairedBy');
+    //         break;
+    //       case 'training':
+    //         $notificationable->load('trainedBy');
+    //         break;
+    //     }
+    //   }
+    // }
+    // return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
+
     $type = $request->query('type');
-    $notifications = NotificationUser::with([
-      'notification.notificationable',
-      'notification.notificationable.participants',
-      'notification.notificationable.participants.department.roles',
-      'notification.notificationable.participants.role.department',
-      'notification.notificationable.participants.staff.department',
-      'notification.notificationable.participants.staff.roles',
-    ])
+    
+    $notificationUsers = NotificationUser::with(['notification'])
       ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
       ->where('notification_users.staff_id', '=', $staffId)
       ->when($type, function ($query) use ($type) {
-        return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew'])
-          ->where('notifications.notificationable_type', $type);
-      }, function ($query) {
-        return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew']);
-      })->orderBy('notifications.created_at', 'desc')
+            return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift'])
+              ->where('notifications.notificationable_type', $type);
+          }, function ($query) {
+            return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+          })
+      ->orderBy('notifications.created_at', 'desc')
       ->get();
-    foreach ($notifications as $notification) {
-      $notificationable = $notification->notification->notificationable;
-      if ($notificationable) {
-        switch ($notification->notification->notificationable_type) {
-          case 'meeting':
-            $notificationable->load('chairedBy');
-            break;
-          case 'training':
-            $notificationable->load('trainedBy');
-            break;
+    
+    foreach ($notificationUsers as $notificationUser) {
+      $notificationType = $notificationUser->notification->notificationable_type;
+      $notificationUser->notification->load(['notificationable']);
+      if ($notificationType === 'staff_timeshift') {
+        $notificationUser->notification->load([
+          'notificationable.timeshift.shift',
+          'notificationable.area'
+        ]);
+      } elseif (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
+        $notificationUser->notification->load([
+          'notificationable.participants',
+          'notificationable.participants.department.roles',
+          'notificationable.participants.role.department',
+          'notificationable.participants.staff.department',
+          'notificationable.participants.staff.roles'
+        ]);
+        
+        if ($notificationType === 'meeting') {
+          $notificationUser->notification->load('notificationable.chairedBy');
+        } elseif ($notificationType === 'training') {
+          $notificationUser->notification->load('notificationable.trainedBy');
         }
       }
     }
-    return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
+    return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
+  }
+
+  public function getMeetingsByStaffId($staffId)
+  {
+    $staff = Staff::with('department','roles')->find($staffId);
+    if(!$staff){
+      return ResponseData(null, 404, false, 'Staff not found.');
+    }
+    $departmentId = $staff->department_id;
+    $roleIds = $staff->roles->pluck('id')->toArray();
+    $meetings = Meeting::with([
+      'chairedBy',
+      'createdBy',
+      'participants.department',
+      'participants.role', 
+      'participants.staff'
+    ])
+    ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
+      $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+        $subQuery->where('staff_id', $staffId)
+          ->orWhere('department_id', $departmentId)
+          ->orWhereIn('role_id', $roleIds);
+      });
+    })
+    ->orderBy('date_time', 'desc')
+    ->get();
+    return ResponseData($meetings, 200, true, 'Meetings retrieved successfully.');
   }
 }

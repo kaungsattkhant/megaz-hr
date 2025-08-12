@@ -37,4 +37,5 @@ interface ParticipantNotificationInterface
 
   //mobile
   public function getallNoties($request, $staffId);
+  public function getMeetingsByStaffId($staffId);
 }
