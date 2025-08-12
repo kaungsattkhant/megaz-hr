@@ -2,6 +2,7 @@
 
 namespace App\Repositories\ParticipantNotification;
 
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\Type;
 use App\Models\Staff;
@@ -12,9 +13,12 @@ use App\Models\Training;
 use App\Models\Department;
 use App\Models\Participant;
 use App\Models\Notification;
+use App\Models\StaffTimeshift;
 use App\Models\NotificationUser;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\MeetingResource;
 use Illuminate\Support\Facades\Request;
+use App\Http\Resources\StaffTimeShiftResource;
 use App\Http\Resources\NotificationUserResource;
 use App\Http\Action\SendNotification\SendNotification;
 
@@ -1201,20 +1205,24 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
   }
 
-  public function getMeetingsByStaffId($staffId)
+  public function getMeetingsByStaffId($staffId,$request)
   {
     $staff = Staff::with('department','roles')->find($staffId);
     if(!$staff){
       return ResponseData(null, 404, false, 'Staff not found.');
     }
+
     $departmentId = $staff->department_id;
     $roleIds = $staff->roles->pluck('id')->toArray();
+    $search = $request->query('search');
+    $currentDateTime = Carbon::now()->toDateTimeString();
     $meetings = Meeting::with([
       'chairedBy',
-      'createdBy',
+      'participants.staff.department',
+      'participants.staff.roles',
       'participants.department',
-      'participants.role', 
-      'participants.staff'
+      'participants.role',
+      'participants.role.department',
     ])
     ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
       $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
@@ -1223,8 +1231,57 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           ->orWhereIn('role_id', $roleIds);
       });
     })
-    ->orderBy('date_time', 'desc')
+    ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
+      return $query->where('date_time', '>=', $currentDateTime);
+    })
+    ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
+      return $query->where('date_time', '<', $currentDateTime);
+    })
+    ->orderBy('id', 'desc')
     ->get();
-    return ResponseData($meetings, 200, true, 'Meetings retrieved successfully.');
+    return ResponseData(MeetingResource::collection($meetings), 200, true, 'Meetings retrieved successfully.');
+  }
+
+  public function getTrainingsByStaffId($staffId,$request)
+  {
+    $staff = Staff::with('department','roles')->find($staffId);
+    if(!$staff){
+      return ResponseData(null, 404, false, 'Staff not found.');
+    }
+
+    $departmentId = $staff->department_id;
+    $roleIds = $staff->roles->pluck('id')->toArray();
+    $search = $request->query('search');
+    $currentDateTime = Carbon::now()->toDateTimeString();
+    $trainings = Training::with([
+      'trainedBy',
+      'participants.staff.department',
+      'participants.staff.roles',
+      'participants.department',
+      'participants.role',
+      'participants.role.department',
+    ])
+    ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
+      $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+        $subQuery->where('staff_id', $staffId)
+          ->orWhere('department_id', $departmentId)
+          ->orWhereIn('role_id', $roleIds);
+      });
+    })
+    ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
+      return $query->where('date_time', '>=', $currentDateTime);
+    })
+    ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
+      return $query->where('date_time', '<', $currentDateTime);
+    })
+    ->orderBy('id', 'desc')
+    ->get();
+    return ResponseData(MeetingResource::collection($trainings), 200, true, 'Trainings retrieved successfully.');
+  }
+
+  public function getShiftsByStaffId($staffId,$request)
+  {
+    $shifts = StaffTimeshift::with('staff','timeshift.shift','area')->where('staff_id',$staffId)->orderBy('id','desc')->paginate(config('common.list_count'));
+    return ResponseData(StaffTimeShiftResource::collection($shifts), 200, true, 'Shifts retrieved successfully.');
   }
 }
