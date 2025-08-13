@@ -695,6 +695,14 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
     Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
     Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
+    Route::view('/handbooks', 'handbooks.index')->name('handbooks.index');
+    Route::view('/handbooks/create', 'handbooks.create')->name('handbooks.create');
+    Route::view('/shift_assignment', 'shift_assignment.index')->name('shift_assignment.index');
+    Route::view('/shift_assignment/create', 'shift_assignment.create')->name('shift_assignment.create');
+    Route::view('/asset_assignment', 'asset_assignment.index')->name('asset_assignment.index');
+    Route::view('/equipment_assignment', 'equipment_assignment.index')->name('equipment_assignment.index');
+    Route::view('/equipment_assignment/create', 'equipment_assignment.create')->name('equipment_assignment.create');
+    Route::view('/shift', 'shift.index')->name('shift.index');
 // });
 
 // =======

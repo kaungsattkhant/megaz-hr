@@ -1016,6 +1016,21 @@
                     </li>
                     @endif
 
+                    @if (checkFeaturePermission('staff') || checkFeaturePermission('staff.create'))
+                    <li>
+                        <p class="sidebar-title">
+                            HR
+                        </p>
+                    </li>
+                    @endif
+                    <li>
+                        <a href="/handbooks" class="flex items-center @yield('handbook') sidebar-gap-x">
+                            <i class="fal fa-project-diagram "></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-product-tree-64.png') }}" alt=""> -->
+                            Handbooks
+                        </a>
+                    </li>
+
                     @if (checkFeaturePermission('time-shift') || checkFeaturePermission('gps') || checkFeaturePermission('check-in'))
                     <li>
                         <p class="sidebar-title">
@@ -1032,6 +1047,13 @@
                         </a>
                     </li>
                     @endif
+                    <li>
+                        <a href="/shift" class="flex items-center @yield('shift') sidebar-gap-x">
+                            <i class="fal fa-user-clock "></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-time-shift-50.png') }}" alt=""> -->
+                            Shift
+                        </a>
+                    </li>
                     @if (checkFeaturePermission('gps'))
                     <li>
                         <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">

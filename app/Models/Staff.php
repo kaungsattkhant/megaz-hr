@@ -12,6 +12,7 @@ use App\Models\Inventory;
 use App\Models\Department;
 use App\Models\TaskDetail;
 use App\Models\LeaveAllowance;
+use App\Models\StaffTimeshift;
 use App\Models\SalaryBatchStaff;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\StaffCertification;
@@ -59,7 +60,9 @@ class Staff extends Authenticatable
         'confirmed_by',
         'cancelled_at',
         'cancelled_by',
-        'is_cv'
+        'is_cv',
+        'profile_image_url',
+        'profile_image_path',
     ];
 
     protected $hidden = [
@@ -279,5 +282,9 @@ class Staff extends Authenticatable
     public function leaveAllowances()
     {
         return $this->morphMany(LeaveAllowance::class, 'allowanceable');
+    }
+    public function staffTimeshifts()
+    {
+        return $this->hasMany(StaffTimeshift::class, 'staff_id');
     }
 }
