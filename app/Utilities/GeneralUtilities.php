@@ -343,6 +343,19 @@ if (!function_exists('checkFeaturePermission')) {
         return false;
     }
 }
+if (!function_exists('checkMultipleFeaturePermission')) {
+    function checkMultipleFeaturePermission($names)
+    {
+        $features = UserData()->features;
+        foreach ($names as $name) {
+            if ($features->contains('slug', $name)) {
+                return true;
+            }
+        }
+      
+        return false;
+    }
+}
 
 if (!function_exists('InventoryIds')) {
     function InventoryIds()
