@@ -248,6 +248,14 @@ import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
 import OkrAssignComponent from './Components/OkrAssign/OkrAssignComponent.vue';
 import OkrAssignCreateComponent from './Components/OkrAssign/OkrAssignCreateComponent.vue';
 import OkrAssignEditComponent from './Components/OkrAssign/OkrAssignEditComponent.vue';
+import HandbooksListComponent from './Components/Handbooks/HandbooksListComponent.vue';
+import HandbooksCreateComponent from './Components/Handbooks/HandbooksCreateComponent.vue';
+import ShiftAssignmentListComponent from './Components/ShiftAssignment/ShiftAssignmentListComponent.vue';
+import ShiftAssignmentCreateComponent from './Components/ShiftAssignment/ShiftAssignmentCreateComponent.vue';
+import AssetAssignmentCrudComponent from './Components/AssetAssignment/AssetAssignmentCrudComponent.vue';
+import EquipmentAssignmentListComponent from './Components/EquipmentAssignment/EquipmentAssignmentListComponent.vue';
+import EquipmentAssignmentCreateComponent from './Components/EquipmentAssignment/EquipmentAssignmentCreateComponent.vue';
+import ShiftCrudComponent from './Components/Shift/ShiftCrudComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -476,6 +484,14 @@ app.component('SopCreateComponent',SopCreateComponent);
 app.component('OkrAssignComponent',OkrAssignComponent);
 app.component('OkrAssignCreateComponent',OkrAssignCreateComponent);
 app.component('OkrAssignEditComponent',OkrAssignEditComponent);
+app.component('HandbooksListComponent',HandbooksListComponent);
+app.component('HandbooksCreateComponent',HandbooksCreateComponent);
+app.component('ShiftAssignmentListComponent',ShiftAssignmentListComponent);
+app.component('ShiftAssignmentCreateComponent',ShiftAssignmentCreateComponent);
+app.component('AssetAssignmentCrudComponent',AssetAssignmentCrudComponent);
+app.component('EquipmentAssignmentListComponent',EquipmentAssignmentListComponent);
+app.component('EquipmentAssignmentCreateComponent',EquipmentAssignmentCreateComponent);
+app.component('ShiftCrudComponent',ShiftCrudComponent);
 
 
 app.use(store);

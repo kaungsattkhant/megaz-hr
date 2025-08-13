@@ -1016,6 +1016,21 @@
                     </li>
                     @endif
 
+                    @if (checkFeaturePermission('staff') || checkFeaturePermission('staff.create'))
+                    <li>
+                        <p class="sidebar-title">
+                            HR
+                        </p>
+                    </li>
+                    @endif
+                    <li>
+                        <a href="/handbooks" class="flex items-center @yield('handbook') sidebar-gap-x">
+                            <i class="fal fa-project-diagram "></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-product-tree-64.png') }}" alt=""> -->
+                            Handbooks
+                        </a>
+                    </li>
+
                     @if (checkFeaturePermission('time-shift') || checkFeaturePermission('gps') || checkFeaturePermission('check-in'))
                     <li>
                         <p class="sidebar-title">
@@ -1032,6 +1047,13 @@
                         </a>
                     </li>
                     @endif
+                    <li>
+                        <a href="/shift" class="flex items-center @yield('shift') sidebar-gap-x">
+                            <i class="fal fa-user-clock "></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-time-shift-50.png') }}" alt=""> -->
+                            Shift
+                        </a>
+                    </li>
                     @if (checkFeaturePermission('gps'))
                     <li>
                         <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">   
@@ -1234,6 +1256,7 @@
                         </a>
                     </li>
                     @endif
+                    @if (checkFeaturePermission('jd'))
                     <li>
                         <a href="/JD" class="flex items-center @yield('JD') sidebar-gap-x">
                             <i class="fal fa-layer-group"></i>
@@ -1241,6 +1264,8 @@
                             JD
                         </a>
                     </li>
+                    @endif
+                    @if (checkFeaturePermission('js'))
                     <li>
                         <a href="/JS" class="flex items-center @yield('JS') sidebar-gap-x">
                             <i class="fal fa-briefcase"></i>
@@ -1248,6 +1273,8 @@
                             JS
                         </a>
                     </li>
+                    @endif
+                    @if (checkFeaturePermission('sop'))
                     <li>
                         <a href="/SOP" class="flex items-center @yield('SOP') sidebar-gap-x">
                             <i class="fal fa-door-open"></i>
@@ -1255,6 +1282,16 @@
                             SOP
                         </a>
                     </li>
+                    @endif
+                    @if (checkFeaturePermission('cv'))
+                    <li>
+                        <a href="/cv" class="flex items-center @yield('cv') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            CV
+                        </a>
+                    </li>
+                    @endif
 
                 </ul>
 

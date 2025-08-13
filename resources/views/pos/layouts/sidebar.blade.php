@@ -121,6 +121,7 @@
                         </a>
                     </li>
                 @endif
+                @if (checkFeaturePermission('pos-menu-sale-report'))
                 <li>
                     <a href="/pos/sale_report" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('sale_report')">
                         <i class="fas fa-chart-bar mb-1.5 text-2xl"></i>
@@ -129,6 +130,7 @@
                         </span>
                     </a>
                 </li>
+                @endif
             </ul>
         </div>
 

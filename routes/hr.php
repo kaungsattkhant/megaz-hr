@@ -7,8 +7,11 @@ use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
 use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\StaffTimeShiftController;
+use App\Http\Controllers\API\AssetItemEquipmentAssignController;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -117,6 +120,23 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/locations', 'createLocation');
     Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
     Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
+  });
+  Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
+    Route::post('/staff_time_shifts', 'createStaffTimeShift');
+    Route::get('/staff_time_shifts', 'getStaffTimeShifts');
+  });
+  Route::prefix('hr')->controller(AssetItemEquipmentAssignController::class)->group(function () {
+    Route::post('/asset-assignments', 'createAssetAssign');
+    Route::get('/asset-assignments', 'getAssetAssigns');
+    Route::post('/equipment-assignments', 'createEquipmentAssign');
+    Route::get('/equipment-assignments', 'getEquipmentAssigns');
+  });
+
+  Route::prefix('hr')->controller(HandBookeController::class)->group(function () {
+    Route::post('/hand-books', 'updateOrCreateHandBook');
+    Route::get('/hand-books', 'getHandBookList');
+    Route::get('/hand-books/{id}', 'getHandBookById');
+    Route::delete('/hand-books/{id}', 'deleteHandBook');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

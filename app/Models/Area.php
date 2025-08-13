@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
 use App\Models\AreaType;
 use App\Models\Inventory;
+
+use App\Models\StaffTimeshift;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Area extends BaseModel
 {
@@ -65,5 +66,10 @@ class Area extends BaseModel
     public function menuCategories()
     {
         return $this->belongsToMany(MenuCategory::class, 'menu_category_areas', 'selling_area_id', 'menu_category_id');
+    }
+
+    public function staffTimeshifts()
+    {
+        return $this->hasMany(StaffTimeshift::class, 'area_id');
     }
 }
