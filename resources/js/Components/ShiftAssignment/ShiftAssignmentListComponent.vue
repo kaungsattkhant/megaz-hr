@@ -48,6 +48,9 @@
                                     #
                                 </th>
                                 <th scope="col" class=" text-left">
+                                    Date
+                                </th>
+                                <th scope="col" class=" text-left">
                                     Staff
                                 </th>
                                 <th scope="col" class="">
@@ -73,6 +76,9 @@
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
+                                    </td>
+                                    <td class="whitespace-nowrap text-left">
+                                        {{ item.date_time.split(' ')[0] }}
                                     </td>
                                     <td class="whitespace-nowrap text-left">
                                         {{ item.staff.name }}

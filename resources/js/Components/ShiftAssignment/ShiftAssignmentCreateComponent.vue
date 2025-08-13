@@ -103,6 +103,9 @@
                     <thead class="!text-left">
                         <tr>
                             <th scope="col" class="">
+                                Date
+                            </th>
+                            <th scope="col" class="">
                                 Department
                             </th>
                             <th scope="col" class="">
@@ -125,6 +128,9 @@
                     <tbody class="!text-left">
                         <tr class="" v-for="(item, itemIndex) in selectedAssignList"
                             :key="itemIndex">
+                            <td class="">
+                                {{ item.date_time }}
+                            </td>
                             <td class="">
                                 {{ item.department_name }}
                             </td>
@@ -157,7 +163,7 @@
         </div>
         <div>
             <button class="add-btn" @click="btnClickedCreateShiftAssign()">
-                Create SOP
+                Create
             </button>
         </div>
     </div>
@@ -251,7 +257,11 @@ export default {
 
 
         btnClickedAddShift(){
-            if(!this.selectedDepartment){
+            if(!this.selectedDate){
+                this.alertValidationMessage(`Date`);
+                return 1;
+            }
+            else if(!this.selectedDepartment){
                 this.alertValidationMessage(`Department`);
                 return 1;
             }
@@ -288,7 +298,7 @@ export default {
                 area_name: this.selectedArea?.name,
                 area_id: this.selectedArea?.id,
             })
-            this.selectedDate = null;
+            // this.selectedDate = null;
             this.selectedDepartment = null;
             this.selectedRole = null;
             this.selectedStaff = null;
@@ -315,7 +325,7 @@ export default {
         },
         async createShiftAssign(){
             let formData = new FormData();
-            formData.append('sops',JSON.stringify(this.selectedAssignList));
+            formData.append('staff_time_shifts',JSON.stringify(this.selectedAssignList));
             let response = await postApiData({url:`/api/hr/staff_time_shifts`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')

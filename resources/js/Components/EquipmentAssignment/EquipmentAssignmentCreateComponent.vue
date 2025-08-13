@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Assign Shift
+                Assign Equipment
             </p>
         </div>
 
@@ -130,7 +130,7 @@
         </div>
         <div>
             <button class="add-btn" @click="btnClickedCreateEquipmentAssing()">
-                Create SOP
+                Create
             </button>
         </div>
     </div>
