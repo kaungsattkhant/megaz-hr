@@ -218,7 +218,7 @@ Route::middleware(['departments:account'])->group(function () {
 });
 
 
-Route::middleware(['departments:fixe-asset'])->group(function () {
+Route::middleware(['departments:fix-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 
 });
