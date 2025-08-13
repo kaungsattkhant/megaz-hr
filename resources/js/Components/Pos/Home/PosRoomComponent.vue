@@ -153,7 +153,7 @@
                                     <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
-                                    <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
+                                    <input type="number" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <div class="mb-4" v-if="isPreDeposit">
@@ -172,7 +172,7 @@
                                     <label for="" class="block text-sm text-black mb-3">
                                         Duration
                                     </label>
-                                    <input type="text" placeholder="" v-model="duration"
+                                    <input type="number" placeholder="" v-model="duration"
                                         :disabled="this.type == 'package' || this.type == 'endless_time'"
                                         :class="this.type == 'package' || this.type == 'endless_time' ? ' cursor-not-allowed ' : ''"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
