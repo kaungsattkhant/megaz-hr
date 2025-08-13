@@ -30,11 +30,11 @@
                                 v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
                             <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
-                                class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40">
+                                class=" flex-shrink-0 flex-grow w-44 max-w-48 h-40 rounded">
                                 <!-- <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" :disabled="parseInt(time.start_time.split(':')) < currentTime" :class="parseInt(time.start_time.split(':')) < currentTime ? ' cursor-not-allowed' : ''"
                                     class="relative flex flex-col justify-between h-full w-full p-6"> -->
                                 <button @click="btnClickedSession(time, timeIndex, room, roomIndex)"
-                                    class="relative flex flex-col justify-between h-full w-full p-6">
+                                    class="relative flex flex-col justify-center h-full w-full py-5 px-1 items-center">
                                     <div  class=" flex justify-center flex-col h-full gap-y-4">
                                         <p class="text-sm text-white">Start Time : <span class="font-semibold">{{ time.start_time ? time.start_time.slice(0,5) : '' }} </span></p>
                                         <p class="text-sm text-white">End Time : <span class="font-semibold">{{ time.end_time ? time.end_time.slice(0,5) : '' }}</span> </p>
@@ -102,8 +102,9 @@
                                     <label for="" class="block text-sm text-black mb-3">
                                         Time
                                     </label>
-                                    <input type="datetime-local" placeholder="Time" v-model="invoice_date" @change="getPackageList(invoice_date)"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                    <input ref="datetimeInput" type="text" class="form-control input-ui"  v-model="invoice_date" @change="getPackageList(invoice_date)" />
+                                    <!-- <input type="datetime-local" placeholder="Time" v-model="invoice_date" @change="getPackageList(invoice_date)"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
@@ -1504,7 +1505,8 @@
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
     import moment from "moment";
-    
+    import flatpickr from "flatpickr";
+    import "flatpickr/dist/flatpickr.min.css";
 
     export default {
         name:'PosRoomComponent',
@@ -1737,8 +1739,7 @@
                     this.isOpenRoomStep('open_1');
                     console.log('open 1')
                 };
-                this.getPackageList(this.currentTimeForPackage);
-
+                this.getPackageList(this.currentTimeForPackage);                
             },
 
             btnClickedOpenRoom() {
@@ -1759,6 +1760,17 @@
                 this.child = null;
                 this.selectedDiscountType = null;
                 this.getDiscountTypeList();
+
+                this.$nextTick(() => {
+                    flatpickr(this.$refs.datetimeInput, {
+                        enableTime: true,
+                        dateFormat: "Y-m-d H:i",
+                        time_24hr: true,
+                        onChange: (selectedDates, dateStr) => {
+                            this.invoice_date = dateStr;
+                        }
+                    });
+                });
             },
 
             // step 2's methods
@@ -2959,6 +2971,8 @@
         },
         mounted()
         {
+            // Date picker
+            
             // if (this.roomAreaId) {
             //     this.getRoomList(this.roomAreaId);
             // }
