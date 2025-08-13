@@ -218,11 +218,15 @@ Route::middleware(['departments:account'])->group(function () {
 });
 
 
-Route::middleware(['departments:fixed-asset'])->group(function () {
+Route::middleware(['departments:fixe-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
+
+});
+Route::middleware(['departments:asset'])->group(function () {
     Route::view('/assets/create', 'fixed_assets.assets')->name('fixed_assets.assets');
     Route::view('/asset/list', 'fixed_assets.asset_list')->name('assetList');
 });
+
 Route::middleware(['departments:asset-item'])->group(function () {
     Route::view('/asset_items/list', 'fixed_assets.asset_item_list')->name('assetItemList');
 });
@@ -349,13 +353,27 @@ Route::middleware(['departments:ar'])->group(function () {
 });
 
 Route::view('/account_receivable/{id}/detail', 'AR.detail');
-Route::middleware(['departments:financial-report'])->group(function () {
+Route::middleware(['departments:cash-flow'])->group(function () {
     Route::view('/cash_flow_statement', 'cash_flow_statement.index');
-    Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
-    Route::view('/working_capital', 'working_capital.index');
-    Route::view('/ap_balances', 'ap_balances.index');
-    Route::view('/creditor_balances', 'creditor_balances.index');
+
 });
+Route::middleware(['departments:indirect-cash-flow'])->group(function () {
+    Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
+
+});
+Route::middleware(['departments:working-capital'])->group(function () {
+    Route::view('/working_capital', 'working_capital.index');
+
+});
+Route::middleware(['departments:ap-balance'])->group(function () {
+    Route::view('/ap_balances', 'ap_balances.index');
+
+});
+Route::middleware(['departments:creditor-balance'])->group(function () {
+    Route::view('/creditor_balances', 'creditor_balances.index');
+
+});
+
 
 Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
     Route::view('/asset_depreciation_balance_list', 'asset_depreciation_balance.index')->name('asset_list');
@@ -433,7 +451,7 @@ Route::middleware(['departments:okr-duty'])->group(function () {
 
 });
 // Route::middleware(['departments:okr-duty.create'])->group(function () {
-    Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
+Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
 // });
 Route::middleware(['departments:okr-duty.edit'])->group(function () {
     Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
@@ -481,13 +499,13 @@ Route::middleware(['departments:ktv-forecasting.edit'])->group(function () {
 
 // ktv product tree
 // Route::middleware(['departments:ktv-product-tree'])->group(function () {
-    Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
+Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
 // });
 // Route::middleware(['departments:ktv-product-tree.create'])->group(function () {
-    Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
+Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
 // });
 // Route::middleware(['departments:ktv-product-tree.edit'])->group(function () {
-    Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
+Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
 // });
 
 
@@ -525,123 +543,146 @@ Route::middleware(['departments:time-shift'])->group(function () {
 //hr
 // Route::middleware(['departments:hr'])->group(function () {
 
-    Route::middleware(['departments:contact'])->group(function () {
-        Route::view('/contact', 'contact.index')->name('contact');
-    });
+Route::middleware(['departments:contact'])->group(function () {
+    Route::view('/contact', 'contact.index')->name('contact');
+});
 
-    // meeting
-    Route::middleware(['departments:meeting'])->group(function () {
-        Route::view('/meeting', 'meeting.index')->name('meeting');
-    });
-    Route::middleware(['departments:meeting.create'])->group(function () {
-        Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
-    });
-    Route::middleware(['departments:meeting.edit'])->group(function () {
-        Route::view('/meeting/{id}/edit', 'meeting.edit');
-    });
+// meeting
+Route::middleware(['departments:meeting'])->group(function () {
+    Route::view('/meeting', 'meeting.index')->name('meeting');
+});
+Route::middleware(['departments:meeting.create'])->group(function () {
+    Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
+});
+Route::middleware(['departments:meeting.edit'])->group(function () {
+    Route::view('/meeting/{id}/edit', 'meeting.edit');
+});
 
-    // training
-    Route::middleware(['departments:training'])->group(function () {
-        Route::view('/training', 'training.index')->name('training');
-    });
-    Route::middleware(['departments:training.create'])->group(function () {
-        Route::view('/training/create', 'training.create')->name('training.create');
-    });
-    Route::middleware(['departments:training.edit'])->group(function () {
-        Route::view('/training/{id}/edit', 'training.edit');
-    });
+// training
+Route::middleware(['departments:training'])->group(function () {
+    Route::view('/training', 'training.index')->name('training');
+});
+Route::middleware(['departments:training.create'])->group(function () {
+    Route::view('/training/create', 'training.create')->name('training.create');
+});
+Route::middleware(['departments:training.edit'])->group(function () {
+    Route::view('/training/{id}/edit', 'training.edit');
+});
 
-    // training
-    Route::middleware(['departments:org-new'])->group(function () {
-        Route::view('/org_news', 'org_news.index')->name('org_news');
-    });
-    Route::middleware(['departments:org-new.create'])->group(function () {
-        Route::view('/org_news/create', 'org_news.create')->name('org_news.create');
-    });
-    Route::middleware(['departments:org-new.edit'])->group(function () {
-        Route::view('/org_news/{id}/edit', 'org_news.edit');
-    });
+// training
+Route::middleware(['departments:org-new'])->group(function () {
+    Route::view('/org_news', 'org_news.index')->name('org_news');
+});
+Route::middleware(['departments:org-new.create'])->group(function () {
+    Route::view('/org_news/create', 'org_news.create')->name('org_news.create');
+});
+Route::middleware(['departments:org-new.edit'])->group(function () {
+    Route::view('/org_news/{id}/edit', 'org_news.edit');
+});
 
-    // warning
-    Route::middleware(['departments:warning'])->group(function () {
-        Route::view('/warning', 'warning.index')->name('warning');
-    });
-    Route::middleware(['departments:warning.create'])->group(function () {
-        Route::view('/warning/create', 'warning.create')->name('warning.create');
-    });
-    Route::middleware(['departments:warning.edit'])->group(function () {
-        Route::view('/warning/{id}/edit', 'warning.edit');
-    });
+// warning
+Route::middleware(['departments:warning'])->group(function () {
+    Route::view('/warning', 'warning.index')->name('warning');
+});
+Route::middleware(['departments:warning.create'])->group(function () {
+    Route::view('/warning/create', 'warning.create')->name('warning.create');
+});
+Route::middleware(['departments:warning.edit'])->group(function () {
+    Route::view('/warning/{id}/edit', 'warning.edit');
+});
 
-    Route::middleware(['departments:off-day'])->group(function () {
-        Route::view('/off_day', 'off_day.index')->name('off_day.index');
-    });
+Route::middleware(['departments:off-day'])->group(function () {
+    Route::view('/off_day', 'off_day.index')->name('off_day.index');
+});
 
-    // leave allowance
-    Route::middleware(['departments:leave-allowance'])->group(function () {
-        Route::view('/leave_allowance', 'leave_allowance.index')->name('leave_allowance.index');
-    });
-    Route::middleware(['departments:leave-allowance.create'])->group(function () {
-        Route::view('/leave_allowance/create', 'leave_allowance.create')->name('leave_allowance.create');
-    });
+// leave allowance
+Route::middleware(['departments:leave-allowance'])->group(function () {
+    Route::view('/leave_allowance', 'leave_allowance.index')->name('leave_allowance.index');
+});
+Route::middleware(['departments:leave-allowance.create'])->group(function () {
+    Route::view('/leave_allowance/create', 'leave_allowance.create')->name('leave_allowance.create');
+});
 
-    Route::middleware(['departments:leave'])->group(function () {
-        Route::view('/leave', 'leave.index')->name('leave.index');
-    });
+Route::middleware(['departments:leave'])->group(function () {
+    Route::view('/leave', 'leave.index')->name('leave.index');
+});
 
-    Route::middleware(['departments:exit-pass'])->group(function () {
-        Route::view('/exit_pass', 'exit_pass.index')->name('exit_pass.index');
-    });
+Route::middleware(['departments:exit-pass'])->group(function () {
+    Route::view('/exit_pass', 'exit_pass.index')->name('exit_pass.index');
+});
 
-    Route::middleware(['departments:overtime-fee'])->group(function () {
-        Route::view('/overtime_fees', 'overtime_fees.index')->name('overtime_fees.index');
-    });
+Route::middleware(['departments:overtime-fee'])->group(function () {
+    Route::view('/overtime_fees', 'overtime_fees.index')->name('overtime_fees.index');
+});
 
-    Route::middleware(['departments:overtime-confirmation'])->group(function () {
-        Route::view('/overtime_confirmation', 'overtime_confirmation.index')->name('overtime_confirmation.index');
-    });
+Route::middleware(['departments:overtime-confirmation'])->group(function () {
+    Route::view('/overtime_confirmation', 'overtime_confirmation.index')->name('overtime_confirmation.index');
+});
 
-    // warning
-    Route::middleware(['departments:salary-setup'])->group(function () {
-        Route::view('/salary_setup', 'salary_setup.index')->name('salary_setup.index');
-    });
-    Route::middleware(['departments:salary-setup.create'])->group(function () {
-        Route::view('/salary_setup/create', 'salary_setup.create')->name('salary_setup.create');
-    });
-    Route::middleware(['departments:salary-setup.edit'])->group(function () {
-        Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
-    });
+// warning
+Route::middleware(['departments:salary-setup'])->group(function () {
+    Route::view('/salary_setup', 'salary_setup.index')->name('salary_setup.index');
+});
+Route::middleware(['departments:salary-setup.create'])->group(function () {
+    Route::view('/salary_setup/create', 'salary_setup.create')->name('salary_setup.create');
+});
+Route::middleware(['departments:salary-setup.edit'])->group(function () {
+    Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
+});
 
-    Route::middleware(['departments:salary'])->group(function () {
-        Route::view('/salary', 'salary.index')->name('salary.index');
-    });
+Route::middleware(['departments:salary'])->group(function () {
+    Route::view('/salary', 'salary.index')->name('salary.index');
+});
 
-    Route::middleware(['departments:allowance'])->group(function () {
-        Route::view('/allowance', 'allowance.index')->name('allowance.index');
-    });
-    Route::view('/holiday', 'holiday.index')->name('holiday.index');
+Route::middleware(['departments:allowance'])->group(function () {
+    Route::view('/allowance', 'allowance.index')->name('allowance.index');
+});
+Route::view('/holiday', 'holiday.index')->name('holiday.index');
 
-    // salary batch
-    Route::middleware(['departments:salary-batch'])->group(function () {
-        Route::view('/salary_batch', 'salary_batch.index')->name('salary_batch.index');
-    });
-    Route::middleware(['departments:salary-batch.create'])->group(function () {
-        Route::view('/salary_batch/create', 'salary_batch.create')->name('salary_batch.create');
-    });
-    Route::middleware(['departments:salary-batch.edit'])->group(function () {
-        Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
-    });
+// salary batch
+Route::middleware(['departments:salary-batch'])->group(function () {
+    Route::view('/salary_batch', 'salary_batch.index')->name('salary_batch.index');
+});
+Route::middleware(['departments:salary-batch.create'])->group(function () {
+    Route::view('/salary_batch/create', 'salary_batch.create')->name('salary_batch.create');
+});
+Route::middleware(['departments:salary-batch.edit'])->group(function () {
+    Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
+});
 
-    Route::middleware(['departments:salary-calculate'])->group(function () {
-        Route::view('/salary_calculate', 'salary_calculate.index')->name('salary_calculate.index');
-    });
+Route::middleware(['departments:salary-calculate'])->group(function () {
+    Route::view('/salary_calculate', 'salary_calculate.index')->name('salary_calculate.index');
+});
 
-    Route::middleware(['departments:resignation-categories'])->group(function () {
-        Route::view('/pay_slip', 'salary_calculate.pay_slip')->name('salary_calculate.pay_slip');
-    });
+Route::middleware(['departments:resignation-categories'])->group(function () {
+    Route::view('/pay_slip', 'salary_calculate.pay_slip')->name('salary_calculate.pay_slip');
+});
 
+Route::view('/resignation_categories', 'resignation_categories.index')->name('resignation_categories.index');
+Route::view('/resignations', 'resignations.index')->name('resignations.index');
+
+
+Route::view('/cv/form', 'CV.form')->name('CV.form');
+Route::view('/cv', 'CV.index')->name('CV.index');
+Route::view('/cv/{id}/detail', 'CV.detail');
+Route::view('/exams', 'exams.index');
+Route::view('/exam/create', 'exams.create')->name('exams.create');
+Route::view('/exam/{id}/edit', 'exams.edit');
+Route::view('/interviews', 'interviews.index');
+Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
+// Route::view('/interviews/create', 'interviews.create')->name('interviews.create');
+Route::view('/interview/result', 'interviews.result');
+Route::view('/locations', 'locations.index');
+Route::view('/location/{id}/floor/{floorId}/detail', 'locations.detail');
+
+
+Route::middleware(['departments:pay-slip'])->group(function () {
     Route::view('/resignation_categories', 'resignation_categories.index')->name('resignation_categories.index');
+});
+
+Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/resignations', 'resignations.index')->name('resignations.index');
+});
 
 
     
@@ -703,6 +744,22 @@ Route::middleware(['departments:time-shift'])->group(function () {
     Route::view('/equipment_assignment', 'equipment_assignment.index')->name('equipment_assignment.index');
     Route::view('/equipment_assignment/create', 'equipment_assignment.create')->name('equipment_assignment.create');
     Route::view('/shift', 'shift.index')->name('shift.index');
+// =======
+// Route::middleware(['departments:event'])->group(function () {
+//     Route::view('/events', 'event.index')->name('event.index');
+// });
+
+
+
+// Route::view('/JD', 'job_description.index')->name('job_description.index');
+// Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
+// Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
+// Route::view('/SOP', 'SOP.index')->name('SOP.index');
+// Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+// Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+// Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+// Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
+// >>>>>>> origin/k/teaology-backend
 // });
 
 // =======
