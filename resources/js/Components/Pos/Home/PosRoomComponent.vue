@@ -102,9 +102,9 @@
                                     <label for="" class="block text-sm text-black mb-3">
                                         Time
                                     </label>
-                                    <input ref="datetimeInput" type="text" class="form-control input-ui"  v-model="invoice_date" @change="getPackageList(invoice_date)" />
-                                    <!-- <input type="datetime-local" placeholder="Time" v-model="invoice_date" @change="getPackageList(invoice_date)"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                                    <!-- <input ref="datetimeInput" type="text" class="form-control input-ui"  v-model="invoice_date" @change="getPackageList(invoice_date)" /> -->
+                                    <input type="datetime-local" placeholder="Time" v-model="invoice_date" @change="getPackageList(invoice_date)"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
@@ -1762,16 +1762,16 @@
                 this.selectedDiscountType = null;
                 this.getDiscountTypeList();
 
-                this.$nextTick(() => {
-                    flatpickr(this.$refs.datetimeInput, {
-                        enableTime: true,
-                        dateFormat: "Y-m-d H:i",
-                        time_24hr: true,
-                        onChange: (selectedDates, dateStr) => {
-                            this.invoice_date = dateStr;
-                        }
-                    });
-                });
+                // this.$nextTick(() => {
+                //     flatpickr(this.$refs.datetimeInput, {
+                //         enableTime: true,
+                //         dateFormat: "Y-m-d H:i",
+                //         time_24hr: true,
+                //         onChange: (selectedDates, dateStr) => {
+                //             this.invoice_date = dateStr;
+                //         }
+                //     });
+                // });
             },
 
             // step 2's methods
