@@ -31,7 +31,7 @@
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
-                    <a href="/SOP/create"
+                    <a href="/SOP/create" v-show="feature.includes('sop.create')"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
                     </a>
@@ -90,6 +90,7 @@
                                             <i class="fal fa-pen"></i>
                                         </a> -->
                                         <button @click="deleteBtnClicked(item.id)" data-te-toggle="modal"
+                                            v-show="feature.includes('sop.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>

@@ -31,7 +31,7 @@
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div> -->
-                    <a href="/JS/create"
+                    <a href="/JS/create" v-show="feature.includes('js.create')"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
                     </a>
@@ -53,11 +53,11 @@
                                 <th scope="col" class="">
                                     JD
                                 </th>
-                                <th scope="col" class="">
+                                <!-- <th scope="col" class="">
                                     Report
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
-                                    Position
+                                    Department
                                 </th>
                                 <th scope="col" class="">
                                     Role
@@ -80,20 +80,20 @@
                                     <td class="whitespace-nowrap">
                                         {{ js.job_description.job_description }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         --
-                                    </td>
+                                    </td> -->
                                     <td class="whitespace-nowrap">
-                                       --
+                                        {{ js.job_description.role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ js.job_description.role.name }}
                                     </td>
                                     
                                     <td class="whitespace-nowrap" >
-                                        <a :href="'/js/'+js.id+'/edit'" class="pr-3">
+                                        <!-- <a :href="'/js/'+js.id+'/edit'" class="pr-3">
                                             <i class="fal fa-pen"></i>
-                                        </a>
+                                        </a> -->
                                         <button @click="deleteBtnClicked(js.id)" data-te-toggle="modal"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>

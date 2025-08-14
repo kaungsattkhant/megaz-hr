@@ -68,16 +68,15 @@ class ObjectiveRepository implements ObjectiveInterface
                 $q->where('staff.id', $staffId);
             })
             ->when(($from_date && $to_date), function ($q) use ($from_date, $to_date) {
-                $q->whereBetween(DB::raw('DATE(objective_staff.start_date)'), [$from_date, $to_date])
-                    ->whereBetween(DB::raw('DATE(objective_staff.end_date)'), [$from_date, $to_date]);
+                $q->whereBetween(DB::raw('DATE(objective_staff.created_at)'), [$from_date, $to_date]);
             })
             ->when($from_date && !$to_date, function ($query) use ($from_date) {
-                $query->whereDate('objective_staff.start_date', '>=', $from_date)
-                    ->whereDate('objective_staff.end_date', '>=', $from_date);
+                $query->whereDate('objective_staff.created_at', '>=', $from_date);
+                // ->whereDate('objective_staff.created_at', '>=', $from_date);
             })
             ->when(!$from_date && $to_date, function ($query) use ($to_date) {
-                $query->whereDate('objective_staff.end_date', '<=', $to_date)
-                    ->whereDate('objective_staff.end_date', '<=', $to_date);
+                $query->whereDate('objective_staff.created_at', '<=', $to_date);
+                // ->whereDate('objective_staff.created_at', '<=', $to_date);
             })
             ->when($status, function ($query) use ($status) {
                 $query->where('objective_staff.status', $status);

@@ -287,6 +287,7 @@ export default {
             }
         },
         roleChanged(){
+            this.sopList = [];
             this.getSopList();
         },
         async getSopList(){

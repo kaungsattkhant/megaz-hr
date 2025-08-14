@@ -32,6 +32,13 @@
                 </div>
                 <div class="flex pr-0 gap-x-4">
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Status" @change="statusChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedStatus" class="input-ui">
+                            <option :value="status" v-for="(status, statusIndex) in statusList"
+                                :key="statusIndex"> {{ status.name }} </option>
+                        </select>
+                    </div>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
                             data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
                             <option :value="department" v-for="(department, departmentIndex) in departmentList"
@@ -46,10 +53,10 @@
                         </select>
                     </div> -->
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Staff" @change="selectedStaffChanged()"
-                            data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui">
-                            <option :value="staff" v-for="(staff, staffIndex) in staffList"
-                                :key="staffIndex"> {{ staff.name }} </option>
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
                 </div>
@@ -71,22 +78,22 @@
                                     Department
                                 </th>
                                 <th scope="col" class="">
-                                    Key Results
+                                    Position
                                 </th>
                                 <th scope="col" class="">
-                                    Assigned Date
+                                    Assigned Task
                                 </th>
                                 <th scope="col" class="">
-                                    Due Date
+                                    In progress Task
                                 </th>
                                 <th scope="col" class="">
-                                    Start Date
+                                    Completed Task
                                 </th>
                                 <th scope="col" class="">
-                                    End Date
+                                    Approve Task
                                 </th>
                                 <th scope="col" class="">
-                                    Okr Point
+                                    
                                 </th>
                             </tr>
                         </thead>
@@ -99,28 +106,28 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.name }}
+                                        {{ okr.staff_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ okr.department_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.objective_key_name }}
+                                        {{ okr.role_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.assign_date }}
+                                        {{ okr.assigned_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.due_date }}
+                                        {{ okr.in_progress_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.assign_date }}
+                                        {{ okr.completed_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.due_date }}
+                                        {{ okr.approved_tasks }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.okr_total_point }}
+                                        <!-- {{ okr.okr_total_point }} -->
                                     </td>
                                     
                                     <!-- <td class="whitespace-nowrap">
@@ -184,13 +191,23 @@ export default {
 
             searchInput:null,
 
-            url:'/api/dashboard_okr',
+            url:'/api/dashboard-okr',
             url_department:'',
             url_role:'',
             url_staff:'',
             url_from:'',
             url_to:'',
+            url_status: '',
             deleteId:null,
+
+            selectedStatus: null,
+            statusList: [
+                { value: "completed",name: "Completed" },
+                { value: "approved",name: "Approved" },
+                { value: "assigned",name: "Assigned" },
+                { value: "in_progress",name: "In Progress" },
+                { value: "cancelled",name: "Cancelled" },
+            ]
 
         };
     },
@@ -201,7 +218,7 @@ export default {
         
         async getOkrList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
-            let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department;
+            let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department + this.url_role + this.url_status;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.okrList = response.data.data;
@@ -224,15 +241,19 @@ export default {
             }
         },
         selectedDepartmentChange(){
-            this.getRoleList();
+            // this.getRoleList();
+            this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = null;
             this.url_from = '';
             this.url_to = '';
-            this.url_staff = '';
+            this.url_role = '';
             this.url_department = '?department_id=' + this.selectedDepartment.id;
             this.getOkrList();
             this.fromDate = null;
             this.toDate = null;
-            this.selectedStaff = null;
+            // this.selectedStaff = null;
+            this.selectedStatus = null;
+            this.url_status = '';
         },
         async getRoleList(){
             let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
@@ -240,15 +261,18 @@ export default {
                 this.roleList = response.data;
             }
         },
+
         selectedRoleChange(){
             this.url_from = '';
             this.url_to = '';
             this.url_staff = '';
-            this.url_role = '?role_id=' + this.selectedRole.id;
+            this.url_role = '&role_id=' + this.selectedRole.id;
             this.getOkrList();
             this.fromDate = null;
             this.toDate = null;
             this.selectedStaff = null;
+            this.selectedStatus = null;
+            this.url_status = '';
         },
         selectedStaffChanged(){
             this.url_from = '';
@@ -262,6 +286,8 @@ export default {
             this.roleList = null;
             this.fromDate = null;
             this.toDate = null;
+            this.selectedStatus = null;
+            this.url_status = '';
         },
         fromDateChanged(){
             this.url_staff = '';
@@ -273,12 +299,25 @@ export default {
             this.selectedRole = null;
             this.roleList = [];
             this.selectedStaff = null;
+            this.selectedStatus = null;
+            this.url_status = '';
         },
         toDateChanged(){
             this.url_to = '&to_date=' + this.toDate
             this.getOkrList();
         },
-        
+        statusChange(){
+            this.url_department = '';
+            this.url_role = '';
+            this.url_from = '';
+            this.url_to = '';
+            this.selectedDepartment = null;
+            this.roleList = [];
+            this.selectedRole = null;
+
+            this.url_status = '?status=' + this.selectedStatus.value;
+            this.getOkrList();
+        },
         alertValidationMessage(field) {
                 this.$notify({
                     title: 'Input validation',

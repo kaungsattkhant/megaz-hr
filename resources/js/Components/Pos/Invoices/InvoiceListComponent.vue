@@ -338,7 +338,7 @@
             confirmBtnClicked(invoice){
                 this.selectedInvoice = invoice;
                 this.selectedPayment = null;
-                this.paidAmount = 0;
+                this.paidAmount = invoice.total;
             },
             async confirmInvoice(){
                 console.log('test confirm invoice')

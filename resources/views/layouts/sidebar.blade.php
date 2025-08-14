@@ -268,15 +268,7 @@
                         </p>
                     </li>
                     @endif
-                    @if (checkFeaturePermission('ar'))
-                    <li>
-                        <a href="{{ route('account_receivable') }}"
-                            class="flex items-center @yield('ar') sidebar-gap-x">
-                            <i class="fas fa-coins"></i>
-                            AR
-                        </a>
-                    </li>
-                    @endif
+                   
 
                     @if (checkFeaturePermission('skill'))
                     <li>
@@ -746,7 +738,7 @@
 
 
                     @if (checkFeaturePermission('asset-item') || checkFeaturePermission('asset')
-                        || checkFeaturePermission('fixed-asset') || checkFeaturePermission('account-payable'))
+                        || checkFeaturePermission('fixed-asset') || checkFeaturePermission('ap-balance')|| checkFeaturePermission('ar'))
                     <li>
                         <p class="sidebar-title">
                             ASSET
@@ -777,20 +769,30 @@
                         </a>
                     </li>
                     @endif
-                    @if (checkFeaturePermission('account-payable'))
+                    @if (checkFeaturePermission('ap-balance'))
                     <li>
                         <a href="{{ route('AP.index') }}" class="flex items-center @yield('account_payables') sidebar-gap-x">
                             <i class="fal fa-envelope-open-dollar"></i>
                             AP
                         </a>
                     </li>
+                    @endif
                     {{-- <li>
                             <a href="{{ route('AP.history') }}" class="flex items-center @yield('ap_history')">
                     <i class="fal fa-truck-loading  pr-3"></i>
                     AP Transactions
                     </a>
                     </li> --}}
+                    @if (checkFeaturePermission('ar'))
+                    <li>
+                        <a href="{{ route('account_receivable') }}"
+                            class="flex items-center @yield('ar') sidebar-gap-x">
+                            <i class="fas fa-coins"></i>
+                            AR
+                        </a>
+                    </li>
                     @endif
+                    
 
                     @if (checkFeaturePermission('inventory-stock') || checkFeaturePermission('inventory-transfer-history')
                         || checkFeaturePermission('inventory-transfer-receive') || checkFeaturePermission('inventory-transfer'))
@@ -960,7 +962,7 @@
                         </a>
                     </li>
                     @endif
-                    <!-- @if (checkFeaturePermission('okr-duty')) -->
+                    @if (checkFeaturePermission('okr-duty'))
                     <li>
                         <a href="/okr_assign" class="flex items-center @yield('okr_assign') sidebar-gap-x">
                             <i class="fal fa-poll-people"></i>
@@ -968,7 +970,7 @@
                             OKR Assign
                         </a>
                     </li>
-                    <!-- @endif -->
+                    @endif
                     @if (checkFeaturePermission('okr-dashboard'))
                     <li>
                         <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
@@ -1014,6 +1016,21 @@
                     </li>
                     @endif
 
+                    @if (checkFeaturePermission('staff') || checkFeaturePermission('staff.create'))
+                    <li>
+                        <p class="sidebar-title">
+                            HR
+                        </p>
+                    </li>
+                    @endif
+                    <li>
+                        <a href="/handbooks" class="flex items-center @yield('handbook') sidebar-gap-x">
+                            <i class="fal fa-project-diagram "></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-product-tree-64.png') }}" alt=""> -->
+                            Handbooks
+                        </a>
+                    </li>
+
                     @if (checkFeaturePermission('time-shift') || checkFeaturePermission('gps') || checkFeaturePermission('check-in'))
                     <li>
                         <p class="sidebar-title">
@@ -1030,6 +1047,13 @@
                         </a>
                     </li>
                     @endif
+                    <li>
+                        <a href="/shift" class="flex items-center @yield('shift') sidebar-gap-x">
+                            <i class="fal fa-user-clock "></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-time-shift-50.png') }}" alt=""> -->
+                            Shift
+                        </a>
+                    </li>
                     @if (checkFeaturePermission('gps'))
                     <li>
                         <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">
@@ -1232,6 +1256,7 @@
                         </a>
                     </li>
                     @endif
+                    @if (checkFeaturePermission('jd'))
                     <li>
                         <a href="/JD" class="flex items-center @yield('JD') sidebar-gap-x">
                             <i class="fal fa-layer-group"></i>
@@ -1239,6 +1264,8 @@
                             JD
                         </a>
                     </li>
+                    @endif
+                    @if (checkFeaturePermission('js'))
                     <li>
                         <a href="/JS" class="flex items-center @yield('JS') sidebar-gap-x">
                             <i class="fal fa-briefcase"></i>
@@ -1246,6 +1273,8 @@
                             JS
                         </a>
                     </li>
+                    @endif
+                    @if (checkFeaturePermission('sop'))
                     <li>
                         <a href="/SOP" class="flex items-center @yield('SOP') sidebar-gap-x">
                             <i class="fal fa-door-open"></i>
@@ -1253,6 +1282,16 @@
                             SOP
                         </a>
                     </li>
+                    @endif
+                    @if (checkFeaturePermission('cv'))
+                    <li>
+                        <a href="/cv" class="flex items-center @yield('cv') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            CV
+                        </a>
+                    </li>
+                    @endif
 
                 </ul>
 
