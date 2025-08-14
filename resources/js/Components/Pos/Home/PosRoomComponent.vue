@@ -219,11 +219,12 @@
                                     data-te-target="#change_modal">
                                     <i class="far fa-random"></i>
                                 </button>
-                                <button @click="btnClickAddMenu()"
+                                <!-- <button @click="btnClickAddMenu()"
                                     class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_menu_modal">
                                     <i class="far fa-cocktail"></i>
-                                </button>
+                                </button> -->
+                                <a :href="'/pos/pos_order/'+selectedRoom?.id"><i class="far fa-cocktail"></i></a>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_hour_modal">
                                     <i class="far fa-hourglass-half"></i>
@@ -2072,7 +2073,7 @@
                     if (response.data) {
                         if(response.data.deposit_balance > 0){
                             this.depositBalance = response.data.deposit_balance;
-                            alert(this.depositBalance);
+                            // alert(this.depositBalance);
                         }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
