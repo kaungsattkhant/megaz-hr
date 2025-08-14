@@ -8,7 +8,7 @@
         </div>
         <div class="w-10/12 lg:w-1/2 ">
             <div class="mb-6 w-4/5">
-                <img src="../../../../../public/img/logo.png" class="w-1/3 mx-auto" alt="">
+                <img src="../../../../public/img/logo.png" class="w-1/3 mx-auto" alt="">
                 <div class="px-8" @keyup.enter="login">
                     <div>
                         <p class=" text-4xl font-black text-[#153063] mb-4">
