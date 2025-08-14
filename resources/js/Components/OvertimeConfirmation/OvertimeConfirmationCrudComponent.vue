@@ -49,9 +49,9 @@
                                 <th scope="col" class="">
                                     #
                                 </th>
-                                <th scope="col" class="">
+                                <!-- <th scope="col" class="">
                                     Date
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
                                     Name
                                 </th>
@@ -88,9 +88,9 @@
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         Date ??
-                                    </td>
+                                    </td> -->
                                     <td class="whitespace-nowrap">
                                         {{ ot.staff.name }}
                                     </td>

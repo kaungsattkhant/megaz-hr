@@ -32,7 +32,7 @@
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div> -->
-                    <button type="button" v-show="feature.includes('allowance.create')"
+                    <button type="button" v-show="feature.includes('jd.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
                         Add New

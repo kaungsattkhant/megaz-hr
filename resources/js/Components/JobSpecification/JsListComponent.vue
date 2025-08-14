@@ -31,7 +31,7 @@
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div> -->
-                    <a href="/JS/create"
+                    <a href="/JS/create" v-show="feature.includes('js.create')"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
                     </a>

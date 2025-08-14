@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Shift;
 use App\Models\CheckIn;
+use App\Models\StaffTimeshift;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,5 +58,10 @@ class TimeShift extends Model
         $totalHours = $totalMinutes / 60;
 
         return round($totalHours, 2);
+    }
+
+    public function staffTimeshifts()
+    {
+        return $this->hasMany(StaffTimeshift::class, 'timeshift_id');
     }
 }

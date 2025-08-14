@@ -18,16 +18,16 @@
                 </div>
                 <div class="flex pr-0 gap-x-4">
                     <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Department"
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment"
                             data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                            <option :value="department.value" v-for="(department, departmentIndex) in departmentList"
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
                                 :key="departmentIndex"> {{ department.name }} </option>
                         </select>
                     </div>
                     <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="changeRole"
                             data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                            <option :value="role.value" v-for="(role, roleIndex) in roleList"
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
@@ -186,7 +186,17 @@ export default {
                 this.departmentList = response.data;
             }
         },
-
+        changeDepartment(){
+            this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = null;
+            this.url_role = '';
+            this.url_department = '?department_id=' + this.selectedDepartment.id;
+            this.getSalaryList();
+        },
+        changeRole(){
+            this.url_role = '&role_id=' + this.selectedRole.id;
+            this.getSalaryList();
+        },
 
         
         // async searchBtnClicked() {
@@ -234,6 +244,7 @@ export default {
     },
     created() {
         this.getSalaryList();
+        this.getDepartmentList();
     }
 }
 </script>

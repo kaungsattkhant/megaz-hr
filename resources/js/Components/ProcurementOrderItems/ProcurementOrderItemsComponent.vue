@@ -349,7 +349,7 @@
                     </button>
                     <button type="button" class="add-btn focus:outline-none focus:ring-0 "
                     @click="confirmBtnClicked">
-                        Create
+                        Create 
                     </button>
                 </div>
             </div>

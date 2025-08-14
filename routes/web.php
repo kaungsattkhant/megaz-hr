@@ -684,20 +684,82 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/resignations', 'resignations.index')->name('resignations.index');
 });
 
-Route::middleware(['departments:event'])->group(function () {
-    Route::view('/events', 'event.index')->name('event.index');
-});
+
+    
+    Route::view('/exams', 'exams.index');
+    Route::view('/exam/create', 'exams.create')->name('exams.create');
+    Route::view('/exam/{id}/edit', 'exams.edit');
+    Route::view('/interviews', 'interviews.index');
+    Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
+    // Route::view('/interviews/create', 'interviews.create')->name('interviews.create');
+    Route::view('/interview/result', 'interviews.result');
+    Route::view('/locations', 'locations.index');
+    Route::view('/location/{id}/floor/{floorId}/detail', 'locations.detail');
+
+
+    Route::middleware(['departments:pay-slip'])->group(function () {
+        Route::view('/resignation_categories', 'resignation_categories.index')->name('resignation_categories.index');
+    });
+
+    Route::middleware(['departments:resignation'])->group(function () {
+        Route::view('/resignations', 'resignations.index')->name('resignations.index');
+    });
+
+    Route::middleware(['departments:event'])->group(function () {
+        Route::view('/events', 'event.index')->name('event.index');
+    });
 
 
 
-Route::view('/JD', 'job_description.index')->name('job_description.index');
-Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
-Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
-Route::view('/SOP', 'SOP.index')->name('SOP.index');
-Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
-Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
-Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
-Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
+    Route::middleware(['departments:jd'])->group(function () {
+        Route::view('/JD', 'job_description.index')->name('job_description.index');
+    });
+    Route::middleware(['departments:js'])->group(function () {
+        Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
+    });
+    Route::middleware(['departments:js.create'])->group(function () {
+        Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
+    });
+    Route::middleware(['departments:sop'])->group(function () {
+        Route::view('/SOP', 'SOP.index')->name('SOP.index');
+    });
+    Route::middleware(['departments:sop.create'])->group(function () {
+        Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+    });
+    Route::middleware(['departments:cv'])->group(function () {
+        Route::view('/cv', 'CV.index')->name('CV.index');
+    });
+
+
+    Route::view('/cv/form', 'CV.form')->name('CV.form');
+    Route::view('/cv/{id}/detail', 'CV.detail');
+    Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+    Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+    Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
+    Route::view('/handbooks', 'handbooks.index')->name('handbooks.index');
+    Route::view('/handbooks/create', 'handbooks.create')->name('handbooks.create');
+    Route::view('/shift_assignment', 'shift_assignment.index')->name('shift_assignment.index');
+    Route::view('/shift_assignment/create', 'shift_assignment.create')->name('shift_assignment.create');
+    Route::view('/asset_assignment', 'asset_assignment.index')->name('asset_assignment.index');
+    Route::view('/equipment_assignment', 'equipment_assignment.index')->name('equipment_assignment.index');
+    Route::view('/equipment_assignment/create', 'equipment_assignment.create')->name('equipment_assignment.create');
+    Route::view('/shift', 'shift.index')->name('shift.index');
+// =======
+// Route::middleware(['departments:event'])->group(function () {
+//     Route::view('/events', 'event.index')->name('event.index');
+// });
+
+
+
+// Route::view('/JD', 'job_description.index')->name('job_description.index');
+// Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
+// Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
+// Route::view('/SOP', 'SOP.index')->name('SOP.index');
+// Route::view('/SOP/create', 'SOP.create')->name('SOP.create');
+// Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
+// Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
+// Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
+// >>>>>>> origin/k/teaology-backend
 // });
 
 // =======

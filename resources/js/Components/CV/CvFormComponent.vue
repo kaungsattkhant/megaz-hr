@@ -1,4 +1,5 @@
 <template>
+    <notifications position="top center" />
     <div class="w-10/12 mx-auto px-4 pt-8">
         <div class="mb-6">
             <p class="text-3xl font-inter text-center">
@@ -68,8 +69,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Gender" data-te-select-filter="true"
-                        name="" id="" v-model="selectedGender" class="input-ui h-[34px]"
-                        @change="stateSelectChanged">
+                        name="" id="" v-model="selectedGender" class="input-ui h-[34px]" >
                         <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
                             {{ gender.name }}
                         </option>
@@ -77,11 +77,85 @@
                 </div>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <!-- <label for="" class="label-form mb-3">
+                    NRC Number
+                </label>
+                <input type="text" v-model="nrcNumber" placeholder="NRC (Required)" class="input-ui"> -->
+            </div>
+
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Code
+                </label>
+                <div class="flex">
+                    <multiselect v-model="selectedNrcCode"
+                    :options="[1,2,3,4,5,6,7,8,9,10,11,12,13,14]"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Select NRC Code"
+                    :preselect-first="false"
+                    @select="getNrcTownships">
+                    </multiselect>
+                    <div class="mx-2 text-lg text-4xl text-gray-500">
+                        /
+                    </div>
+                </div>
+                <!-- <div class="mt-1" v-if="nrcCodeError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcCodeError }} *</span>
+                </div> -->
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Townships
+                </label>
+                <multiselect v-model="selectedNrcTownship"
+                :options="nrcTownships"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select NRC Township"
+                track-by="id"
+                label="name_en"
+                :preselect-first="false">
+                </multiselect>
+                <!-- <div class="mt-1" v-if="nrcTownshipError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcTownshipError }} *</span>
+                </div> -->
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    NRC Type
+                </label>
+                <multiselect v-model="selectedNrcType"
+                :options="['N','E','P']"
+                :multiple="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :preserve-search="false"
+                placeholder="Select NRC Type"
+                :preselect-first="false">
+                </multiselect>
+                <!-- <div class="mt-1" v-if="nrcTypeError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcTypeError }} *</span>
+                </div> -->
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     NRC Number
                 </label>
                 <input type="text" v-model="nrcNumber" placeholder="NRC (Required)" class="input-ui">
+                <!-- <div class="mt-1" v-if="nrcInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ nrcInputError }} *</span>
+                </div> -->
             </div>
+
 
             <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -215,7 +289,7 @@
                 <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
-                <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)" class="input-ui">
+                <input type="number" v-model="primaryPhone" placeholder="Phone Number (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -235,7 +309,7 @@
                 <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
-                <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)" class="input-ui">
+                <input type="number" v-model="secondaryPhone" placeholder="Phone Number (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -258,7 +332,7 @@
                     <p class="text-sm">Choose a department and role to get started.</p>
                   </div>
             </div>
-            <div class="col-span-12 flex gap-x-8">
+            <div class="col-span-12 flex gap-x-8 mb-8">
                 <label class="inline-flex items-center space-x-2" v-for="skill in skillList">
                     <input
                       type="checkbox" :value="skill" v-model="selectedSkills"
@@ -269,9 +343,9 @@
             </div>
 
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-2 container-card">
+        <!-- <div class="grid !grid-cols-12 gap-x-4 mb-2 container-card">
             
-        </div>
+        </div> -->
         <div class="px-4 mb-8">
             <button class="add-btn" @click="btnClickedCreateCVForm">
                 Send CV
@@ -324,6 +398,10 @@ export default {
             email: null,
             fatherName: null,
             motherName: null,
+            selectedNrcCode: null,
+            nrcTownships: [],
+            selectedNrcTownship: null,
+            selectedNrcType: 'N',
             nrcNumber: null,
             state: null,
             city: null,
@@ -410,8 +488,23 @@ export default {
                 type: "warn"
             });
         },
+        getNrcTownships(){
+            if(!this.selectedNrcCode){
+                this.alertValiationMessage('NRC Code');
+                this.nrcTownships = [];
+                return;
+            }
+            this.selectedNrcTownship = null;
+            this.nrcTownships = [];
+            getApiData({ url: `/api/nrcs?nrc_code=${this.selectedNrcCode}`, token: this.getToken() }).then(response => {
+                if (response.data) {
+                    this.nrcTownships = response.data;
+                }
+            });
+        },
         btnClickedCreateCVForm() {
             // this.roleIds = [];
+            console.log( ' error ')
 
             if(this.$refs.nrc_front_image.files[0]){
                 this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
@@ -441,8 +534,21 @@ export default {
                 this.alertValiationMessage('gender');
                 return 1;
             }
+            
+            if (!this.selectedNrcCode) {
+                this.alertValiationMessage('Nrc Code');
+                return 1;
+            }
+            if (!this.selectedNrcTownship) {
+                this.alertValiationMessage('Nrc TownShip');
+                return 1;
+            }
+            if (!this.selectedNrcType) {
+                this.alertValiationMessage('Nrc Type');
+                return 1;
+            }
             if (!this.nrcNumber) {
-                this.alertValiationMessage('Nrc');
+                this.alertValiationMessage('Nrc Number');
                 return 1;
             }
             if (!this.phoneNumber) {
@@ -506,6 +612,9 @@ export default {
             formData.append('phone_number', this.phoneNumber);
             formData.append('alt_phone_number', this.altPhoneNumber);
             formData.append('email', this.email);
+            formData.append('nrc_code', this.selectedNrcCode);
+            formData.append('nrc_township_code', this.selectedNrcTownship.name_en);
+            formData.append('nrc_type', this.selectedNrcType);
             formData.append('nrc_number', this.nrcNumber);
             formData.append('father_name', this.fatherName);
             formData.append('mother_name', this.motherName);
