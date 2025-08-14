@@ -189,12 +189,12 @@
                                     data-te-target="#change_table_modal">
                                     <i class="far fa-random"></i>
                                 </button>
-                                <button @click="btnClickAddMenu()"
+                                <!-- <button @click="btnClickAddMenu()"
                                     class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_menu_table_modal">
                                     <i class="far fa-cocktail"></i>
-                                </button>
-                                <a :href="'/pos/pos_order/'+selectedRoom?.id"><i class="far fa-plus-circle"></i></a>
+                                </button> -->
+                                <a :href="'/pos/pos_order/'+selectedRoom?.id"><i class="far fa-cocktail"></i></a>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_accessory_modal"
                                     @click="getAccessoryCategoryList()">
