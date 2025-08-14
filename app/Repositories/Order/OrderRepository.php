@@ -569,6 +569,9 @@ class OrderRepository implements OrderRepositoryInterface
             )
         )) as order_items_details')
             )
+            ->when(isset($request->area_id) && $request->area_id,function($q)use($request){
+                $q->where('order_items.area_id',$request->area_id);
+            })
             ->whereNull('order_items.group_order_id')
             ->groupBy('menus.id', 'menus.name')
             ->paginate(config('common.list_count'));
