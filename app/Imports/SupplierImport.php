@@ -46,23 +46,13 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
             } else {
                 $creditOpeningDate = now();
             }
-            $name=trim((string)$row['name']);
-            $shopName=$row['shop_name'];
-            $address=$row['address'];
-            $email=$row['email'];
-            $creditLimit=$row['credit_limit'];
-            $creditOpeningAmount=$row['credit_opening_amount'];
-            $leadTimeDay=$row['lead_time_day'];
-            $leadTimeHour=$row['lead_time_hour'];
-            $leadTimeMinute=$row['lead_time_minute'];
-            $creditTermType=$row['credit_term_type'];
-            $day=$row['day'];
-            $amountLimitation=$row['amount_limitation'];
-            $exactDate=$row['exact_date'];
+
             $mockRequest = (object) ['name' => $row['supplier_ap_name']];
             $account = $this->supplierRepository->createSupplierAccount($mockRequest);
             $otherPayable = $account['other_payable'];
             $creditor = $account['creditor'];
+
+            $exactDate = null;
             if (isset($row['exact_date']) && $row['exact_date'] !== 'null') {
                 $decodedExactDate = json_decode($row['exact_date'], true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -74,20 +64,20 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
             $supplier = new Supplier([
                 'account_id' => $otherPayable->id,
                 'creditor_account_id' => $creditor->id,
-                'name' => $name,
-                'shop_name' => $shopName,
-                'address' => $address,
-                'email' => $email,
-                'credit_limit' => $creditLimit,
-                'credit_opening_date' => $creditOpeningDate,
-                'credit_opening_amount' => $creditOpeningAmount ?? null,
-                'lead_time_day' => $leadTimeDay ?? null,
-                'lead_time_hour' => $leadTimeHour ?? null,
-                'lead_time_minutes' => $leadTimeMinute ?? null,
-                'credit_term_type' => $creditTermType,
-                'day' => $day ?? null,
-                'amount_limitation' => $amountLimitation ?? null,
-                'exact_date' => $exactDate ?? null,
+                'name' => trim((string)$row['name']),
+                'shop_name' =>$row['shop_name'],
+                'address' =>$row['address'],
+                'email' =>$row['email'],
+                'credit_limit' =>$row['credit_limit'],
+                'credit_opening_date' =>$creditOpeningDate,
+                'credit_opening_amount' =>$row['credit_opening_amount'],
+                'lead_time_day' => $row['lead_time_day'] ?? null,
+                'lead_time_hour' => $row['lead_time_hour'] ?? null,
+                'lead_time_minutes' => $row['lead_time_minutes'] ?? null,
+                'credit_term_type' => $row['credit_term_type'],
+                'day' => $row['day'] ?? null,
+                'amount_limitation' => $row['amount_limitation'] ?? null,
+                'exact_date' => $exactDate,
             ]);
 
             $supplier->save();
@@ -102,7 +92,6 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
                         [
                             'supplier_id' => $supplier->id,
                             'id' => $phone['id'] ?? null,
-
                         ],
                         [
                             'phone_number' => $phone['phone_number'],
@@ -129,6 +118,10 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
                         ]
                     );
                 }
+            }
+
+            if (isset($row['credit_opening_amount']) && isset($row['credit_opening_date'])) {
+                $this->supplierRepository->createPayableTransaction($supplier);
             }
             DB::commit();
             return $supplier;
