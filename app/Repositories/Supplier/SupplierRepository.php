@@ -4,13 +4,17 @@ namespace App\Repositories\Supplier;
 
 use App\Models\Account;
 use App\Models\Supplier;
+use App\Imports\BrandImport;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\SupplierPhone;
 use App\Models\AccountPayable;
-use PhpParser\Node\Expr\Isset_;
+use App\Imports\SupplierImport;
 use Illuminate\Support\Facades\DB;
 use App\Models\SupplierBankAccount;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
+use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class SupplierRepository implements SupplierInterface
 {
@@ -46,7 +50,7 @@ class SupplierRepository implements SupplierInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-            
+
             if (isset($data['credit_term_type'])) {
                 switch ($data['credit_term_type']) {
                     case "day":
@@ -189,7 +193,6 @@ class SupplierRepository implements SupplierInterface
             $creditorCode = config('common.creditor_account_code');
             $otherPayable = $this->createAccountBySubAccount('Other Payable-' . $request->name, $otherPayableCode);
             $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);
-
             if ($otherPayable && $creditor) {
                 DB::commit();
                 return ['other_payable' => $otherPayable, 'creditor' => $creditor];
@@ -299,5 +302,20 @@ class SupplierRepository implements SupplierInterface
         } else {
             ResponseMessage('Supplier Bank Account not found.', 404);
         }
+    }
+
+    public function supplierImport($request)
+    {
+        $file = $request->file('sheet');
+        $headings = (new HeadingRowImport)->toArray($file);
+        Excel::import(new SupplierImport($this), $file);
+        ResponseMessage('Import Successfully', 200);
+    }
+
+    public function brandImport($request)
+    {
+        $file = $request->file('sheet');
+        Excel::import(new BrandImport(), $file);
+        ResponseMessage('Import Successfully', 200);
     }
 }
