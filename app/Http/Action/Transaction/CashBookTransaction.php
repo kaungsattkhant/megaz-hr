@@ -17,7 +17,7 @@ class CashBookTransaction
     public function getOpeningBalanceOriginal($data)
     {
         $cashAccountId = $data->cash_account_id;
-        $latestClosedTransaction = $this->getLatestClosedTransaction($data, $cashAccountId,'is_closing');
+        $latestClosedTransaction = $this->getLatestClosedTransaction($data, $cashAccountId, 'is_closing');
         if ($latestClosedTransaction) {
             $balance = DB::table('ledgers')
                 ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
@@ -46,7 +46,7 @@ class CashBookTransaction
         return $balance;
     }
 
-    public function getOpeningBalance($data)
+    public function getOpeningBalance($data) //monthly
     {
         $cashAccountId = $data->cash_account_id;
         $month = Carbon::now()->subMonth();
@@ -55,6 +55,27 @@ class CashBookTransaction
             ->where('month', $month->month)
             ->where('cash_account_id', $cashAccountId)
             ->value('closing_balance') ?? 0;
+        $openingBalance = new stdClass;
+        $openingBalance->opening_balance = $balance;
+        return $openingBalance;
+    }
+    public function getDailyOpeningBalance($data) //daily
+    {
+        $cashAccountId = $data->cash_account_id;
+        $month = Carbon::now()->subMonth();
+
+        $yesterday = Carbon::yesterday();
+
+        $balance = CashbookBalance::where('cash_account_id', $cashAccountId)
+            ->where(function ($query) use ($yesterday) {
+                // First: records from yesterday
+                $query->whereDate('created_at', $yesterday)
+                    // Or: latest record before today if yesterday's missing
+                    ->orWhereDate('created_at', '<', $yesterday);
+            })
+            ->orderBy('created_at', 'desc') // Most recent first
+            ->value('closing_balance') ?? 0;
+
         $openingBalance = new stdClass;
         $openingBalance->opening_balance = $balance;
         return $openingBalance;
@@ -80,8 +101,36 @@ class CashBookTransaction
         $closingBalance = ((int) $openingBalance + $totalDebitAmount) - $totalCreditAmount;
         return $closingBalance;
     }
+    public function getDailyClosingBalance($openingBalance, $data)
+    {
 
-    public function getLatestClosedTransaction($data, $cashAccountId,$is_closing_column)
+        $cash_account_id = $data->cash_account_id;
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        // $totals = DB::table('ledgers')
+        //     ->select(
+        //         DB::raw('SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) as total_debit_amount'),
+        //         DB::raw('SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) as total_credit_amount')
+        //     )
+        //     ->where('account_id', $cash_account_id)
+        //     ->whereYear('created_at', $currentYear)
+        //     ->whereMonth('created_at', $currentMonth)
+        //     ->first();
+        $totals = DB::table('ledgers')
+            ->select(
+                DB::raw('SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) as total_debit_amount'),
+                DB::raw('SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) as total_credit_amount')
+            )
+            ->where('account_id', $cash_account_id)
+            ->whereDate('created_at', today())
+            ->first();
+        $totalDebitAmount = (int) $totals->total_debit_amount;
+        $totalCreditAmount = (int) $totals->total_credit_amount;
+        $closingBalance = ((int) $openingBalance + $totalDebitAmount) - $totalCreditAmount;
+        return $closingBalance;
+    }
+
+    public function getLatestClosedTransaction($data, $cashAccountId, $is_closing_column)
     {
         $fromDate = convertDateFormat($data->from_date);
         return Transaction::with(['ledgers.account'])

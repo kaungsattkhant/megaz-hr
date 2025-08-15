@@ -2,11 +2,14 @@
 
 namespace App\Repositories\CashBook;
 
-use App\Http\Action\Transaction\CashBookTransaction;
-use App\Models\CashbookBalance;
-use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
 use stdClass;
+use Carbon\Carbon;
+use App\Models\Ledger;
+use App\Models\Transaction;
+use App\Models\CashbookBalance;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
+use App\Http\Action\Transaction\CashBookTransaction;
 
 
 class CashBookRepository implements CashBookInterface
@@ -14,8 +17,8 @@ class CashBookRepository implements CashBookInterface
     public function list($request)
     {
         $isPos = $request->is_pos;
-        $is_closing_column = 'is_pos_closing';
-        $closing_date_column = 'pos_closing_date';
+        // $is_closing_column = 'is_pos_closing';
+        // $closing_date_column = 'pos_closing_date';
 
         $is_closing_column = null;
         $closing_date_column = null;
@@ -68,7 +71,7 @@ class CashBookRepository implements CashBookInterface
             }
             UnsetData($transaction, ['ledgers']);
         }
-        $balance = (new CashBookTransaction())->getOpeningBalance($request);
+        $balance = (new CashBookTransaction())->getDailyOpeningBalance($request);
         $data = new stdClass();
         $data->opening_balance = $balance->opening_balance;
         $data->remaining_balance = ($balance->opening_balance + $current_debit_amount) - $current_credit_amount;
@@ -98,14 +101,25 @@ class CashBookRepository implements CashBookInterface
             }
 
             $cashAccountId = $request->cash_account_id;
-            $openingBalance = (new CashBookTransaction())->getOpeningBalance($request);
-            $closingBalance = (new CashBookTransaction())->getClosingBalance($openingBalance->opening_balance, $request);
-            $cashbookBalance = CashbookBalance::updateOrCreate(
-                [
-                    'year' => now()->year,
-                    'month' => now()->month,
-                    'cash_account_id' => $cashAccountId,
-                ],
+            // $openingBalance = (new CashBookTransaction())->getOpeningBalance($request);
+            $openingBalance = (new CashBookTransaction())->getDailyOpeningBalance($request);
+            $closingBalance = (new CashBookTransaction())->getDailyClosingBalance($openingBalance->opening_balance, $request);
+            // $closingBalance = (new CashBookTransaction())->getClosingBalance($openingBalance->opening_balance, $request);
+            // $cashbookBalance = CashbookBalance::updateOrCreate(
+            //     [
+            //         'year' => now()->year,
+            //         'month' => now()->month,
+            //         'cash_account_id' => $cashAccountId,
+            //     ],
+            //     [
+            //         'year' => now()->year,
+            //         'month' => now()->month,
+            //         'opening_balance' => $openingBalance->opening_balance,
+            //         'closing_balance' => $closingBalance,
+            //         'cash_account_id' => $cashAccountId,
+            //     ]
+            // );
+            $cashbookBalance = CashbookBalance::create(
                 [
                     'year' => now()->year,
                     'month' => now()->month,
@@ -120,8 +134,11 @@ class CashBookRepository implements CashBookInterface
                     $query->where('account_id', $cashAccountId); #transaction close depend on transaction
                 })
                 ->isConfirmed(1)
-                ->latest()
+                ->whereDate('created_at', today())
                 ->first();
+            if($latestTransaction->$is_closing_column){
+                ResponseMessage('Cashbook is already closed', 419);
+            }
             if ($latestTransaction) {
                 $latestTransaction->$is_closing_column = 1;
                 $latestTransaction->$closing_date_column = now();
@@ -138,6 +155,42 @@ class CashBookRepository implements CashBookInterface
             throw $e;
         }
         // ResponseMessage('Transaction closing is fail', 422);
+    }
+
+    public function getCashbookClosingHistory($request){
+        $isPos = $request->is_pos;
+        $date=isset($request->date)|| $request->date!=null ? Carbon::parse($request->date): today();
+        // $is_closing_column = 'is_pos_closing';
+        // $closing_date_column = 'pos_closing_date';
+
+        $is_closing_column = null;
+        $closing_date_column = null;
+        if ($isPos) {
+            $is_closing_column = 'is_pos_closing';
+            $closing_date_column = 'pos_closing_date';
+        }
+        if (!$isPos) {
+            $is_closing_column = 'is_closing';
+            $closing_date_column = 'closing_date';
+        }
+        if ($is_closing_column == null && $closing_date_column == null) {
+            ResponseMessage('Something went wrong in cashbook', 419);
+        }
+        $account_codes=$request->is_pos ? Config::get('common.pos_cash_account_code'): Config::get('common.cash_account_code');
+        // $closingCashbook=Ledger::with(['account','transaction:id,closing_date,is_closing,pos_closing_date,is_pos_closing'])->whereHas('account',function($query)use($account_codes){
+        //     $query->whereIn('account_code',$account_codes);
+        // })
+        // ->whereHas('transaction',function($q)use($is_closing_column,$closing_date_column,$date){
+        //     $q->where($is_closing_column,1)
+            // ->whereDate($closing_date_column,$date);
+        // })->paginate(20);
+        $closingCashbook=CashbookBalance::with(['account'])
+        ->whereHas('account',function($query)use($account_codes){
+                $query->whereIn('account_code',$account_codes);
+            })
+        ->whereDate('created_at',$date)
+        ->get();
+        return $closingCashbook;
     }
 
 
