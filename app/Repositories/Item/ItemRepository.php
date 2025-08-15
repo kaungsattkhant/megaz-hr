@@ -16,6 +16,7 @@ use App\Models\UomConversion;
 use App\Services\ItemService;
 use App\Imports\CategoryImport;
 use App\Imports\ItemTypeImport;
+use App\Imports\ItemPriceImport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\HeadingRowImport;
 use App\Services\AveragePriceCalculator;
@@ -425,11 +426,11 @@ class ItemRepository implements ItemRepositoryInterface
             'item_type_code',
             'base_uom_code',
             'uom_code',
-            'min_holding_base_uom_quantity',
+            // 'min_holding_base_uom_quantity',
             'min_holding_uom_quantity',
             'limitation_type',
             'amount',
-            'max_limit_base_uom_quantity',
+            // 'max_limit_base_uom_quantity',
             'max_limit_uom_quantity',
         ];
         $actualHeadings = $headings[0][0];
@@ -554,6 +555,27 @@ class ItemRepository implements ItemRepositoryInterface
         $uom_import = new UomsImport();
         $uom_import->import($file);
         ResponseMessage('Import UOM Import Successfully', 200);
+    }
+
+    public function importItemPrice($request){
+        $file = $request->file('sheet');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = [
+            'item_code',
+            'brand_id',
+            'supplier_id',
+            'price',
+        ];
+        $actualHeadings = $headings[0][0];
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
+        }
+        $itemService = new ItemService();
+        $import = new ItemPriceImport($itemService);
+        $import->import($file);
+        ResponseMessage('Import Successfully', 200);
     }
 
     public function createUomConversion($item, $data)
