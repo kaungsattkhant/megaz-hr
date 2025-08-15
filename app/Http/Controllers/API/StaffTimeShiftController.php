@@ -23,4 +23,9 @@ class StaffTimeShiftController extends Controller
     {
         return $this->staffTimeShiftRepository->createStaffTimeShift($request->all());
     }
+
+    public function updateStaffTimeShiftStatus($id ,Request $request)
+    {
+        return $this->staffTimeShiftRepository->updateStaffTimeShiftStatus($id, $request->all());
+    }
 }

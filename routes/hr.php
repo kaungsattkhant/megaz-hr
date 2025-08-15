@@ -124,6 +124,7 @@ Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
     Route::post('/staff_time_shifts', 'createStaffTimeShift');
     Route::get('/staff_time_shifts', 'getStaffTimeShifts');
+    Route::post('/staff_time_shifts/{id}/status', 'updateStaffTimeShiftStatus');
   });
   Route::prefix('hr')->controller(AssetItemEquipmentAssignController::class)->group(function () {
     Route::post('/asset-assignments', 'createAssetAssign');

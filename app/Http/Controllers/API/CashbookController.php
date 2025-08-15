@@ -27,4 +27,9 @@ class CashbookController extends Controller
         $cashbooks= $this->cashBookRepo->closeTransaction($request);
     }
 
+    public function getCashbookClosingHistory(Request $request){
+        $cashbooks= $this->cashBookRepo->getCashbookClosingHistory($request);
+        ResponseData($cashbooks);
+
+    }
 }

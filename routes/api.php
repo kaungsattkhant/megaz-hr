@@ -282,6 +282,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/toggle_brand_item', 'toggleBrandItem');
         Route::post('/suppliers/toggle_phones', 'toggleSupplierPhone');
         Route::post('/suppliers/toggle_bank_accounts', 'toggleSupplierBankAccount');
+        Route::post('/suppliers/import', 'supplierImport');
+        Route::post('/brands/import', 'brandImport');
     });
     Route::resource('notifications', NotificationController::class)->only(['index']);
     Route::get('notification_by_user', [NotificationController::class, 'notificationUsersData']);
@@ -610,6 +612,8 @@ Route::post('/import/item_types', [ItemAPIController::class, 'importItemType']);
 Route::post('/import/categories', [ItemAPIController::class, 'importCategory']);
 Route::post('/import/uoms', [ItemAPIController::class, 'importUom']);
 Route::post('/import/items', [ItemAPIController::class, 'itemImport']);
+Route::post('/import/item_prices', [ItemAPIController::class, 'itemPriceImport']);
+
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);

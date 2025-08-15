@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\FinancialReportController;
 
 Route::middleware('auth:api')->group(function () {
@@ -21,6 +22,9 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(CreditorController::class)->group(function () {
         Route::get('get_creditor_balance','getCreditorBalance');
+    });
+    Route::controller(CashbookController::class)->group(function () {
+        Route::get('get_cashbook_closing_history','getCashbookClosingHistory');
     });
 
 });

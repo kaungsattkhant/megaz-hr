@@ -38,4 +38,6 @@ interface ItemRepositoryInterface
     public function importCategory($request);
 
     public function importUom($request);
+
+    public function importItemPrice($request);
 }

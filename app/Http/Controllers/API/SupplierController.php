@@ -61,4 +61,16 @@ class SupplierController extends Controller
         $createdSupplierAccount = $this->supplierRepo->toggleSupplierBankAccount($request->id);
         ResponseData($createdSupplierAccount);
     }
+
+    public function supplierImport(Request $request)
+    {
+        $supplier = $this->supplierRepo->supplierImport($request);
+        return $supplier;
+    }
+
+    public function brandImport(Request $request)
+    {
+        $brand = $this->supplierRepo->brandImport($request);
+        return $brand;
+    }
 }

@@ -15,7 +15,7 @@ return [
         'customer.create',
         'customer-deposit',
         'customer-deposit.confirm',
-        'invoice.list',
+        'invoice.list', 
         'pos-cashbook',
 
         'inventory-stock',
@@ -171,6 +171,10 @@ return [
         'okr-duties.edit',
         'okr-duties.delete',
         'okr-dashboard',
+        'okr-duty',
+        'okr-duty.create',
+        'okr-duty.edit',
+        'okr-duty.delete',
         'ktv-product-tree.create',
         'ktv-product-tree',
         'ktv-product-tree.edit',
@@ -189,7 +193,7 @@ return [
         'time-shift.delete',
         'gps',
         'gps.edit',
-        'check-in.list',
+        'check-in',
         'contact',
         'contact.create',
         'contact.edit',
@@ -297,6 +301,7 @@ return [
         "asset.create",
         "fix-asset",
         "fix-asset.create",
+        "asset-depreciation-balance",
         'account-payableaccount.edit', // This looks like a typo, possibly should be two items?
         'account.delete',
         'financial-transaction',
@@ -365,4 +370,6 @@ return [
     'payable_account_code' => '4-4000',
     'cash_code' => "2-1000",
     'creditor_account_code' => '4-2000',
+    'cash_account_code'=>['2-1001','2-1002','2-1003','2-1004','2-1005','2-1006','2-1007','2-1008','2-1009','2-1010'],
+    'pos_cash_account_code'=>['2-1011','2-1012'],
 ];
