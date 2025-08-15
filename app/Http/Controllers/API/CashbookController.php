@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\CashBook\CashBookInterface;
 use App\Http\Action\Transaction\CashBookTransaction;
+use App\Http\Requests\Financial\CashbookCloseRequest;
 use stdClass;
 
 class CashbookController extends Controller
@@ -23,7 +24,7 @@ class CashbookController extends Controller
         ResponseData($cashbooks);
     }
 
-    public function closeTransaction(Request $request){
+    public function closeTransaction(CashbookCloseRequest $request){
         $cashbooks= $this->cashBookRepo->closeTransaction($request);
     }
 

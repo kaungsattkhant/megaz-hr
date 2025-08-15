@@ -130,6 +130,28 @@ class CashBookTransaction
         return $closingBalance;
     }
 
+    public function getCashInBalance($date,$cashAccountId)
+    {
+
+
+        $total = DB::table('ledgers')
+        ->select(
+            DB::raw('CAST(SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) AS DECIMAL(15,2)) as total_debit_amount'),
+            DB::raw('CAST(SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) AS DECIMAL(15,2)) as total_credit_amount')
+        )
+        ->where('account_id', $cashAccountId)
+        ->whereDate('created_at', today())
+        ->first();
+    
+        $totalDebitAmount = (float) $total->total_debit_amount;
+        $totalCreditAmount = (float) $total->total_credit_amount;
+        $cashInBalance=$totalDebitAmount-$totalCreditAmount;
+        return $cashInBalance;
+        // $closingBalance = ((int) $openingBalance + $totalDebitAmount) - $totalCreditAmount;
+        // return $closingBalance;
+    }
+
+
     public function getLatestClosedTransaction($data, $cashAccountId, $is_closing_column)
     {
         $fromDate = convertDateFormat($data->from_date);
@@ -225,5 +247,30 @@ class CashBookTransaction
 
         // Step 4: Output the results
         return $results;
+    }
+
+    public function transferDailyCash($cashAccountId,$toCashAccountId,$balance){
+        $transaction = Transaction::create([
+            'date' => now(),
+            'created_by' => UserData()->id,
+            'transactionable_id' => null,
+            'transactionable_type' => 'cashbook_transfer',
+            'is_confirmed' => 0,
+        ]);
+        $creditDepositLeder = (new StoreTransactionLedger())->storeLedger([
+            'value' => $balance,
+            'transaction_id' => $transaction->id,
+            'account_id' => $cashAccountId, //deposit amount
+            'action' => 'credit',
+            'is_cashier_confirmed' => 0
+        ]);
+        $debitDepositLeder = (new StoreTransactionLedger())->storeLedger([
+            'value' => $balance,
+            'transaction_id' => $transaction->id,
+            'account_id' => $toCashAccountId, //deposit amount
+            'action' => 'debit',
+            'is_cashier_confirmed' => 0
+        ]);
+        return true;
     }
 }
