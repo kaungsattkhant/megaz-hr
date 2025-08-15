@@ -332,6 +332,7 @@
                     this.detail = response.data;
                     this.invoice_id = response.data.invoice.invoice_id;
                     this.area_id = response.data.area_id;
+                    this.getMenuCategoryList();
                 }
             },
             async getMenuCategoryList() {
@@ -345,10 +346,14 @@
             
             async getInitMenuList(id) {
                 console.log(id)
-                const response = await getApiData({ url: '/api/menu_categories/' + id + '/menus?selling_area_id=' + this.detail.area_id, token: this.getToken() });
-                if (response.data) {
-                    this.menuList = response.data;
+                console.log(this.detail.area_id)
+                if(this.detail.area_id){
+                    const response = await getApiData({ url: '/api/menu_categories/' + id + '/menus?selling_area_id=' + this.detail.area_id, token: this.getToken() });
+                    if (response.data) {
+                        this.menuList = response.data;
+                    }
                 }
+                
             },
             menuCategoryChange(category){
                 this.selectedMenuCategory = category.id
@@ -477,8 +482,12 @@
                 const response = await getApiData({ url: '/api/pos/selling_extra_categories', token: this.getToken() });
                 if (response.data) {
                     this.extraCategoryList = response.data;
-                    this.selectedExtraCategory = response.data[0].id;
-                    this.extraList = response.data[0].extras;
+                    if(response.data[0].id){
+                        this.selectedExtraCategory = response.data[0].id;
+                    }
+                    if(response.data[0].extras){
+                        this.extraList = response.data[0].extras;
+                    }
                     // this.getInitMenuList(response.data[0].id)
                 }
             },
@@ -579,7 +588,7 @@
         },
         created(){
             this.getOrderDetail();
-            this.getMenuCategoryList();
+            // this.getMenuCategoryList();
             this.getExtraCategoryList();
             this.getRemarks();
         },
