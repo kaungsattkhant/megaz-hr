@@ -175,7 +175,7 @@
 <script>
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
-import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
 export default {
     data() {
@@ -231,7 +231,7 @@ export default {
                     type: "info"
                 });
                 this.selectedImportItem = null;
-                this.getSupplierList();
+                this.getSupplierList(1);
             }
             else {
                 this.$notify({

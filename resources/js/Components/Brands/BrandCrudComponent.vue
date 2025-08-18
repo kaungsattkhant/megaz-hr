@@ -342,10 +342,10 @@ export default {
             const selectedImportItem = event.target.files[0];
             this.selectedImportItem = selectedImportItem;
             if(this.selectedImportItem){
-                this.importSupplier();
+                this.importBrand();
             }
         },
-        async importSupplier() {
+        async importBrand() {
             let formData = new FormData();
             formData.append('sheet', this.selectedImportItem);
             let response = await postApiData({ url: '/api/brands/import', form_data: formData, token: this.getToken() });
@@ -355,7 +355,7 @@ export default {
                     type: "info"
                 });
                 this.selectedImportItem = null;
-                this.getBrandList();
+                this.getBrandList(1);
             }
             else {
                 this.$notify({
