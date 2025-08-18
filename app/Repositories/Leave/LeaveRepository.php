@@ -346,7 +346,7 @@ class LeaveRepository implements LeaveRepositoryInterface
 
     $totalLeaveAllowance = 0;
     $totalLeaveTaken = 0;
-
+    $result = [];
     foreach ($leaveAllowances as $leaveAllowance) {
       $leaveCategoryId = $leaveAllowance->leave_category_id;
       $totalLeaveAllowance += $leaveAllowance->day;
