@@ -263,6 +263,7 @@ class CashBookTransaction
             'created_by' => UserData()->id,
             'transactionable_id' => $cashbookTransfer->id,
             'transactionable_type' => 'cashbook_transfer',
+            'description' => 'Cashbook Transfer',
             'is_confirmed' => 0,
         ]);
         $creditDepositLeder = (new StoreTransactionLedger())->storeLedger([
