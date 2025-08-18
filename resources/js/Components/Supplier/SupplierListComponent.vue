@@ -16,7 +16,11 @@
                     <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
                     <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <div class="flex justify-end flex-col">
+                <div class="flex justify-end gap-x-4">
+                    <label for="excel_import_supplier" class="add-btn h-8 cursor-pointer">
+                        Import 
+                        <input type="file" placeholder="Excel" id="excel_import_supplier" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
                     <a href="/suppliers/create" class="add-btn " v-if="feature.includes('supplier.create')">
                         Add New
                     </a>
@@ -185,6 +189,8 @@ export default {
             lastPage: 0,
             totalData: 0,
             
+            selectedImportItem: null,
+
             feature: this.getFeature(),
         };
     },
@@ -205,6 +211,33 @@ export default {
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
 
+            }
+        },
+        handleFileChange(event) {
+            console.log("Event object:", event);
+            const selectedImportItem = event.target.files[0];
+            this.selectedImportItem = selectedImportItem;
+            if(this.selectedImportItem){
+                this.importSupplier();
+            }
+        },
+        async importSupplier() {
+            let formData = new FormData();
+            formData.append('sheet', this.selectedImportItem);
+            let response = await postApiData({ url: '/api/suppliers/import', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedImportItem = null;
+                this.getSupplierList();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
             }
         },
         async searchBtnClicked() {

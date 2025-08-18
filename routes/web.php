@@ -365,6 +365,7 @@ Route::middleware(['departments:working-capital'])->group(function () {
     Route::view('/working_capital', 'working_capital.index');
 
 });
+Route::view('/profit_and_loss', 'profit_and_loss.index');
 Route::middleware(['departments:ap-balance'])->group(function () {
     Route::view('/ap_balances', 'ap_balances.index');
 
@@ -744,6 +745,7 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/equipment_assignment', 'equipment_assignment.index')->name('equipment_assignment.index');
     Route::view('/equipment_assignment/create', 'equipment_assignment.create')->name('equipment_assignment.create');
     Route::view('/shift', 'shift.index')->name('shift.index');
+    Route::view('/working_capital', 'working_capital.index')->name('working_capital.index');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');

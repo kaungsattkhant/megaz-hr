@@ -17,8 +17,11 @@
                     <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
 
                 </div>
-                <div class="flex justify-end flex-col">
-
+                <div class="flex justify-end gap-x-4">
+                    <label for="excel_import_supplier" class="add-btn h-8 cursor-pointer">
+                        Import 
+                        <input type="file" placeholder="Excel" id="excel_import_supplier" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
                     <button type="button" v-show="feature.includes('brand.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal" @click="createBtnClicked">
@@ -230,6 +233,8 @@ export default {
             selectedItem:[],
 
             editId: null,
+
+            selectedImportItem: null,
             feature: this.getFeature(),
         };
     },
@@ -332,6 +337,33 @@ export default {
             }
         },
 
+        handleFileChange(event) {
+            console.log("Event object:", event);
+            const selectedImportItem = event.target.files[0];
+            this.selectedImportItem = selectedImportItem;
+            if(this.selectedImportItem){
+                this.importSupplier();
+            }
+        },
+        async importSupplier() {
+            let formData = new FormData();
+            formData.append('sheet', this.selectedImportItem);
+            let response = await postApiData({ url: '/api/brands/import', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedImportItem = null;
+                this.getBrandList();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
         async searchBtnClicked() {
             let url = null;
             if (this.searchInput && this.searchCategory) {
