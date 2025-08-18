@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use App\Models\CashbookBalance;
+use App\Models\CashbookTransfer;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
@@ -157,7 +158,7 @@ class CashBookTransaction
         $fromDate = convertDateFormat($data->from_date);
         return Transaction::with(['ledgers.account'])
             ->withoutGlobalScope('dateFilter')
-            ->select(['id', 'date', 'description'])
+            ->select(['id', 'date', 'description','closing_date','pos_closing_date'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
             })
@@ -172,7 +173,6 @@ class CashBookTransaction
 
     public function getCashAndBankBalanceByMonth($sub_account_id, $year, $month)
     {
-
         // return DB::table('sub_accounts')
         // ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
         // ->leftJoin('ledgers', function ($join) use ($year) {
@@ -249,11 +249,19 @@ class CashBookTransaction
         return $results;
     }
 
-    public function transferDailyCash($cashAccountId,$toCashAccountId,$balance){
+    public function transferDailyCash($cashAccountId,$toCashAccountId,$cashbookBalanceId,$balance){
+        $cashbookTransfer=CashbookTransfer::create([
+            'date_time'=>now(),
+            'cash_account_id'=>$cashAccountId,
+            'to_cash_account_id'=>$toCashAccountId,
+            'amount'=>$balance,
+            'cashbook_balance_id'=>$cashbookBalanceId,
+            'created_by'=>UserData()->id,
+        ]);
         $transaction = Transaction::create([
             'date' => now(),
             'created_by' => UserData()->id,
-            'transactionable_id' => null,
+            'transactionable_id' => $cashbookTransfer->id,
             'transactionable_type' => 'cashbook_transfer',
             'is_confirmed' => 0,
         ]);

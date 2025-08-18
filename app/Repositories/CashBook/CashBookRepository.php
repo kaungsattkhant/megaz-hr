@@ -35,14 +35,15 @@ class CashBookRepository implements CashBookInterface
         }
         $cashAccountId = $request->cash_account_id;
         $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($request, $cashAccountId, $is_closing_column);
+        // dd($latestClosedTransaction->$closing_date_column);
         $cashbookTransactions = Transaction::with(['ledgers.account', 'transactionable'])
             ->isConfirmed(1)
             ->select(['id', 'date', 'description', 'transactionable_id', 'transactionable_type'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->whereIn('account_id', $cashAccountId);
             })
-            ->when(($request->from_date == null && $request->to_date == null) && $latestClosedTransaction, function ($q) use ($latestClosedTransaction) {
-                $q->where('id', '>', $latestClosedTransaction->id);
+            ->when(($request->from_date == null && $request->to_date == null) && $latestClosedTransaction, function ($q) use ($latestClosedTransaction, $closing_date_column) {
+                $q->where('created_at', '>', $latestClosedTransaction->$closing_date_column);
             })
             ->get();
         $current_debit_amount = $current_credit_amount = 0;
@@ -144,14 +145,15 @@ class CashBookRepository implements CashBookInterface
             if ($latestTransaction->$is_closing_column) {
                 ResponseMessage('Cashbook is already closed', 419);
             }
+            if (isset($request->is_pos) && $request->is_pos) {
+                (new CashBookTransaction())->transferDailyCash($cashAccountId, $toCashAccountId, $cashbookBalance->id, $cashInBalance);
+            }
             if ($latestTransaction) {
                 $latestTransaction->$is_closing_column = 1;
                 $latestTransaction->$closing_date_column = now();
                 $latestTransaction->save();
             }
-            if (isset($request->is_pos) && $request->is_pos) {
-                (new CashBookTransaction())->transferDailyCash($cashAccountId, $toCashAccountId, $cashInBalance);
-            }
+
             if ($cashbookBalance) {
                 DB::commit();
                 ResponseMessage('Transaction closing is successfully', 200);

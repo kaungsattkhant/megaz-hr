@@ -61,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
             'role'=>'App\Models\Role',
             'selling_extra'=>'App\Models\SellingExtra',
             'staff_advance'=>'App\Models\StaffAdvance',
+            'cashbook_transfer'=>'App\Models\CashbookTransfer',
+
         ]);
     }
 }
