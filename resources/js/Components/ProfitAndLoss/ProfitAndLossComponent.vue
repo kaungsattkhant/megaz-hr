@@ -396,6 +396,7 @@
 
                                     </td>
                                 </tr>
+                                
                                 <tr class=" !rounded-none" v-if="primaryList[5]?.total">
                                     <td  class=" !font-semibold !rounded-none">
                                     </td>
