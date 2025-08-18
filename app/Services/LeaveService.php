@@ -35,8 +35,6 @@ class LeaveService
       if ($roleAllowances->isEmpty()) {
         ResponseMessage('Leave allowance not found for the staff\'s roles and leave category.', 422);
       }
-
-      // Use the maximum allowance from all assigned roles
       $allowance = $roleAllowances->max();
     }
 
