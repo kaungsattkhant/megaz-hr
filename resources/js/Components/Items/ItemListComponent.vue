@@ -1,10 +1,28 @@
 <template>
     <div class="mt-4 bg-white">
         <div class="card-shadow">
-            <div>
+            <div class="flex justify-between">
                 <p class=" page-title">
                     Items
                 </p>
+                <div class="flex gap-x-4 pt-4 pr-4">
+                    <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
+                        Import Type
+                        <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
+                    </label>
+                    <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-category.import')">
+                        Import Category
+                        <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
+                    </label>
+                    <label for="excel_import" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
+                        Import Item
+                        <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
+                    <label for="excel_import_price" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
+                        Import Price
+                        <input type="file" placeholder="Excel" id="excel_import_price" class="opacity-0 w-0 h-0 hidden"  @change="handleItemPriceFileChange">
+                    </label>
+                </div>
             </div>
             <div class="btn-container">
                 <div class=" flex gap-x-4 ">
@@ -36,18 +54,7 @@
 
                 </div>
                 <div class="flex justify-end gap-x-4">
-                    <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
-                        Import Type
-                        <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
-                    </label>
-                    <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-category.import')">
-                        Import Category
-                        <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
-                    </label>
-                    <label for="excel_import" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item.import')">
-                        Import Item
-                        <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
-                    </label>
+                    
                     <!-- <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#import_modal">
@@ -973,6 +980,7 @@ export default {
                 this.importBtnClicked();
             }
         },
+        
         async importBtnClicked() {
             let formData = new FormData();
             formData.append('item_import', this.selectedFile);
@@ -1043,6 +1051,35 @@ export default {
                 });
                 this.selectedItemCategoryFile = null;
                 this.getItemCategoryList();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
+
+        
+        handleItemPriceFileChange(event) {
+            console.log("Event object:", event);
+            const selectedItemPriceFile = event.target.files[0];
+            this.selectedItemPriceFile = selectedItemPriceFile;
+            if(this.selectedItemPriceFile){
+                this.importItemPrice();
+            }
+        },
+        async importItemPrice() {
+            let formData = new FormData();
+            formData.append('sheet', this.selectedItemPriceFile);
+            let response = await postApiData({ url: '/api/import/item_prices', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedItemPriceFile = null;
+                this.getItemList(1);
             }
             else {
                 this.$notify({
