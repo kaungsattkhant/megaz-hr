@@ -17,6 +17,12 @@ class StaffTimeshift extends Model
         'staff_id',
         'timeshift_id',
         'area_id',
+        'status',
+        'confirmed_by',
+        'confirmed_at',
+        'cancelled_by',
+        'cancelled_at',
+        'created_by',
     ];
 
     public function staff()

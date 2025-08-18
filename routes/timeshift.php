@@ -88,5 +88,8 @@ Route::middleware('auth:api')->group(function () {
 
     //mobile
     Route::get('/noties/{staffId}', 'getallNoties');
+    Route::get('/meetings_by_staff/{staffId}', 'getMeetingsByStaffId');
+    Route::get('/trainings_by_staff/{staffId}', 'getTrainingsByStaffId');
+    Route::get('/shifts_by_staff/{staffId}', 'getShiftsByStaffId');
   });
 });

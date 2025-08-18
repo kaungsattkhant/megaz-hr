@@ -151,10 +151,27 @@ class ParticipantNotificationController extends Controller
         ResponseData($data);
     }
 
-
     public function getallNoties(Request $request, $staffId)
     {
         $data = $this->ParticipantNotificationRepository->getallNoties($request, $staffId);
+        ResponseData($data);
+    }
+
+    public function getMeetingsByStaffId($staffId,Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->getMeetingsByStaffId($staffId,$request);
+        ResponseData($data);
+    }
+
+    public function getTrainingsByStaffId($staffId,Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->getTrainingsByStaffId($staffId,$request);
+        ResponseData($data);
+    }
+
+    public function getShiftsByStaffId($staffId,Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->getShiftsByStaffId($staffId,$request);
         ResponseData($data);
     }
 }

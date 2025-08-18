@@ -282,6 +282,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/toggle_brand_item', 'toggleBrandItem');
         Route::post('/suppliers/toggle_phones', 'toggleSupplierPhone');
         Route::post('/suppliers/toggle_bank_accounts', 'toggleSupplierBankAccount');
+        Route::post('/suppliers/import', 'supplierImport');
+        Route::post('/brands/import', 'brandImport');
     });
     Route::resource('notifications', NotificationController::class)->only(['index']);
     Route::get('notification_by_user', [NotificationController::class, 'notificationUsersData']);

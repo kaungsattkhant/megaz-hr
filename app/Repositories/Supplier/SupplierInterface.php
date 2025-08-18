@@ -19,4 +19,8 @@ interface SupplierInterface
     public function toggleSupplierPhone($supplierPhoneId);
 
     public function toggleSupplierBankAccount($supplierBankAccountId);
+
+    public function supplierImport($request);
+
+    public function brandImport($request);
 }

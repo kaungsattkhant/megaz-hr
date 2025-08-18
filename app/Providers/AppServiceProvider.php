@@ -62,7 +62,7 @@ class AppServiceProvider extends ServiceProvider
             'selling_extra'=>'App\Models\SellingExtra',
             'staff_advance'=>'App\Models\StaffAdvance',
             'cashbook_transfer'=>'App\Models\CashbookTransfer',
-
+            'staff_timeshift' => 'App\Models\StaffTimeshift',
         ]);
     }
 }

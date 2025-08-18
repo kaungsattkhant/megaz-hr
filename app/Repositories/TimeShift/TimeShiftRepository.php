@@ -18,7 +18,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getGPS($request)
   {
-    return Gps::all();
+    return Gps::orderBy('id', 'desc')->get();
   }
 
   public function getGPSById(int $gpsId)
@@ -35,7 +35,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getShifts($request)
   {
-    return Shift::all();
+    return Shift::orderBy('id', 'desc')->get();
   }
 
   public function getShiftsById(int $shiftId)
@@ -45,12 +45,15 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function storeShifts($data)
   {
-    return Shift::create($data);
+    return Shift::updateOrCreate(
+      ['id' => $data['id']  ?? null],
+      $data
+    );
   }
 
   public function getTimeShift($request)
   {
-    return TimeShift::with('shift')->get();
+    return TimeShift::with('shift')->orderBy('id', 'desc')->get();
   }
 
   public function getTimeShiftById($timeShiftId)
