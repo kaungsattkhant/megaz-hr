@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use App\Models\CashbookBalance;
+use App\Models\CashbookTransfer;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
@@ -130,12 +131,34 @@ class CashBookTransaction
         return $closingBalance;
     }
 
+    public function getCashInBalance($date,$cashAccountId)
+    {
+
+
+        $total = DB::table('ledgers')
+        ->select(
+            DB::raw('CAST(SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) AS DECIMAL(15,2)) as total_debit_amount'),
+            DB::raw('CAST(SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) AS DECIMAL(15,2)) as total_credit_amount')
+        )
+        ->where('account_id', $cashAccountId)
+        ->whereDate('created_at', today())
+        ->first();
+    
+        $totalDebitAmount = (float) $total->total_debit_amount;
+        $totalCreditAmount = (float) $total->total_credit_amount;
+        $cashInBalance=$totalDebitAmount-$totalCreditAmount;
+        return $cashInBalance;
+        // $closingBalance = ((int) $openingBalance + $totalDebitAmount) - $totalCreditAmount;
+        // return $closingBalance;
+    }
+
+
     public function getLatestClosedTransaction($data, $cashAccountId, $is_closing_column)
     {
         $fromDate = convertDateFormat($data->from_date);
         return Transaction::with(['ledgers.account'])
             ->withoutGlobalScope('dateFilter')
-            ->select(['id', 'date', 'description'])
+            ->select(['id', 'date', 'description','closing_date','pos_closing_date'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
             })
@@ -150,7 +173,6 @@ class CashBookTransaction
 
     public function getCashAndBankBalanceByMonth($sub_account_id, $year, $month)
     {
-
         // return DB::table('sub_accounts')
         // ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
         // ->leftJoin('ledgers', function ($join) use ($year) {
@@ -225,5 +247,39 @@ class CashBookTransaction
 
         // Step 4: Output the results
         return $results;
+    }
+
+    public function transferDailyCash($cashAccountId,$toCashAccountId,$cashbookBalanceId,$balance){
+        $cashbookTransfer=CashbookTransfer::create([
+            'date_time'=>now(),
+            'cash_account_id'=>$cashAccountId,
+            'to_cash_account_id'=>$toCashAccountId,
+            'amount'=>$balance,
+            'cashbook_balance_id'=>$cashbookBalanceId,
+            'created_by'=>UserData()->id,
+        ]);
+        $transaction = Transaction::create([
+            'date' => now(),
+            'created_by' => UserData()->id,
+            'transactionable_id' => $cashbookTransfer->id,
+            'transactionable_type' => 'cashbook_transfer',
+            'description' => 'Cashbook Transfer',
+            'is_confirmed' => 0,
+        ]);
+        $creditDepositLeder = (new StoreTransactionLedger())->storeLedger([
+            'value' => $balance,
+            'transaction_id' => $transaction->id,
+            'account_id' => $cashAccountId, //deposit amount
+            'action' => 'credit',
+            'is_cashier_confirmed' => 0
+        ]);
+        $debitDepositLeder = (new StoreTransactionLedger())->storeLedger([
+            'value' => $balance,
+            'transaction_id' => $transaction->id,
+            'account_id' => $toCashAccountId, //deposit amount
+            'action' => 'debit',
+            'is_cashier_confirmed' => 0
+        ]);
+        return true;
     }
 }

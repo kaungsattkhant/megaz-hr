@@ -38,8 +38,8 @@ class AccountController extends Controller
         ResponseData($account);
     }
 
-    public function getCashAccount(){
-        $sub_account= $this->accountRepo->getCashAccount();
+    public function getCashAccount(Request $request){
+        $sub_account= $this->accountRepo->getCashAccount($request);
         ResponseData($sub_account);
     }
 
