@@ -56,6 +56,20 @@
                                             </a>
                                         </li>
                                     @endif
+                                    <li>
+                                            <a href="/profit_and_loss"
+                                                class="flex items-center text-left @yield('profit_and_loss')">
+                                                <i class="fal fa-braille pr-3"></i>
+                                                Profit And Loss
+                                            </a>
+                                    </li>
+                                    <li>
+                                            <a href="/trial_balance"
+                                                class="flex items-center text-left @yield('trial_balance')">
+                                                <i class="fal fa-braille pr-3"></i>
+                                                Trial Balance
+                                            </a>
+                                    </li>
                                     @if (checkFeaturePermission('ap-balance'))
 
                                         <li>

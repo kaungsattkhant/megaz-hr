@@ -366,6 +366,7 @@ Route::middleware(['departments:working-capital'])->group(function () {
 
 });
 Route::view('/profit_and_loss', 'profit_and_loss.index');
+Route::view('/trial_balance', 'trial_balance.index');
 Route::middleware(['departments:ap-balance'])->group(function () {
     Route::view('/ap_balances', 'ap_balances.index');
 
