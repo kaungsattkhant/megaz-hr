@@ -44,14 +44,15 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
 
     public function model(array $row)
     {
-        if (empty($row['item_code']) || empty($row['brand_id']) || empty($row['supplier_id']) || empty($row['uom_code']) || empty($row['price'])) {
+        if (empty($row['item_code']) || empty($row['brand_id']) || empty($row['supplier_code']) || empty($row['uom_code']) || empty($row['price'])) {
             return null; // Returning null skips the row
         }
         DB::beginTransaction();
         try {
             $item = Item::where('code',  $row['item_code'])->first();
             $brand=Brand::where('id',$row['brand_id'])->first();
-            $supplier=Supplier::where('id',$row['supplier_id'])->first();
+            $supplier=Supplier::where('supplier_code',$row['supplier_code'])->first();
+            // dd($supplier);
             $uom=Uom::where('uom_code',$row['uom_code'])->first();
             if(!$item){
                 ResponseMessage('Item Code is invalid',419);

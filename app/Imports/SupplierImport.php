@@ -32,7 +32,7 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
         DB::beginTransaction();
         try {
 
-            if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '') {
+            if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '' || $row['supplier_ap_name']==null) {
                 DB::rollback();
                 return null;
             }
@@ -48,6 +48,7 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
             }
 
             $mockRequest = (object) ['name' => $row['supplier_ap_name']];
+
             $account = $this->supplierRepository->createSupplierAccount($mockRequest);
             $otherPayable = $account['other_payable'];
             $creditor = $account['creditor'];
@@ -61,24 +62,48 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
                 $exactDate = json_encode($decodedExactDate);
             }
 
-            $supplier = new Supplier([
-                'account_id' => $otherPayable->id,
-                'creditor_account_id' => $creditor->id,
-                'name' => trim((string)$row['name']),
-                'shop_name' =>$row['shop_name'],
-                'address' =>$row['address'],
-                'email' =>$row['email'],
-                'credit_limit' =>$row['credit_limit'],
-                'credit_opening_date' =>$creditOpeningDate,
-                'credit_opening_amount' =>$row['credit_opening_amount'],
-                'lead_time_day' => $row['lead_time_day'] ?? null,
-                'lead_time_hour' => $row['lead_time_hour'] ?? null,
-                'lead_time_minutes' => $row['lead_time_minutes'] ?? null,
-                'credit_term_type' => $row['credit_term_type'],
-                'day' => $row['day'] ?? null,
-                'amount_limitation' => $row['amount_limitation'] ?? null,
-                'exact_date' => $exactDate,
-            ]);
+            $supplier = Supplier::firstOrCreate(
+                [
+                    'supplier_code' => $row['supplier_code'], // 👈 unique lookup
+                ],
+                [
+                    'account_id'            => $otherPayable->id,
+                    'creditor_account_id'   => $creditor->id,
+                    'name'                  => trim((string) $row['name']),
+                    'shop_name'             => $row['shop_name'],
+                    'address'               => $row['address'],
+                    'email'                 => $row['email'],
+                    'credit_limit'          => $row['credit_limit'],
+                    'credit_opening_date'   => $creditOpeningDate,
+                    'credit_opening_amount' => $row['credit_opening_amount'],
+                    'lead_time_day'         => $row['lead_time_day'] ?? null,
+                    'lead_time_hour'        => $row['lead_time_hour'] ?? null,
+                    'lead_time_minutes'     => $row['lead_time_minutes'] ?? null,
+                    'credit_term_type'      => $row['credit_term_type'],
+                    'day'                   => $row['day'] ?? null,
+                    'amount_limitation'     => $row['amount_limitation'] ?? null,
+                    'exact_date'            => $exactDate,
+                ]
+            );
+            // $supplier = new Supplier([
+            //     'supplier_code'=>$row['supplier_code'],
+            //     'account_id' => $otherPayable->id,
+            //     'creditor_account_id' => $creditor->id,
+            //     'name' => trim((string)$row['name']),
+            //     'shop_name' =>$row['shop_name'],
+            //     'address' =>$row['address'],
+            //     'email' =>$row['email'],
+            //     'credit_limit' =>$row['credit_limit'],
+            //     'credit_opening_date' =>$creditOpeningDate,
+            //     'credit_opening_amount' =>$row['credit_opening_amount'],
+            //     'lead_time_day' => $row['lead_time_day'] ?? null,
+            //     'lead_time_hour' => $row['lead_time_hour'] ?? null,
+            //     'lead_time_minutes' => $row['lead_time_minutes'] ?? null,
+            //     'credit_term_type' => $row['credit_term_type'],
+            //     'day' => $row['day'] ?? null,
+            //     'amount_limitation' => $row['amount_limitation'] ?? null,
+            //     'exact_date' => $exactDate,
+            // ]);
 
             $supplier->save();
 
