@@ -1,0 +1,1497 @@
+[
+    {
+        "account_code": "1-1001",
+        "name": "Leasehold Improvements",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1002",
+        "name": "Equipment (PPE)",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1003",
+        "name": "Musical Instruments",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1004",
+        "name": "Office Equipment",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1005",
+        "name": "Furniture",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1006",
+        "name": "Vehicle",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1007",
+        "name": "Machinery",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1008",
+        "name": "Project (FA)",
+        "sub_account_id": 1
+    },
+    {
+        "account_code": "1-1101",
+        "name": "Software System Build",
+        "sub_account_id": 2
+    },
+    {
+        "account_code": "1-1102",
+        "name": "License & Rights",
+        "sub_account_id": 2
+    },
+    {
+        "account_code": "1-1201",
+        "name": "Accn Depn - Leasehold Improvements",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1202",
+        "name": "Accn Depn - Equipment (PPE)",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1203",
+        "name": "Accn Depn - Musical Instruments",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1204",
+        "name": "Accn Depn - Equipment",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1205",
+        "name": "Accn Depn - Furniture",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1206",
+        "name": "Accn Depn - Vehicle",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1207",
+        "name": "Accn Depn - Machinery",
+        "sub_account_id": 3
+    },
+    {
+        "account_code": "1-1301",
+        "name": "Accn Amortization - Software System Build",
+        "sub_account_id": 4
+    },
+    {
+        "account_code": "1-1302",
+        "name": "Accn Amortization - License & Rights",
+        "sub_account_id": 4
+    },
+    {
+        "account_code": "1-1351",
+        "name": "Pron Replacement - China Ware/Glass Ware",
+        "sub_account_id": 5
+    },
+    {
+        "account_code": "1-1352",
+        "name": "Pron Replacement - Kitchen Utencils",
+        "sub_account_id": 5
+    },
+    {
+        "account_code": "1-1353",
+        "name": "Pron Replacement - Silver & Cutlery",
+        "sub_account_id": 5
+    },
+    {
+        "account_code": "2-1001",
+        "name": "Office Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1002",
+        "name": "Service Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1003",
+        "name": "AGM Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1004",
+        "name": "GM Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1005",
+        "name": "Advance Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1006",
+        "name": "Owner' Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1007",
+        "name": "KBZ Pay",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1008",
+        "name": "KBZ Old (GM)",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1009",
+        "name": "KTV Project",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1010",
+        "name": "KBZ Specital (MD+GM)",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1011",
+        "name": "POS Cash",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1012",
+        "name": "POS Bank",
+        "sub_account_id": 6
+    },
+    {
+        "account_code": "2-1051",
+        "name": "Receivable Restaurant",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-1052",
+        "name": "Receivable Staff Loan",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-1053",
+        "name": "Receivable Staff Advance",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-1054",
+        "name": "Receivable MD Family",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-1055",
+        "name": "Receivable Default",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-1056",
+        "name": "Receivable Shwe Kyiat",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-1057",
+        "name": "Receivable 5% Tax",
+        "sub_account_id": 8
+    },
+    {
+        "account_code": "2-2001",
+        "name": "RT- Door To Door",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-2002",
+        "name": "RT- Tiger Company",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-2003",
+        "name": "RT- Member",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-2004",
+        "name": "Unknown",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-2005",
+        "name": "KTV- Door To Door",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-2006",
+        "name": "KTV- Tiger Company",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-2007",
+        "name": "KTV- Member",
+        "sub_account_id": 9
+    },
+    {
+        "account_code": "2-3001",
+        "name": "Prepaid - Rental Fee",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3002",
+        "name": "Prepaid - Professional Fee",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3003",
+        "name": "Prepaid - CCTV",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3004",
+        "name": "Prepaid - Wifi",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3005",
+        "name": "Prepaid - Fire Insurance",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3006",
+        "name": "Prepaid - Digital Box(Marketing)",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3007",
+        "name": "Prepaid - License(FL17)",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3008",
+        "name": "Prepaid - MCDC Tax (Waste Removal)",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3009",
+        "name": "Prepaid - Commericial License",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3010",
+        "name": "Prepaid - Entrance & Parking",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-3011",
+        "name": "Prepaid - Elevator Service",
+        "sub_account_id": 10
+    },
+    {
+        "account_code": "2-4001",
+        "name": "Deposit Paid -",
+        "sub_account_id": 11
+    },
+    {
+        "account_code": "2-4002",
+        "name": "Deposit Paid -",
+        "sub_account_id": 11
+    },
+    {
+        "account_code": "3-1010",
+        "name": "Existing Capital",
+        "sub_account_id": 12
+    },
+    {
+        "account_code": "3-1020",
+        "name": "Retained Earnings",
+        "sub_account_id": 12
+    },
+    {
+        "account_code": "3-1030",
+        "name": "Net Profit",
+        "sub_account_id": 12
+    },
+    {
+        "account_code": "3-2001",
+        "name": "Drawings - MD",
+        "sub_account_id": 13
+    },
+    {
+        "account_code": "3-2002",
+        "name": "Drawings -",
+        "sub_account_id": 13
+    },
+    {
+        "account_code": "4-1001",
+        "name": "Loan",
+        "sub_account_id": 14
+    },
+    {
+        "account_code": "4-1002",
+        "name": "Loan- Yuan",
+        "sub_account_id": 14
+    },
+    {
+        "account_code": "4-1003",
+        "name": "Loan- Dollar",
+        "sub_account_id": 14
+    },
+    {
+        "account_code": "4-1004",
+        "name": "Loan- Interest",
+        "sub_account_id": 14
+    },
+    {
+        "account_code": "4-2101",
+        "name": "360 Petro",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2102",
+        "name": "Alpine",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2103",
+        "name": "Liquor and whole sale",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2104",
+        "name": "Apna Bazaar",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2105",
+        "name": "Asia Energy",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2106",
+        "name": "Asia Golden Sea",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2107",
+        "name": "74",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2108",
+        "name": "Ayer Shwe Wah",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2109",
+        "name": "Beyond",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2110",
+        "name": "CM Trading",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2111",
+        "name": "De De",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2112",
+        "name": "Denko",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2113",
+        "name": "E-Enterprises",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2114",
+        "name": "Golden",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2115",
+        "name": "Happy",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2116",
+        "name": "Heaven Praise",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2117",
+        "name": "Hello Balloons",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2118",
+        "name": "Orchid store",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2119",
+        "name": "HSD",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2120",
+        "name": "Kwee",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2121",
+        "name": "Liquor Pro",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2122",
+        "name": "Lo Ta Ya",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2123",
+        "name": "Super Point",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2124",
+        "name": "Lotus",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2125",
+        "name": "Lucky",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2126",
+        "name": "21 Mart",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2127",
+        "name": "Lucky Point",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2128",
+        "name": "Mandalay Stars Gas",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2129",
+        "name": "Seven colour",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2130",
+        "name": "Mizzuri Furniture",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2131",
+        "name": "Mya Power",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2132",
+        "name": "Ocean",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2133",
+        "name": "Htike Balloons",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2134",
+        "name": "Oscar Balloons",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2135",
+        "name": "Ko Kyaw Thu + Ma Moe Moe",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2136",
+        "name": "Satula",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2137",
+        "name": "Shisha Storm",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2138",
+        "name": "Santa",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2139",
+        "name": "Shwe Byain Phyu",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2140",
+        "name": "Shwe Mandalay",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2141",
+        "name": "Red Mountain",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2142",
+        "name": "Shwe Pyae Sone",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2143",
+        "name": "Shwe Pyi Taw",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2144",
+        "name": "VS Vape & Shisha Myanmar",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2145",
+        "name": "Sub Heater",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2146",
+        "name": "Summer Ice",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2147",
+        "name": "Three Stars",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2148",
+        "name": "TTA Trading",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2149",
+        "name": "TTO",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2150",
+        "name": "I Liqueur",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2151",
+        "name": "U Myo Min Thu",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2152",
+        "name": "Yazar Store",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2153",
+        "name": "Broadway International",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2154",
+        "name": "Zenith",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2155",
+        "name": "ကျိုင်းတုံ",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2156",
+        "name": "Tat Nay Wun",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2157",
+        "name": "ကာမေ",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2158",
+        "name": "ကိုကျော်မင်း",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2159",
+        "name": "ကိုကောင်းဝယ်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2160",
+        "name": "Sein Pa Laung",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2161",
+        "name": "ကိုနေလင်းအောင်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2162",
+        "name": "ကေဇော်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2163",
+        "name": "ကောင်းကြိုက်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2164",
+        "name": "Shin Chi",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2165",
+        "name": "ချမ်းသာအောင်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2166",
+        "name": "ခိုင်ဦး",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2167",
+        "name": "ငွေခြ‌င်္သေ့",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2168",
+        "name": "ဌေးဌေးကြွယ်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2169",
+        "name": "Shwe Kachin",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2170",
+        "name": "ထိပ်တန်း",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2171",
+        "name": "မငယ်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2172",
+        "name": "Ngwe Zin yaw",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2173",
+        "name": "မဇာဝယ်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2174",
+        "name": "မတင်တင်အေး ဆန်ဆိုင်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2175",
+        "name": "The Mandalay ဆိုင်းဘုတ်လုပ်ငန်း",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2176",
+        "name": "မြဝတီ",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2177",
+        "name": "မအိ",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2178",
+        "name": "Palace Shisha",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2179",
+        "name": "မိဘမေတ္တာ",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2180",
+        "name": "မေဖူးလွင်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2181",
+        "name": "ဝှမ်တက်၊ မကြူ‌ ‌",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2182",
+        "name": "ရွှေကျုံးကြီး",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2183",
+        "name": "ရွှေလီ ကုန်စိမ်း",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2184",
+        "name": "ရွှေလီစန်း",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2185",
+        "name": "လက်ရာမွန်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2186",
+        "name": "ကိုကြိမ်လုံး",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2187",
+        "name": "သင်းသင်းနွယ်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2188",
+        "name": "အမဲသား",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2189",
+        "name": "အောင် စတိုး",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2190",
+        "name": "အောင်ကြီး",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2191",
+        "name": "အောင်ပြည့်စုံ",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2192",
+        "name": "ဦးသစ်လွင်",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2193",
+        "name": "ကိုမျိုး ( အာလူး )",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-2194",
+        "name": "Default",
+        "sub_account_id": 15
+    },
+    {
+        "account_code": "4-4001",
+        "name": "Accrued Salary",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4002",
+        "name": "Accrued Gov.Affairs",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4003",
+        "name": "Other Payables - MD",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4004",
+        "name": "Other Payables - KTV",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4005",
+        "name": "Other Payables - Restaurant",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4006",
+        "name": "Other Payables - The Mandalay",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4007",
+        "name": "Other Payables - AGM",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4008",
+        "name": "Other Payables - GM",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4009",
+        "name": "Other Payables - Ma Thu",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4010",
+        "name": "Other Payables - ဝှမ်တက်၊ မကြူ‌ ‌",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4011",
+        "name": "Other Payables - ရှန့်ဟိုင်",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4012",
+        "name": "Other Payables - သိန်းညျွန့်",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4013",
+        "name": "Other Payables-ရွှေကြိုက်",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4014",
+        "name": "Other Payables -Service Money",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4015",
+        "name": "Other Payables - MD Home",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4016",
+        "name": "Other Payables - Default",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4017",
+        "name": "Other Payables - Canteen",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4018",
+        "name": "Other Payables - Equipment",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4019",
+        "name": "Other Payable-မိဘမေတ္တာ",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4020",
+        "name": "Other Payable- ရွှေကျုံးကြီး",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4021",
+        "name": "Other Payable- ဦးသစ်လွင်",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4022",
+        "name": "Other Payable- မတင်တင်အေး",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4023",
+        "name": "Other Payable-ငွေခြသ်ေ့",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4024",
+        "name": "Other Payable-Happy",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4025",
+        "name": "Other Payable-Shwe Pyae Sone",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4026",
+        "name": "Other Payable-Three Tree Paid Myanmar",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4027",
+        "name": "Other Payable-ကိုကျော်မင်း",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4028",
+        "name": "Other Payable-မေဖူးလွင်",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4029",
+        "name": "Other Payable-မြ၀တီ",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4030",
+        "name": "Other Payable-မငယ်",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4031",
+        "name": "Other Payable-Y&IJ glass",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4032",
+        "name": "Other Payable-Golden Crowm & Silve Star",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4033",
+        "name": "Other Payables - Ko Kyaw Thu & Ma Moe Moe",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4034",
+        "name": "Other Payable-Bank Loan",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "4-4035",
+        "name": "Other Payable-Ko Sai",
+        "sub_account_id": 17
+    },
+    {
+        "account_code": "5-0001",
+        "name": "Income - Food (RT)",
+        "sub_account_id": 18
+    },
+    {
+        "account_code": "5-0002",
+        "name": "Income - Beverages (RT)",
+        "sub_account_id": 18
+    },
+    {
+        "account_code": "5-0003",
+        "name": "Income - Room Charges (RT)",
+        "sub_account_id": 18
+    },
+    {
+        "account_code": "5-0101",
+        "name": "Income - Food (KTV)",
+        "sub_account_id": 19
+    },
+    {
+        "account_code": "5-0102",
+        "name": "Income - Beverages (KTV)",
+        "sub_account_id": 19
+    },
+    {
+        "account_code": "5-0103",
+        "name": "Income - Room Charges (KTV)",
+        "sub_account_id": 19
+    },
+    {
+        "account_code": "5-1001",
+        "name": "Bad Debt Recovery",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1002",
+        "name": "Bank Interest Received",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1003",
+        "name": "Garbage Sales",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1004",
+        "name": "Staff Fine/SSB",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1005",
+        "name": "SurpLus Money",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1006",
+        "name": "Discount Received",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1007",
+        "name": "Delivery Fee",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1009",
+        "name": "Service Charges(8%)",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1010",
+        "name": "Loan Interest Received",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1011",
+        "name": "Decoration Fees",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1012",
+        "name": "Other Rental Charges",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1013",
+        "name": "Other Sales",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1014",
+        "name": "Event/Function-Service Fees",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "5-1015",
+        "name": "5% Income",
+        "sub_account_id": 20
+    },
+    {
+        "account_code": "6-2001",
+        "name": "Advertising & Business Promotion",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2002",
+        "name": "Carriage Outwards / Delivery",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2003",
+        "name": "Discount Allowed",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2004",
+        "name": "FOC & Entertainment-Customer",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2005",
+        "name": "Entrance & Parking",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2006",
+        "name": "Foc & Entertainment-Owner",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2007",
+        "name": "Event & Function Supplies",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2008",
+        "name": "Packing & Shop Supplies",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-2009",
+        "name": "Service Money",
+        "sub_account_id": 22
+    },
+    {
+        "account_code": "6-3001",
+        "name": "Garden & Landscaping",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3002",
+        "name": "Health & Water Supplies",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3003",
+        "name": "Hygience Service",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3004",
+        "name": "Repair & Maintenance",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3005",
+        "name": "Newspaper & Magazine",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3006",
+        "name": "Pest Control",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3007",
+        "name": "Phone/Internet/Wifi",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3008",
+        "name": "Fuel For Generator",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3009",
+        "name": "Transportation & Postage",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3010",
+        "name": "Utilities Cost",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3011",
+        "name": "Donations",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3012",
+        "name": "Cleaning & Service Supplies",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3013",
+        "name": "General Expenses",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3014",
+        "name": "Kitchen /Bar Utensil Supplies",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3015",
+        "name": "Fuel For Vehicle",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3016",
+        "name": "Repair & Maintenance - Vehicle",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3017",
+        "name": "Travelling Expenses",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-3018",
+        "name": "Stationery",
+        "sub_account_id": 23
+    },
+    {
+        "account_code": "6-4001",
+        "name": "Bank Charges",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-4002",
+        "name": "Fire Insurance Expense",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-4003",
+        "name": "Printing & Stationery, IT & Data Processing",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-4004",
+        "name": "Waste Removal",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-4005",
+        "name": "Official Entertainment",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-4006",
+        "name": "Professional Entertainment",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-4007",
+        "name": "Legal Expenses",
+        "sub_account_id": 24
+    },
+    {
+        "account_code": "6-5001",
+        "name": "Employee Benefit",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5002",
+        "name": "Employee Training & Relations",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5003",
+        "name": "Medical Benefit",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5004",
+        "name": "Professional Fee",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5005",
+        "name": "Canteen Cost",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5006",
+        "name": "Staff Recruitment",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5007",
+        "name": "Staff Refreshment & Vacation",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5008",
+        "name": "Staff Salary",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5009",
+        "name": "Staff Uniform & Accessories",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5010",
+        "name": "Wages",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5011",
+        "name": "DJ/Unplugged Fees",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5012",
+        "name": "KPI Money",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5013",
+        "name": "Htun Tauk Hlan Security",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5014",
+        "name": "Mass Security",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-5015",
+        "name": "Security Fee",
+        "sub_account_id": 25
+    },
+    {
+        "account_code": "6-6001",
+        "name": "Legal & Licence Fees",
+        "sub_account_id": 26
+    },
+    {
+        "account_code": "6-6002",
+        "name": "MCDC Signboard",
+        "sub_account_id": 26
+    },
+    {
+        "account_code": "6-6003",
+        "name": "MCDC Water",
+        "sub_account_id": 26
+    },
+    {
+        "account_code": "6-6004",
+        "name": "SSB",
+        "sub_account_id": 26
+    },
+    {
+        "account_code": "6-6005",
+        "name": "MCDC Land & Building",
+        "sub_account_id": 26
+    },
+    {
+        "account_code": "6-6006",
+        "name": "Electricity EPC",
+        "sub_account_id": 26
+    },
+    {
+        "account_code": "6-7001",
+        "name": "Rental Fee",
+        "sub_account_id": 27
+    },
+    {
+        "account_code": "6-7002",
+        "name": "Depreciation",
+        "sub_account_id": 27
+    },
+    {
+        "account_code": "6-7003",
+        "name": "Amortization",
+        "sub_account_id": 27
+    },
+    {
+        "account_code": "6-7004",
+        "name": "Provisional Re-PLacement",
+        "sub_account_id": 27
+    },
+    {
+        "account_code": "6-8001",
+        "name": "Interest on Loan",
+        "sub_account_id": 28
+    },
+    {
+        "account_code": "6-8002",
+        "name": "Exchange Gain or Loss",
+        "sub_account_id": 28
+    },
+    {
+        "account_code": "6-9001",
+        "name": "Commercial Tax",
+        "sub_account_id": 29
+    },
+    {
+        "account_code": "6-9002",
+        "name": "Income Tax",
+        "sub_account_id": 29
+    },
+    {
+        "account_code": "2-1021",
+        "name": "Inventory Food",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1022",
+        "name": "Inventory Beverage",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1023",
+        "name": "Inventory Tobacco",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1024",
+        "name": "Inventory General",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1025",
+        "name": "Inventory Stationery",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1026",
+        "name": "Inventory Packing",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1027",
+        "name": "Inventory Cleaning Supplies",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1028",
+        "name": "Inventory Hygiene Supplies",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1029",
+        "name": "Inventory Decoration",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1030",
+        "name": "Inventory China Ware/Glass Ware",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1031",
+        "name": "Inventory Utencils",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "2-1032",
+        "name": "Inventory Silver & Cutlery",
+        "sub_account_id": 7
+    },
+    {
+        "account_code": "6-1001",
+        "name": "COS - Food",
+        "sub_account_id": 21
+    },
+    {
+        "account_code": "6-1002",
+        "name": "COS - Beverage",
+        "sub_account_id": 21
+    },
+    {
+        "account_code": "6-1003",
+        "name": "COS - Banquet/Function",
+        "sub_account_id": 21
+    },
+    {
+        "account_code": "6-1004",
+        "name": "COS - Fuel",
+        "sub_account_id": 21
+    },
+    {
+        "account_code": "6-1005",
+        "name": "COS - Carriage Inwards",
+        "sub_account_id": 21
+    }
+]

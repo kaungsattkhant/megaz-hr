@@ -279,6 +279,8 @@ return [
         'cash-flow',
         'indirect-cash-flow',
         'working-capital',
+        'trial-balance',
+        'profit-and-loss',
         'ap-balance',
         'creditor-balance',
         'journal.create',

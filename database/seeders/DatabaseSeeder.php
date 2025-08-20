@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
             ServiceCategorySeeder::class,
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
+            AccountTableSeeder::class,
             // RoomAndTableSeeder::class,
             InventorySeeder::class,
             StaffSeeder::class,

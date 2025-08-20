@@ -563,7 +563,7 @@ class ItemRepository implements ItemRepositoryInterface
         $expectedHeadings = [
             'item_code',
             'brand_id',
-            'supplier_id',
+            'supplier_code',
             'price',
         ];
         $actualHeadings = $headings[0][0];

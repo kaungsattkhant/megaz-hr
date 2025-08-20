@@ -189,10 +189,14 @@ class SupplierRepository implements SupplierInterface
     {
         DB::beginTransaction();
         try {
+            if($request->name==null){
+                // dd($request);
+            }
             $otherPayableCode = config('common.payable_account_code');
             $creditorCode = config('common.creditor_account_code');
             $otherPayable = $this->createAccountBySubAccount('Other Payable-' . $request->name, $otherPayableCode);
             $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);
+           
             if ($otherPayable && $creditor) {
                 DB::commit();
                 return ['other_payable' => $otherPayable, 'creditor' => $creditor];

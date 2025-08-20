@@ -97,6 +97,7 @@ class CashBookRepository implements CashBookInterface
                 $is_closing_column = 'is_closing';
                 $closing_date_column = 'closing_date';
             }
+            // dd($is_closing_column,$closing_date_column);
             if ($is_closing_column == null && $closing_date_column == null) {
                 ResponseMessage('Something went wrong in cashbook', 419);
             }
@@ -142,7 +143,7 @@ class CashBookRepository implements CashBookInterface
                 ->isConfirmed(1)
                 ->whereDate('created_at', today())
                 ->first();
-            if ($latestTransaction->$is_closing_column) {
+            if ($latestTransaction&&$latestTransaction->$is_closing_column) {
                 ResponseMessage('Cashbook is already closed', 419);
             }
             if (isset($request->is_pos) && $request->is_pos) {
@@ -153,7 +154,6 @@ class CashBookRepository implements CashBookInterface
                 $latestTransaction->$closing_date_column = now();
                 $latestTransaction->save();
             }
-
             if ($cashbookBalance) {
                 DB::commit();
                 ResponseMessage('Transaction closing is successfully', 200);
