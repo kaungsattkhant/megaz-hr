@@ -127,6 +127,7 @@ import PurchaseOrderInvoiceListComponent from './Components/PurchaseOrderInvoice
 import PurchaseOrderInvoiceDetailComponent from './Components/PurchaseOrderInvoice/PurchaseOrderInvoiceDetailComponent.vue';
 import WorkingCapitalComponent from './Components/WorkingCapital/WorkingCapitalComponent.vue';
 import ProfitAndLossComponent from './Components/ProfitAndLoss/ProfitAndLossComponent.vue';
+import TrialBalanceComponent from './Components/TrialBalance/TrialBalanceComponent.vue';
 import ApBalancesComponent from './Components/ApBalances/ApBalancesComponent.vue';
 import CreditorBalancesComponent from './Components/CreditorBalances/CreditorBalancesComponent.vue';
 
@@ -331,6 +332,7 @@ app.component('PurchaseOrderInvoiceListComponent', PurchaseOrderInvoiceListCompo
 app.component('PurchaseOrderInvoiceDetailComponent', PurchaseOrderInvoiceDetailComponent);
 app.component('WorkingCapitalComponent', WorkingCapitalComponent);
 app.component('ProfitAndLossComponent', ProfitAndLossComponent);
+app.component('TrialBalanceComponent', TrialBalanceComponent);
 app.component('ApBalancesComponent', ApBalancesComponent);
 app.component('CreditorBalancesComponent', CreditorBalancesComponent);
 
