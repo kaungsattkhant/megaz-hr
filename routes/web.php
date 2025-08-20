@@ -261,6 +261,7 @@ Route::group(['prefix' => 'pos'], function () {
     Route::view('/selling_areas', 'pos.areas.index')->name('pos.areas');
     Route::view('/sale_report', 'pos.sale_reports.index')->name('pos.sale_reports');
     Route::view('/pos_order/{id}', 'pos.home.order')->name('pos.home.order');
+    Route::view('/cashbook_history', 'pos.cashbook.history')->name('pos.cashbook.history');
     // });
 });
 
@@ -747,6 +748,7 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/equipment_assignment/create', 'equipment_assignment.create')->name('equipment_assignment.create');
     Route::view('/shift', 'shift.index')->name('shift.index');
     Route::view('/working_capital', 'working_capital.index')->name('working_capital.index');
+    Route::view('/cashbook_history', 'cashbook.history')->name('cashbook.history');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');
