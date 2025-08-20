@@ -1,0 +1,1397 @@
+[
+    {
+        "module": "staff",
+        "name": "Staff List",
+        "slug": "staff"
+    },
+    {
+        "module": "staff",
+        "name": "Staff Create",
+        "slug": "staff.create"
+    },
+    {
+        "module": "staff",
+        "name": "Staff Edit",
+        "slug": "staff.edit"
+    },
+    {
+        "module": "staff",
+        "name": "Staff Active On\/Off",
+        "slug": "staff.toggle"
+    },
+    {
+        "module": "role",
+        "name": "Role List",
+        "slug": "role"
+    },
+    {
+        "module": "role",
+        "name": "Role Create",
+        "slug": "role.create"
+    },
+    {
+        "module": "role",
+        "name": "Role Edit",
+        "slug": "role.edit"
+    },
+    {
+        "module": "uom-conversion",
+        "name": "Uom Conversion LIst",
+        "slug": "uom-conversion"
+    },
+    {
+        "module": "uom-conversion",
+        "name": "Uom Conversion Create",
+        "slug": "uom-conversion.create"
+    },
+    {
+        "module": "department",
+        "name": "Department List",
+        "slug": "department"
+    },
+    {
+        "module": "department",
+        "name": "Department Create",
+        "slug": "department.create"
+    },
+    {
+        "module": "department",
+        "name": "Department Edit",
+        "slug": "department.edit"
+    },
+    {
+        "module": "complain",
+        "name": "getComplainData",
+        "slug": "complaint"
+    },
+    {
+        "module": "complain",
+        "name": "getStaffComplaints",
+        "slug": "staff.complaints"
+    },
+    {
+        "module": "complain",
+        "name": "createComplain",
+        "slug": "complain.create"
+    },
+    {
+        "module": "complain",
+        "name": "complaintDetail",
+        "slug": "complaint.detail"
+    },
+    {
+        "module": "complain",
+        "name": "updateComplain",
+        "slug": "complaint.update"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplain",
+        "slug": "complain.delete"
+    },
+    {
+        "module": "complain",
+        "name": "complainStatusChange",
+        "slug": "complain.toggle"
+    },
+    {
+        "module": "complain",
+        "name": "complaintResponsiblesByStaff",
+        "slug": "complaint.responsibles-by-staff"
+    },
+    {
+        "module": "complain",
+        "name": "complaintCarbonCopiesByStaff",
+        "slug": "complaint.carbon-copies-by-staff"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplaintImage",
+        "slug": "complaint.delete.image"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplaintResponsible",
+        "slug": "complaint.delete.responsible"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplaintCarbonCopy",
+        "slug": "complaint.delete.carbon-copies"
+    },
+    {
+        "module": "complaint-category",
+        "name": "ComplaintCategory",
+        "slug": "complaint-category"
+    },
+    {
+        "module": "accessory",
+        "name": "accessories list",
+        "slug": "accessory"
+    },
+    {
+        "module": "accessory",
+        "name": "accessories create",
+        "slug": "accessory.store"
+    },
+    {
+        "module": "accessory",
+        "name": "accessories show",
+        "slug": "accessory.show"
+    },
+    {
+        "module": "accessory",
+        "name": "getAccessoryCategory",
+        "slug": "accessory-category"
+    },
+    {
+        "module": "accessory",
+        "name": "getAccessoryByCategory",
+        "slug": "accessory-category.detail"
+    },
+    {
+        "module": "accessory",
+        "name": "deleteAccessoryItem",
+        "slug": "accessory-item.delete"
+    },
+    {
+        "module": "accessory",
+        "name": "createInvoiceAccessory",
+        "slug": "accessory.add"
+    },
+    {
+        "module": "duty",
+        "name": "createDuty",
+        "slug": "duty.create"
+    },
+    {
+        "module": "duty",
+        "name": "listDuties",
+        "slug": "duty"
+    },
+    {
+        "module": "duty",
+        "name": "updateDuty",
+        "slug": "duty.update"
+    },
+    {
+        "module": "duty",
+        "name": "deleteDuty",
+        "slug": "duty.delete"
+    },
+    {
+        "module": "duty",
+        "name": "dutyDetail",
+        "slug": "duty.edit"
+    },
+    {
+        "module": "menu-category",
+        "name": "Menu Category List",
+        "slug": "menu-category"
+    },
+    {
+        "module": "menu-category",
+        "name": "Menu Category Create",
+        "slug": "menu-category.create"
+    },
+    {
+        "module": "menu-category",
+        "name": "Menu Category Update",
+        "slug": "menu-category.update"
+    },
+    {
+        "module": "menu-category",
+        "name": "Menu Category Delete",
+        "slug": "menu-category.delete"
+    },
+    {
+        "module": "menu-category",
+        "name": "Menu Category Active On\/Off",
+        "slug": "menu-category.toggle"
+    },
+    {
+        "module": "menu",
+        "name": "Menu List",
+        "slug": "menu"
+    },
+    {
+        "module": "menu",
+        "name": "Menu Create",
+        "slug": "menu.create"
+    },
+    {
+        "module": "menu",
+        "name": "Menu Edit",
+        "slug": "menu.edit"
+    },
+    {
+        "module": "menu",
+        "name": "Menu Active On\/Off",
+        "slug": "menu.toggle"
+    },
+    {
+        "module": "menu-area",
+        "name": "Menu Area List",
+        "slug": "menu-area"
+    },
+    {
+        "module": "menu-costing",
+        "name": "Menu Costing List",
+        "slug": "menu-costing"
+    },
+    {
+        "module": "menu-sale-report",
+        "name": "Menu Sale Report List",
+        "slug": "menu-sale-report"
+    },
+    {
+        "module": "sale-target-menu",
+        "name": "Sale Target Menu List",
+        "slug": "sale-target-menu"
+    },
+    {
+        "module": "sale-target-position",
+        "name": "Sale Target Position List",
+        "slug": "sale-target-position"
+    },
+    {
+        "module": "skill",
+        "name": "Skill List",
+        "slug": "skill"
+    },
+    {
+        "module": "skill",
+        "name": "Skill Create",
+        "slug": "skill.create"
+    },
+    {
+        "module": "skill",
+        "name": "Skill Edit",
+        "slug": "skill.edit"
+    },
+    {
+        "module": "skill",
+        "name": "Skill Delete",
+        "slug": "skill.delete"
+    },
+    {
+        "module": "cooking-place",
+        "name": " Cooking Place List",
+        "slug": "cooking-place"
+    },
+    {
+        "module": "cooking-place",
+        "name": "Cooking Place Create",
+        "slug": "cooking-place.create"
+    },
+    {
+        "module": "cooking-place",
+        "name": "Cooking Place Edit ",
+        "slug": "cooking-place.edit"
+    },
+    {
+        "module": "cooking-place",
+        "name": "Cooking Place Delete",
+        "slug": "cooking-place.delete"
+    },
+    {
+        "module": "area",
+        "name": "Area List",
+        "slug": "area.list"
+    },
+    {
+        "module": "area",
+        "name": "Area Create",
+        "slug": "area.create"
+    },
+    {
+        "module": "area",
+        "name": "Area Edit",
+        "slug": "area.edit"
+    },
+    {
+        "module": "area",
+        "name": "Area Active On\/Off",
+        "slug": "area.toggle"
+    },
+    {
+        "module": "brand",
+        "name": "Brand list",
+        "slug": "brand"
+    },
+    {
+        "module": "brand",
+        "name": "Brand Create",
+        "slug": "brand.create"
+    },
+    {
+        "module": "brand",
+        "name": "Brand Edit",
+        "slug": "brand.edit"
+    },
+    {
+        "module": "item",
+        "name": "Item List",
+        "slug": "item"
+    },
+    {
+        "module": "item",
+        "name": "Item Detail",
+        "slug": "item.detail"
+    },
+    {
+        "module": "item",
+        "name": "Item Create",
+        "slug": "item.create"
+    },
+    {
+        "module": "item",
+        "name": "Item Supplier Detail",
+        "slug": "item-supplier.detail"
+    },
+    {
+        "module": "item",
+        "name": "Item Price Update",
+        "slug": "item-price.update"
+    },
+    {
+        "module": "item",
+        "name": "Item Type Import",
+        "slug": "item-type.import"
+    },
+    {
+        "module": "item",
+        "name": "Item Category Import",
+        "slug": "item-category.import"
+    },
+    {
+        "module": "item",
+        "name": "Item Import",
+        "slug": "item.import"
+    },
+    {
+        "module": "room",
+        "name": "Room List",
+        "slug": "room"
+    },
+    {
+        "module": "room",
+        "name": "Room Create",
+        "slug": "room.create"
+    },
+    {
+        "module": "room",
+        "name": "Room Active On\/Off",
+        "slug": "room.toggle"
+    },
+    {
+        "module": "table",
+        "name": "Table List",
+        "slug": "table"
+    },
+    {
+        "module": "table",
+        "name": "Table Create",
+        "slug": "table.create"
+    },
+    {
+        "module": "table",
+        "name": "Table Active On\/Off",
+        "slug": "table.toggle"
+    },
+    {
+        "module": "cash-flow",
+        "name": "Cash Flow List",
+        "slug": "cash-flow"
+    },
+    {
+        "module": "indirect-cash-flow",
+        "name": "Indirect Cash Flow List",
+        "slug": "indirect-cash-flow"
+    },
+    {
+        "module": "ap-balance",
+        "name": "Ap Balance",
+        "slug": "ap-balance"
+    },
+    {
+        "module": "creditor-balance",
+        "name": "creditor-balance",
+        "slug": "creditor-balance"
+    },
+    {
+        "module": "journal",
+        "name": "journal create",
+        "slug": "journal.create"
+    },
+    {
+        "module": "journal",
+        "name": "journal list",
+        "slug": "journal"
+    },
+    {
+        "module": "staff-balance",
+        "name": "Staff Balance List",
+        "slug": "staff-balance"
+    },
+    {
+        "module": "staff-balance",
+        "name": "staff balance create",
+        "slug": "staff-balance.create"
+    },
+    {
+        "module": "prepaid",
+        "name": "prepaid create",
+        "slug": "prepaid.create"
+    },
+    {
+        "module": "prepaid",
+        "name": "Prepaid Payment",
+        "slug": "prepaid-payment.create"
+    },
+    {
+        "module": "prepaid",
+        "name": "prepaid list",
+        "slug": "prepaid"
+    },
+    {
+        "module": "ar",
+        "name": "AR create",
+        "slug": "ar.create"
+    },
+    {
+        "module": "ar",
+        "name": "AR list",
+        "slug": "ar"
+    },
+    {
+        "module": "ar",
+        "name": "AR Payment",
+        "slug": "ar-payment.create"
+    },
+    {
+        "module": "task",
+        "name": "Task Create",
+        "slug": "task.create"
+    },
+    {
+        "module": "task",
+        "name": "Task List",
+        "slug": "task.create"
+    },
+    {
+        "module": "task",
+        "name": "Task Status",
+        "slug": "task.toggle"
+    },
+    {
+        "module": "custom-task",
+        "name": "custom task create",
+        "slug": "custom-task.create"
+    },
+    {
+        "module": "custom-task",
+        "name": "custom task list",
+        "slug": "custom-task"
+    },
+    {
+        "module": "custom-task",
+        "name": "custom taskupdate",
+        "slug": "custom-task.update"
+    },
+    {
+        "module": "report-task",
+        "name": "report task list",
+        "slug": "report-task"
+    },
+    {
+        "module": "service",
+        "name": "service list",
+        "slug": "service"
+    },
+    {
+        "module": "service",
+        "name": "service create ",
+        "slug": "service.create"
+    },
+    {
+        "module": "service",
+        "name": "service Active On\/Off",
+        "slug": "service.toggle"
+    },
+    {
+        "module": "service",
+        "name": "service update",
+        "slug": "service.update"
+    },
+    {
+        "module": "inventory",
+        "name": "inventory list",
+        "slug": "inventory"
+    },
+    {
+        "module": "inventory",
+        "name": "inventory create",
+        "slug": "inventory.create"
+    },
+    {
+        "module": "inventory",
+        "name": "inventory update",
+        "slug": "inventory.update"
+    },
+    {
+        "module": "inventory",
+        "name": "inventory active on\/off",
+        "slug": "inventory.toggle"
+    },
+    {
+        "module": "supplier",
+        "name": "supplier create",
+        "slug": "supplier.create"
+    },
+    {
+        "module": "supplier",
+        "name": "supplier list",
+        "slug": "supplier"
+    },
+    {
+        "module": "supplier",
+        "name": "supplier edit",
+        "slug": "supplier.edit"
+    },
+    {
+        "module": "supplier",
+        "name": "supplier delete",
+        "slug": "supplier.delete"
+    },
+    {
+        "module": "chartofaccount",
+        "name": "account create",
+        "slug": "account.create"
+    },
+    {
+        "module": "chartofaccount",
+        "name": "account list",
+        "slug": "account"
+    },
+    {
+        "module": "chartofaccount",
+        "name": "account edit",
+        "slug": "account.edit"
+    },
+    {
+        "module": "chartofaccount",
+        "name": "account active on\/off",
+        "slug": "account.toggle"
+    },
+    {
+        "module": "financial-transaction",
+        "name": "financial-transaction list",
+        "slug": "financial-transaction"
+    },
+    {
+        "module": "financial-transaction",
+        "name": "financial transaction create",
+        "slug": "financial-transaction.create"
+    },
+    {
+        "module": "financial-transaction",
+        "name": "financial-transaction edit",
+        "slug": "financial-transaction.edit"
+    },
+    {
+        "module": "financial-transaction",
+        "name": "financial-transaction delete ",
+        "slug": "financial-transaction.delete"
+    },
+    {
+        "module": "financial-transaction",
+        "name": "financial-transaction isconfirm",
+        "slug": "financial-transaction.isconfirm"
+    },
+    {
+        "module": "financial-transaction",
+        "name": "financial-transaction confirm selected",
+        "slug": "financial-transaction.confirm_selected"
+    },
+    {
+        "module": "cashbook",
+        "name": "cashbook list",
+        "slug": "cashbook"
+    },
+    {
+        "module": "purchase-order",
+        "name": "purchase-order create",
+        "slug": "purchase-order.create"
+    },
+    {
+        "module": "purchase-order",
+        "name": "purchase-order list",
+        "slug": "purchase-order"
+    },
+    {
+        "module": "purchase-order",
+        "name": "purchase-order edit",
+        "slug": "purchase-order.edit"
+    },
+    {
+        "module": "purchase-order",
+        "name": "purchase-order confirm",
+        "slug": "purchase-order.confirm"
+    },
+    {
+        "module": "po-order",
+        "name": "Po Order List",
+        "slug": "po-order"
+    },
+    {
+        "module": "po-order",
+        "name": "Po Order Confirm",
+        "slug": "po-order.confirm"
+    },
+    {
+        "module": "arrival-item",
+        "name": "Arrival Item List",
+        "slug": "arrival-item"
+    },
+    {
+        "module": "arrival-item",
+        "name": "Arrival Item Confirm",
+        "slug": "arrival-item.confirm"
+    },
+    {
+        "module": "po-order-invoice",
+        "name": "Po Order Invoice List",
+        "slug": "po-order-invoice"
+    },
+    {
+        "module": "po-order-invoice",
+        "name": "Po Order Invoice Paid",
+        "slug": "po-order-invoice.paid"
+    },
+    {
+        "module": "asset-item",
+        "name": "asset-item list ",
+        "slug": "asset-item"
+    },
+    {
+        "module": "asset-item",
+        "name": "asset-item create",
+        "slug": "asset-item.create"
+    },
+    {
+        "module": "asset",
+        "name": "asset list",
+        "slug": "asset"
+    },
+    {
+        "module": "asset",
+        "name": "asset create",
+        "slug": "asset.create"
+    },
+    {
+        "module": "fix-asset",
+        "name": "Fix Asset List",
+        "slug": "fix-asset"
+    },
+    {
+        "module": "fix-asset",
+        "name": "Fix Asset Create",
+        "slug": "fix-asset.create"
+    },
+    {
+        "module": "asset-depreciation-balance",
+        "name": "Asset Depreciation Balance",
+        "slug": "asset-depreciation-balance"
+    },
+    {
+        "module": "account-payable",
+        "name": "account-payable list",
+        "slug": "account-payable"
+    },
+    {
+        "module": "okr",
+        "name": "OKR create",
+        "slug": "okr.create"
+    },
+    {
+        "module": "okr",
+        "name": "OKR list",
+        "slug": "okr"
+    },
+    {
+        "module": "okr",
+        "name": "OKR edit",
+        "slug": "okr.edit"
+    },
+    {
+        "module": "okr",
+        "name": "OKR delete",
+        "slug": "okr.delete"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty list",
+        "slug": "okr-duty"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty create",
+        "slug": "okr-duty.create"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty edit",
+        "slug": "okr-duty.edit"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty delete",
+        "slug": "okr-duty.delete"
+    },
+    {
+        "module": "okr-dashboard",
+        "name": "okr-dashboard list ",
+        "slug": "okr-dashboard"
+    },
+    {
+        "module": "ktv-product-tree",
+        "name": "ktv-product-tree create",
+        "slug": "ktv-product-tree.create"
+    },
+    {
+        "module": "ktv-product-tree",
+        "name": "ktv-product-tree list",
+        "slug": "ktv-product-tree"
+    },
+    {
+        "module": "ktv-product-tree",
+        "name": "ktv-product-tree edit",
+        "slug": "ktv-product-tree.edit"
+    },
+    {
+        "module": "ktv-product-tree",
+        "name": "ktv-product-tree delete",
+        "slug": "ktv-product-tree.delete"
+    },
+    {
+        "module": "menu-forecasting",
+        "name": "menu-forecasting list",
+        "slug": "menu-forecasting"
+    },
+    {
+        "module": "menu-forecasting",
+        "name": "menu-forecasting create",
+        "slug": "menu-forecasting.create"
+    },
+    {
+        "module": "menu-forecasting",
+        "name": "menu-forecasting edit",
+        "slug": "menu-forecasting.edit"
+    },
+    {
+        "module": "menu-forecasting",
+        "name": "menu-forecasting delete",
+        "slug": "menu-forecasting.delete"
+    },
+    {
+        "module": "ktv-forecasting",
+        "name": "ktv-forecasting  list",
+        "slug": "ktv-forecasting"
+    },
+    {
+        "module": "ktv-forecasting",
+        "name": "ktv-forecasting create",
+        "slug": "ktv-forecasting.create"
+    },
+    {
+        "module": "ktv-forecasting",
+        "name": "ktv-forecasting edit",
+        "slug": "ktv-forecasting.edit"
+    },
+    {
+        "module": "ktv-forecasting",
+        "name": "ktv-forecasting delete",
+        "slug": "ktv-forecasting.delete"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift list",
+        "slug": "time-shift"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift create",
+        "slug": "time-shift.create"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift edit",
+        "slug": "time-shift.edit"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift delete",
+        "slug": "time-shift.delete"
+    },
+    {
+        "module": "gps",
+        "name": "gps list",
+        "slug": "gps"
+    },
+    {
+        "module": "gps",
+        "name": "gps edit",
+        "slug": "gps.edit"
+    },
+    {
+        "module": "check-in",
+        "name": "check-in list",
+        "slug": "check-in"
+    },
+    {
+        "module": "contact",
+        "name": "contact",
+        "slug": "contact"
+    },
+    {
+        "module": "contact",
+        "name": "contact create",
+        "slug": "contact.create"
+    },
+    {
+        "module": "contact",
+        "name": "contact edit",
+        "slug": "contact.edit"
+    },
+    {
+        "module": "contact",
+        "name": "contact delete",
+        "slug": "contact.delete"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting create",
+        "slug": "meeting.create"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting list ",
+        "slug": "meeting"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting edit",
+        "slug": "meeting.edit"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting delete",
+        "slug": "meeting.delete"
+    },
+    {
+        "module": "training",
+        "name": "training list",
+        "slug": "training"
+    },
+    {
+        "module": "training",
+        "name": "training create",
+        "slug": "training.create"
+    },
+    {
+        "module": "training",
+        "name": "training edit",
+        "slug": "training.edit"
+    },
+    {
+        "module": "training",
+        "name": "training delete",
+        "slug": "training.delete"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new list",
+        "slug": "org-new"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new create",
+        "slug": "org-new.create"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new edit",
+        "slug": "org-new.edit"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new delete",
+        "slug": "org-new.delete"
+    },
+    {
+        "module": "warning",
+        "name": "warning list",
+        "slug": "warning"
+    },
+    {
+        "module": "warning",
+        "name": "warning create",
+        "slug": "warning.create"
+    },
+    {
+        "module": "warning",
+        "name": "warning edit ",
+        "slug": "warning.edit"
+    },
+    {
+        "module": "warning",
+        "name": "warning delete",
+        "slug": "warning.delete"
+    },
+    {
+        "module": "off day",
+        "name": "off day list",
+        "slug": "off-day"
+    },
+    {
+        "module": "off day",
+        "name": "off-day create",
+        "slug": "off-day.create"
+    },
+    {
+        "module": "off day",
+        "name": "off-day edit",
+        "slug": "off-day.edit"
+    },
+    {
+        "module": "off day",
+        "name": "off-day delete",
+        "slug": "off-day.delete"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance list",
+        "slug": "leave-allowance"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance create",
+        "slug": "leave-allowance.create"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance edit ",
+        "slug": "leave-allowance.edit"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance delete",
+        "slug": "leave-allowance.delete"
+    },
+    {
+        "module": "leave",
+        "name": "leave list",
+        "slug": "leave"
+    },
+    {
+        "module": "leave",
+        "name": "leave create",
+        "slug": "leave.create"
+    },
+    {
+        "module": "leave",
+        "name": "leave delete ",
+        "slug": "leave.delete"
+    },
+    {
+        "module": "exit-pass",
+        "name": "exit-pass list",
+        "slug": "exit-pass"
+    },
+    {
+        "module": "exit-pass",
+        "name": "exit-pass delete",
+        "slug": "exit-pass.delete"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee list",
+        "slug": "overtime-fee"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee create",
+        "slug": "overtime-fee.create"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee edit",
+        "slug": "overtime-fee.edit"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee delete",
+        "slug": "overtime-fee.delete"
+    },
+    {
+        "module": "overtime-confirmation",
+        "name": "overtime-confirmation list",
+        "slug": "overtime-confirmation"
+    },
+    {
+        "module": "overtime-confirmation",
+        "name": "overtime-confirmation create",
+        "slug": "overtime-confirmation.create"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup list",
+        "slug": "salary-setup"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup create",
+        "slug": "salary-setup.create"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup edit",
+        "slug": "salary-setup.edit"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup delete",
+        "slug": "salary-setup.delete"
+    },
+    {
+        "module": "salary",
+        "name": "salary list",
+        "slug": "salary"
+    },
+    {
+        "module": "salary",
+        "name": "salary create",
+        "slug": "salary.create"
+    },
+    {
+        "module": "salary",
+        "name": "salary edit",
+        "slug": "salary.edit"
+    },
+    {
+        "module": "salary",
+        "name": "salary delete",
+        "slug": "salary.delete"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance list",
+        "slug": "allowance"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance create",
+        "slug": "allowance.create"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance edit",
+        "slug": "allowance.edit"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance delete",
+        "slug": "allowance.delete"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch list",
+        "slug": "salary-batch"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch create",
+        "slug": "salary-batch.create"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch edit",
+        "slug": "salary-batch.edit"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch delete",
+        "slug": "salary-batch.delete"
+    },
+    {
+        "module": "salary-calculate",
+        "name": "salary-calculate list",
+        "slug": "salary-calculate"
+    },
+    {
+        "module": "salary-calculate",
+        "name": "salary-calculate create",
+        "slug": "salary-calculate.create"
+    },
+    {
+        "module": "salary-calculate",
+        "name": "salary-calculate publish",
+        "slug": "salary-calculate.publish"
+    },
+    {
+        "module": "pay-slip",
+        "name": "pay-slip list",
+        "slug": "pay-slip"
+    },
+    {
+        "module": "pay-slip",
+        "name": "pay-slip edit",
+        "slug": "pay-slip.edit"
+    },
+    {
+        "module": "resignation-categories",
+        "name": "resignation-categories list",
+        "slug": "resignation-categories"
+    },
+    {
+        "module": "resignation-categories",
+        "name": "resignation-categories create ",
+        "slug": "resignation-categories.create"
+    },
+    {
+        "module": "resignation",
+        "name": "resignation list",
+        "slug": "resignation"
+    },
+    {
+        "module": "resignation",
+        "name": "resignation create",
+        "slug": "resignation.create"
+    },
+    {
+        "module": "resignation",
+        "name": "resignation status",
+        "slug": "resignation.status"
+    },
+    {
+        "module": "customer",
+        "name": "customer list ",
+        "slug": "customer"
+    },
+    {
+        "module": "customer-level-discount",
+        "name": "customer level  discount list",
+        "slug": "customer-level-discount"
+    },
+    {
+        "module": "customer-level-discount",
+        "name": "customer level  discount create",
+        "slug": "customer-level-discount.create"
+    },
+    {
+        "module": "customer-level-discount",
+        "name": "customer level  discount edit",
+        "slug": "customer-level-discount.edit"
+    },
+    {
+        "module": "customer-level-discount",
+        "name": "customer level  discount  delete ",
+        "slug": "customer-level-discount.delete"
+    },
+    {
+        "module": "customer-birthday",
+        "name": "customer birthday list",
+        "slug": "customer-birthday"
+    },
+    {
+        "module": "customer-birthday-promotion",
+        "name": "customer-birthday-promotion list",
+        "slug": "customer-birthday-promotion"
+    },
+    {
+        "module": "inventory",
+        "name": "inventory list",
+        "slug": "inventory"
+    },
+    {
+        "module": "inventory-stock",
+        "name": "Inventory Stock List",
+        "slug": "inventory-stock"
+    },
+    {
+        "module": "inventory-transfer",
+        "name": "inventory-transfer list",
+        "slug": "inventory-transfer"
+    },
+    {
+        "module": "inventory-receive",
+        "name": "inventory-receive list",
+        "slug": "inventory-receive"
+    },
+    {
+        "module": "used-defected-item",
+        "name": "used-defected-item list ",
+        "slug": "used-defected-item"
+    },
+    {
+        "module": "room-discount",
+        "name": "room-discount list ",
+        "slug": "room-discount"
+    },
+    {
+        "module": "room-discount",
+        "name": "room-discount create",
+        "slug": "room-discount.create"
+    },
+    {
+        "module": "room-discount",
+        "name": "room-discount delete",
+        "slug": "room-discount.delete"
+    },
+    {
+        "module": "menu-service-discount",
+        "name": "menu-service-discount list ",
+        "slug": "menu-service-discount"
+    },
+    {
+        "module": "menu-service-discount",
+        "name": "menu-service-discount create",
+        "slug": "menu-service-discount.create"
+    },
+    {
+        "module": "menu-service-discount",
+        "name": "menu-service-discount delete",
+        "slug": "menu-service-discount.delete"
+    },
+    {
+        "module": "pos-home",
+        "name": "pos-home",
+        "slug": "pos-home"
+    },
+    {
+        "module": "pos-customer",
+        "name": "pos customer list",
+        "slug": "pos-customer"
+    },
+    {
+        "module": "pos-customer",
+        "name": "pos customer create",
+        "slug": "pos-customer.create"
+    },
+    {
+        "module": "pos-customer-deposit",
+        "name": "pos-customer-deposit",
+        "slug": "pos-customer-deposit"
+    },
+    {
+        "module": "pos-customer-deposit",
+        "name": "Pos Customer Deposit Confirm",
+        "slug": "pos-customer-deposit.confirm"
+    },
+    {
+        "module": "pos-invoice",
+        "name": "invoice list",
+        "slug": "pos-invoice"
+    },
+    {
+        "module": "pos-cashbook",
+        "name": "pos-cashbook list ",
+        "slug": "pos-cashbook"
+    },
+    {
+        "module": "pos-booking",
+        "name": "pos booking list ",
+        "slug": "pos-booking"
+    },
+    {
+        "module": "pos-food-order",
+        "name": "pos-food-order list",
+        "slug": "pos-food-order"
+    },
+    {
+        "module": "pos-ar",
+        "name": "pos-ar list",
+        "slug": "pos-ar"
+    },
+    {
+        "module": "event",
+        "name": "event list",
+        "slug": "event"
+    },
+    {
+        "module": "event",
+        "name": "event create",
+        "slug": "event.create"
+    },
+    {
+        "module": "package",
+        "name": "package list",
+        "slug": "package"
+    },
+    {
+        "module": "package",
+        "name": "package create",
+        "slug": "package.create"
+    },
+    {
+        "module": "pos-menu-sale-report",
+        "name": "pos menu sale report list",
+        "slug": "pos-menu-sale-report"
+    },
+    {
+        "module": "jd",
+        "name": "jd list",
+        "slug": "jd"
+    },
+    {
+        "module": "jd",
+        "name": "jd create",
+        "slug": "jd.create"
+    },
+    {
+        "module": "js",
+        "name": "js list",
+        "slug": "js"
+    },
+    {
+        "module": "js",
+        "name": "js create",
+        "slug": "js.create"
+    },
+    {
+        "module": "sop",
+        "name": "sop list",
+        "slug": "sop"
+    },
+    {
+        "module": "sop",
+        "name": "sop create",
+        "slug": "sop.create"
+    },
+    {
+        "module": "sop",
+        "name": "sop delete",
+        "slug": "sop.delete"
+    },
+    {
+        "module": "cv",
+        "name": "cv list",
+        "slug": "cv"
+    },
+    {
+        "module": "cv",
+        "name": "cv salary create",
+        "slug": "cv-salary.create"
+    },
+    {
+        "module": "cv",
+        "name": "cv edit",
+        "slug": "cv.edit"
+    },
+    {
+        "module": "cv",
+        "name": "cv delete",
+        "slug": "cv.delete"
+    }
+]
