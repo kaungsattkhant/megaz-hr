@@ -258,6 +258,8 @@ import AssetAssignmentCrudComponent from './Components/AssetAssignment/AssetAssi
 import EquipmentAssignmentListComponent from './Components/EquipmentAssignment/EquipmentAssignmentListComponent.vue';
 import EquipmentAssignmentCreateComponent from './Components/EquipmentAssignment/EquipmentAssignmentCreateComponent.vue';
 import ShiftCrudComponent from './Components/Shift/ShiftCrudComponent.vue';
+import PosCashbookHistoryComponent from './Components/Pos/Cashbook/PosCashbookHistoryComponent.vue';
+import CashbookHistoryComponent from './Components/Cashbook/CashbookHistoryComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -496,6 +498,8 @@ app.component('AssetAssignmentCrudComponent',AssetAssignmentCrudComponent);
 app.component('EquipmentAssignmentListComponent',EquipmentAssignmentListComponent);
 app.component('EquipmentAssignmentCreateComponent',EquipmentAssignmentCreateComponent);
 app.component('ShiftCrudComponent',ShiftCrudComponent);
+app.component('PosCashbookHistoryComponent',PosCashbookHistoryComponent);
+app.component('CashbookHistoryComponent',CashbookHistoryComponent);
 
 
 app.use(store);

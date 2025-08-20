@@ -2,7 +2,7 @@
     <div class="relative pb-12 overflow-y-hidden small-scrollbar h-[100vh]" onmouseover="this.style.overflowY='scroll'"
         onmouseout="this.style.overflowY='hidden'">
 
-        <div class="relative w-[11vw] pt-8 px-7">
+        <div class="relative w-[11vw] pt-8 px-7 pb-24">
             <ul class=" mb-4">
                 @if (checkFeaturePermission('pos-home'))
                     <li class="mb-4">
@@ -82,6 +82,15 @@
                         </a>
                     </li>
                 @endif
+                <li>
+                    <a href="/pos/cashbook_history"
+                        class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('cashbook_history')">
+                        <i class="fas fa-book mb-1.5 text-2xl"></i>
+                        <span class="">
+                            Cashbook History
+                        </span>
+                    </a>
+                </li>
                 @if (checkFeaturePermission('pos-booking'))
                     <li>
                         <a href="/booking" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('booking')">
@@ -135,7 +144,7 @@
         </div>
 
     </div>
-    <div id="app" class="absolute bottom-0 left-0 w-[11vw] h-24 flex items-end justify-end">
+    <div id="app" class="absolute bottom-0 left-0 w-[11vw] h-24 flex items-end justify-end bg-white">
         <logout-component-pos />
         <button class="w-full">
             <a href="/pos/ar" class="flex items-center flex-col  rounded-lg px-6 py-12 text-black">

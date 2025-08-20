@@ -223,7 +223,7 @@
                             </label>
                             <select name="" id="" v-model="selectedCloseAccount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in subAccountList"
+                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in posAccountList"
                                     :key="subAccountIndex">
                                     {{ subAccount.name }}
                                 </option>
@@ -292,6 +292,7 @@
                 url_date: '',
 
                 closeAccountList: [],
+                posAccountList: [],
                 toAccountList: [],
                 selectedCloseAccount: null,
                 selectedToAccount: null,
@@ -439,6 +440,13 @@
                     this.toAccountList = response.data;
                 }
             },
+            async getPosAccountList() {
+                let url = `/api/get_cash_account?is_pos=1`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.posAccountList = response.data;
+                }
+            },
             btnClickedCloseCashbookModal(){
                 this.selectedCloseAccount = null;
                 this.selectedToAccount = null;
@@ -494,6 +502,7 @@
             this.getCloseAccountList();
             this.getToAccountList();
             // this.getTotalBookList();
+            this.getPosAccountList();
         }
     }
 </script>
