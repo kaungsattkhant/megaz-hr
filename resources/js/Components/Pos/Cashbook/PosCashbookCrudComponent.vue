@@ -9,6 +9,10 @@
                             <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate" @change="dateChanged()">
                             <!-- <button class="add-btn " @click="searchBtnClicked">Search</button>
                             <button class="add-btn " @click="clearSearchBtnClicked">Clear</button> -->
+                            <select name="" id="" v-model="bookType" @change="cashOrBank" placeholder="Select Account"
+                                class="text-sm border border-gray-300 input-ui w-full !bg-white rounded-lg focus:ring-0">
+                                <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
+                            </select>
                         </div>
                         
                     </div>
@@ -16,10 +20,7 @@
                         <!-- <button class="pos-add-btn !bg-[#F15181]">
                             Close
                         </button> -->
-                        <select name="" id="" v-model="bookType" @change="cashOrBank" placeholder="Select Account"
-                            class="text-sm border border-gray-300 input-ui w-full !bg-white rounded-lg focus:ring-0">
-                            <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
-                        </select>
+                        
                         <button class="pos-add-btn !bg-[#F15181]" data-te-toggle="modal" data-te-target="#close_cashbook_modal" @click="btnClickedCloseCashbookModal">
                             Close
                         </button>
@@ -316,7 +317,8 @@
                         // this.getCashbookList(posBankAccount.id);
                         this.cashAccountList.push(posBankAccount);
                     }
-
+                    this.bookType = this.cashAccountList[0];
+                    // this.cashOrBank();
                     this.getCashbookList(this.cashAccountList);
                 }
             },
