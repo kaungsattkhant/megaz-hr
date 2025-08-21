@@ -190,20 +190,20 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         'quantity' => $batchDeduction['deduction_amount'],
         'inventory_ledger_id' => $sourceLedger->id,
       ]);
+      $destinationLedger = InventoryLedger::create([
+        'date' => now(),
+        'ledgerable_id' => $ledgerable_id,
+        'ledgerable_type' => 'staff_equipment_assign',
+        'inventory_id' => $destination_inventory_id,
+        'action' => 'in',
+        'batch_no' => $batchDeduction['batch_no'],
+      ]);
+      $destinationLedger->inventory_ledger_items()->create([
+        'item_id' => $item_id,
+        'quantity' => $batchDeduction['deduction_amount'],
+        'inventory_ledger_id' => $destinationLedger->id,
+      ]);
     }
-    $destinationLedger = InventoryLedger::create([
-      'date' => now(),
-      'ledgerable_id' => $ledgerable_id,
-      'ledgerable_type' => 'staff_equipment_assign',
-      'inventory_id' => $destination_inventory_id,
-      'action' => 'in',
-      'batch_no' =>  now()->format('YmdHis') . '_' . $item_id . '_' . $ledgerable_id,
-    ]);
-    $destinationLedger->inventory_ledger_items()->create([
-      'item_id' => $item_id,
-      'quantity' => $uom_quantity,
-      'inventory_ledger_id' => $destinationLedger->id,
-    ]);
     return true;
   }
 }

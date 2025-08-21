@@ -538,6 +538,7 @@ Route::get('/cooking_areas', [AreaController::class, 'getCookingAreas']);
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
 Route::post('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
+Route::get('/deps', [DepartmentAPIController::class, 'getDepartments']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
 Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);

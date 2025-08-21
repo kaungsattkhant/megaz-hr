@@ -5,6 +5,7 @@ namespace App\Repositories\HandBook;
 use App\Models\HandBook;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\HandBookResource;
 
 
 class HandBookRepository implements HandBookInterface
@@ -16,6 +17,11 @@ class HandBookRepository implements HandBookInterface
     return (isset(request()->per_page) || isset(request()->page))
       ? $handBooks->paginate(config('common.list_count'))
       : $handBooks->get();
+  }
+
+  public function getHandBooks(){
+    $handBooks = HandBook::all();
+    return HandBookResource::collection($handBooks);
   }
 
   public function updateOrCreateHandBook($data)
@@ -35,7 +41,7 @@ class HandBookRepository implements HandBookInterface
         $data
       );
       DB::commit();
-      ResponseData($handBook);
+      return $handBook;
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
