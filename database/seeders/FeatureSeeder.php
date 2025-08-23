@@ -62,7 +62,7 @@ class FeatureSeeder extends Seeder
             Feature::insertOrIgnore($data);
             // file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
             DB::commit();
-            ResponseMessage('Feature insert successfully',200);
+            // ResponseMessage('Feature insert successfully',200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

@@ -127,6 +127,7 @@ import PurchaseOrderInvoiceListComponent from './Components/PurchaseOrderInvoice
 import PurchaseOrderInvoiceDetailComponent from './Components/PurchaseOrderInvoice/PurchaseOrderInvoiceDetailComponent.vue';
 import WorkingCapitalComponent from './Components/WorkingCapital/WorkingCapitalComponent.vue';
 import ProfitAndLossComponent from './Components/ProfitAndLoss/ProfitAndLossComponent.vue';
+import TrialBalanceComponent from './Components/TrialBalance/TrialBalanceComponent.vue';
 import ApBalancesComponent from './Components/ApBalances/ApBalancesComponent.vue';
 import CreditorBalancesComponent from './Components/CreditorBalances/CreditorBalancesComponent.vue';
 
@@ -257,6 +258,8 @@ import AssetAssignmentCrudComponent from './Components/AssetAssignment/AssetAssi
 import EquipmentAssignmentListComponent from './Components/EquipmentAssignment/EquipmentAssignmentListComponent.vue';
 import EquipmentAssignmentCreateComponent from './Components/EquipmentAssignment/EquipmentAssignmentCreateComponent.vue';
 import ShiftCrudComponent from './Components/Shift/ShiftCrudComponent.vue';
+import PosCashbookHistoryComponent from './Components/Pos/Cashbook/PosCashbookHistoryComponent.vue';
+import CashbookHistoryComponent from './Components/Cashbook/CashbookHistoryComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -331,6 +334,7 @@ app.component('PurchaseOrderInvoiceListComponent', PurchaseOrderInvoiceListCompo
 app.component('PurchaseOrderInvoiceDetailComponent', PurchaseOrderInvoiceDetailComponent);
 app.component('WorkingCapitalComponent', WorkingCapitalComponent);
 app.component('ProfitAndLossComponent', ProfitAndLossComponent);
+app.component('TrialBalanceComponent', TrialBalanceComponent);
 app.component('ApBalancesComponent', ApBalancesComponent);
 app.component('CreditorBalancesComponent', CreditorBalancesComponent);
 
@@ -494,6 +498,8 @@ app.component('AssetAssignmentCrudComponent',AssetAssignmentCrudComponent);
 app.component('EquipmentAssignmentListComponent',EquipmentAssignmentListComponent);
 app.component('EquipmentAssignmentCreateComponent',EquipmentAssignmentCreateComponent);
 app.component('ShiftCrudComponent',ShiftCrudComponent);
+app.component('PosCashbookHistoryComponent',PosCashbookHistoryComponent);
+app.component('CashbookHistoryComponent',CashbookHistoryComponent);
 
 
 app.use(store);

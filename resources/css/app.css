@@ -48,5 +48,8 @@
     .sidebar-title{
         @apply text-[#2a3547] text-xs font-semibold ml-1 pt-2
     }
+    .group-first tr p{
+        @apply opacity-0
+    }
 
     }

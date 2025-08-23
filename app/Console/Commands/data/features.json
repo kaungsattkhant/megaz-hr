@@ -410,6 +410,21 @@
         "slug": "indirect-cash-flow"
     },
     {
+        "module": "working-capital",
+        "name": "Working Capital List",
+        "slug": "working-capital"
+    },
+    {
+        "module": "profit-and-loss",
+        "name": "P&L List",
+        "slug": "profit-and-loss"
+    },
+    {
+        "module": "trial-balance",
+        "name": "Trial Balance",
+        "slug": "trial-balance"
+    },
+    {
         "module": "ap-balance",
         "name": "Ap Balance",
         "slug": "ap-balance"

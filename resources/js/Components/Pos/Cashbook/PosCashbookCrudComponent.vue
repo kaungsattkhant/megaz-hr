@@ -20,7 +20,7 @@
                             class="text-sm border border-gray-300 input-ui w-full !bg-white rounded-lg focus:ring-0">
                             <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
                         </select>
-                        <button class="pos-add-btn !bg-[#F15181]" @click="closeCashBook()">
+                        <button class="pos-add-btn !bg-[#F15181]" data-te-toggle="modal" data-te-target="#close_cashbook_modal" @click="btnClickedCloseCashbookModal">
                             Close
                         </button>
                         <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
@@ -195,6 +195,65 @@
 
 
 
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="close_cashbook_modal" tabindex="-1" aria-labelledby="createCashbookModalLabel" aria-modal="true"
+            role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Close Cashbook
+                        </p>
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
+                        " id="closeCashBookModal" data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                 Account
+                            </label>
+                            <select name="" id="" v-model="selectedCloseAccount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in posAccountList"
+                                    :key="subAccountIndex">
+                                    {{ subAccount.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                To Cash Account
+                            </label>
+                            <select name="" id="" v-model="selectedToAccount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="account" v-for="(account, accountIndex) in toAccountList"
+                                    :key="accountIndex">
+                                    {{ account.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button  @click="closeCashBook()" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
 
 </template>
@@ -231,6 +290,12 @@
                 fromDate: null,
                 toDate: null,
                 url_date: '',
+
+                closeAccountList: [],
+                posAccountList: [],
+                toAccountList: [],
+                selectedCloseAccount: null,
+                selectedToAccount: null,
             };
         },
 
@@ -361,14 +426,45 @@
                     window.location.reload();
                 }
             },
+            async getCloseAccountList() {
+                let url = `/api/get_cash_account?is_pos=0`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.closeAccountList = response.data;
+                }
+            },
+            async getToAccountList() {
+                let url = `/api/get_cash_account?is_pos=0`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.toAccountList = response.data;
+                }
+            },
+            async getPosAccountList() {
+                let url = `/api/get_cash_account?is_pos=1`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.posAccountList = response.data;
+                }
+            },
+            btnClickedCloseCashbookModal(){
+                this.selectedCloseAccount = null;
+                this.selectedToAccount = null;
+            },
             async closeCashBook() {
-                if(!this.bookType){
+                if(!this.selectedCloseAccount){
                     this.alertValidationMessage(`Cash accout is required!`);
                     return 1;
                 }
+
+                if(!this.selectedToAccount){
+                    this.alertValidationMessage(`To accout is required!`);
+                    return 1;
+                }
                 let formData = new FormData();
-                formData.append('cash_account_id', this.bookType.id);
+                formData.append('cash_account_id', this.selectedCloseAccount.id);
                 formData.append('is_pos', 1);
+                formData.append('to_cash_account_id', this.selectedToAccount.id);
 
                 let url = `/api/close_cashbook_transaction`;
                 let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
@@ -403,7 +499,10 @@
         created(){
             this.getCashAccount();
             this.getSubAccountList();
+            this.getCloseAccountList();
+            this.getToAccountList();
             // this.getTotalBookList();
+            this.getPosAccountList();
         }
     }
 </script>
