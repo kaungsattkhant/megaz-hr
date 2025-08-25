@@ -11,10 +11,10 @@ class Ledger extends Model
     protected $fillable=['value','personable_id','personable_type','action','is_cashier_confirmed','transaction_id','account_id'];
     
     public function account(){
-        return $this->belongsTo(\App\Models\Account::class);
+        return $this->belongsTo(Account::class);
     }
     public function transaction(){
-        return $this->belongsTo(\App\Models\Transaction::class);
+        return $this->belongsTo(Transaction::class);
     }
     public function personable(){
         return $this->morphTo();

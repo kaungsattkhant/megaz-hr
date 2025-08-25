@@ -305,7 +305,7 @@ class FinancialRepository implements FinancialInterface
         $retainEarning = $this->trialBalanceService->getTrialBalanceResults($retainEarningCode, 'credit', $current, 'credit_balance');
         $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
 
-        $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
+        // $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
 
         $currentLiabilities = $this->trialBalanceService->getTotalBySubAccountCode($currentLiabilitieCode, 'credit', $current, 'creditor_balance');
 
@@ -320,14 +320,14 @@ class FinancialRepository implements FinancialInterface
         $creditTotalBalance += collect($capital)->sum('amount');
         $creditTotalBalance += collect($retainEarning)->sum('amount');
         $creditTotalBalance += collect($longTerm)->sum('amount');
-        $creditTotalBalance += collect($currentLiabilities)->sum('amount');
+        $creditTotalBalance += collect($currentLiabilities)->sum('total_amount');
         #end credit balance
 
 
         #debit balance
 
 
-        $cashAndBankBalance = $this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode, 'credit', $current, 'cash_and_bank');
+        $cashAndBankBalance = $this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode, 'debit', $current, 'cash_and_bank');
         $otherReceiveable = $this->trialBalanceService->getTotalBySubAccountCode($otherReceivableCode, 'credit', $current, 'other_receiveable');
         //book value of current asset and fixed asset
         $fix_asset_tangiable = '1-1000';

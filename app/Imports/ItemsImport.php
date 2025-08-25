@@ -40,11 +40,15 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
 
     public function model(array $row)
     {
+         if (empty($row['name'])) {
+                return null; // Returning null skips the row
+            }
         DB::beginTransaction();
         try {
-            $itemCode = Item::where('code',  $row['code'])->first();
+           
+            $itemCode = Item::where('code', $row['code'])->first();
             if ($itemCode) {
-                return ResponseMessage($itemCode . ' is duplicate itemcode.',  419);
+                return ResponseMessage($itemCode . ' is duplicate itemcode.', 419);
             }
             $categoryId = Category::where('category_code', $row['category_code'])->value('id');
             $itemTypeId = ItemType::where('item_type_code', $row['item_type_code'])->value('id');
@@ -76,17 +80,17 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 'item_type_id' => $itemTypeId,
                 'base_uom_id' => $baseUomId ?? null,
                 'uom_id' => $uomId ?? null,
-                'min_uom_id'=>$minUomId,
-                'min_holding_uom_quantity'=>$row['min_holding_uom_quantity'],
-                'min_holding_quantity'=>$row['min_holding_uom_quantity'] * $row['conversion'],
+                'min_uom_id' => $minUomId,
+                'min_holding_uom_quantity' => $row['min_holding_uom_quantity'],
+                'min_holding_quantity' => $row['min_holding_uom_quantity'] * $row['conversion'],
                 // 'min_holding_base_uom_quantity' => $minHoldingBaseUomQuantity ?? 0,
                 // 'min_holding_uom_quantity' => $minHoldingUomQuantity ?? 0,
-                'minimum_holding_amount' =>  $minimumHoldingAmount  ?? 0,
+                'minimum_holding_amount' => $minimumHoldingAmount ?? 0,
                 'limitation_type' => $row['limitation_type'] ?? null,
                 'amount' => $row['amount'] ?? 0,
-                'max_uom_id'=>$maxUomId,
-                'max_limit_uom_quantity'=>$row['max_limit_uom_quantity'],
-                'max_limit_quantity'=>$row['max_limit_uom_quantity'] * $row['conversion'],
+                'max_uom_id' => $maxUomId,
+                'max_limit_uom_quantity' => $row['max_limit_uom_quantity'],
+                'max_limit_quantity' => $row['max_limit_uom_quantity'] * $row['conversion'],
                 // 'max_limit_base_uom_quantity' => $row['max_limit_base_uom_quantity'] ?? 0,
                 // 'max_limit_uom_quantity' => $row['max_limit_uom_quantity'] ?? 0,
             ]);
@@ -102,11 +106,11 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 'item_id' => $item->id,
                 'base_unit_id' => $baseUomId,
                 'conversion_unit_id' => $uomId,
-                'conversion' =>  $conversionRate,
+                'conversion' => $conversionRate,
             ]);
             DB::commit();
 
-            return $item;
+            // return $item;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;

@@ -19,7 +19,7 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use App\Repositories\Supplier\SupplierRepository;
 
-class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithChunkReading,SkipsOnError, SkipsOnFailure
+class SupplierImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading, SkipsOnError, SkipsOnFailure
 {
     use Importable, SkipsErrors, SkipsFailures;
     protected $supplierRepository;
@@ -32,7 +32,10 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
         DB::beginTransaction();
         try {
 
-            if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '' || $row['supplier_ap_name']==null) {
+            // if(!isset($row['supplier_code'])){
+            //     dd($row);
+            // }
+            if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '' || $row['supplier_ap_name']==null  || $row['supplier_code']==null) {
                 DB::rollback();
                 return null;
             }
@@ -64,7 +67,7 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
 
             $supplier = Supplier::firstOrCreate(
                 [
-                    'supplier_code' => $row['supplier_code'], // 👈 unique lookup
+                    'supplier_code' => $row['supplier_code'],
                 ],
                 [
                     'account_id'            => $otherPayable->id,
