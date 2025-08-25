@@ -49,46 +49,51 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
         }
         DB::beginTransaction();
         try {
-            $item = Item::where('code',  $row['item_code'])->first();
-            $brand=Brand::where('id',$row['brand_id'])->first();
-            $supplier=Supplier::where('supplier_code',$row['supplier_code'])->first();
-            
-            $uom=Uom::where('uom_code',$row['uom_code'])->first();
-            if(!$item){
-                ResponseMessage('Item Code is invalid',419);
+            // if(!isset($row['item_code'])){
+            //     dd($row);
+            // }
+            $item = Item::where('code', $row['item_code'])->first();
+            $brand = Brand::where('id', $row['brand_id'])->first();
+            $supplier = Supplier::where('supplier_code', $row['supplier_code'])->first();
+            if (!$supplier) {
+                // DB::rollback();
+                // return null;
             }
-            if(!$brand){
-                ResponseMessage('Brand Id is invalid',419);
+            $uom = Uom::where('uom_code', $row['uom_code'])->first();
+            if (!$item) {
+                ResponseMessage('Item Code is invalid', 419);
             }
-            if(!$supplier){
-                ResponseMessage('Supplier Id is invalid',419);
+            if (!$brand) {
+                ResponseMessage('Brand Id is invalid', 419);
             }
-            $supplierItem=SupplierItem::create([
-                'supplier_id'=>$supplier->id,
-                'item_id'=>$item->id,
-                'brand_id'=>$brand->id,
+            if (!$supplier) {
+                ResponseMessage('Supplier Id is invalid', 419);
+            }
+            $supplierItem = SupplierItem::create([
+                'supplier_id' => $supplier->id,
+                'item_id' => $item->id,
+                'brand_id' => $brand->id,
             ]);
-            $uomPrice=$row['price'];
-            $type=null;
-            $price=$row['price'];
-            if($item->base_uom_id==$uom->id){
-                $type='base_uom';
+            $uomPrice = $row['price'];
+            $type = null;
+            $price = $row['price'];
+            if ($item->base_uom_id == $uom->id) {
+                $type = 'base_uom';
+            } elseif ($item->uom_id == $uom->id) {
+                $type = 'uom';
+                $price = $item->uom_conversion * (float)$row['price'];
+            } else {
+                ResponseMessage('Uom does not match with item uom', 419);
             }
-            elseif($item->uom_id==$uom->id){
-                $type='uom';
-                $price=$item->uom_conversion*$row['price'];
-            } else{
-                ResponseMessage('Uom does not match with item uom',419);
+            if (!$type) {
+                ResponseMessage('Uom Type is invalid', 419);
             }
-            if(!$type){
-                ResponseMessage('Uom Type is invalid',419);
-            }
-            $itemPrice=ItemPrice::create([
-                'price'=>$price,
-                'supplier_item_id'=>$supplierItem->id,
-                'uom_id'=>$uom->id,
-                'type'=>$type,
-                'uom_price'=>$uomPrice,
+            $itemPrice = ItemPrice::create([
+                'price' => $price,
+                'supplier_item_id' => $supplierItem->id,
+                'uom_id' => $uom->id,
+                'type' => $type,
+                'uom_price' => $uomPrice,
             ]);
             $item->brands()->sync([$brand->id]);
             DB::commit();

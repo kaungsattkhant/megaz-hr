@@ -32,7 +32,10 @@ class SupplierImport implements ToModel, WithHeadingRow, WithBatchInserts, WithC
         DB::beginTransaction();
         try {
 
-            if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '' || $row['supplier_ap_name'] == null) {
+            // if(!isset($row['supplier_code'])){
+            //     dd($row);
+            // }
+            if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '' || $row['supplier_ap_name']==null  || $row['supplier_code']==null) {
                 DB::rollback();
                 return null;
             }
