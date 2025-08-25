@@ -40,11 +40,12 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
 
     public function model(array $row)
     {
-        DB::beginTransaction();
-        try {
-            if (empty($row['name'])) {
+         if (empty($row['name'])) {
                 return null; // Returning null skips the row
             }
+        DB::beginTransaction();
+        try {
+           
             $itemCode = Item::where('code', $row['code'])->first();
             if ($itemCode) {
                 return ResponseMessage($itemCode . ' is duplicate itemcode.', 419);
@@ -109,7 +110,7 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
             ]);
             DB::commit();
 
-            return $item;
+            // return $item;
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
