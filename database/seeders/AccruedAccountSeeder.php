@@ -41,7 +41,7 @@ class AccruedAccountSeeder extends Seeder
                 $accruedAccount = [
                     'account_code' => "4-{$accruedCode}",
                     'name' => "Accured-{$expenseAccount->name}",
-                    'sub_account_id' => $expenseAccount->sub_account_id,
+                    'sub_account_id' => $lastOtherPayable->sub_account_id,
                     'link_account_id' => $expenseAccount->id,
                 ];
                 $accruedAccounts[] = $accruedAccount;
