@@ -65,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
             'staff_timeshift' => 'App\Models\StaffTimeshift',
             'staff_equipment' => 'App\Models\StaffEquipment',
             'staff_equipment_assign' => 'App\Models\StaffEquipmentAssign',
+            'accrued' => 'App\Models\Accrued',
         ]);
     }
 }
