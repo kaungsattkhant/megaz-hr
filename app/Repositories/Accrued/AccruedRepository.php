@@ -122,8 +122,8 @@ class AccruedRepository implements AccruedRepositoryInterface
         ->select(
             'accrueds.account_id',
             'accounts.name as account_name',
-            DB::raw('SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) as total_addition'),
-            DB::raw('SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END) as total_settlement'),
+            // DB::raw('SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) as total_addition'),
+            // DB::raw('SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END) as total_settlement'),
             DB::raw('(SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) - SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END)) as total_balance')
         )
         ->groupBy('accrueds.account_id', 'accounts.name')
@@ -144,6 +144,7 @@ class AccruedRepository implements AccruedRepositoryInterface
         )
         ->where('accrueds.account_id', $accountId)
         ->orderBy('accrueds.date_time', 'asc')
+        ->orderBy('accrueds.id', 'asc')
         ->get();
         $runningBalance = 0;
         $accruedsWithBalance = $accrueds->map(function ($accrued) use (&$runningBalance) {
@@ -155,6 +156,6 @@ class AccruedRepository implements AccruedRepositoryInterface
             $accrued->balance = $runningBalance;
             return $accrued;
         });
-    return $accruedsWithBalance;
+        return $accruedsWithBalance->reverse()->values();
     }
 }
