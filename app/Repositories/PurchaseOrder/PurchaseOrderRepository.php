@@ -438,7 +438,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             $is_column => $value,
         ]);
     }
-
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
