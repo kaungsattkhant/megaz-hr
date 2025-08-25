@@ -6,4 +6,5 @@
 @section('content')
     <handbooks-create-component/>
     
+    
 @endsection

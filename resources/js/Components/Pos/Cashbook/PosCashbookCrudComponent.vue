@@ -471,7 +471,7 @@
                 let url = `/api/close_cashbook_transaction`;
                 let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    window.location.reload();
+                    // window.location.reload();
                 }
             },
             alertValidationMessage(field) {

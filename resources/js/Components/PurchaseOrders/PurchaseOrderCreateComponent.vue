@@ -53,7 +53,7 @@
                     <label for="" class="label-form mb-3">
                         Item Name
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Item"
                             data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
@@ -61,7 +61,11 @@
                                 {{ item.name }}
                             </option>
                         </select>
-                    </div>
+                    </div> -->
+                    <multiselect v-model="selectedItem" :options="itemList" :multiple="false" :close-on-select="false"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Item" label="name"
+                        track-by="name" :preselect-first="false">
+                    </multiselect>
                     <!-- <select name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                             {{ item.name }}
@@ -73,7 +77,7 @@
                     <label for="" class="label-form mb-3">
                         Item Code
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
                             data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
@@ -81,7 +85,11 @@
                                 {{ item.code }}
                             </option>
                         </select>
-                    </div>
+                    </div> -->
+                    <multiselect v-model="selectedItem" :options="itemList" :multiple="false" :close-on-select="false"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Item" label="code"
+                        track-by="name" :preselect-first="false">
+                    </multiselect>
                 </div>
                 <div class="col-span-4">
                     <label for="" class="label-form mb-3">
@@ -304,6 +312,7 @@
 </template>
 
 <script>
+    import Multiselect from 'vue-multiselect';
     import { initTE, Select, Dropdown, Modal } from "tw-elements";
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getCurrentDate } from '../../utilities/datetime-helpers';
@@ -311,6 +320,9 @@
 import { find } from "lodash";
 
     export default {
+        components: {
+            Multiselect
+        },
         data() {
             return {
                 date: getCurrentDate(),

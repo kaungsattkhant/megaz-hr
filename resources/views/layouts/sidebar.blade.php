@@ -647,6 +647,13 @@
                                             KTV Project Cash Book
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="{{ route('cashbook.history') }}"
+                                            class="flex items-center @yield('cashbook_history')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Cash Book History
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
