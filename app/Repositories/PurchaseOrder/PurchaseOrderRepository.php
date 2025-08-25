@@ -90,7 +90,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             });
         }
 
-        if (checkDepartmentAndRoles('Finance', ['Manager'])) {
+        if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
             $purchaseOrders->where(function ($query) {
                 $query->whereIn('status', ['procurement_manager_checked', 'manager_checked', 'financial_checked'])
                     ->orWhere(function ($subQuery) {
@@ -196,11 +196,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                             // if (checkRoles(['Manager'])) {
                             if (checkDepartmentAndRoles('HR', ['Manager'])) {
                                 $column = 'quantity_by_manager';
-                            } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
+                            } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
                                 $column = 'quantity_by_financial';
                             } elseif (checkDepartmentAndRoles('Management', ['MD'])) {
                                 $column = 'quantity_by_md';
-                            } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
+                            } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
                                 $column = 'quantity_after_md';
                             }
                             if ($column != null) {
@@ -363,7 +363,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
                     $status = 'manager_checked';
-                } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
+                } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
                     $column = 'financial_check';
                     $is_column = 'is_financial_checked';
                     $status = 'financial_checked';
@@ -404,13 +404,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         $users = $this->getUserByRole('Procurement', ['Manager']);
                         $title = 'You have received a new PO to confirm';
                     } elseif (checkDepartmentAndRoles('Procurement', ['Manager'])) {
-                        $users = $this->getUserByRole('Finance', ['Manager']);
+                        $users = $this->getUserByRole('Finance', ['Chief Accountant']);
                         $title = 'You have received a new PO to confirm From Procurement';
-                    } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
+                    } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
                         $users = $this->getUserByRole('Management', ['MD']);
                         $title = 'You have received a new PO to confirm';
                     } else if (checkDepartmentAndRoles('Management', ['MD'])) {
-                        $users = $this->getUserByRole('Finance', ['Manager']);
+                        $users = $this->getUserByRole('Finance', ['Chief Accountant']);
                         $title = 'You have received a new PO to confirm From MD';
                     }
                     $data = [
@@ -459,7 +459,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     if ($model->manager_check_id == null || $model->manager_check_time == null) {
                         ResponseMessage('Required confirmation from HR(Manager) ! ', 422);
                     }
-                } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
+                } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
                     if ($model->financial_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Financial', 422);
                     }
