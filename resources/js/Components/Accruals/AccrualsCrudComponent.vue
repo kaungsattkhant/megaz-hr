@@ -61,7 +61,7 @@
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
-                                    <!-- <td class=" font-medium ">
+                                    <td class=" font-medium ">
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
@@ -75,10 +75,15 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.balance }}
-                                    </td> -->
+                                    </td>
                                     
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="primaryList.length < 1">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -86,13 +91,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getPrimaryList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getPrimaryList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -324,45 +329,41 @@ export default {
             let url = this.url + '/' + this.accrualsId
             let response = await getApiData({ url: url, token: this.getToken() })
 
-            console.log("Raw API Response:", response);
+            // console.log("Raw API Response:", response);
 
-            if (response) {
-                // some APIs return { data: [...] }, others return [...]
-                this.primaryList = response.data ? response.data : response;
+            // if (response) {
+            //     this.primaryList = response.data ? response.data : response;
+            // }
+            if (response.data) {
+                this.primaryList = response.data;
             }
         },
         async getExpenseAccountList() {
-            try {
-                let url = `/api/get_expense_accounts`;
-                let response = await getApiData({ url: url, token: this.getToken() });
-
-                if (response.data) {
-                    this.accountList = response;
-                }
-            } catch (error) {
+            let url = `/api/get_expense_accounts`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.accountList = response.data;
+            }
+            else{
                 this.$notify({
                     title: 'Input validation',
-                    text: error,
+                    text: response.error,
                     type: 'warn'
                 });
-                console.error("Error fetching cash account list:", error);
             }
         },
         async getCashAccountList() {
-            try {
-                let url = `/api/get_cash_account`;
-                let response = await getApiData({ url: url, token: this.getToken() });
-
-                if (response.data) {
-                    this.cashbookList = response.data;
-                }
-            } catch (error) {
+            let url = `/api/get_cash_account`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.cashbookList = response.data;
+            }
+            else{
                 this.$notify({
                     title: 'Input validation',
-                    text: error,
+                    text: response.error,
                     type: 'warn'
                 });
-                console.error("Error fetching cash account list:", error);
             }
         },
 
@@ -392,12 +393,12 @@ export default {
             let formData = new FormData();
             formData.append('type', this.selectedType.value);
             formData.append('category', this.selectedCategory.value);
-            formData.append('expense_account_id', '221');
-            formData.append('expense_account_code', '6-2002');
+            formData.append('expense_account_id', this.selectedAccount.id);
+            formData.append('expense_account_code', this.selectedAccount.account_code);
             formData.append('amount',this.amount);
             if(this.selectedType.value === 'settlement'){
                 
-                formData.append('cash_account_id',this.selectedCashbook);
+                formData.append('cash_account_id',this.selectedCashbook.id);
             }
             let response = await postApiData({url:`/api/accruals`, form_data:formData, token:this.getToken()})
             if(response.success){
