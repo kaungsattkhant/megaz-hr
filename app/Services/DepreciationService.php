@@ -20,14 +20,14 @@ class DepreciationService
             ->where('year', $year)
             ->where('sub_accounts.account_code', $account_code)
             ->select(
+                'main_account.name as name',
                 DB::raw('SUM(asset_depreciation_balances.original_cost) as original_cost'),
                 DB::raw('SUM(asset_depreciation_balances.addition_year_cost) as addition_year_cost'),
-                DB::raw('SUM(asset_depreciation_balances.addition_year_depreciation) as addition_year_depreciation'),
                 DB::raw('SUM(asset_depreciation_balances.total_cost) as total_cost'),
                 DB::raw('SUM(asset_depreciation_balances.current_month_depreciation) as current_month_depreciation'),
+                DB::raw('SUM(asset_depreciation_balances.addition_year_depreciation) as addition_year_depreciation'),
                 DB::raw('SUM(asset_depreciation_balances.total_depreciation) as total_depreciation'),
                 DB::raw('SUM(asset_depreciation_balances.book_value) as book_value'),
-                'main_account.name as name',
             )
             ->groupBy('main_account.id', 'account_depreciation.id')
             ->get();
