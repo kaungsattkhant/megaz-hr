@@ -34,14 +34,18 @@
                 </div>
             </div>
             <div class="col-span-7"></div>
-            <div class="mb-4 col-span-6">
+            <!-- <div class="mb-4 col-span-6">
                 <label for="" class="labelform mb-3">
                     Detail
                 </label>
                 <textarea v-model="detail" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                      name="" id="" cols="30" rows="10"></textarea>
 
+            </div> -->
+            <div class="col-span-10">
+                <textarea id="editor" v-model="test"></textarea>
             </div>
+            
             
         </div>
 
@@ -67,6 +71,8 @@ export default {
     },
     data() {
         return {
+            test: null,
+            editorInstance: null,
 
             selectedTitle:null,
             selectedDescription:null,
@@ -110,7 +116,7 @@ export default {
             let formData = new FormData();
             formData.append('title',this.selectedTitle);
             formData.append('description',this.selectedDescription);
-            formData.append('detail',this.detail);
+            formData.append('detail',JSON.stringify(this.detail));
             formData.append('image',this.selectedImage);
             let response = await postApiData({url:`/api/hr/hand-books`, form_data:formData, token:this.getToken()})
             if(response.success){
@@ -142,6 +148,12 @@ export default {
     },
 
     mounted() {
+        this.editorInstance = CKEDITOR.replace("editor");
+
+        // Sync data when editor content changes
+        this.editorInstance.on("change", () => {
+            this.detail = this.editorInstance.getData();
+        });
         initTE({ Modal, Select, Tab, Ripple });
     }
 }

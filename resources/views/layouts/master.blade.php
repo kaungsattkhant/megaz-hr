@@ -25,6 +25,8 @@
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+  <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 </head>
 
 <body>
