@@ -15,19 +15,23 @@ class AccruedController extends Controller
     }
     public function getExpenseAccount(Request $request)
     {
-        return $this->accruedRepository->getExpenseAccount($request);
+        $data =  $this->accruedRepository->getExpenseAccount($request);
+        ResponseData($data);
     }
     public function createAccrued(AccruedRequest $request)
     {
-        return $this->accruedRepository->createAccrued($request->all());
+        $data = $this->accruedRepository->createAccrued($request->all());
+        ResponseData($data);
     }
     public function getAccrued(Request $request)
     {
-        return $this->accruedRepository->getAccrued($request);
+        $data = $this->accruedRepository->getAccrued($request);
+        return $data;
     }
 
     public function detailAccrued($accountId)
     {
-        return $this->accruedRepository->detailAccrued($accountId);
+        $data = $this->accruedRepository->detailAccrued($accountId);
+        ResponseData($data);
     }
 }
