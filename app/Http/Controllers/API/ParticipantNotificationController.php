@@ -174,4 +174,10 @@ class ParticipantNotificationController extends Controller
         $data = $this->ParticipantNotificationRepository->getShiftsByStaffId($staffId,$request);
         ResponseData($data);
     }
+
+    public function getConfirmedShiftsByStaffIdTimeShiftId($staffId,$staffTimeshiftId)
+    {
+        $data = $this->ParticipantNotificationRepository->getConfirmedShiftsByStaffIdTimeShiftId($staffId,$staffTimeshiftId);
+        ResponseData($data);
+    }
 }
