@@ -1341,6 +1341,27 @@
                         </a>
                     </li>
                     @endif
+                    <li>
+                        <a href="/shift_assignment" class="flex items-center @yield('shift_assignment') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            shift Assignment
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/equipment_assignment" class="flex items-center @yield('equipment_assignment') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            Equipment Assignment
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/accruals" class="flex items-center @yield('accruals') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            Accruals
+                        </a>
+                    </li>
 
                 </ul>
 
