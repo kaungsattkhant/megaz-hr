@@ -91,5 +91,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/meetings_by_staff/{staffId}', 'getMeetingsByStaffId');
     Route::get('/trainings_by_staff/{staffId}', 'getTrainingsByStaffId');
     Route::get('/shifts_by_staff/{staffId}', 'getShiftsByStaffId');
+    Route::get('/staff/{staffId}/time-shifts/{staffTimeshiftId}', 'getConfirmedShiftsByStaffIdTimeShiftId');
   });
 });

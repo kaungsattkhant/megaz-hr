@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Ledger;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaction extends Model
 {
@@ -51,21 +52,21 @@ class Transaction extends Model
 
     public function ledgers()
     {
-        return $this->hasMany(\App\Models\Ledger::class);
+        return $this->hasMany(Ledger::class);
     }
 
     public function initialLedger()
     {
-        return $this->hasOne(\App\Models\Ledger::class)->orderBy('id', 'asc');
+        return $this->hasOne(Ledger::class)->orderBy('id', 'asc');
     }
     public function finalLedger()
     {
-        return $this->hasOne(\App\Models\Ledger::class)->orderBy('id', 'desc');
+        return $this->hasOne(Ledger::class)->orderBy('id', 'desc');
     }
 
     public function supplier()
     {
-        return $this->belongsTo(\App\Models\Supplier::class);
+        return $this->belongsTo(Supplier::class);
     }
 
     public function scopeIsConfirmed($query, $bool)

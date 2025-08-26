@@ -19,7 +19,7 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use App\Repositories\Supplier\SupplierRepository;
 
-class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithChunkReading,SkipsOnError, SkipsOnFailure
+class SupplierImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChunkReading, SkipsOnError, SkipsOnFailure
 {
     use Importable, SkipsErrors, SkipsFailures;
     protected $supplierRepository;
@@ -67,7 +67,7 @@ class SupplierImport implements ToModel, WithHeadingRow,WithBatchInserts, WithCh
 
             $supplier = Supplier::firstOrCreate(
                 [
-                    'supplier_code' => $row['supplier_code'], // 👈 unique lookup
+                    'supplier_code' => $row['supplier_code'],
                 ],
                 [
                     'account_id'            => $otherPayable->id,

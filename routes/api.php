@@ -29,6 +29,7 @@ use App\Http\Controllers\API\AdsAPIController;
 use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
+use App\Http\Controllers\API\AccruedController;
 use App\Http\Controllers\API\CanteenController;
 use App\Http\Controllers\API\CreditorControler;
 use App\Http\Controllers\API\DutyAPIController;
@@ -40,8 +41,8 @@ use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\CreditorController;
-use App\Http\Controllers\API\OrderAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
+use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
@@ -70,6 +71,7 @@ use App\Http\Controllers\API\AccountPayableController;
 use App\Http\Controllers\API\CookingPlaceAPIController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
+use App\Http\Controllers\API\SellingExtraAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
@@ -92,7 +94,6 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
-use App\Http\Controllers\API\SellingExtraAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -146,6 +147,12 @@ Route::controller(FeatureAPIController::class)->group(function () {
     Route::post('/feature_import', 'featureImport');
 });
 Route::middleware('auth:api')->group(function () {
+    Route::controller(AccruedController::class)->group(function () {
+        Route::get('get_expense_accounts', 'getExpenseAccount');
+        Route::post('accruals', 'createAccrued');
+        Route::get('accruals', 'getAccrued');
+        Route::get('accruals/{accountId}', 'detailAccrued');
+    });
     Route::post('/logout', [AuthController::class, 'logout']);
     // Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
     // Route::get('/api/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
@@ -266,6 +273,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(CommonController::class)->group(function () {
         Route::post('is_active', 'toggleIsActive');
     });
+    
 
     Route::controller(FixedAssetPurchaseAPIController::class)->group(function () {
         Route::get('/fixed_asset_purchases', 'getFixedAssetPurchaseData');
@@ -538,6 +546,7 @@ Route::get('/cooking_areas', [AreaController::class, 'getCookingAreas']);
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
 Route::post('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
+Route::get('/deps', [DepartmentAPIController::class, 'getDepartments']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
 Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);

@@ -23,6 +23,11 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         }
     }
 
+    public function getDepartments()
+    {
+        return Department::get();
+    }
+
     public function createData(array $data)
     {
         DB::beginTransaction();
