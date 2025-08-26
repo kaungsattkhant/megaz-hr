@@ -1283,6 +1283,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   {
     $shifts = StaffTimeshift::with('staff','timeshift.shift','area')->where('staff_id',$staffId)
     ->where('status','confirmed')->orderBy('id','desc')->paginate(config('common.list_count'));
+    if($shifts->isEmpty()){
+      return ResponseData([], 404, false, 'Shifts not found.');
+    }
     return ResponseData(StaffTimeShiftResource::collection($shifts), 200, true, 'Shifts retrieved successfully.');
   }
 
@@ -1291,6 +1294,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     ->where('staff_id',$staffId)
     ->where('id',$staffTimeshiftId)
     ->where('status','confirmed')->get();
+    if($shift->isEmpty()){
+      return ResponseData([], 404, false, 'Shift not found.');
+    }
     return ResponseData(StaffTimeShiftResource::collection($shift), 200, true, 'Shift retrieved successfully.');
   }
 

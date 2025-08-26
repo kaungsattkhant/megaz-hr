@@ -29,11 +29,11 @@ class StaffTimeShiftResource extends JsonResource
                 "from_time" => $this->timeshift->from_time,
                 "to_time"   => $this->timeshift->to_time,
             ]
-            : [],
+            : null,
             "area" => $this->area ? [
                 "id"=> $this->area->id ?? null,
                 "name"=> $this->area->name ?? null,
-            ] : [],
+            ] : null,
         ];
     }
 }
