@@ -100,6 +100,17 @@
                                             </a>
                                         </li>
                                     @endif
+                                    @if (checkFeaturePermission('asset-depreciation-balance'))
+                                        <li>
+                                            <a href="/fix_asset_depreciation"
+                                                class="flex items-center text-left @yield('fix_asset_depreciation')" >
+                                                                                               <i class="fal fa-braille pr-3"></i>
+
+                                                <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-balance-list-50.png') }}" alt=""> -->
+                                                Fix Asset Depreciation
+                                            </a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </div>
                         </li>

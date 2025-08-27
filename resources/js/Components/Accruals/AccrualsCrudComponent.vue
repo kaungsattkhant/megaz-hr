@@ -336,6 +336,10 @@ export default {
             // }
             if (response.data) {
                 this.primaryList = response.data;
+                this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
             }
         },
         async getExpenseAccountList() {
@@ -370,7 +374,11 @@ export default {
         
 
         addBtnClicked(){
-            // this.shiftName = null;
+            this.selectedType = null;
+            this.selectedCategory = null;
+            this.amount = null;
+            this.selectedAccount = null;
+            this.selectedCashbook = null;
         },
         btnClickedAddAccrual(){
             if(!this.selectedType){
@@ -381,8 +389,16 @@ export default {
                 this.alertValidationMessage(`Category`);
                 return 1;
             }
+            else if(!this.selectedAccount){
+                this.alertValidationMessage(`Account`);
+                return 1;
+            }
             else if(!this.amount){
-                this.alertValidationMessage(`amount`);
+                this.alertValidationMessage(`Amount`);
+                return 1;
+            }
+            else if(this.selectedType.value === 'settlement' && !this.selectedCashbook){
+                this.alertValidationMessage(`Cashbook`);
                 return 1;
             }
             else{
@@ -405,7 +421,13 @@ export default {
                 this.getPrimaryList();
                 document.getElementById('close_create_modal').click();
             }
-            this.getPrimaryList();
+            else{
+                this.$notify({
+                    title: 'Input validation',
+                    text: response.error,
+                    type: 'warn'
+                });
+            }
         },
 
 

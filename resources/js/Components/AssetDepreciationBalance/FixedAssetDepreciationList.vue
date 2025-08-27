@@ -164,7 +164,7 @@
             ...mapGetters(['getToken']),
 
             async getAssetDepreciationBalanceList(date) {
-                const response = await getApiData({ url: `/api/get_depreciation_balance?type=current_asset&date=${date}`, token: this.getToken() });
+                const response = await getApiData({ url: `/api/get_depreciation_balance?type=fix_asset&date=${date}`, token: this.getToken() });
                 console.log(response);
                 if(response){
                     this.assetDepreciationBalance = response.data;

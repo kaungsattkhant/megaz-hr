@@ -378,9 +378,10 @@ Route::middleware(['departments:creditor-balance'])->group(function () {
 });
 
 
-Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
+// Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
     Route::view('/asset_depreciation_balance_list', 'asset_depreciation_balance.index')->name('asset_list');
-});
+    Route::view('/fix_asset_depreciation', 'asset_depreciation_balance.fix_asset_depreciation')->name('fix_asset_depreciation');
+// });
 
 
 // test
