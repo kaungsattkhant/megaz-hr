@@ -96,7 +96,7 @@
                                                                                                <i class="fal fa-braille pr-3"></i>
 
                                                 <!-- <img class=" sidebar-img" src="{{ asset('img/icons8-balance-list-50.png') }}" alt=""> -->
-                                                Asset Depreciation Balance List
+                                                Current Asset Depreciation
                                             </a>
                                         </li>
                                     @endif

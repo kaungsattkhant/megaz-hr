@@ -3,7 +3,7 @@
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
-                    Asset Depreciation Balance List
+                    Current Asset Depreciation
                 </p>
             </div>
             <div class="btn-container">
@@ -41,7 +41,7 @@
                                 <th scope="col" class="">
                                     Sr.No
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class=" text-left">
                                     Particular
                                 </th>
                                 <th scope="col" class="">
@@ -51,13 +51,7 @@
                                     Addition During Year
                                 </th>
                                 <th scope="col" class="">
-                                    Less, Sold During Year
-                                </th>
-                                <th scope="col" class="">
-                                    Total
-                                </th>
-                                <th scope="col" class="">
-                                    Life
+                                    Total Cost
                                 </th>
                                 <th scope="col" class="">
                                     Current Month
@@ -66,7 +60,7 @@
                                     Addition Duration Year
                                 </th>
                                 <th scope="col" class="">
-                                    Total
+                                    Total Depreciation
                                 </th>
                                 <th scope="col" class="">
                                     Book Value
@@ -75,13 +69,12 @@
                         </thead>
                         <tbody>
 
-                            <!-- looping start -->
-                            <div class="contents" v-for="(asset, index) in assetDepreciationBalance" :key="index">
+                            <div class="contents" v-for="(asset, index) in current_asset?.data" :key="index">
                                 <tr class="">
                                     <td class="  ">
                                         {{ ++index }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <td class="whitespace-nowrap text-left ">
                                         {{ asset.name }}
                                     </td>
 
@@ -93,21 +86,10 @@
                                         {{ asset.addition_year_cost }}
 
                                     </td>
-
-                                    <td class="whitespace-nowrap ">
-
-                                    </td>
-
-
                                     <td class="whitespace-nowrap ">
                                         {{ asset.total_cost }}
 
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        12
-
-                                    </td>
-
                                     <td class="whitespace-nowrap ">
                                         {{ asset.current_month_depreciation }}
 
@@ -129,8 +111,34 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !rounded-none">
+                                <td></td>
+                                <td class="  !font-semibold !rounded-none  text-left" colspan="1">
+                                    Total
+                                </td>
 
-                            <!-- looping end -->
+                                <td class="whitespace-nowrap  !font-semibold">
+                                    {{ current_asset.total_original_cost }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ current_asset.total_addition_year }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ current_asset.total }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ current_asset.total_addition_during_year }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ current_asset.total_depreciation }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold !rounded-none">
+                                    {{ current_asset.boototal_book_valuek_value }}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -155,6 +163,8 @@
             return {
 
                 assetDepreciationBalance:[],
+
+                current_asset: null,
                 currentDate:'',
                 filterDate:null
             };
@@ -167,7 +177,7 @@
                 const response = await getApiData({ url: `/api/get_depreciation_balance?type=current_asset&date=${date}`, token: this.getToken() });
                 console.log(response);
                 if(response){
-                    this.assetDepreciationBalance = response.data;
+                    this.current_asset = response.data.current_asset;
                 }
             },
 
