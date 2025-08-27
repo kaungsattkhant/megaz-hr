@@ -91,7 +91,7 @@
                                     @endif
                                     @if (checkFeaturePermission('asset-depreciation-balance'))
                                         <li>
-                                            <a href="/asset_list"
+                                            <a href="/asset_depreciation_balance_list"
                                                 class="flex items-center text-left @yield('asset_depreciation_balance_list')" >
                                                                                                <i class="fal fa-braille pr-3"></i>
 
