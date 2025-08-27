@@ -16,7 +16,7 @@
     },
     {
         "module": "staff",
-        "name": "Staff Active On\/Off",
+        "name": "Staff Active On/Off",
         "slug": "staff.toggle"
     },
     {
@@ -206,7 +206,7 @@
     },
     {
         "module": "menu-category",
-        "name": "Menu Category Active On\/Off",
+        "name": "Menu Category Active On/Off",
         "slug": "menu-category.toggle"
     },
     {
@@ -226,7 +226,7 @@
     },
     {
         "module": "menu",
-        "name": "Menu Active On\/Off",
+        "name": "Menu Active On/Off",
         "slug": "menu.toggle"
     },
     {
@@ -311,7 +311,7 @@
     },
     {
         "module": "area",
-        "name": "Area Active On\/Off",
+        "name": "Area Active On/Off",
         "slug": "area.toggle"
     },
     {
@@ -381,7 +381,7 @@
     },
     {
         "module": "room",
-        "name": "Room Active On\/Off",
+        "name": "Room Active On/Off",
         "slug": "room.toggle"
     },
     {
@@ -396,7 +396,7 @@
     },
     {
         "module": "table",
-        "name": "Table Active On\/Off",
+        "name": "Table Active On/Off",
         "slug": "table.toggle"
     },
     {
@@ -531,7 +531,7 @@
     },
     {
         "module": "service",
-        "name": "service Active On\/Off",
+        "name": "service Active On/Off",
         "slug": "service.toggle"
     },
     {
@@ -556,7 +556,7 @@
     },
     {
         "module": "inventory",
-        "name": "inventory active on\/off",
+        "name": "inventory active on/off",
         "slug": "inventory.toggle"
     },
     {
@@ -596,7 +596,7 @@
     },
     {
         "module": "chartofaccount",
-        "name": "account active on\/off",
+        "name": "account active on/off",
         "slug": "account.toggle"
     },
     {
@@ -1408,5 +1408,20 @@
         "module": "cv",
         "name": "cv delete",
         "slug": "cv.delete"
+    },
+    {
+        "module": "accrual",
+        "name": "accrual list",
+        "slug": "accrual"
+    },
+    {
+        "module": "accrual",
+        "name": "accrual create",
+        "slug": "accrual.create"
+    },
+    {
+        "module": "accrual",
+        "name": "accrual detail",
+        "slug": "accrual.detail"
     }
 ]
