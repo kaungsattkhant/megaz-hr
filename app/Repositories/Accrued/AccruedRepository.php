@@ -137,25 +137,21 @@ class AccruedRepository implements AccruedRepositoryInterface
         ->join('accounts', 'accrueds.account_id', '=', 'accounts.id')
         ->select(
             'accrueds.id',
-            'accrueds.date_time AS date', 
+            'accrueds.date_time AS date',
             'accrueds.type',
             'accounts.name AS accrued_name',
-            'accrueds.amount'
+            'accrueds.amount',
+            DB::raw('SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) 
+                    OVER (PARTITION BY accrueds.account_id ORDER BY accrueds.date_time, accrueds.id) 
+                - 
+                SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END) 
+                    OVER (PARTITION BY accrueds.account_id ORDER BY accrueds.date_time, accrueds.id)
+                    AS balance')
         )
         ->where('accrueds.account_id', $accountId)
-        ->orderBy('accrueds.date_time', 'asc')
-        ->orderBy('accrueds.id', 'asc')
-        ->get();
-        $runningBalance = 0;
-        $accruedsWithBalance = $accrueds->map(function ($accrued) use (&$runningBalance) {
-            if ($accrued->type === "addition") {
-                $runningBalance += $accrued->amount;
-            } elseif ($accrued->type === "settlement") {
-                $runningBalance -= $accrued->amount;
-            }
-            $accrued->balance = $runningBalance;
-            return $accrued;
-        });
-        return $accruedsWithBalance->reverse()->values();
+        ->orderBy('accrueds.id', 'desc')
+        ->paginate(config('common.list_count'));
+
+        return $accrueds;
     }
 }

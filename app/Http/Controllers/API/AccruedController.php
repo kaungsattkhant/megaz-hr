@@ -32,6 +32,6 @@ class AccruedController extends Controller
     public function detailAccrued($accountId)
     {
         $data = $this->accruedRepository->detailAccrued($accountId);
-        ResponseData($data);
+        return $data;
     }
 }
