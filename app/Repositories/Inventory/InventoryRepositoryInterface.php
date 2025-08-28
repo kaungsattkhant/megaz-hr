@@ -27,4 +27,6 @@ interface InventoryRepositoryInterface
     public function createInventoryItem($validatedData);
 
     public function getallInventories($request);
+
+    public function getInventoryItemsByStaff($areaId);
 }

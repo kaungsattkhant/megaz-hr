@@ -121,13 +121,19 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
       : $equipmentAssigns->get();
   }
 
-  public function getEquipmentAssignsByStaffId($staff_id, $request){
-    $equipmentAssigns = StaffEquipment::with(['staff.roles', 'staff.department', 'staffEquipmentAssigns.item', 'staffEquipmentAssigns.baseUom', 'staffEquipmentAssigns.uom'])
-      ->where('staff_id', $staff_id)
-      ->orderBy('id', 'desc');
-    return (isset(request()->per_page) || isset(request()->page))
-      ? $equipmentAssigns->paginate(config('common.list_count'))
-      : $equipmentAssigns->get();
+  public function getEquipmentAssignsByStaffId($request){
+    $staff_id = UserData()->id;
+    $equipmentAssigns = StaffEquipmentAssign::with([
+      'staffEquipment.staff',
+      'item',
+      'baseUom',
+      'uom'
+    ])
+      ->whereHas('staffEquipment', function ($query) use ($staff_id) {
+        $query->where('staff_id', $staff_id);
+      })
+      ->orderBy('id', 'desc')->get();
+    return $equipmentAssigns;
   }
 
   public function checkInventoryStockEnough($item_id, $inventory_id, $uom_quantity)

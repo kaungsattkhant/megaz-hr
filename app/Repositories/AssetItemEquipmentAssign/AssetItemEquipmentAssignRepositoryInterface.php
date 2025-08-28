@@ -17,5 +17,5 @@ interface AssetItemEquipmentAssignRepositoryInterface
 
   public function processInventoryBatchDeductions($item_id, $source_inventory_id, $destination_inventory_id, $ledgerable_id, $ledgerable_type, $uom_quantity);
 
-  public function getEquipmentAssignsByStaffId($staff_id, $request);
+  public function getEquipmentAssignsByStaffId($request);
 }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
+use GuzzleHttp\Psr7\Response;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\StaffEquipmentAssignResource;
+use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
 
 class AssetItemEquipmentAssignController extends Controller
 {
@@ -39,8 +40,9 @@ class AssetItemEquipmentAssignController extends Controller
         ResponseData($equipmentAssigns);
     }
 
-    public function getEquipmentAssignsByStaffId($staff_id, $request){
-        $equipmentAssigns = $this->assetItemEquipmentAssignRepo->getEquipmentAssignsByStaffId($staff_id, $request);
-        ResponseData($equipmentAssigns);
+    public function getEquipmentAssignsByStaffId(Request $request){
+        
+        $equipmentAssigns = $this->assetItemEquipmentAssignRepo->getEquipmentAssignsByStaffId($request);
+        ResponseData(StaffEquipmentAssignResource::collection($equipmentAssigns));
     }
 }
