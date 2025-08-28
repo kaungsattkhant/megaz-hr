@@ -62,7 +62,8 @@
                             </option>
                         </select>
                     </div> -->
-                    <multiselect v-model="selectedItem" :options="itemList" :multiple="false" :close-on-select="false"
+                    <multiselect v-model="selectedItem" :options="itemList" :multiple="false" :close-on-select="true"
+                        @select="itemSelectChanged"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select Item" label="name"
                         track-by="name" :preselect-first="false">
                     </multiselect>
@@ -86,7 +87,8 @@
                             </option>
                         </select>
                     </div> -->
-                    <multiselect v-model="selectedItem" :options="itemList" :multiple="false" :close-on-select="false"
+                    <multiselect v-model="selectedItem" :options="itemList" :multiple="false" :close-on-select="true"
+                        @select="itemSelectChanged"
                         :clear-on-select="false" :preserve-search="true" placeholder="Select Item" label="code"
                         track-by="name" :preselect-first="false">
                     </multiselect>
