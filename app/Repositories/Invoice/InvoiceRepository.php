@@ -1176,7 +1176,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 if ($entity->entity_type == 'table') {
                     $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $RtAreaTypeId);
                     $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $RtAreaTypeId);
-
                     if (($foodMenusRT)->count() > 0) {
                         $foodTotal = $foodMenusRT->sum('total_price');
                         $ledgerTransactionWriter->storeLedger([
@@ -1218,7 +1217,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ->join('order_items', 'orders.id', '=', 'order_items.order_id') // Join order items
             ->join('menus', 'order_items.menu_id', '=', 'menus.id') // Join menus
             ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id') // Join menu categories
-            ->join('areas', 'order_items.area_id', '=', 'areas.id') // Join areas
+            ->join('areas', 'invoices.area_id', '=', 'areas.id') // Join areas
             ->join('area_types', 'areas.area_type_id', '=', 'area_types.id') // Join area types
             ->select(
                 'menu_categories.id as category_id',
