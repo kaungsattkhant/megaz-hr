@@ -138,6 +138,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/hand-books', 'getHandBookList');
     Route::get('/hand-books/{id}', 'getHandBookById');
     Route::delete('/hand-books/{id}', 'deleteHandBook');
+    Route::get('/handbooks', 'getHandBooks');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

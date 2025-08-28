@@ -22,17 +22,18 @@ class StaffTimeShiftResource extends JsonResource
             "timeshift_id"=> $this->timeshift_id,
             "area_id"=> $this->area_id,
             "status"=> $this->status,
-            "timeshift" => [
-                "id"=> $this->timeshift->id,
-                "shift_id"=> $this->timeshift->shift_id,
-                "shift_name"=> $this->timeshift->shift->name,
-                "from_time"=> $this->timeshift->from_time,
-                "to_time"=> $this->timeshift->to_time,
-            ],
-            "area" => [
-                "id"=> $this->area->id,
-                "name"=> $this->area->name,
-            ],
+            "timeshift" => $this->timeshift ? [
+                "id"        => $this->timeshift->id,
+                "shift_id"  => $this->timeshift->shift_id,
+                "shift_name"=> $this->timeshift->shift->name ?? null,
+                "from_time" => $this->timeshift->from_time,
+                "to_time"   => $this->timeshift->to_time,
+            ]
+            : null,
+            "area" => $this->area ? [
+                "id"=> $this->area->id ?? null,
+                "name"=> $this->area->name ?? null,
+            ] : null,
         ];
     }
 }

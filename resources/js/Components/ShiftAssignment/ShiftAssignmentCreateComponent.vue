@@ -147,7 +147,7 @@
                                 {{ item.area_name ? item.area_name : '-' }}
                             </td>
                             <td class="text-center">
-                                <button @click="removeSop(itemIndex)">
+                                <button @click="removeItem(itemIndex)">
                                     <i class="fas fa-times  pr-3"></i>
                                 </button>
                             </td>
@@ -309,8 +309,8 @@ export default {
             this.staffList = [];
             this.areaList = [];
         },
-        removeSop(index){
-            this.selectedSopList.splice(index, 1);
+        removeItem(index){
+            this.selectedAssignList.splice(index, 1);
         },
 
 

@@ -37,4 +37,10 @@ class HandBookeController extends Controller
         $data = $this->handBookRepository->deleteHandBook($id);
         ResponseData($data);
     }
+
+    public function getHandBooks()
+    {
+        $data = $this->handBookRepository->getHandBooks();
+        ResponseData($data);
+    }
 }

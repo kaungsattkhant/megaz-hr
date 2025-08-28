@@ -11,4 +11,6 @@ interface HandBookInterface
   public function getHandBookById($id);
 
   public function deleteHandBook($id);
+
+  public function getHandBooks();
 }

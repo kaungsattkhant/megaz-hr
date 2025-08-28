@@ -749,6 +749,8 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/shift', 'shift.index')->name('shift.index');
     Route::view('/working_capital', 'working_capital.index')->name('working_capital.index');
     Route::view('/cashbook_history', 'cashbook.history')->name('cashbook.history');
+    Route::view('/accruals', 'accruals.index')->name('accruals.index');
+    Route::view('/accruals/detail/{id}', 'accruals.detail')->name('accruals.detail');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');

@@ -580,17 +580,17 @@
                 //     window.location.reload();
                 // }
 
-                if(!this.bookType){
-                    this.alertValidationMessage(`Cash accout is required!`);
-                    return 1;
-                }
+                // if(!this.bookType){
+                //     this.alertValidationMessage(`Cash accout is required!`);
+                //     return 1;
+                // }
                 let formData = new FormData();
-                formData.append('cash_account_id', this.bookType.id);
+                formData.append('cash_account_id', this.cashAccountId);
                 formData.append('is_pos', 0);
                 let url = `/api/close_cashbook_transaction`;
                 let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    window.location.reload();
+                    // window.location.reload();
                 }
             },
         },

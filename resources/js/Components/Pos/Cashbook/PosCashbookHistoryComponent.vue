@@ -21,8 +21,8 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-4">Id</th>
                                     <th scope="col" class="px-6 py-4">Date</th>
-                                    <th scope="col" class="px-6 py-4">Closing Balance</th>
                                     <th scope="col" class="px-6 py-4">Opening Balance</th>
+                                    <th scope="col" class="px-6 py-4">Closing Balance</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -36,7 +36,10 @@
                                         {{ cashbook.created_at }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ cashbook }}
+                                        {{ cashbook.opening_balance }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ cashbook.closing_balance }}
                                     </td>
                                 </tr>
                             </tbody>
