@@ -195,9 +195,19 @@
                         <label for="" class="label-form mb-3">
                             Category
                         </label>
+                        <!-- <multiselect
+                        v-model="selectedCategory"
+                        :options="categoryList"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Category"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="false" ></multiselect> -->
                         <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Category"
+                            <select data-te-select-init data-te-select-placeholder="Select Category" disabled
                                 data-te-select-filter="true" name="" id="" v-model="selectedCategory" class="input-ui !text-black">
                                 <option :value="category" v-for="(category, index) in categoryList"
                                     :key="index"> {{ category.name }} </option>
@@ -337,9 +347,11 @@ export default {
             if (response.data) {
                 this.primaryList = response.data;
                 this.lastPage = response.data.last_page;
-                    this.currentPage = pageNumber;
-                    this.perPage = response.data.per_page;
-                    this.totalData = response.data.total;
+                this.currentPage = response.pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+                this.selectedCategory = this.categoryList.find(item => item.value = this.primaryList[0].category);
+                this.selectedAccount = this.accountList.find(item => item.value = this.primaryList[0].category);
             }
         },
         async getExpenseAccountList() {
@@ -375,7 +387,6 @@ export default {
 
         addBtnClicked(){
             this.selectedType = null;
-            this.selectedCategory = null;
             this.amount = null;
             this.selectedAccount = null;
             this.selectedCashbook = null;
@@ -418,7 +429,7 @@ export default {
             }
             let response = await postApiData({url:`/api/accruals`, form_data:formData, token:this.getToken()})
             if(response.success){
-                this.getPrimaryList();
+                this.getPrimaryList(1);
                 document.getElementById('close_create_modal').click();
             }
             else{
