@@ -38,4 +38,9 @@ class AssetItemEquipmentAssignController extends Controller
         $equipmentAssigns = $this->assetItemEquipmentAssignRepo->getEquipmentAssigns();
         ResponseData($equipmentAssigns);
     }
+
+    public function getEquipmentAssignsByStaffId($staff_id, $request){
+        $equipmentAssigns = $this->assetItemEquipmentAssignRepo->getEquipmentAssignsByStaffId($staff_id, $request);
+        ResponseData($equipmentAssigns);
+    }
 }

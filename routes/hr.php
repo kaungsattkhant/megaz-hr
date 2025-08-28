@@ -131,7 +131,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/asset-assignments', 'getAssetAssigns');
     Route::post('/equipment-assignments', 'createEquipmentAssign');
     Route::get('/equipment-assignments', 'getEquipmentAssigns');
+    Route::get('/equipment-assignments/staff/{staff_id}', 'getEquipmentAssignsByStaffId');
   });
+
 
   Route::prefix('hr')->controller(HandBookeController::class)->group(function () {
     Route::post('/hand-books', 'updateOrCreateHandBook');

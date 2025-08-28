@@ -70,16 +70,16 @@ class InventoryRepository implements InventoryRepositoryInterface
         $data = $request->all();
         DB::beginTransaction();
         try {
-            if (!isset($request->id)) {
+            if (!isset($data['id'])) {
                 $data['id'] = null;
             }
-            $request_inventoryable_id = $request->inventoryable_id;
+            $request_inventoryable_id = $data['inventoryable_id'];
 
             $inventory = Inventory::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );
-            if (!isset($request->id)) {
+            if (!isset($data['id'])) {
                 foreach ($request_inventoryable_id as $id) {
                     $inventoryable = $inventory->inventoryable()->create([
                         'inventoryable_type' => $request->inventoryable_type,
@@ -93,7 +93,6 @@ class InventoryRepository implements InventoryRepositoryInterface
                 $deleted_ids = array_diff($inventoryable_id, $request_inventoryable_id);
 
                 if (count($created_ids)) {
-                    // dd('ab');
                     foreach ($created_ids as $id) {
                         $inventoryable = $inventory->inventoryable()->create([
                             'inventoryable_type' => 'department',
