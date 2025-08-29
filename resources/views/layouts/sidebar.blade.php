@@ -70,6 +70,27 @@
                                                 Trial Balance
                                             </a>
                                     </li>
+                                    <li>
+                                            <a href="/sale_ledger"
+                                                class="flex items-center text-left @yield('sale_ledger')">
+                                                <i class="fal fa-braille pr-3"></i>
+                                                Sale Ledger
+                                            </a>
+                                    </li>
+                                    <li>
+                                            <a href="/sale_ledger_ktv"
+                                                class="flex items-center text-left @yield('sale_ledger_ktv')">
+                                                <i class="fal fa-braille pr-3"></i>
+                                                Sale Ledger Ktv
+                                            </a>
+                                    </li>
+                                    <li>
+                                            <a href="/sale_ledger_restaurant"
+                                                class="flex items-center text-left @yield('sale_ledger_restaurant')">
+                                                <i class="fal fa-braille pr-3"></i>
+                                                Sale Ledger Restaurant
+                                            </a>
+                                    </li>
                                     @if (checkFeaturePermission('ap-balance'))
 
                                         <li>
@@ -1364,6 +1385,13 @@
                             <i class="fal fa-door-open"></i>
                             <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
                             Equipment Assignment
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/asset_assignment" class="flex items-center @yield('asset_assignment') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            Asset Assignment
                         </a>
                     </li>
                     <li>
