@@ -16,7 +16,7 @@ class StaffEquipmentAssignResource extends JsonResource
     {
         $baseQuantity = 0;
         $uomQuantity = 0;
-        if($this->uom_type == "uom" &&   $this->uom_quantity < $this->item->uom_conversion){
+        if( !empty($this->uom_type) && $this->uom_type == "uom" && $this->uom_quantity < $this->item->uom_conversion){
             $uomQuantity = $this->uom_quantity;
         }else{
             $baseQuantity = floor($this->uom_quantity / $this->item->uom_conversion); //full pkt,
