@@ -93,6 +93,6 @@ class InventoryAPIController extends Controller
     public function getInventoryItemsByStaff($areaId)
     {
         $inventoryItems = $this->inventoryRepo->getInventoryItemsByStaff($areaId);
-        ResponseData(AreaEquipmentResource::collection($inventoryItems));
+        ResponseData($inventoryItems);
     }
 }

@@ -150,7 +150,7 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function inventoryList()
     {
-        $inventoryId = UserData()->inventories->pluck('id')->first();
+        $inventoryId = UserData()->inventories->pluck('id')->toArray();
         $toInventory = Inventory::where('is_active', 1)
             ->whereNotIn('id', $inventoryId)
             ->get();
@@ -216,9 +216,48 @@ class InventoryRepository implements InventoryRepositoryInterface
         ->whereHas('inventory_ledger.inventory.inventoryable', function($query) use ($areaId) {
             $query->where('inventoryable_type', 'area')
                     ->where('inventoryable_id', $areaId);
-        })->groupBy('item_id')
+        })
         ->get();
 
-        return $inventoryItems;
+        if($inventoryItems->isEmpty()){
+            return ResponseData([], 404, false, 'AreaEquipments not found.');
+        }
+
+        $result = $inventoryItems->groupBy('item_id')
+        ->map(function ($items, $itemId) {
+            $firstItem = $items->first();
+            $item = $firstItem->item;
+            $conversion =  $item->conversion;
+            $baseUom =  $item->base_uom_name;
+            $uom =  $item->item_uom;
+            $inQuantity = $items->filter(function ($item) {
+                return $item->inventory_ledger->action === "in";
+            })->sum('quantity');
+            
+            
+            $outQuantity = $items->filter(function ($item) {
+                return $item->inventory_ledger->action === "out";
+            })->sum('quantity');
+            $currentQuantity = max(0, $inQuantity - $outQuantity);
+
+            $baseQuantity =  floor($currentQuantity / $conversion);
+            $uomQuantity = $currentQuantity % $conversion;
+            // $areaInventoryable = collect($firstItem->inventory_ledger->inventory->inventoryable)
+            //     ->firstWhere('inventoryable_type', 'area');
+            // $area = $areaInventoryable ? $areaInventoryable->inventoryable : null;
+            
+            return [
+                'id' => $firstItem->id,
+                'item_id' => $itemId,
+                'item_name' => $item->name,
+                'base_quantity' =>  $baseQuantity,
+                'base_uom' => $baseUom,
+                'uom_quantity' => $uomQuantity,
+                'uom' => $uom,
+            ];
+        })
+        ->values();
+        
+    return $result;
     }
 }

@@ -14,13 +14,25 @@ class StaffEquipmentAssignResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $baseQuantity = 0;
+        $uomQuantity = 0;
+        if($this->uom_type == "uom" &&   $this->uom_quantity < $this->item->uom_conversion){
+            $uomQuantity = $this->uom_quantity;
+        }else{
+            $baseQuantity = floor($this->uom_quantity / $this->item->uom_conversion); //full pkt,
+            $uomQuantity = $this->uom_quantity % $this->item->uom_conversion; //remaining pcs
+        }
         return [
             'id' => $this->id,
             'staff_id' => $this->staffEquipment->staff_id ?? null,
             'item_id' => $this->item_id,
             'item' => $this->item->name ?? null,
-            'quantity' => $this->quantity ?? null,
-            'uom_name' => $this->uom->name ?? null,
+            'base_quantity' => $baseQuantity,
+            'base_uom_name' => $this->item->base_uom_name ?? null,
+            'uom_quantity' => $uomQuantity,
+            'uom_name' => $this->item->item_uom ?? null,
+            // 'uom_type' => $this->uom_type,
+            // 'uom_conversion' => $this->item->uom_conversion ?? null,
         ];
     }
 }

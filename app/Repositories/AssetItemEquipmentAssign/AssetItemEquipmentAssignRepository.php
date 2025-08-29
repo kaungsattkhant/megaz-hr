@@ -62,13 +62,13 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         return ResponseMessage('Invalid JSON data provided for equipments.', 400);
       }
       foreach ($equipments as $equipment) {
-
         $checkExist = StaffEquipmentAssign::where('staff_equipment_id', $staffEquip->id)
           ->where('item_id', $equipment['item_id'])
           ->first();
         if ($checkExist) {
           ResponseMessage('Equipment item already assigned to this staff', 400);
         }
+
         $uom_quantity = null;
         $equipAssign = null;
         if (isset($equipment['uom_type']) && $equipment['uom_type'] == "base_uom") {
@@ -133,6 +133,9 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         $query->where('staff_id', $staff_id);
       })
       ->orderBy('id', 'desc')->get();
+      if($equipmentAssigns->isEmpty()){
+        return ResponseData([], 404, false, 'Equipment Assigns not found.');
+    }
     return $equipmentAssigns;
   }
 
