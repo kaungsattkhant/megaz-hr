@@ -199,6 +199,9 @@ use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningIn
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
 
+use App\Repositories\SaleLedgerReport\SaleLedgerReportRepositoryInterface;
+use App\Repositories\SaleLedgerReport\SaleLedgerReportRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -299,5 +302,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AssetItemEquipmentAssignRepositoryInterface::class, AssetItemEquipmentAssignRepository::class);
         $this->app->bind(HandBookInterface::class, HandBookRepository::class);
         $this->app->bind(AccruedRepositoryInterface::class, AccruedRepository::class);
+        $this->app->bind(SaleLedgerReportRepositoryInterface::class, SaleLedgerReportRepository::class);
     }
 }

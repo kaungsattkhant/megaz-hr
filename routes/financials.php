@@ -5,6 +5,7 @@ use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\AccountPayableController;
 use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\FinancialReportController;
+use App\Http\Controllers\API\SalesLedgerReportController;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(FinancialReportController::class)->group(function () {
@@ -26,9 +27,12 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(CashbookController::class)->group(function () {
         Route::get('get_cashbook_closing_history','getCashbookClosingHistory');
     });
-
 });
 
 Route::controller(FinancialReportController::class)->group(function () {
     Route::get('profit_and_loss', 'getProfitAndLoss');
+});
+
+Route::controller(SalesLedgerReportController::class)->group(function () {
+    Route::get('get_sale_ledgers','getSaleLedgerReport');
 });

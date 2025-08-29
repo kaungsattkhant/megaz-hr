@@ -378,9 +378,10 @@ Route::middleware(['departments:creditor-balance'])->group(function () {
 });
 
 
-Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
+// Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
     Route::view('/asset_depreciation_balance_list', 'asset_depreciation_balance.index')->name('asset_list');
-});
+    Route::view('/fix_asset_depreciation', 'asset_depreciation_balance.fix_asset_depreciation')->name('fix_asset_depreciation');
+// });
 
 
 // test
@@ -751,6 +752,9 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/cashbook_history', 'cashbook.history')->name('cashbook.history');
     Route::view('/accruals', 'accruals.index')->name('accruals.index');
     Route::view('/accruals/detail/{id}', 'accruals.detail')->name('accruals.detail');
+    Route::view('/sale_ledger', 'sale_ledgers.index')->name('sale_ledgers.index');
+    Route::view('/sale_ledger_ktv', 'sale_ledgers.sale_ledger_ktv')->name('sale_ledgers.sale_ledger_ktv');
+    Route::view('/sale_ledger_restaurant', 'sale_ledgers.sale_ledger_restaurant')->name('sale_ledgers.sale_ledger_restaurant');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');

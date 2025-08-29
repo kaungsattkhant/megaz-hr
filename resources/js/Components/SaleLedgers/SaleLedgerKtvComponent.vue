@@ -3,7 +3,7 @@
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
-                    Current Asset Depreciation
+                    Sale Ledger KTV
                 </p>
             </div>
             <div class="btn-container">
@@ -23,11 +23,11 @@
 
                 <div class="flex justify-end flex-col">
 
-                    <button type="button"
+                    <!-- <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
                         Add New
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -38,107 +38,106 @@
                     <table class="primary-table">
                         <thead class="">
                             <tr>
-                                <th scope="col" class="">
-                                    Sr.No
+                                <th scope="col" class="text-center">
+                                    Date
                                 </th>
-                                <th scope="col" class=" text-left">
-                                    Particular
+                                <th scope="col" class=" text-right">
+                                    Food
                                 </th>
-                                <th scope="col" class="">
-                                    Original Cost
+                                <th scope="col" class="text-right">
+                                    Beverage
                                 </th>
-                                <th scope="col" class="">
-                                    Addition During Year
+                                <th scope="col" class="text-right">
+                                    Room
                                 </th>
-                                <th scope="col" class="">
-                                    Total Cost
+                                <th scope="col" class="text-right">
+                                    Other
                                 </th>
-                                <th scope="col" class="">
-                                    Current Month
+                                <th scope="col" class="text-right">
+                                    Service
                                 </th>
-                                <th scope="col" class="">
-                                    Addition Duration Year
+                                <th scope="col" class="text-right">
+                                    Amount
                                 </th>
-                                <th scope="col" class="">
-                                    Total Depreciation
-                                </th>
-                                <th scope="col" class="">
-                                    Book Value
-                                </th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-
-                            <div class="contents" v-for="(asset, index) in current_asset?.data" :key="index">
+                            <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
-                                    <td class="  ">
-                                        {{ ++index }}
+                                    <td class="  text-center">
+                                        {{ item.report_date }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left ">
-                                        {{ asset.name }}
-                                    </td>
-
-                                    <td class="whitespace-nowrap  ">
-                                        {{ asset.original_cost }}
-
-                                    </td>
-                                    <td class="whitespace-nowrap ">
-                                        {{ asset.addition_year_cost }}
-
-                                    </td>
-                                    <td class="whitespace-nowrap ">
-                                        {{ asset.total_cost }}
-
-                                    </td>
-                                    <td class="whitespace-nowrap ">
-                                        {{ asset.current_month_depreciation }}
-
+                                    <td class="whitespace-nowrap text-right ">
+                                        {{ item.Food_Total }}
                                     </td>
 
-                                    <td class="whitespace-nowrap ">
-                                        {{ asset.addition_year_depreciation }}
+                                    <td class="whitespace-nowrap text-right ">
+                                        {{ item.Beverage_Total }}
+
+                                    </td>
+                                    <td class="whitespace-nowrap text-right">
+                                        {{ item.Room_Charges }}
+
+                                    </td>
+                                    <td class="whitespace-nowrap text-right">
+                                        {{ item.Other_Charges }}
+
+                                    </td>
+                                    <td class="whitespace-nowrap text-right">
+                                        {{ item.Service_Charge }}
 
                                     </td>
 
-                                    <td class="whitespace-nowrap ">
-                                        {{ asset.total_depreciation }}
+                                    <td class="whitespace-nowrap text-right">
+                                        {{ item.All_Total }}
 
                                     </td>
-
-                                    <td class="whitespace-nowrap ">
-                                        {{ asset.book_value }}
-
-                                    </td>
+                                    <td></td>
                                 </tr>
                             </div>
+                            <!-- <tr>
+                                <td>
+                                    <p>
+                                        Total: {{
+                                          primaryList.reduce((sum, item) => sum + Number(item.All_Total), 0)
+                                        }}
+                                      </p>
+                                </td>
+                            </tr> -->
+                            <!-- 
                             <tr class=" !rounded-none">
                                 <td></td>
-                                <td class="  !font-semibold !rounded-none  text-left" colspan="1">
+                                <td class="  !font-semibold !rounded-none text-left" colspan="1">
                                     Total
                                 </td>
 
                                 <td class="whitespace-nowrap  !font-semibold">
-                                    {{ current_asset.total_original_cost }}
+                                    {{ fix_asset_untangible.total_original_cost }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total_addition_year }}
+                                    {{ fix_asset_untangible.total_addition_year }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total }}
+                                    {{ fix_asset_untangible.total }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
 
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total_addition_during_year }}
+                                    {{ fix_asset_untangible.total_addition_during_year }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total_depreciation }}
+                                    {{ fix_asset_untangible.total_depreciation }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold !rounded-none">
-                                    {{ current_asset.boototal_book_valuek_value }}
+                                    {{ fix_asset_untangible.boototal_book_valuek_value }}
                                 </td>
-                            </tr>
+                            </tr> -->
+
+                            <!-- looping end -->
+
+
                         </tbody>
                     </table>
                 </div>
@@ -162,9 +161,8 @@
         data() {
             return {
 
-                assetDepreciationBalance:[],
+                primaryList:[],
 
-                current_asset: null,
                 currentDate:'',
                 filterDate:null
             };
@@ -173,17 +171,17 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getAssetDepreciationBalanceList(date) {
-                const response = await getApiData({ url: `/api/get_depreciation_balance?type=current_asset&date=${date}`, token: this.getToken() });
+            async getPrimaryList(date) {
+                const response = await getApiData({ url: `/api/get_sale_ledgers?date=${date}&type=ktv`, token: this.getToken() });
                 console.log(response);
                 if(response){
-                    this.current_asset = response.data.current_asset;
+                    this.primaryList = response.data;
                 }
             },
 
             filterDateAsset(date)
             {
-             this.getAssetDepreciationBalanceList(date);
+             this.getPrimaryList(date);
             },
 
             getCurrentDate() {
@@ -200,7 +198,8 @@
         mounted()
         {
             this.currentDate = this.getCurrentDate();
-            this.getAssetDepreciationBalanceList(this.currentDate);
+            this.filterDate = this.getCurrentDate();
+            this.getPrimaryList(this.currentDate);
 
         }
     }
