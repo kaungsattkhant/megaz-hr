@@ -234,7 +234,6 @@ class InventoryRepository implements InventoryRepositoryInterface
                 return $item->inventory_ledger->action === "in";
             })->sum('quantity');
             
-            
             $outQuantity = $items->filter(function ($item) {
                 return $item->inventory_ledger->action === "out";
             })->sum('quantity');

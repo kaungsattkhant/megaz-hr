@@ -482,6 +482,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
         Route::get('brand_list_of_supplier_by_item/{item_id}', 'brandlistOfSupplierByItem');
         Route::get('brand_list_of_by_item/{item_id}', 'brandlistOfSupplierByItem');
+        Route::get('equipment-items', 'equipmentItem');
     });
     //invoice transaction
     Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
