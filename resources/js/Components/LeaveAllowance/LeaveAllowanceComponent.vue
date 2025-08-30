@@ -90,13 +90,13 @@
                                         {{ leave.allowanceable?.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.allowanceable?.roles ? leave.allowanceable.roles[0].name : leave.allowanceable.name }}
+                                        {{ leave.allowanceable?.roles ? leave.allowanceable.roles[0].name : leave.allowanceable?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.allowanceable_type === 'staff' ? leave.allowanceable.name : '--' }}
+                                        {{ leave.allowanceable_type === 'staff' ? leave.allowanceable?.name : '--' }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.leave_category.name }}
+                                        {{ leave.leave_category?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
