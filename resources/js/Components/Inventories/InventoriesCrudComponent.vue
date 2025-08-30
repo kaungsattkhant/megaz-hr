@@ -181,8 +181,7 @@
                                     <option value="department">Department</option>
                                 </select>
                             </div>
-
-                            <div class="mb-4" v-if="inventoryableList.length > 0">
+                            <!-- <div class="mb-4" v-if="inventoryableList.length > 0">
                                 <label v-if="selectedInventoryType == 'area'" for="" class="block text-sm text-black mb-3">
                                     Area
                                 </label>
@@ -199,10 +198,78 @@
 
                                 <span v-for="inventoryableId in inventoryableIds" :key="inventoryableId"> {{
                                     inventoryableId.name }}, </span>
+                            </div> -->
+
+
+
+
+
+
+
+                            <div class="mb-4" v-if="inventoryableList.length > 0 && selectedInventoryType == 'area'">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Area
+                                </label>
+                                <select name="" id="" v-model="selectedInventoryable"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    @change="inventoryableSelectChanged">
+                                    <option :value="inventoryable" v-for="(inventoryable, index) in inventoryableList"
+                                        :key="index">{{ inventoryable.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-4" v-if="inventoryableList.length > 0 && selectedInventoryType == 'department'">
+                                <label v-if="selectedInventoryType == 'department'" for=""
+                                    class="block text-sm text-black mb-3">
+                                    Department
+                                </label>
+                                <select name="" id="" v-model="selectedInventoryable"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    @change="inventoryableSelectChanged">
+                                    <option :value="inventoryable" v-for="(inventoryable, index) in inventoryableList"
+                                        :key="index">{{ inventoryable.name }}</option>
+                                </select>
                             </div>
 
                         </div>
-                        <div class="flex justify-center px-12 mb-6">
+                        
+
+                        <div class="grid grid-cols-3 gap-x-4 px-12">
+
+                            <div class="col-span-1">
+                                <p>
+                                    Type
+                                </p>
+                            </div>
+                            <div class="col-span-1">
+                                <p>
+                                    Department
+                                </p>
+                            </div>
+                            <div class="col-span-1">
+                                <p>
+                                    Area
+                                </p>
+                            </div>
+                            <!-- <div class="contents" v-if="selectedAnswerList.length > 0" v-for="(q,index) in selectedAnswerList">
+                                <div class="col-span-3">
+                                    <p>
+                                        {{ q.answer }}
+                                    </p>
+                                </div>
+                                <div class="col-span-1">
+                                    <p>
+                                        {{ q.mark }}
+                                    </p>
+                                </div>
+                                <div class="col-span-1">
+                                    <button>
+                                        <i class="fal fa-times" @click="deleteSeleted(index,selectedAnswerList)" ></i>
+                                    </button>
+                                </div>
+                            </div> -->
+
+                        </div>
+                        <div class="flex justify-end px-12 mb-6">
                             <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create

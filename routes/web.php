@@ -718,9 +718,9 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::middleware(['departments:jd'])->group(function () {
         Route::view('/JD', 'job_description.index')->name('job_description.index');
     });
-    Route::middleware(['departments:js'])->group(function () {
+    // Route::middleware(['departments:js'])->group(function () {
         Route::view('/JS', 'job_specifications.index')->name('job_specifications.index');
-    });
+    // });
     Route::middleware(['departments:js.create'])->group(function () {
         Route::view('/JS/create', 'job_specifications.create')->name('job_specifications.create');
     });

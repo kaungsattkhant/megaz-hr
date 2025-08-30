@@ -267,7 +267,10 @@ export default {
             let response = await getApiData({ url: `/api/hr/salary_setups/${this.salarySetupId}`, token: this.getToken() });
             if (response.data) {
                 this.detail = response.data;
-                this.addDetail(response.data);
+                setTimeout(() => {
+                    this.addDetail(response.data);
+                }, 200);
+                
             }
         },
         addDetail(detail){

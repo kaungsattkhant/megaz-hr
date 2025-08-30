@@ -1348,7 +1348,7 @@
                     @endif
                     @if (checkFeaturePermission('js'))
                     <li>
-                        <a href="/JS" class="flex items-center @yield('JS') sidebar-gap-x">
+                        <a href="/JS" class="flex items-center @yield('js') sidebar-gap-x">
                             <i class="fal fa-briefcase"></i>
                             <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
                             JS

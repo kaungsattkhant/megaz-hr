@@ -174,7 +174,7 @@ export default {
             }
         },
         async getEquipmentList(){
-            let response = await getApiData({ url: '/api/items', token: this.getToken() });
+            let response = await getApiData({ url: '/api/equipment-items', token: this.getToken() });
             if (response.data) {
                 this.equipmentList = response.data;
             }
