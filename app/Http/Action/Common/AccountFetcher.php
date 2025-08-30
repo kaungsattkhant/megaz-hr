@@ -3,6 +3,7 @@
 namespace App\Http\Action\Common;
 
 use App\Models\Account;
+use App\Models\SubAccount;
 
 class AccountFetcher
 {
@@ -32,5 +33,15 @@ class AccountFetcher
         }
 
         return $account;
+    }
+
+    public function getAccountsBySubAccount($subAccountCode)
+    {
+        $subAccount = SubAccount::with('accounts')->where('code',$subAccountCode)->first();
+        if(!$subAccount){
+            ResponseMessage('Sub-Account with given code not found', 404);
+        }
+        $accounts = $subAccount->accounts;
+        return $accounts;
     }
 }

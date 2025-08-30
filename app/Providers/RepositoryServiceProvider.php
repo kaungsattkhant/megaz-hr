@@ -201,6 +201,8 @@ use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository
 
 use App\Repositories\SaleLedgerReport\SaleLedgerReportRepositoryInterface;
 use App\Repositories\SaleLedgerReport\SaleLedgerReportRepository;
+use App\Repositories\CustomerDepositReport\CustomerDepositReportRepositoryInterface;
+use App\Repositories\CustomerDepositReport\CustomerDepositReportRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -303,5 +305,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(HandBookInterface::class, HandBookRepository::class);
         $this->app->bind(AccruedRepositoryInterface::class, AccruedRepository::class);
         $this->app->bind(SaleLedgerReportRepositoryInterface::class, SaleLedgerReportRepository::class);
+        $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
     }
 }
