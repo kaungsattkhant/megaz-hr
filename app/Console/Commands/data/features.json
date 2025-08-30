@@ -715,9 +715,14 @@
         "slug": "fix-asset.create"
     },
     {
-        "module": "asset-depreciation-balance",
+        "module": "asset-depreciation-balance", 
         "name": "Asset Depreciation Balance",
-        "slug": "asset-depreciation-balance"
+        "slug": "asset-depreciation-balance" 
+    },
+    {
+        "module": "fix-asset-depreciation-balance",
+        "name": "Fix Asset Depreciation Balance",
+        "slug": "fix-asset-depreciation-balance"
     },
     {
         "module": "account-payable",
