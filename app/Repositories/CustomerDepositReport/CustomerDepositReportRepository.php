@@ -13,13 +13,17 @@ class CustomerDepositReportRepository implements CustomerDepositReportRepository
         ->selectRaw("
             c.name,
 
+            CAST(
             IFNULL(SUM(CASE WHEN cd.type = 'deposit' AND cd.date_time < ? THEN cd.amount
-                            WHEN cd.type = 'withdrawal' AND cd.date_time < ? THEN -cd.amount END), 0) as Opening_Balance,
+                            WHEN cd.type = 'withdrawal' AND cd.date_time < ? THEN -cd.amount END), 0) AS DOUBLE) as Opening_Balance,
 
-            IFNULL(SUM(CASE WHEN cd.type = 'deposit' AND cd.date_time >= ? AND cd.date_time < ? THEN cd.amount END), 0) as Deposit_Total,
+            CAST(
+            IFNULL(SUM(CASE WHEN cd.type = 'deposit' AND cd.date_time >= ? AND cd.date_time < ? THEN cd.amount END), 0) AS DOUBLE) as Deposit_Total,
 
-            IFNULL(SUM(CASE WHEN cd.type = 'withdrawal' AND cd.date_time >= ? AND cd.date_time < ? THEN cd.amount END), 0) as Withdrawal_Total,
+            CAST(
+            IFNULL(SUM(CASE WHEN cd.type = 'withdrawal' AND cd.date_time >= ? AND cd.date_time < ? THEN cd.amount END), 0) AS DOUBLE) as Withdrawal_Total,
 
+            CAST(
             (
                 IFNULL(SUM(CASE WHEN cd.type = 'deposit' AND cd.date_time < ? THEN cd.amount
                                 WHEN cd.type = 'withdrawal' AND cd.date_time < ? THEN -cd.amount END), 0)
@@ -27,7 +31,7 @@ class CustomerDepositReportRepository implements CustomerDepositReportRepository
                 IFNULL(SUM(CASE WHEN cd.type = 'deposit' AND cd.date_time >= ? AND cd.date_time < ? THEN cd.amount END), 0)
                 -
                 IFNULL(SUM(CASE WHEN cd.type = 'withdrawal' AND cd.date_time >= ? AND cd.date_time < ? THEN cd.amount END), 0)
-            ) as Closing_Balance
+            ) AS DOUBLE) as Closing_Balance
         ", [
             $startDate, $startDate,  // opening balance
             $startDate, $endDate,    // deposits

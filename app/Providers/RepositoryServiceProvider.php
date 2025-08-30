@@ -203,6 +203,8 @@ use App\Repositories\SaleLedgerReport\SaleLedgerReportRepositoryInterface;
 use App\Repositories\SaleLedgerReport\SaleLedgerReportRepository;
 use App\Repositories\CustomerDepositReport\CustomerDepositReportRepositoryInterface;
 use App\Repositories\CustomerDepositReport\CustomerDepositReportRepository;
+use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepositoryInterface;
+use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -306,5 +308,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AccruedRepositoryInterface::class, AccruedRepository::class);
         $this->app->bind(SaleLedgerReportRepositoryInterface::class, SaleLedgerReportRepository::class);
         $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
+        $this->app->bind(DepositAndReceivableReportRepositoryInterface::class, DepositAndReceivableReportRepository::class);
     }
 }

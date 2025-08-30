@@ -37,7 +37,7 @@ class AccountFetcher
 
     public function getAccountsBySubAccount($subAccountCode)
     {
-        $subAccount = SubAccount::with('accounts')->where('code',$subAccountCode)->first();
+        $subAccount = SubAccount::with('accounts')->where('account_code',$subAccountCode)->first();
         if(!$subAccount){
             ResponseMessage('Sub-Account with given code not found', 404);
         }

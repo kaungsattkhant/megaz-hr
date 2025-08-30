@@ -7,6 +7,7 @@ use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\FinancialReportController;
 use App\Http\Controllers\API\SalesLedgerReportController;
 use App\Http\Controllers\API\CustomerDepositReportController;
+use App\Http\Controllers\API\DepositReceivableReportController;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(FinancialReportController::class)->group(function () {
@@ -40,4 +41,7 @@ Route::controller(SalesLedgerReportController::class)->group(function () {
 
 Route::controller(CustomerDepositReportController::class)->group(function () {
     Route::get('get_customer_deposits','getCustomerDepositReport');
+});
+Route::controller(DepositReceivableReportController::class)->group(function () {
+    Route::get('get_deposit_receivable_balance','getDepositReceivalbeBalance');
 });
