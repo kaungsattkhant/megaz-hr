@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
     build: {
-        sourcemap: process.env.NODE_ENV !== 'production'
+        sourcemap: process.env.NODE_ENV === 'development'
     },
     plugins: [
         vue(),
