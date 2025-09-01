@@ -49,4 +49,34 @@ class CheckInResource extends JsonResource
 
         return null;
     }
+
+    public static function collection($resource)
+    {
+        $collection = parent::collection($resource);
+        if ($resource instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            $response = [
+                'data' => $collection->collection,
+                'links' => [
+                    'first' => $resource->url(1),
+                    'last' => $resource->url($resource->lastPage()),
+                    'prev' => $resource->previousPageUrl(),
+                    'next' => $resource->nextPageUrl(),
+                ],
+                'meta' => [
+                    'current_page' => $resource->currentPage(),
+                    'from' => $resource->firstItem(),
+                    'last_page' => $resource->lastPage(),
+                    'links' => $resource->linkCollection()->toArray(),
+                    'path' => $resource->path(),
+                    'per_page' => $resource->perPage(),
+                    'to' => $resource->lastItem(),
+                    'total' => $resource->total(),
+                ],
+                'success' => true
+            ];
+            $collection->withResponse(request(), response()->json($response));
+        }
+        
+        return $collection;
+    }
 }
