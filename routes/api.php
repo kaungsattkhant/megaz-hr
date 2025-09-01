@@ -319,6 +319,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
     Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
     Route::get('inventory_list', [InventoryAPIController::class, 'inventoryList']);
+    Route::get('area-equipments/{areaId}', [InventoryAPIController::class, 'getInventoryItemsByStaff']);
     Route::controller(InventoryAPIController::class)->group(function () {
         Route::get('inventory_ledger_list', 'getInventoryLedgerList');
         Route::post('inventory_item', 'createInventoryItem');
@@ -481,6 +482,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
         Route::get('brand_list_of_supplier_by_item/{item_id}', 'brandlistOfSupplierByItem');
         Route::get('brand_list_of_by_item/{item_id}', 'brandlistOfSupplierByItem');
+        Route::get('equipment-items', 'equipmentItem');
     });
     //invoice transaction
     Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);

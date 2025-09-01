@@ -195,9 +195,19 @@
                         <label for="" class="label-form mb-3">
                             Category
                         </label>
+                        <!-- <multiselect
+                        v-model="selectedCategory"
+                        :options="categoryList"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Category"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="false" ></multiselect> -->
                         <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Category"
+                            <select data-te-select-init data-te-select-placeholder="Select Category" disabled
                                 data-te-select-filter="true" name="" id="" v-model="selectedCategory" class="input-ui !text-black">
                                 <option :value="category" v-for="(category, index) in categoryList"
                                     :key="index"> {{ category.name }} </option>
@@ -336,6 +346,12 @@ export default {
             // }
             if (response.data) {
                 this.primaryList = response.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = response.pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+                this.selectedCategory = this.categoryList.find(item => item.value = this.primaryList[0].category);
+                this.selectedAccount = this.accountList.find(item => item.value = this.primaryList[0].category);
             }
         },
         async getExpenseAccountList() {
@@ -370,7 +386,10 @@ export default {
         
 
         addBtnClicked(){
-            // this.shiftName = null;
+            this.selectedType = null;
+            this.amount = null;
+            this.selectedAccount = null;
+            this.selectedCashbook = null;
         },
         btnClickedAddAccrual(){
             if(!this.selectedType){
@@ -381,8 +400,16 @@ export default {
                 this.alertValidationMessage(`Category`);
                 return 1;
             }
+            else if(!this.selectedAccount){
+                this.alertValidationMessage(`Account`);
+                return 1;
+            }
             else if(!this.amount){
-                this.alertValidationMessage(`amount`);
+                this.alertValidationMessage(`Amount`);
+                return 1;
+            }
+            else if(this.selectedType.value === 'settlement' && !this.selectedCashbook){
+                this.alertValidationMessage(`Cashbook`);
                 return 1;
             }
             else{
@@ -402,10 +429,16 @@ export default {
             }
             let response = await postApiData({url:`/api/accruals`, form_data:formData, token:this.getToken()})
             if(response.success){
-                this.getPrimaryList();
+                this.getPrimaryList(1);
                 document.getElementById('close_create_modal').click();
             }
-            this.getPrimaryList();
+            else{
+                this.$notify({
+                    title: 'Input validation',
+                    text: response.error,
+                    type: 'warn'
+                });
+            }
         },
 
 

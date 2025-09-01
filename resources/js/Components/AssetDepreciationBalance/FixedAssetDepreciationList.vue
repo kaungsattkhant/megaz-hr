@@ -3,7 +3,7 @@
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
-                    Current Asset Depreciation
+                    Fix Asset Depreciation Balance List
                 </p>
             </div>
             <div class="btn-container">
@@ -69,7 +69,12 @@
                         </thead>
                         <tbody>
 
-                            <div class="contents" v-for="(asset, index) in current_asset?.data" :key="index">
+                            <!-- looping start -->
+                             <tr>
+                                <td></td>
+                                <td colspan="1" class=" !font-semibold text-left">Fix Asset Tangiable</td>
+                             </tr>
+                            <div class="contents" v-for="(asset, index) in fix_asset_tangiable.data" :key="index">
                                 <tr class="">
                                     <td class="  ">
                                         {{ ++index }}
@@ -118,27 +123,112 @@
                                 </td>
 
                                 <td class="whitespace-nowrap  !font-semibold">
-                                    {{ current_asset?.total_original_cost }}
+                                    {{ fix_asset_tangiable.total_original_cost }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset?.total_addition_year }}
+                                    {{ fix_asset_tangiable.total_addition_year }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset?.total }}
+                                    {{ fix_asset_tangiable.total }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
 
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset?.total_addition_during_year }}
+                                    {{ fix_asset_tangiable.total_addition_during_year }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset?.total_depreciation }}
+                                    {{ fix_asset_tangiable.total_depreciation }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold !rounded-none">
-                                    {{ current_asset?.boototal_book_valuek_value }}
+                                    {{ fix_asset_tangiable.boototal_book_valuek_value }}
                                 </td>
                             </tr>
+
+                            <!-- looping end -->
+                            <tr class="!border-t-0">
+                                <td class="!border-b-0"></td>
+                            </tr>
+
+                            <!-- looping start -->
+                            <tr class=" !border-t-0">
+                                <td></td>
+                                <td colspan="1" class=" !font-semibold text-left">Fix Asset Unangiable</td>
+                             </tr>
+                            <div class="contents" v-for="(asset, index) in fix_asset_untangible.data" :key="index">
+                                <tr class="">
+                                    <td class="  ">
+                                        {{ ++index }}
+                                    </td>
+                                    <td class="whitespace-nowrap text-left">
+                                        {{ asset.name }}
+                                    </td>
+
+                                    <td class="whitespace-nowrap  ">
+                                        {{ asset.original_cost }}
+
+                                    </td>
+                                    <td class="whitespace-nowrap ">
+                                        {{ asset.addition_year_cost }}
+
+                                    </td>
+                                    <td class="whitespace-nowrap ">
+                                        {{ asset.total_cost }}
+
+                                    </td>
+                                    <td class="whitespace-nowrap ">
+                                        {{ asset.current_month_depreciation }}
+
+                                    </td>
+
+                                    <td class="whitespace-nowrap ">
+                                        {{ asset.addition_year_depreciation }}
+
+                                    </td>
+
+                                    <td class="whitespace-nowrap ">
+                                        {{ asset.total_depreciation }}
+
+                                    </td>
+
+                                    <td class="whitespace-nowrap ">
+                                        {{ asset.book_value }}
+
+                                    </td>
+                                </tr>
+                            </div>
+                            <tr class=" !rounded-none">
+                                <td></td>
+                                <td class="  !font-semibold !rounded-none text-left" colspan="1">
+                                    Total
+                                </td>
+
+                                <td class="whitespace-nowrap  !font-semibold">
+                                    {{ fix_asset_untangible.total_original_cost }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ fix_asset_untangible.total_addition_year }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ fix_asset_untangible.total }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ fix_asset_untangible.total_addition_during_year }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold">
+                                    {{ fix_asset_untangible.total_depreciation }}
+                                </td>
+                                <td class="whitespace-nowrap !font-semibold !rounded-none">
+                                    {{ fix_asset_untangible.boototal_book_valuek_value }}
+                                </td>
+                            </tr>
+
+                            <!-- looping end -->
+
+
                         </tbody>
                     </table>
                 </div>
@@ -164,7 +254,8 @@
 
                 assetDepreciationBalance:[],
 
-                current_asset: null,
+                fix_asset_tangiable: [],
+                fix_asset_untangible: [],
                 currentDate:'',
                 filterDate:null
             };
@@ -174,10 +265,11 @@
             ...mapGetters(['getToken']),
 
             async getAssetDepreciationBalanceList(date) {
-                const response = await getApiData({ url: `/api/get_depreciation_balance?type=current_asset&date=${date}`, token: this.getToken() });
+                const response = await getApiData({ url: `/api/get_depreciation_balance?type=fix_asset&date=${date}`, token: this.getToken() });
                 console.log(response);
                 if(response){
-                    this.current_asset = response.data.current_asset;
+                    this.fix_asset_tangiable = response.data.fix_asset_tangiable;
+                    this.fix_asset_untangible = response.data.fix_asset_untangible;
                 }
             },
 
@@ -200,6 +292,7 @@
         mounted()
         {
             this.currentDate = this.getCurrentDate();
+            this.filterDate = this.getCurrentDate();
             this.getAssetDepreciationBalanceList(this.currentDate);
 
         }

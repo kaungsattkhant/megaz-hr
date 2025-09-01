@@ -177,6 +177,7 @@ import DutyComponent from './Components/Duty/DutyComponent.vue';
 import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
 import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
 import AssetDepreciationBalanceList from './Components/AssetDepreciationBalance/AssetDepreciationBalanceList.vue';
+import FixedAssetDepreciationList from './Components/AssetDepreciationBalance/FixedAssetDepreciationList.vue';
 import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue';
 import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue';
 import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue';
@@ -262,6 +263,9 @@ import PosCashbookHistoryComponent from './Components/Pos/Cashbook/PosCashbookHi
 import CashbookHistoryComponent from './Components/Cashbook/CashbookHistoryComponent.vue';
 import AccrualsCrudComponent from './Components/Accruals/AccrualsCrudComponent.vue';
 import AccrualsListComponent from './Components/Accruals/AccrualsListComponent.vue';
+import SaleLedgerComponent from './Components/SaleLedgers/SaleLedgerComponent.vue';
+import SaleLedgerKtvComponent from './Components/SaleLedgers/SaleLedgerKtvComponent.vue';
+import SaleLedgerRestaurantComponent from './Components/SaleLedgers/SaleLedgerRestaurantComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -422,6 +426,7 @@ app.component('ItemUsageForecastListMonth',ItemUsageForecastListMonth);
 app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthWithDepartment);
 app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
 app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
+app.component('FixedAssetDepreciationList',FixedAssetDepreciationList);
 app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
 app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
 app.component('SaleTargetPositionEditComponent',SaleTargetPositionEditComponent);
@@ -504,6 +509,9 @@ app.component('PosCashbookHistoryComponent',PosCashbookHistoryComponent);
 app.component('CashbookHistoryComponent',CashbookHistoryComponent);
 app.component('AccrualsCrudComponent',AccrualsCrudComponent);
 app.component('AccrualsListComponent',AccrualsListComponent);
+app.component('SaleLedgerComponent',SaleLedgerComponent);
+app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
+app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
 
 
 app.use(store);
