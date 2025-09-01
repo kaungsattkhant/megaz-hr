@@ -64,6 +64,8 @@ class CheckInResource extends JsonResource
                 ],
                 'meta' => [
                     'current_page' => $resource->currentPage(),
+                    'next_page_url' => $resource->nextPageUrl(),
+                    'prev_page_url' => $resource->previousPageUrl(),
                     'from' => $resource->firstItem(),
                     'last_page' => $resource->lastPage(),
                     'links' => $resource->linkCollection()->toArray(),
