@@ -50,7 +50,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/salary_setups/{id}', 'getSalarySetUpById');
     Route::post('/salary_setups/{id}', 'updateSalarySetUp');
     Route::delete('/salary_setup/salary_allowances/{salaryAllowanceId}', 'deleteSalaryAllowance');
+    Route::get('/salary-setup-by-role/{roleId}', 'getSalarySetupByRoleId');
     Route::get('/salaries', 'getSalaries');
+    Route::post('/salaries','createSalary');
     Route::post('/salaries/{id}', 'updateBasicSalary');
     Route::get('/overtime_fees', 'getOvertimeFee');
     Route::post('/overtime_fees', 'createOvertimeFee');

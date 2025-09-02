@@ -44,6 +44,17 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function deleteJobDescription(int $jobDescriptionId)
     {
         $jobDescription = JobDescription::findOrFail($jobDescriptionId);
+        $jobSpecifications = jobSpecification::where('job_description_id', $jobDescriptionId)->get();
+        $jdSops = JdSop::where('job_description_id', $jobDescriptionId)->get();
+        if ($jobSpecifications->isNotEmpty() || $jdSops->isNotEmpty()) {
+            foreach ($jobSpecifications as $jobSpecification) {
+                $jobSpecification->delete();
+            }
+            foreach ($jdSops as $jdSop) {
+                $jdSop->sops()->delete();
+                $jdSop->delete();
+            }
+        }
         $jobDescription->delete();
         return $jobDescription;
     }
@@ -73,7 +84,7 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function getJobSpecification(Request $request)
     {
         $roleId = $request->role_id;
-        return JobSpecification::with(['jobDescription.role.department', 'createdBy'])
+        return JobSpecification::with(['jobDescription.role.department', 'createdBy', 'skills.role.department'])
             ->when($roleId, function ($query) use ($roleId) {
                 return $query->whereHas('jobDescription', function ($q) use ($roleId) {
                     $q->where('role_id', $roleId);
@@ -90,6 +101,7 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function deleteJobSpecification(int $jobSpecificationId)
     {
         $jobSpecification = JobSpecification::findOrFail($jobSpecificationId);
+        $jobSpecification->skills()->detach();
         $jobSpecification->delete();
         return $jobSpecification;
     }
