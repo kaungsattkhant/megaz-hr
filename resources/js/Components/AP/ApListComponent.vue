@@ -220,6 +220,7 @@
                 formData.append('value', this.payAmount);
                 formData.append('cash_account_id', this.selectedCashAccount.id);
                 formData.append('account_id', this.selectedAP.account_id);
+                formData.append('creditor_account_id', this.selectedAP.creditor_account_id);
                 let url = `/api/create_payable_transaction`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
