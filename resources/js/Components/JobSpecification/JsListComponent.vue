@@ -91,9 +91,9 @@
                                     </td>
                                     
                                     <td class="whitespace-nowrap" >
-                                        <!-- <a :href="'/js/'+js.id+'/edit'" class="pr-3">
+                                        <a :href="'/JS/'+js.id+'/edit'" class="pr-3">
                                             <i class="fal fa-pen"></i>
-                                        </a> -->
+                                        </a>
                                         <button @click="deleteBtnClicked(js.id)" data-te-toggle="modal"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>

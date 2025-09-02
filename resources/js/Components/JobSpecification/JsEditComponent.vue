@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Create Job Specification
+                Edit Job Specification
             </p>
         </div>
 
@@ -122,7 +122,7 @@
 
         <div>
             <button class="add-btn" @click="btnClickedCreateJs()">
-                Create Job Specification
+                Edit Job Specification
             </button>
         </div>
 
@@ -205,6 +205,7 @@ import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
 
 export default {
+    props:['jsId'],
     components: {
         Multiselect
     },
@@ -229,17 +230,35 @@ export default {
             selectedSkillName: null,
             selectedDepartmentForSkill: null,
             selectedRoleForSkill: null,
+
+            jsDetail: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-        // async getJdList(){
-        //     let response = await getApiData({ url: '/api/job-descriptions', token: this.getToken() });
-        //     if (response.data) {
-        //         this.jdList = response.data.data;
-        //     }
-        // },
+        async getJsDetail(){
+            let response = await getApiData({ url: '/api/job-specifications/' + this.jsId, token: this.getToken() });
+            if (response.data) {
+                this.jsDetail = response.data;
+                this.selectedJs = response.data.job_specification;
+                this.selectedDepartment = this.departmentList.find(dep => dep.id === response.data.job_description.role.department_id);
+                this.roleList = this.selectedDepartment.roles;
+                this.selectedRole = this.roleList.find(role => role.id === response.data.job_description.role.id);
+                setTimeout(() => {
+                    this.getJdList();
+                }, 200);
+            }
+        },
+        async getJdList(){
+            this.selectedJd = null;
+            let response = await getApiData({ url: '/api/job-descriptions?role_id=' + this.selectedRole.id, token: this.getToken() });
+            if (response.data) {
+                this.jdList = response.data;
+                this.selectedJd = this.jdList.find(jd => jd.id === this.jsDetail.job_description_id)
+            }
+            this.getSkillList();
+        },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -364,7 +383,7 @@ export default {
             let response = await postApiData({url:`/api/job-specifications`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/JS`);
+                window.location.replace(`/JS`);
             }
         },
 
@@ -399,7 +418,7 @@ export default {
 
     mounted() {
         this.getDepartmentList();
-        // this.getJdList();
+        this.getJsDetail();
         initTE({ Modal, Select, Tab, Ripple });
     }
 }
