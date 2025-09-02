@@ -81,24 +81,20 @@ class SalaryRepository implements SalaryRepositoryInterface
       $staffIds = Staff::whereHas('roles', function ($query) use ($data) {
         $query->where('id', $data['role_id'])->where('is_cv', 0);
       })->pluck('id');
-      // if ($staffIds->isEmpty()) {
-      //   ResponseMessage('No staff found for this role', 402);
-      // }
-    
       if($staffIds->isNotEmpty()){
         foreach ($staffIds as $staffId) {
-        // $salaryExist = Salary::where('basic_salary', $data['basic_salary'])
-        // ->where('salary_setup_id', $salarySetup->id)
-        // ->where('staff_id', $staffId)->first();
-        // if ($salaryExist) {
-        //   ResponseMessage('Salary already exists for this staff', 402);
-        // }
-        Salary::create([
-          'basic_salary' => $data['basic_salary'],
-          'staff_id' => $staffId,
-          'salary_setup_id' => $salarySetup->id,
-          'created_by' => UserData()->id,
-        ]);
+        Salary::createOrUpdate(
+          [
+            'staff_id' => $staffId,
+            'salary_setup_id' => $salarySetup->id,
+          ],
+          [
+            'basic_salary' => $data['basic_salary'],
+            'staff_id' => $staffId,
+            'salary_setup_id' => $salarySetup->id,
+            'created_by' => UserData()->id,
+          ]
+        );
       }
     }
       DB::commit();
@@ -257,6 +253,43 @@ class SalaryRepository implements SalaryRepositoryInterface
       return $item;
     });
     ResponseData($data);
+  }
+  public function getSalarySetupByRoleId($roleId){
+    $salarySetup = SalarySetup::with('salaryAllowances.allowance')->where('role_id', $roleId)->first();
+    if (!$salarySetup) {
+      ResponseMessage('Salary setup not found', 404);
+    }
+    return $salarySetup;
+  }
+
+  public function createSalary($data)
+  {
+    DB::beginTransaction();
+    try {
+      $salarySetup = SalarySetup::find($data['salary_setup_id']);
+      if (!$salarySetup) {
+          ResponseMessage('Salary setup not found', 404);
+      }
+      $existing = Salary::where('staff_id', $data['staff_id'])
+      ->where('salary_setup_id', $data['salary_setup_id'])
+      ->first();
+    if ($existing) {
+        ResponseMessage('Salary already exists for this staff with this setup', 409);
+    }
+
+    $salary = Salary::create([
+      'basic_salary'    => $data['basic_salary'] ?? $salarySetup->basic_salary,
+      'staff_id'        => $data['staff_id'],
+      'salary_setup_id' => $data['salary_setup_id'],
+      'created_by'      => UserData()->id,
+  ]);
+      DB::commit();
+      ResponseData($salary, 201);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
   }
 
   public function updateBasicSalary($request, $id)

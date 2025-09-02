@@ -61,6 +61,18 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->getSalaries($request);
         ResponseData($data);
     }
+
+    public function getSalarySetupByRoleId($roleId)
+    {
+        $data = $this->salaryRepository->getSalarySetupByRoleId($roleId);
+        ResponseData($data);
+    }
+
+    public function createSalary(Request $request){
+        $data = $this->salaryRepository->createSalary($request->all());
+        ResponseData($data);
+    }
+
     public function updateBasicSalary(Request $request, $id)
     {
         $data = $this->salaryRepository->updateBasicSalary($request->all(), $id);
