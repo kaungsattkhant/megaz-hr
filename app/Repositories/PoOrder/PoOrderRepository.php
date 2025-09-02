@@ -1423,6 +1423,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         's.name',
         'i.name',
         's.account_id',
+        's.creditor_account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',
       )
@@ -1435,6 +1436,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function processInvoiceTransaction($request)
   {
+    dd($request->all());
     $poInvoiceId = $request->po_invoice_id;
     $supplierId = $request->supplier_id;
     $supplierAccountId = $request->supplier_account_id;

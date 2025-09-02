@@ -37,6 +37,7 @@ class AccountPayableRepository implements AccountPayableInterface
                 'supplier_id',
                 'suppliers.name as supplier_name',
                 'suppliers.account_id',
+                'suppliers.creditor_account_id',
                 DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) as credit_amount'),
                 DB::raw('SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) as debit_amount'),
                 DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) - SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) as total_credit_amount')
@@ -81,6 +82,7 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function createPayableTransaction($request)
     {
+        dd($request->all());
         DB::beginTransaction();
         try {
             // $accountPayable = AccountPayable::create([
@@ -140,7 +142,6 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function listOfAccountPayableTransaction($request)
     {
-
         $ledger = DB::table('account_payables')
             ->join('suppliers', 'account_payables.supplier_id', '=', 'suppliers.id')
             ->join('accounts', 'account_payables.account_id', '=', 'accounts.id')

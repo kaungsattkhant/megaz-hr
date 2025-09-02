@@ -215,14 +215,14 @@ class SupplierRepository implements SupplierInterface
             $accountPayable = AccountPayable::updateOrCreate(
                 [
                     'supplier_id' => $supplier->id,
-                    'account_id' => $supplier->account_id
+                    'account_id' => $supplier->creditor_account_id
                 ],
                 [
                     'type' => 'addition',
                     'date_time' => $supplier->credit_opening_date,
                     'amount' => $supplier->credit_opening_amount,
                     'supplier_id' => $supplier->id,
-                    'account_id' => $supplier->account_id,
+                    'account_id' => $supplier->creditor_account_id,
                     'created_by' => UserData()->id,
                 ]
             );
