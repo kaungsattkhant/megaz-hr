@@ -18,6 +18,12 @@ class Sop extends Model
         'jd_sop_id',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
     public function role()
     {
         return $this->belongsTo(Role::class);

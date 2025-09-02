@@ -15,6 +15,12 @@ class JdSop extends Model
         'job_description_id',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
     public function jobDescription()
     {
         return $this->belongsTo(JobDescription::class);

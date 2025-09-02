@@ -51,6 +51,7 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
                 $jobSpecification->delete();
             }
             foreach ($jdSops as $jdSop) {
+                $jdSop->sops()->delete();
                 $jdSop->delete();
             }
         }
