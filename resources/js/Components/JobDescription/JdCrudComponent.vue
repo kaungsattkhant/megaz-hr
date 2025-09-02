@@ -18,23 +18,28 @@
                     <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
                 <div class="flex pr-0 gap-x-4">
-                    <!-- <div class=" !text-sm" data-te-select-wrapper-ref>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department"
-                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
-                            <option :value="department.value" v-for="(department, departmentIndex) in searchDepartmentList"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui" @change="searchDepartmentChange">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
                                 :key="departmentIndex"> {{ department.name }} </option>
                         </select>
                     </div>
                     <div class=" !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange"
                             data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
-                            <option :value="role.value" v-for="(role, roleIndex) in searchRoleList"
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
-                    </div> -->
-                    <button type="button" v-show="feature.includes('jd.create')"
+                    </div>
+                    <!-- <button type="button" v-show="feature.includes('jd.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
+                        Add New
+                    </button> -->
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="addModalBtnClicked">
                         Add New
                     </button>
                 </div>
@@ -64,34 +69,34 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(ot, index) in primaryList" :key="index">
+                            <div class="contents" v-for="(jd, index) in primaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ ot.job_description }}
+                                    <td class="">
+                                        {{ jd.job_description }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
                                         --
                                     </td> -->
                                     <td class="whitespace-nowrap">
-                                        {{ ot.role.department.name }}
+                                        {{ jd.role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ot.role.name }}
+                                        {{ jd.role.name }}
                                     </td>
-                                    <!-- <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(ot, index)">
+                                    <td class="whitespace-nowrap">
+                                        <button data-te-toggle="modal" data-te-target="#create_modal" id="edit-btn"
+                                            class="pr-3" @click="editModalBtnClicked(jd, index)">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(ot.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(jd.id)" data-te-toggle="modal"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
-                                    </td> -->
+                                    </td>
                                 </tr>
                             </div>
                         </tbody>
@@ -177,7 +182,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="create_modalLabel">
-                        Create JD
+                        {{ isEdit ? 'Edit' : 'Create' }} JD
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
                         id="close_create_modal" aria-label="Close">
@@ -230,7 +235,7 @@
                     </button>
                     <button type="button" @click="btnCreateJd()"
                         class="add-btn focus:outline-none focus:ring-0 ">
-                        Create
+                        {{ isEdit ? 'Edit' : 'Create' }}
                     </button>
                 </div>
             </div>
@@ -267,13 +272,19 @@ export default {
             selectedRole:null,
             jd:null,
 
+            editDetail: null,
+            editId: null,
+            isEdit: false,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData: 0,
 
             searchInput: null,
-
+            searchRoleList: [],
+            selectedSearchDepartment: null,
+            selectedSearchRole: null,
             
 
             url:'/api/job-descriptions',
@@ -281,6 +292,8 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            createEditUrl: null,
 
             feature: this.getFeature(),
         };
@@ -290,10 +303,15 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
-            let url = this.url + this.url_search + this.url_department + this.url_role;
+            let url = this.url + this.url_search + this.url_department + '?page=' + pageNumber + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.primaryList = response.data;
+                this.primaryList = response.data.data;
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         async getDepartmentList(){
@@ -302,10 +320,34 @@ export default {
                 this.departmentList = response.data;
             }
         },
+        searchDepartmentChange(){
+            this.searchRoleList = this.selectedSearchDepartment.roles;
+            this.selectedSearchRole = null;
+        },
+        searchRoleChange(){
+            this.url_role = '&role_id=' + this.selectedSearchRole.id;
+            this.getPrimaryList(1);
+        },
         selectedDepartmentChange(){
             console.log('dep change')
             this.roleList = this.selectedDepartment.roles;
             this.selectedRole = null;
+        },
+        addModalBtnClicked(){
+            this.isEdit = false;
+            this.jd = null;
+            this.selectedDepartment = null;
+            this.roleList = [];
+            this.selectedRole = null;
+        },
+        editModalBtnClicked(jd, index){
+            this.isEdit = true;
+            this.editDetail = jd;
+            this.editId = jd.id;
+            this.jd = jd.job_description;
+            this.selectedDepartment = this.departmentList.find(dep => dep.id === jd.role.department_id);
+            this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = this.roleList.find(role => role.id === jd.role.id);
         },
         btnCreateJd(){
             if(!this.selectedDepartment){
@@ -325,12 +367,18 @@ export default {
             }
         },
         async createJd(){
+            if(this.isEdit){
+                this.createEditUrl = '/api/job-descriptions/' + this.editId;
+            }
+            else{
+                this.createEditUrl = '/api/job-descriptions/'
+            }
             let formData = new FormData();
             formData.append('role_id',this.selectedRole.id);
             formData.append('job_description',this.jd);
-            let response = await postApiData({url:`/api/job-descriptions`, form_data:formData, token:this.getToken()})
+            let response = await postApiData({url:this.createEditUrl, form_data:formData, token:this.getToken()})
             if(response.success){
-                this.getPrimaryList();
+                this.getPrimaryList(1);
                 this.clearCreateModal();
                 document.getElementById('close_create_modal').click();
             }
