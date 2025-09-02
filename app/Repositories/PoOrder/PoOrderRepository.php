@@ -4,6 +4,7 @@ namespace App\Repositories\PoOrder;
 
 use App\Models\PoOrder;
 use App\Models\ItemLeft;
+use App\Models\Supplier;
 use App\Models\Inventory;
 use App\Models\PoInvoice;
 use App\Models\ArrivalItem;
@@ -1441,6 +1442,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $cashAccountId = $request->cash_account_id;
     $discountValue = (float) $request->discount_value;
     $poInvoice = PoInvoice::find($poInvoiceId);
+    $supplier=Supplier::find($supplierId);
+    $supplierCreditorAccountId=$supplier->creditor_account_id;
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
     }
@@ -1451,7 +1454,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     try {
       $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId, $supplierId);
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
-        $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
+        $this->storeAP($transaction, $apAmount, $supplierId, $supplierCreditorAccountId, $cashAccountId);
       }
       $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();
