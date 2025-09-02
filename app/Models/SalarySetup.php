@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Role;
+use App\Models\Salary;
 use App\Models\SalaryAllowance;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,5 +28,9 @@ class SalarySetup extends Model
     public function salaryAllowances()
     {
         return $this->hasMany(SalaryAllowance::class);
+    }
+    public function salaries()
+    {
+        return $this->hasMany(Salary::class);
     }
 }
