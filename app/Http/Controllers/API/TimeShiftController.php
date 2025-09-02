@@ -111,7 +111,7 @@ class TimeShiftController extends Controller
     public function getAllCheckIns(Request $request)
     {
         $data =  $this->TimeShiftRepository->getAllCheckIns($request);
-        ResponseData($data);
+        return $data;
     }
 
     public function getTotalHoursCheckIns(Request $request)
