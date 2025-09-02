@@ -220,7 +220,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         ->get();
 
         if($inventoryItems->isEmpty()){
-            return ResponseData([], 404, false, 'AreaEquipments not found.');
+            return [];
         }
 
         $result = $inventoryItems->groupBy('item_id')
