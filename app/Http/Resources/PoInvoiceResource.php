@@ -28,6 +28,7 @@ class PoInvoiceResource extends JsonResource
             'supplier_name' => $this->supplier_name,
             'brands' => $this->brands,
             'account_id' => $this->account_id,
+            'creditor_account_id' => $this->creditor_account_id,
             'is_complete' => $this->is_complete,
             'completed_at' => $this->completed_at,
             'arrival_items' => $this->arrivalItems->map(function ($arrivalItem) {

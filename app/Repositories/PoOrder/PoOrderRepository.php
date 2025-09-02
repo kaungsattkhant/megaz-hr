@@ -1362,6 +1362,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       's.name as supplier_name',
       // 'i.name as i_name',
       's.account_id',
+      's.creditor_account_id',
       'po_invoices.is_complete',
       'po_invoices.completed_at',
       DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands'),
@@ -1381,6 +1382,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'ai.supplier_id',
         's.name',
         's.account_id',
+      's.creditor_account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',
       )
@@ -1436,7 +1438,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function processInvoiceTransaction($request)
   {
-    dd($request->all());
     $poInvoiceId = $request->po_invoice_id;
     $supplierId = $request->supplier_id;
     $supplierAccountId = $request->supplier_account_id;
@@ -1444,8 +1445,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $cashAccountId = $request->cash_account_id;
     $discountValue = (float) $request->discount_value;
     $poInvoice = PoInvoice::find($poInvoiceId);
-    $supplier=Supplier::find($supplierId);
-    $supplierCreditorAccountId=$supplier->creditor_account_id;
+    $supplierCreditorAccountId=$request->creditor_account_id;
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
     }

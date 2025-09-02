@@ -82,7 +82,6 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function createPayableTransaction($request)
     {
-        dd($request->all());
         DB::beginTransaction();
         try {
             // $accountPayable = AccountPayable::create([
@@ -97,10 +96,10 @@ class AccountPayableRepository implements AccountPayableInterface
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['is_confirmed'] = 1;
-            $supplier=Supplier::find($request->supplier_id);
-            if(!$supplier){
-                ResponseMessage('Supplier Not found',419);
-            }
+            // $supplier=Supplier::find($request->supplier_id);
+            // if(!$supplier){
+            //     ResponseMessage('Supplier Not found',419);
+            // }
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
@@ -116,7 +115,7 @@ class AccountPayableRepository implements AccountPayableInterface
             $debitLedger = (new StoreTransactionLedger())->storeLedger([
                 'value' => $request->value,
                 'transaction_id' => $transaction->id,
-                'account_id' => $supplier->creditor_account_id,
+                'account_id' => $request->creditor_account_id,
                 'personable_id' => $request->supplier_id,
                 'personable_type' => 'supplier',
                 'action' => 'debit',
@@ -127,7 +126,7 @@ class AccountPayableRepository implements AccountPayableInterface
                 'date_time' => now(),
                 'amount' => $request->value,
                 'supplier_id' => $request->supplier_id,
-                'account_id' => $supplier->creditor_account_id,
+                'account_id' => $request->creditor_account_id,
                 'cash_account_id' => $request->cash_account_id,
                 'created_by' => UserData()->id,
             ]);
