@@ -359,12 +359,12 @@ export default {
             formData.append('job_description_id',this.selectedJd.id);
             formData.append('job_specification',this.selectedJs);
             this.selectedSkillList.forEach((skill) => {
-                formData.append('sills[]', skill.id);
+                formData.append('skills[]', skill.skill_id);
             });
             let response = await postApiData({url:`/api/job-specifications`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/JS`);
+                window.location.replace(`/JS`);
             }
         },
 
