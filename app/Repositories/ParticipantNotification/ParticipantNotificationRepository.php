@@ -1165,19 +1165,18 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     // return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
 
     $type = $request->query('type');
-    
-    $notificationUsers = NotificationUser::with(['notification'])
-      ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
-      ->where('notification_users.staff_id', '=', $staffId)
-      ->when($type, function ($query) use ($type) {
-            return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift'])
-              ->where('notifications.notificationable_type', $type);
-          }, function ($query) {
-            return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
-          })
-      ->orderBy('notifications.created_at', 'desc')
+    $notificationUsers = NotificationUser::with(['notification' => function($query) use ($type) {
+      $query->with('notificationable');
+      if ($type) {
+          $query->where('notificationable_type', $type)
+                ->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+      } else {
+          $query->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+      }
+    }])
+      ->where('staff_id', $staffId)
+      ->orderBy('id', 'desc')
       ->get();
-    
     foreach ($notificationUsers as $notificationUser) {
       $notificationType = $notificationUser->notification->notificationable_type;
       $notificationUser->notification->load(['notificationable']);
@@ -1284,9 +1283,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     $shifts = StaffTimeshift::with('staff','timeshift.shift','area')->where('staff_id',$staffId)
     ->where('status','confirmed')->orderBy('id','desc')->paginate(config('common.list_count'));
     if($shifts->isEmpty()){
-      return ResponseData([], 404, false, 'Shifts not found.');
+      return [];
     }
-    return ResponseData(StaffTimeShiftResource::collection($shifts), 200, true, 'Shifts retrieved successfully.');
+    return StaffTimeShiftResource::collection($shifts);
   }
 
   public function getConfirmedShiftsByStaffIdTimeShiftId($staffId,$staffTimeshiftId){
@@ -1295,9 +1294,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     ->where('id',$staffTimeshiftId)
     ->where('status','confirmed')->get();
     if($shift->isEmpty()){
-      return ResponseData([], 404, false, 'Shift not found.');
+      return [];
     }
-    return ResponseData(StaffTimeShiftResource::collection($shift), 200, true, 'Shift retrieved successfully.');
+    return StaffTimeShiftResource::collection($shift);
   }
 
 }

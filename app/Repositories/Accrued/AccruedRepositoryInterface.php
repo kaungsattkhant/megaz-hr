@@ -9,4 +9,5 @@ interface AccruedRepositoryInterface
     public function createAccrued($request);
     public function getAccrued($request);
     public function detailAccrued($accountId);
+    public function getOtherPayable($request);
 }

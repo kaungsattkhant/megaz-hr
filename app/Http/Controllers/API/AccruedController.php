@@ -34,4 +34,10 @@ class AccruedController extends Controller
         $data = $this->accruedRepository->detailAccrued($accountId);
         return $data;
     }
+
+    public function getOtherPayable(Request $request)
+    {
+        $data = $this->accruedRepository->getOtherPayable($request);
+        ResponseData($data);
+    }
 }

@@ -127,6 +127,6 @@ class ItemAPIController extends Controller
     public function equipmentItem(Request $request)
     {
         $item = $this->itemRepo->equipmentItem($request);
-        return $item;
+        ResponseData($item);
     }
 }
