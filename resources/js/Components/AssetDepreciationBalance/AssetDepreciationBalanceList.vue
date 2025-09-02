@@ -118,25 +118,25 @@
                                 </td>
 
                                 <td class="whitespace-nowrap  !font-semibold">
-                                    {{ current_asset.total_original_cost }}
+                                    {{ current_asset?.total_original_cost }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total_addition_year }}
+                                    {{ current_asset?.total_addition_year }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total }}
+                                    {{ current_asset?.total }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
 
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total_addition_during_year }}
+                                    {{ current_asset?.total_addition_during_year }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold">
-                                    {{ current_asset.total_depreciation }}
+                                    {{ current_asset?.total_depreciation }}
                                 </td>
                                 <td class="whitespace-nowrap !font-semibold !rounded-none">
-                                    {{ current_asset.boototal_book_valuek_value }}
+                                    {{ current_asset?.boototal_book_valuek_value }}
                                 </td>
                             </tr>
                         </tbody>

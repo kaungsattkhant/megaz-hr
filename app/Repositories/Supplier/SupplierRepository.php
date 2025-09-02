@@ -131,7 +131,6 @@ class SupplierRepository implements SupplierInterface
                         [
                             'supplier_id' => $supplier->id,
                             'id' => $phone['id'] ?? null,
-
                         ],
                         [
                             'phone_number' => $phone['phone_number'],
@@ -196,7 +195,6 @@ class SupplierRepository implements SupplierInterface
             $creditorCode = config('common.creditor_account_code');
             $otherPayable = $this->createAccountBySubAccount('Other Payable-' . $request->name, $otherPayableCode);
             $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);
-           
             if ($otherPayable && $creditor) {
                 DB::commit();
                 return ['other_payable' => $otherPayable, 'creditor' => $creditor];

@@ -8,6 +8,8 @@ interface ItemRepositoryInterface
 {
     public function listAllData(Request $request);
 
+    public function equipmentItem(Request $request);
+
     public function detail($id);
     public function createData(array $data);
 

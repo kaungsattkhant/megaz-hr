@@ -35,56 +35,50 @@ class ItemRepository implements ItemRepositoryInterface
         $this->poOrderRepository = $poOrderRepository;
     }
 
-    public function listAllData(Request $request)
+    private function getBaseItemQuery(Request $request)
     {
         $category_id = $request->category_id;
         $tag_id = $request->tag_id;
         $searchInput = $request->search_input;
+        return Item::with([
+            'tag',
+            'category',
+            'supplier_items.brand',
+            'uom',
+            'base_uom',
+            'supplier_items.item_price' => function ($query) {
+                $query->orderByDesc('id');
+            }
+        ])
+            ->when($category_id, function ($q) use ($category_id) {
+                $q->where('items.category_id', $category_id);
+            })
+            ->when($tag_id, function ($q) use ($tag_id) {
+                $q->where('items.tag_id', $tag_id);
+            })
+            ->when($searchInput, function ($q) use ($searchInput) {
+                $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
+            })
+            ->orderByDesc('id');
+    }
+
+    public function listAllData(Request $request)
+    {
+        $query = $this->getBaseItemQuery($request);
         if ($request->per_page || $request->page) {
-            return Item::with([
-                'category',
-                'supplier_items.brand',
-                'uom',
-                'base_uom',
-                'supplier_items.item_price' => function ($query) {
-                    $query->orderByDesc('id');
-                }
-            ])
-                ->when($category_id, function ($q) use ($category_id) {
-                    $q->where('items.category_id', $category_id);
-                })
-                ->when($tag_id, function ($q) use ($tag_id) {
-                    $q->where('items.tag_id', $tag_id);
-                })
-                ->when($searchInput, function ($q) use ($searchInput) {
-                    $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
-                })
-                // ->withAveragePrice()
-                ->orderByDesc('id')
-                ->paginate(config('common.list_count'));
+            return $query->paginate(config('common.list_count'));
         } else {
-            return Item::with([
-                'category',
-                'supplier_items.brand',
-                'uom',
-                'base_uom',
-                'supplier_items.item_price' => function ($query) {
-                    $query->orderByDesc('id');
-                }
-            ])
-                ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
-                    $q->where('items.category_id', $category_id);
-                })
-                ->when((isset($request->tag_id) && $tag_id), function ($q) use ($tag_id) {
-                    $q->where('items.tag_id', $tag_id);
-                })
-                ->when($searchInput, function ($q) use ($searchInput) {
-                    $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
-                })
-                // ->withAveragePrice()
-                ->orderByDesc('id')
-                ->get();
+            return $query->get();
         }
+    }
+    public function equipmentItem(Request $request)
+    {
+        $query = $this->getBaseItemQuery($request);
+        return $query->whereHas('tag', function ($query) {
+            $query->whereRaw("LOWER(TRIM(name)) LIKE '%equipment%'");
+        })
+        ->orderByDesc('id')
+        ->get();
     }
 
     public function createData(array $data)

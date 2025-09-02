@@ -111,6 +111,9 @@ class AreaRepository implements AreaRepositoryInterface
                 $query->where('name', 'Selling Area');
             })
             ->get();
+            if($areas->isEmpty()){
+                return ResponseData([], 404, false, 'Areas not found.');
+            }
 
         return $areas;
     }

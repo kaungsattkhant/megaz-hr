@@ -71,13 +71,13 @@
                             <div class="contents" v-for="(js, index) in primaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
-                                        <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        <!-- {{ index+1 }} -->
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="">
                                         {{ js.job_specification }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="">
                                         {{ js.job_description.job_description }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
@@ -174,10 +174,15 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
-            let url = this.url + this.url_search + this.url_department + this.url_role;
+            let url = this.url + '?page=' + pageNumber;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.primaryList = response.data.data;
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         async getDepartmentList(){
@@ -233,7 +238,7 @@ export default {
         
     },
     created() {
-        this.getPrimaryList();
+        this.getPrimaryList(1);
     }
 }
 </script>

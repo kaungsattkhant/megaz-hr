@@ -124,4 +124,9 @@ class ItemAPIController extends Controller
         $item = $this->itemRepo->importItemPrice($request);
         return $item;
     }
+    public function equipmentItem(Request $request)
+    {
+        $item = $this->itemRepo->equipmentItem($request);
+        return $item;
+    }
 }

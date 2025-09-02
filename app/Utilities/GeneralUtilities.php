@@ -371,7 +371,6 @@ if (!function_exists('checkMultipleFeaturePermission')) {
                 return true;
             }
         }
-
         return false;
     }
 }
