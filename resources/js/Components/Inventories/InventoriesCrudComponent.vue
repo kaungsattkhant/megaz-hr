@@ -71,8 +71,10 @@
                                         {{ inventory.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        <!-- {{ inventory.inventoryable.length }} -->
                                         <div v-for="inventoryable in inventory.inventoryable" :key="inventoryable">
-                                            {{ inventoryable.inventoryable.name }}
+                                            <span v-if="inventoryable.inventoryable"> {{ inventoryable.inventoryable.name }} <span class="capitalize">({{ inventoryable.inventoryable_type }})</span> </span>
+                                            <!-- {{ inventoryable }} -->
                                         </div>
                                     </td>
                                     <td class="whitespace-nowrap"
