@@ -17,8 +17,9 @@
                 <div>
 
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
-                            data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
+                        <select data-te-select-init data-te-select-placeholder="Select Inventory"
+                            @change="selectedInventoryChanged" data-te-select-filter="true" name="" id=""
+                            v-model="searchInventory" class="input-ui">
                             <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
                                 :key="inventoryIndex"> {{ inventory.name }} </option>
                         </select>
@@ -27,9 +28,10 @@
                 </div>
                 <div class="flex justify-end flex-col">
 
-                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                        @click="addBtnClicked" v-show="feature.includes('inventory.create')"
-                        data-te-toggle="modal" data-te-target="#create_modal">
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        @click="addBtnClicked" v-show="feature.includes('inventory.create')" data-te-toggle="modal"
+                        data-te-target="#create_modal">
                         Add New
                     </button>
                 </div>
@@ -51,7 +53,8 @@
                                 <th scope="col" class="">
                                     Departments/Areas
                                 </th>
-                                <th scope="col" class="" v-show="['inventory.toggle', 'inventory.update'].some(f => feature.includes(f))">
+                                <th scope="col" class=""
+                                    v-show="['inventory.toggle', 'inventory.update'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -62,7 +65,7 @@
                             <div class="contents" v-for="(inventory, index) in inventoryList" :key="index">
                                 <tr class="">
                                     <td class="">
-                                        {{ perPage * (currentPage - 1) + (index+1) }}
+                                        {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ inventory.name }}
@@ -72,12 +75,14 @@
                                             {{ inventoryable.inventoryable.name }}
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap"  v-show="['inventory.toggle', 'inventory.update'].some(f => feature.includes(f))">
+                                    <td class="whitespace-nowrap"
+                                        v-show="['inventory.toggle', 'inventory.update'].some(f => feature.includes(f))">
                                         <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(inventory.id)"
                                         data-te-toggle="modal" data-te-target="#deleteModal">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <input :checked="inventory.is_active == 1" @change="isActiveToggled(inventory.id)"
+                                        <input :checked="inventory.is_active == 1"
+                                            @change="isActiveToggled(inventory.id)"
                                             v-show="feature.includes('inventory.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                         before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
@@ -92,7 +97,8 @@
                                             type="checkbox" role="switch" />
 
                                         <button data-te-toggle="modal" data-te-target="#create_modal" id="edit-btn"
-                                            class="pr-3 ml-2" @click="editBtnClicked(inventory.id)" v-if="feature.includes('inventory.update')">
+                                            class="pr-3 ml-2" @click="editBtnClicked(inventory.id)"
+                                            v-if="feature.includes('inventory.update')">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                     </td>
@@ -111,8 +117,9 @@
                                 @click="getInventoryList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
-                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
-                                    lastPage }}</span>
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                        lastPage }}</span>
                             </button>
 
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
@@ -139,10 +146,10 @@
                                 {{ modalType === 'create' ? 'Create' : 'Edit' }} Inventory
                             </h5>
                             <button type="button" id="close"
-                                class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                                aria-label="Close">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" class="h-5 w-5">
+                                class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -171,7 +178,7 @@
                                 <input type="time" placeholder="End Time" v-model="end_time"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Department / Area
                                 </label>
@@ -180,7 +187,7 @@
                                     <option value="area">Area</option>
                                     <option value="department">Department</option>
                                 </select>
-                            </div>
+                            </div> -->
                             <!-- <div class="mb-4" v-if="inventoryableList.length > 0">
                                 <label v-if="selectedInventoryType == 'area'" for="" class="block text-sm text-black mb-3">
                                     Area
@@ -199,10 +206,9 @@
                                 <span v-for="inventoryableId in inventoryableIds" :key="inventoryableId"> {{
                                     inventoryableId.name }}, </span>
                             </div> -->
-                           
-                            <div class="mb-4" v-if="inventoryableList.length > 0 && selectedInventoryType == 'department'">
-                                <label v-if="selectedInventoryType == 'department'" for=""
-                                    class="block text-sm text-black mb-3">
+
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
                                     Department
                                 </label>
                                 <select name="" id="" v-model="selectedDepartment"
@@ -212,7 +218,8 @@
                                         :key="index">{{ inventoryable.name }}</option>
                                 </select>
                             </div>
-                            <div class="mb-4" v-if="(inventoryableList.length > 0 && selectedInventoryType == 'area') || selectedDepartment?.slug === 'bar' || selectedDepartment?.slug === 'kitchen' || selectedDepartment?.slug === 'catering'">
+                            <div class="mb-4"
+                                v-if="(inventoryableList.length > 0 && selectedInventoryType == 'area') || selectedDepartment?.slug === 'bar' || selectedDepartment?.slug === 'kitchen' || selectedDepartment?.slug === 'catering'">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Area
                                 </label>
@@ -239,18 +246,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b-0" v-if="selectedItem.length > 0" v-for="(q,index) in selectedItem">
-    
+                                    <tr class="border-b-0" v-if="selectedItem.length > 0"
+                                        v-for="(q, index) in selectedItem">
+
                                         <td class="whitespace-nowrap border-r px-6 py-4 capitalize">
                                             {{ q.inventoryable_type }}
                                         </td>
-                                        
+
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ q.inventoryable_name }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             <button>
-                                                <i class="fal fa-times" @click="deleteSeleted(index,selectedItem)" ></i>
+                                                <i class="fal fa-times" @click="deleteSeleted(index, selectedItem)"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -266,7 +274,7 @@
                         <div class="flex justify-end px-12 mb-6">
                             <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
-                                Create
+                                {{ modalType === 'create' ? 'Create' : 'Edit' }}
                             </button>
                         </div>
                     </div>
@@ -288,10 +296,10 @@
                                 Edit Inventory
                             </h5>
                             <button type="button" id="close"
-                                class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                                aria-label="Close">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" class="h-5 w-5">
+                                class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -344,15 +352,16 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Department / Area
                                 </label>
-                                <select name="" id="" v-model="selectedInventoryTypeEdit" @change="inventoryableTypeChanged()"
+                                <select name="" id="" v-model="selectedInventoryTypeEdit"
+                                    @change="inventoryableTypeChanged()"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                     <option value="area">Area</option>
                                     <option value="department">Department</option>
                                 </select>
                             </div>
-                            <div class="mb-4" v-if="inventoryableList.length > 0 && selectedInventoryTypeEdit == 'department'">
-                                <label for=""
-                                    class="block text-sm text-black mb-3">
+                            <div class="mb-4"
+                                v-if="inventoryableList.length > 0 && selectedInventoryTypeEdit == 'department'">
+                                <label for="" class="block text-sm text-black mb-3">
                                     Department
                                 </label>
                                 <select name="" id="" v-model="selectedDepartment"
@@ -362,7 +371,8 @@
                                         :key="index">{{ inventoryable.name }}</option>
                                 </select>
                             </div>
-                            <div class="mb-4" v-if="(inventoryableList.length > 0 && selectedInventoryTypeEdit == 'area') || selectedDepartment?.slug === 'bar' || selectedDepartment?.slug === 'kitchen' || selectedDepartment?.slug === 'catering'">
+                            <div class="mb-4"
+                                v-if="(inventoryableList.length > 0 && selectedInventoryTypeEdit == 'area') || selectedDepartment?.slug === 'bar' || selectedDepartment?.slug === 'kitchen' || selectedDepartment?.slug === 'catering'">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Area
                                 </label>
@@ -408,8 +418,8 @@
                             <button type="button"
                                 class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                                 data-te-modal-dismiss aria-label="Close">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" class="h-6 w-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -483,9 +493,9 @@ export default {
             lastPage: 0,
             totalData: 0,
 
-            searchInventoryList:[],
-            searchInventory:null,
-            url_inventory:'',
+            searchInventoryList: [],
+            searchInventory: null,
+            url_inventory: '',
 
             feature: this.getFeature(),
 
@@ -532,15 +542,15 @@ export default {
 
         async getInventoryList(pageNumber) {
             let url_page = ''
-            if(pageNumber){
-                url_page = '&page='+pageNumber
+            if (pageNumber) {
+                url_page = '&page=' + pageNumber
             }
             const response = await getApiData({ url: `/api/inventories?${this.url_inventory}${url_page}`, token: this.getToken() });
             if (response.data) {
-                if(pageNumber){
+                if (pageNumber) {
                     this.inventoryList = response.data.data;
                 }
-                else{
+                else {
                     this.inventoryList = response.data;
                 }
                 this.lastPage = response.data.last_page;
@@ -566,11 +576,11 @@ export default {
                 this.departmentList = response.data;
             }
         },
-        selectedDepartmentChanged(){
-            if(this.selectedDepartment.slug === 'kitchen'){
+        selectedDepartmentChanged() {
+            if (this.selectedDepartment.slug === 'kitchen') {
                 this.getCookingAreaList();
             }
-            if(this.selectedDepartment.slug === 'catering' || this.selectedDepartment.slug === 'bar'){
+            if (this.selectedDepartment.slug === 'catering' || this.selectedDepartment.slug === 'bar') {
                 this.getSellingAreaList();
             }
             this.selectedArea = null;
@@ -615,59 +625,46 @@ export default {
                 // this.inventoryableIdsEdit = [];
             }
         },
-        addSelectedItemBtnClicked(){
+        addSelectedItemBtnClicked() {
             let selectedId = null;
             let selectedName = null;
-            if(this.selectedInventoryType === 'area'){
-                // selectedId = this.selectedArea.id
-                // selectedName = this.selectedArea.name
+            // if(this.selectedInventoryType === 'area'){
+            //     this.selectedItem.push(
+            //         {
+            //             inventoryable_type: this.selectedInventoryType,
+            //             inventoryable_id: this.selectedArea.id,
+            //             inventoryable_name: this.selectedArea.name
+            //         }
+            //     )
+            // }
+            this.selectedItem.push(
+                {
+                    inventoryable_type: 'department',
+                    inventoryable_id: this.selectedDepartment.id,
+                    inventoryable_name: this.selectedDepartment.name
+                }
+            )
+            if (this.selectedDepartment.slug === 'kitchen') {
                 this.selectedItem.push(
                     {
-                        inventoryable_type: this.selectedInventoryType,
+                        inventoryable_type: 'area',
                         inventoryable_id: this.selectedArea.id,
                         inventoryable_name: this.selectedArea.name
                     }
                 )
+                // selectedId = this.selectedArea.id
+                // selectedName = this.selectedArea.name
             }
-            if(this.selectedInventoryType === 'department'){
+            if (this.selectedDepartment.slug === 'catering' || this.selectedDepartment.slug === 'bar') {
                 this.selectedItem.push(
                     {
-                        test: 'dep type 1',
-                        inventoryable_type: this.selectedInventoryType,
-                        inventoryable_id: this.selectedDepartment.id,
-                        inventoryable_name: this.selectedDepartment.name
+                        inventoryable_type: 'area',
+                        inventoryable_id: this.selectedArea.id,
+                        inventoryable_name: this.selectedArea.name
                     }
                 )
-                if(this.selectedDepartment.slug === 'kitchen'){
-                    this.selectedItem.push(
-                        {
-                            test: 'dep type 2',
-                            inventoryable_type: 'area',
-                            inventoryable_id: this.selectedArea.id,
-                            inventoryable_name: this.selectedArea.name
-                        }
-                    )
-                    // selectedId = this.selectedArea.id
-                    // selectedName = this.selectedArea.name
-                }
-                if(this.selectedDepartment.slug === 'catering' || this.selectedDepartment.slug === 'bar'){
-                    this.selectedItem.push(
-                        {
-
-                            test: 'dep type 3',
-                            inventoryable_type: 'area',
-                            inventoryable_id: this.selectedArea.id,
-                            inventoryable_name: this.selectedArea.name
-                        }
-                    )
-                    // selectedId = this.selectedArea.id
-                    // selectedName = this.selectedArea.name
-                }
-                // else{
-                    
-                //     selectedId = this.selectedDepartment.id
-                //     selectedName = this.selectedDepartment.name
-                // }
+                // selectedId = this.selectedArea.id
+                // selectedName = this.selectedArea.name
             }
             // this.selectedItem.push(
             //     {
@@ -679,7 +676,7 @@ export default {
             this.selectedArea = null;
             this.selectedDepartment = null;
         },
-        addBtnClicked(){
+        addBtnClicked() {
             this.name = null;
             this.start_time = null;
             this.end_time = null;
@@ -689,10 +686,10 @@ export default {
 
             this.inventoryableList = [];
             this.selectedInventoryable = null;
-            this.inventoryableIds= [];
+            this.inventoryableIds = [];
             this.typeList = [];
-            this.departmentList = [];
-            this.areaList = [];
+            // this.departmentList = [];
+            // this.areaList = [];
 
             this.modalType = 'create';
         },
@@ -712,7 +709,7 @@ export default {
             // formData.append('inventoryable_type', this.selectedInventoryType);
             formData.append('start_time', this.start_time);
             formData.append('end_time', this.end_time);
-            if(this.modalType === 'edit'){
+            if (this.modalType === 'edit') {
                 formData.append('id', this.editId);
             }
             // this.inventoryableIds.forEach((inventoryable) => {
@@ -763,7 +760,7 @@ export default {
                         }
                     )
                 })
-                
+
                 // if(this.selectedInventoryType === 'area'){
                 //     this.selectedItem.push(
                 //         {
@@ -801,7 +798,7 @@ export default {
                 //         )
                 //     }
                 // }
-                
+
             }
         },
 
@@ -868,21 +865,21 @@ export default {
                 alert(`deleted`);
             }
         },
-        async getSearchInventoryList(){
+        async getSearchInventoryList() {
             const response = await getApiData({ url: '/api/get_inventory', token: this.getToken() });
             if (response.data) {
                 this.searchInventoryList = response.data;
             }
         },
-        selectedInventoryChanged(){
+        selectedInventoryChanged() {
             this.url_inventory = 'inventory_id=' + this.searchInventory.id
             this.fromDate = null;
             this.toDate = null;
             this.getInventoryList(1);
         },
 
-        deleteSeleted(index,list){
-            if(index != -1){
+        deleteSeleted(index, list) {
+            if (index != -1) {
                 list.splice(index, 1);
             }
         },
@@ -890,6 +887,8 @@ export default {
 
     created() {
         this.getInventoryList(1);
+        this.getDepartmentList();
+        this.getAreaList();
         this.getSearchInventoryList();
     },
 

@@ -247,7 +247,16 @@ export default {
                 this.selectedRole = this.roleList.find(role => role.id === response.data.job_description.role.id);
                 setTimeout(() => {
                     this.getJdList();
+                    this.getSkillList();
                 }, 200);
+                if(response.data.skills.length > 1){
+                    response.data.skills.forEach(skill => {
+                        this.selectedSkillList.push({
+                            skill_name: skill.skill,
+                            skill_id: skill.id,
+                        })
+                    })
+                }
             }
         },
         async getJdList(){
@@ -257,7 +266,6 @@ export default {
                 this.jdList = response.data;
                 this.selectedJd = this.jdList.find(jd => jd.id === this.jsDetail.job_description_id)
             }
-            this.getSkillList();
         },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
@@ -380,6 +388,7 @@ export default {
             this.selectedSkillList.forEach((skill) => {
                 formData.append('sills[]', skill.id);
             });
+            formData.append('id',this.jsId);
             let response = await postApiData({url:`/api/job-specifications`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')

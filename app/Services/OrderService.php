@@ -253,7 +253,7 @@ class OrderService
                 return isset($menu['is_package']) && in_array($menu['is_package'], [-1]);
             });
             $detaultQuantity = 1;
-            $cookingAreaIds=[];
+            $cookingAreaIds = [];
             foreach ($filteredMenu as $menuData) {
                 $totalExtraPrice = 0;
                 $this->checkInventoryEnough($menuData['menu_id'], $menuData['quantity']);
@@ -267,7 +267,7 @@ class OrderService
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
                 $menuData['invoice_id'] = $invoiceId;
-                if (!isset($menuData['cooking_area_id'])) {                                                                                                                                                                             
+                if (!isset($menuData['cooking_area_id'])) {
                     ResponseMessage('Cooking Area  is required', 419);
                 } elseif (isset($menuData['cooking_area_id']) && ($menuData['cooking_area_id'] == null || $menuData['cooking_area_id'] == "null")) {
 
@@ -279,7 +279,8 @@ class OrderService
                 }
                 $menuData['area_id'] = $menuData['cooking_area_id'];
                 $cookingAreaId = $menuData['cooking_area_id'];
-                $cookingAreaIds[]=$cookingAreaId;
+                $inventoryId = $this->getInventoryIdByCookingArea($cookingAreaId);
+                $cookingAreaIds[] = $cookingAreaId;
                 // $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
                 //     ->where('selling_area_id', $sellingAreaId)
                 //     ->first();
@@ -358,6 +359,7 @@ class OrderService
                     // $menuData['price'] = $menuData['original_price'];
                     $menuData['status'] = 'pos_confirmed';
                     $menuData['area_id'] = $cookingAreaId;
+                    $menuData['inventory_id']=$inventoryId;
                     $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package'])
                         ? 0
                         : ($menuData['original_price'] + $totalExtraPrice) - $defaultDiscountAmont; //after  
@@ -396,6 +398,7 @@ class OrderService
                     $menuData['date'] = now();
                     $menuData['quantity'] = $defaultQuantity;
                     $menuData['status'] = 'pos_confirmed';
+                    $menuData['inventory_id']=$inventoryId;
                     // $menuData['remark'] = $menuData['remark'];
                     // $menuData['original_price'] = $data['original_price'];
                     // $menuData['menu_id'] = $data['menu_id'];
@@ -435,8 +438,8 @@ class OrderService
                 }
 
             }
-            $uniqueCookingAreaIds=array_unique($cookingAreaIds);
-            foreach($uniqueCookingAreaIds as $c_areaId){
+            $uniqueCookingAreaIds = array_unique($cookingAreaIds);
+            foreach ($uniqueCookingAreaIds as $c_areaId) {
                 broadcast(new OrderNotificationByArea($c_areaId)); //send notifcation to checker list
             }
             if (count($cancelledMenu) > 0) {
@@ -469,6 +472,21 @@ class OrderService
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function getInventoryIdByCookingArea($cookingAreaId)
+    {
+        $inventoryId = DB::table('inventoryables')
+            ->where('inventoryable_type', 'area')
+            ->where('inventoryable_id', $cookingAreaId)
+            ->value('inventory_id');
+
+        if (!$inventoryId) {
+            ResponseMessage('Inventory and Area are not related', 419);
+        }
+
+        return $inventoryId;
+
     }
 
     public function createOrderItemExtra($orderItem, $sellingExtraIds)

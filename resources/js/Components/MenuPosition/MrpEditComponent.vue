@@ -467,26 +467,38 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(level, levelIndex) in levelTable"
-                            :key="levelIndex">
-                            <td class="">
-                                {{ level.level }}
-                            </td>
-                            <td class="">
-                                {{ level.type }}
-                            </td>
-                            <td class="">
-                                {{ level.role_name }}
-                            </td>
-                            <td class="">
-                                {{ level.duration }}
-                            </td>
-                            <td class="">
-                                <button @click="removeLevel(levelIndex)">
-                                    <i class="fal fa-trash  pr-3"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        <div class="contents" v-for="(level, levelIndex) in levelTable" :key="levelIndex">
+                            <tr class="" @click="isShowToggle(level)">
+                                <td class="">
+                                    {{ level.level }}
+                                </td>
+                                <td class="">
+                                    {{ level.type }}
+                                </td>
+                                <td class="">
+                                    {{ level.role_name }}
+                                </td>
+                                <td class="">
+                                    {{ level.duration }}
+                                </td>
+                                <td class="">
+                                    <button @click="removeLevel(levelIndex)">
+                                        <i class="fal fa-trash  pr-3"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="level.isShow" v-for="item in level.item_menu">
+                                <td>
+                                    {{ item.name }}
+                                </td>
+                                <td>
+                                    {{ item.weight }}
+                                </td>
+                                <td>
+                                    {{ item.uom_name }}
+                                </td>
+                            </tr>
+                        </div>
                         <tr class="" v-for="(submenu, submenuIndex) in subMenuList"
                             :key="submenuIndex">
                             <td class="" colspan="4">
@@ -617,7 +629,10 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-
+        isShowToggle(level) {
+            // this.inventoryLegderList[index].isShow = !this.inventoryLegderList[index].isShow;
+            level.isShow = !level.isShow;
+        },
         async getMrpDetail() {
             let response = await getApiData({ url: `/api/mrp/${this.mrpId}`, token: this.getToken() });
             if (response.data) {

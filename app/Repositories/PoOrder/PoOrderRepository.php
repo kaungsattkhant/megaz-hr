@@ -1238,7 +1238,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   private function storeInventoryLedger($validatedData, $arrivalItem)
   {
-    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
+    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])
+    ->where('is_active',1)
+    ->pluck('id')->first();
     if (!$inventoryId) {
       ResponseMessage('Main Inventory not found.', 404);
     }
