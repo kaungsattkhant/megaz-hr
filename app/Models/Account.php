@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\SubAccount;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Account extends Model
 {
@@ -19,7 +20,7 @@ class Account extends Model
     ];
 
     public function sub_account(){
-        return $this->belongsTo(\App\Models\SubAccount::class);
+        return $this->belongsTo(SubAccount::class);
     }
 
     public function accountByCode($code){

@@ -270,6 +270,7 @@ export default {
             formData.append('po_invoice_id', this.selectedPoInvoice.id);
             formData.append('supplier_id', this.selectedPoInvoice.supplier_id);
             formData.append('supplier_account_id', this.selectedPoInvoice.account_id);
+            formData.append('creditor_account_id', this.selectedPoInvoice.creditor_account_id);
             let response = await postApiData({url: `/api/invoice_transaction`, form_data:  formData, token: this.getToken()});
             if(response.success){
                 this.$notify({

@@ -248,6 +248,7 @@ import LocationDetailComponent from './Components/Locations/LocationDetailCompon
 import JdCrudComponent from './Components/JobDescription/JdCrudComponent.vue';
 import JsListComponent from './Components/JobSpecification/JsListComponent.vue';
 import JsCreateComponent from './Components/JobSpecification/JsCreateComponent.vue';
+import JsEditComponent from './Components/JobSpecification/JsEditComponent.vue';
 import SopListComponent from './Components/SOP/SopListComponent.vue';
 import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
 import OkrAssignComponent from './Components/OkrAssign/OkrAssignComponent.vue';
@@ -494,6 +495,7 @@ app.component('LocationDetailComponent',LocationDetailComponent);
 app.component('JdCrudComponent',JdCrudComponent);
 app.component('JsListComponent',JsListComponent);
 app.component('JsCreateComponent',JsCreateComponent);
+app.component('JsEditComponent',JsEditComponent);
 app.component('SopListComponent',SopListComponent);
 app.component('SopCreateComponent',SopCreateComponent);
 app.component('OkrAssignComponent',OkrAssignComponent);

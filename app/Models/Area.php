@@ -72,4 +72,15 @@ class Area extends BaseModel
     {
         return $this->hasMany(StaffTimeshift::class, 'area_id');
     }
+
+    public function inventoryable()
+    {
+        return $this->morphOne(Inventoryable::class, 'inventoryable');
+    }
+
+    public function inventory()
+    {
+        return $this->morphOne(Inventoryable::class, 'inventoryable')
+            ->with('inventory');
+    }
 }

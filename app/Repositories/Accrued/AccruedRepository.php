@@ -29,49 +29,51 @@ class AccruedRepository implements AccruedRepositoryInterface
         try {
             $expenseAccount = Account::where('id', $request['expense_account_id'])->where('account_code', $request['expense_account_code'])->first();
             $accruedAccount = Account::where('link_account_id', $expenseAccount->id)->first();
+            $otherPayableAccount = Account::where('id', $request['other_payable_account_id'])->where('account_code', $request['other_payable_account_code'])->first();
 
-            $accrued = Accrued::create([
-                'date_time' => now(),
-                'category' => $request['category'],
-                'type' => $request['type'],
-                'account_id' => $accruedAccount->id,
-                'main_account_id' => $expenseAccount->id,
-                'cash_account_id' => $request['cash_account_id'] ?? null,
-                'amount' => $request['amount'],
-                'created_by' => UserData()->id,
-            ]);
-            if ($request['type'] == "addition") {
-                $transaction = (new StoreTransactionLedger())->createTransaction([
-                    'date' => now(),
+            if($request['category'] === "accrued"){
+                $accrued = Accrued::create([
+                    'date_time' => now(),
+                    'category' => $request['category'],
+                    'type' => $request['type'],
+                    'account_id' => $accruedAccount->id,
+                    'main_account_id' => $expenseAccount->id,
+                    'cash_account_id' => $request['cash_account_id'] ?? null,
+                    'amount' => $request['amount'],
                     'created_by' => UserData()->id,
-                    'description' => 'Accrued',
-                    'transactionable_id' => $accrued->id,
-                    'is_confirmed' => 1,
-                    'transactionable_type' => 'accrued',
                 ]);
-                #debit
-                if ($expenseAccount) {
-                    $debitAccount = (new Account())->accountByCode($expenseAccount->account_code);
-                    if ($debitAccount) {
+                if ($request['type'] == "addition") {
+                    $transaction = (new StoreTransactionLedger())->createTransaction([
+                        'date' => now(),
+                        'created_by' => UserData()->id,
+                        'description' => 'Accrued',
+                        'transactionable_id' => $accrued->id,
+                        'is_confirmed' => 1,
+                        'transactionable_type' => 'accrued',
+                    ]);
+                    #debit
+                    if ($expenseAccount) {
+                        $debitAccount = (new Account())->accountByCode($expenseAccount->account_code);
+                        if ($debitAccount) {
+                            (new StoreTransactionLedger())->storeLedger([
+                                'value' => $request['amount'],
+                                'transaction_id' => $transaction->id,
+                                'account_id' => $expenseAccount->id,
+                                'action' => 'debit',
+                            ]);
+                        } else {
+                            ResponseMessage('Account is Invalid', 419);
+                        }
+                    }
+                    #credit
+                    if ($accruedAccount) {
                         (new StoreTransactionLedger())->storeLedger([
                             'value' => $request['amount'],
                             'transaction_id' => $transaction->id,
-                            'account_id' => $expenseAccount->id,
-                            'action' => 'debit',
+                            'account_id' =>  $accruedAccount->id,
+                            'action' => 'credit',
                         ]);
-                    } else {
-                        ResponseMessage('Account is Invalid', 419);
                     }
-                }
-                #credit
-                if ($accruedAccount) {
-                    (new StoreTransactionLedger())->storeLedger([
-                        'value' => $request['amount'],
-                        'transaction_id' => $transaction->id,
-                        'account_id' =>  $accruedAccount->id,
-                        'action' => 'credit',
-                    ]);
-                }
             } else if ($request['type'] == "settlement") {
                 $transaction = (new StoreTransactionLedger())->createTransaction([
                     'date' => now(),
@@ -105,6 +107,86 @@ class AccruedRepository implements AccruedRepositoryInterface
                     ]);
                 }
             }
+            }
+            else if($request['category'] === "other_payable"){
+
+            $accrued = Accrued::create([
+                'date_time' => now(),
+                'category' => $request['category'],
+                'type' => $request['type'],
+                'account_id' => $otherPayableAccount->id,
+                'main_account_id' => $expenseAccount->id,
+                'cash_account_id' => $request['cash_account_id'] ?? null,
+                'amount' => $request['amount'],
+                'created_by' => UserData()->id,
+            ]);
+            if ($request['type'] == "addition") {
+                $transaction = (new StoreTransactionLedger())->createTransaction([
+                    'date' => now(),
+                    'created_by' => UserData()->id,
+                    'description' => 'Other Payable',
+                    'transactionable_id' => $accrued->id,
+                    'is_confirmed' => 1,
+                    'transactionable_type' => 'accrued',
+                ]);
+                #debit
+                if ($expenseAccount) {
+                    $debitAccount = (new Account())->accountByCode($expenseAccount->account_code);
+                    if ($debitAccount) {
+                        (new StoreTransactionLedger())->storeLedger([
+                            'value' => $request['amount'],
+                            'transaction_id' => $transaction->id,
+                            'account_id' => $expenseAccount->id,
+                            'action' => 'debit',
+                        ]);
+                    } else {
+                        ResponseMessage('Account is Invalid', 419);
+                    }
+                }
+                #credit
+                if ($otherPayableAccount) {
+                    (new StoreTransactionLedger())->storeLedger([
+                        'value' => $request['amount'],
+                        'transaction_id' => $transaction->id,
+                        'account_id' =>  $otherPayableAccount->id,
+                        'action' => 'credit',
+                    ]);
+                }
+            } else if ($request['type'] == "settlement") {
+                $transaction = (new StoreTransactionLedger())->createTransaction([
+                    'date' => now(),
+                    'created_by' => UserData()->id,
+                    'description' => 'Settlement',
+                    'transactionable_id' => $accrued->id,
+                    'is_confirmed' => 1,
+                    'transactionable_type' => 'accrued',
+                ]);
+                #debit
+                if ($otherPayableAccount) {
+                    $debitAccount = (new Account())->accountByCode($otherPayableAccount->account_code);
+                    if ($debitAccount) {
+                        (new StoreTransactionLedger())->storeLedger([
+                            'value' => $request['amount'],
+                            'transaction_id' => $transaction->id,
+                            'account_id' => $otherPayableAccount->id,
+                            'action' => 'debit',
+                        ]);
+                    } else {
+                        ResponseMessage('Account is Invalid', 419);
+                    }
+                }
+                #credit
+                if ($request['cash_account_id']) {
+                    (new StoreTransactionLedger())->storeLedger([
+                        'value' => $request['amount'],
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $request['cash_account_id'],
+                        'action' => 'credit',
+                    ]);
+                }
+            }
+            
+        }
             DB::commit();
             return $accrued;
         } catch (\Exception $e) {
@@ -154,5 +236,18 @@ class AccruedRepository implements AccruedRepositoryInterface
             ->paginate(config('common.list_count'));
 
         return $accrueds;
+    }
+
+    public function getOtherPayable($request)
+    {
+        $account = Account::with('sub_account')
+        ->where('link_account_id', null)
+        ->where('account_code', 'like', '4-4%')
+        ->whereHas('sub_account', function ($query) {
+            $query->where('account_code', '4-4000');
+        })->orderBy('id', 'desc')
+        ->get();
+    
+    return $account;
     }
 }
