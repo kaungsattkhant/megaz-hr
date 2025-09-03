@@ -40,7 +40,8 @@ class OrderItem extends Model
         'completed_by',
         'placed_at',
         'placed_by',
-        'group_order_id'
+        'group_order_id',
+        'inventory_id',
     ];
 
     //     protected $with = ['menu'];

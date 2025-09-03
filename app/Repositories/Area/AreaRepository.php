@@ -126,7 +126,6 @@ class AreaRepository implements AreaRepositoryInterface
                 $query->where('name', 'Cooking Area');
             })
             ->get();
-
         return $areas;
     }
 }

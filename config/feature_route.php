@@ -52,8 +52,8 @@ return [
     'menu-category' => 'menu_categories.index',
     'account' => 'accounting.index',// chart of account (COA)
     // 'financial-transaction'=> 'financial_transaction.index',
-    'asset-item' => 'fixed_assets.asset_item_list',
-    'okr-duty' => 'okr_duty.index',
+    'asset-item' => 'assetItemList',
+    'okr-duty' => 'okr_duty',
     'okr-dashboard' => 'okr_dashboard.index',
     'menu-forecasting' => 'menu_forecastings.index',
     'ktv-forecasting' => 'ktv_forecastings.index',
