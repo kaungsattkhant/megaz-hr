@@ -62,7 +62,7 @@ return [
     'time-shift' => 'time_shift.index',
     'check-in' => 'check_in.index',
     'gps' => 'GPS.index',
-    'contact' => 'contact.index',
+    'contact' => 'contact',
     'meeting' => 'meeting.index',
     'training' => 'training.index',
     'org-new' => 'org_news.index',
