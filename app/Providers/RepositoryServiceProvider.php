@@ -205,6 +205,8 @@ use App\Repositories\CustomerDepositReport\CustomerDepositReportRepositoryInterf
 use App\Repositories\CustomerDepositReport\CustomerDepositReportRepository;
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepositoryInterface;
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
+use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepositoryInterface;
+use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -309,5 +311,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SaleLedgerReportRepositoryInterface::class, SaleLedgerReportRepository::class);
         $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
         $this->app->bind(DepositAndReceivableReportRepositoryInterface::class, DepositAndReceivableReportRepository::class);
+        $this->app->bind(CreditPurchaseJournalRepositoryInterface::class, CreditPurchaseJournalRepository::class);
     }
 }
