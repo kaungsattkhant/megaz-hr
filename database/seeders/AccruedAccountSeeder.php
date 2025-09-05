@@ -28,24 +28,23 @@ class AccruedAccountSeeder extends Seeder
         ->get();
 
 
-        $lastOtherPayable = Account::where('account_code', 'like', '4-4%')
+        $lastOtherPayable = Account::where('account_code', 'like', '4-4001')
         ->where('sub_account_id', 17) // Sub account ID for Other Payable
-        ->orderBy('account_code', 'desc')
         ->first();
-
-        $lastCode = $lastOtherPayable ? intval(substr($lastOtherPayable->account_code, 2)) : 4035;
-        $accruedCode = $lastCode + 1;
+        $baseAccountCode = $lastOtherPayable->account_code;
+        $counter = 1;
         $accruedAccounts = [];
 
         foreach ($expenseAccounts as $expenseAccount) {
                 $accruedAccount = [
-                    'account_code' => "4-{$accruedCode}",
+                    'account_code' => $baseAccountCode . "-" . str_pad($counter, 3, '0', STR_PAD_LEFT),
                     'name' => "Accured-{$expenseAccount->name}",
                     'sub_account_id' => $lastOtherPayable->sub_account_id,
+                    'account_id' => $lastOtherPayable->id,
                     'link_account_id' => $expenseAccount->id,
                 ];
                 $accruedAccounts[] = $accruedAccount;
-                $accruedCode++;
+                $counter++;
             }
 
         DB::beginTransaction();

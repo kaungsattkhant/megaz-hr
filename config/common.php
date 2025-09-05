@@ -374,4 +374,7 @@ return [
     'creditor_account_code' => '4-2000',
     'cash_account_code'=>['2-1001','2-1002','2-1003','2-1004','2-1005','2-1006','2-1007','2-1008','2-1009','2-1010'],
     'pos_cash_account_code'=>['2-1011','2-1012'],
+    'loan_account_code'=>'4-1001', //subheading - Liabilities
+    'interest_on_loan_account_code'=>'6-8001' //subheading - Finance Cost
+
 ];

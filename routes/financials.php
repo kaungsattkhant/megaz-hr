@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\LoanController;
+use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\AccountPayableController;
-use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\FinancialReportController;
 use App\Http\Controllers\API\SalesLedgerReportController;
 
@@ -35,4 +36,13 @@ Route::controller(FinancialReportController::class)->group(function () {
 
 Route::controller(SalesLedgerReportController::class)->group(function () {
     Route::get('get_sale_ledgers','getSaleLedgerReport');
+});
+
+Route::controller(LoanController::class)->group(function () {
+    Route::post('loan-creditor-accounts','storeLoanCreditorAccount');
+    Route::get('loan-creditor-accounts','getLoanCreditorAccount');
+    Route::get('interest-on-loan-creditor-accounts','getInterestOnLoanCreditorAccount');
+    Route::post('loans','storeLoan');
+    Route::get('loans','getLoans');
+    Route::get('loans/{loanAccountId}','getLoanByAccountId');
 });

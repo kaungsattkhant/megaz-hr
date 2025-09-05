@@ -16,6 +16,7 @@ use App\Repositories\Bank\BankRepository;
 use App\Repositories\Duty\DutyRepository;
 use App\Repositories\Exam\ExamRepository;
 use App\Repositories\Item\ItemRepository;
+use App\Repositories\Loan\LoanRepository;
 use App\Repositories\Menu\MenuRepository;
 use App\Repositories\Pack\PackRepository;
 use App\Repositories\Role\RoleRepository;
@@ -24,27 +25,27 @@ use App\Repositories\Asset\AssetInterface;
 use App\Repositories\Asset\AssetRepository;
 use App\Repositories\Event\EventRepository;
 use App\Repositories\Leave\LeaveRepository;
-use App\Repositories\Order\OrderRepository;
 // <<<<<<< HEAD
 // use App\Repositories\AccountPayable\AccountPayableInterface;
 // use App\Repositories\AccountPayable\AccountPayableRepository;
+use App\Repositories\Order\OrderRepository;
 use App\Repositories\Skill\SkillRepository;
-use App\Repositories\Staff\StaffRepository;
 // use App\Repositories\Ads\AdsRepository;
 // use App\Repositories\Ads\AdsRepositoryInterface;
 // =======
+use App\Repositories\Staff\StaffRepository;
 use App\Repositories\Entity\EntityRepository;
-use App\Repositories\OffDay\OffDayRepository;
 // >>>>>>> origin/k/backend-api-main
+use App\Repositories\OffDay\OffDayRepository;
 use App\Repositories\Salary\SalaryRepository;
 use App\Repositories\Account\AccountInterface;
-use App\Repositories\Canteen\CanteenInterface;
 
+use App\Repositories\Canteen\CanteenInterface;
 use App\Repositories\Cv\CvRepositoryInterface;
+
 use App\Repositories\Service\ServiceInterface;
 
 use App\Repositories\Account\AccountRepository;
-
 use App\Repositories\Accrued\AccruedRepository;
 use App\Repositories\Booking\BookingRepository;
 use App\Repositories\Canteen\CanteenRepository;
@@ -60,33 +61,34 @@ use App\Repositories\Ads\AdsRepositoryInterface;
 use App\Repositories\CashBook\CashBookInterface;
 use App\Repositories\Creditor\CreditorInterface;
 use App\Repositories\HandBook\HandBookInterface;
+
 use App\Repositories\Supplier\SupplierInterface;
-
 use App\Repositories\Tag\TagRepositoryInterface;
+
+
 use App\Repositories\Uom\UomRepositoryInterface;
-
-
 use App\Repositories\CashBook\CashBookRepository;
+
 use App\Repositories\Creditor\CreditorRepository;
-
 use App\Repositories\Customer\CustomerRepository;
-use App\Repositories\HandBook\HandBookRepository;
 
+use App\Repositories\HandBook\HandBookRepository;
 use App\Repositories\Location\LocationRepository;
 use App\Repositories\Supplier\SupplierRepository;
+
+
 use App\Repositories\Transfer\TransferRepository;
-
-
 use App\Repositories\Accessory\AccessoryInterface;
+
 use App\Repositories\Area\AreaRepositoryInterface;
-
 use App\Repositories\Bank\BankRepositoryInterface;
+
 use App\Repositories\Duty\DutyRepositoryInterface;
-
 use App\Repositories\Exam\ExamRepositoryInterface;
-use App\Repositories\HomeRepository\HomeInterface;
 
+use App\Repositories\HomeRepository\HomeInterface;
 use App\Repositories\Item\ItemRepositoryInterface;
+use App\Repositories\Loan\LoanRepositoryInterface;
 use App\Repositories\Menu\MenuRepositoryInterface;
 use App\Repositories\Objective\ObjectiveInterface;
 use App\Repositories\Pack\PackRepositoryInterface;
@@ -97,12 +99,12 @@ use App\Repositories\Complaint\ComplaintRepository;
 use App\Repositories\FoodOrder\FoodOrderRepository;
 use App\Repositories\HomeRepository\HomeRepository;
 use App\Repositories\Interview\InterviewRepository;
+
 use App\Repositories\Inventory\InventoryRepository;
 use App\Repositories\Objective\ObjectiveRepository;
 
 use App\Repositories\TimeShift\TimeShiftRepository;
 use App\Repositories\Event\EventRepositoryInterface;
-
 use App\Repositories\Leave\LeaveRepositoryInterface;
 use App\Repositories\Order\OrderRepositoryInterface;
 use App\Repositories\Skill\SkillRepositoryInterface;
@@ -128,19 +130,19 @@ use App\Repositories\Journal\JournalRepositoryInterface;
 use App\Repositories\Notification\NotificationInterface;
 use App\Repositories\Package\PackageRepositoryInterface;
 use App\Repositories\PoOrder\PoOrderRepositoryInterface;
+
 use App\Repositories\Prepaid\PrepaidRepositoryInterface;
 use App\Repositories\CookingPlace\CookingPlaceRepository;
-
 use App\Repositories\FinancialReport\FinancialRepository;
 use App\Repositories\MenuCategory\MenuCategoryRepository;
 use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\RoomDiscount\RoomDiscountRepository;
 use App\Repositories\SellingExtra\SellingExtraRepository;
 use App\Repositories\StaffAdvance\StaffAdvanceRepository;
-use App\Repositories\Customer\CustomerRepositoryInterface;
-use App\Repositories\Location\LocationRepositoryInterface;
 
 // =======
+use App\Repositories\Customer\CustomerRepositoryInterface;
+use App\Repositories\Location\LocationRepositoryInterface;
 use App\Repositories\Transfer\TransferRepositoryInterface;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\AccountPayable\AccountPayableInterface;
@@ -159,6 +161,7 @@ use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\MRPForecast\MRPForecastRepositoryInterface;
 use App\Repositories\Resignation\ResignationRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
+use App\Repositories\SaleLedgerReport\SaleLedgerReportRepository;
 use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
 use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
@@ -181,26 +184,25 @@ use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepository;
 use App\Repositories\AssetInventoryLedger\AssetInventoryLedgerInterface;
 use App\Repositories\AssetInventoryLedger\AssetInventoryLedgerRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
+use App\Repositories\SaleLedgerReport\SaleLedgerReportRepositoryInterface;
 use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
+
 use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
-
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository;
+
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
-
-use App\Repositories\SaleLedgerReport\SaleLedgerReportRepositoryInterface;
-use App\Repositories\SaleLedgerReport\SaleLedgerReportRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -303,5 +305,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(HandBookInterface::class, HandBookRepository::class);
         $this->app->bind(AccruedRepositoryInterface::class, AccruedRepository::class);
         $this->app->bind(SaleLedgerReportRepositoryInterface::class, SaleLedgerReportRepository::class);
+        $this->app->bind(LoanRepositoryInterface::class, LoanRepository::class);
     }
 }

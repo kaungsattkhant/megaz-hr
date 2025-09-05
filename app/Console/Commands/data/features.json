@@ -1365,6 +1365,16 @@
         "slug": "jd.create"
     },
     {
+        "module": "jd",
+        "name": "jd edit",
+        "slug": "jd.edit"
+    },
+    {
+        "module": "jd",
+        "name": "jd delete",
+        "slug": "jd.delete"
+    },
+    {
         "module": "js",
         "name": "js list",
         "slug": "js"
@@ -1373,6 +1383,16 @@
         "module": "js",
         "name": "js create",
         "slug": "js.create"
+    },
+    {
+        "module": "js",
+        "name": "js edit",
+        "slug": "js.edit"
+    },
+    {
+        "module": "js",
+        "name": "js delete",
+        "slug": "js.delete"
     },
     {
         "module": "sop",
