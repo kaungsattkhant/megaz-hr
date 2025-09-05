@@ -282,9 +282,9 @@ class StaffRepository implements StaffRepositoryInterface
     public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null)
     {
 
-        $allowedRoles = $roles ? (in_array('Manager', $roles)
-            ? ['Supervisor', 'Staff']
-            : ['Staff']) : null;
+        $allowedRoles = $roles ? ((in_array('Manager', $roles) || in_array('Bartender', $roles))
+            ? ['Supervisor', 'Staff','Helper']
+            : ['Staff','Helper']) : null;
         if ($request->per_page || $request->page) {
             // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             // $pageNumber = 1;
