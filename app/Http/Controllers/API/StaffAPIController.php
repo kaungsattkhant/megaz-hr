@@ -130,7 +130,7 @@ class StaffAPIController extends Controller
         $staff = Staff::find($request->user()->id);
 
         $roles = $staff->roles->pluck('name')->toArray();
-        $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Helper', $roles);
+        $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Bartender', $roles) || in_array('Helper', $roles);
         if (!$isSupervisorOrManager) {
             ResponseMessage('Not authorized', 403);
         }
