@@ -141,6 +141,7 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function listOfAccountPayableTransaction($request)
     {
+        // dd($request->all());
         $ledger = DB::table('account_payables')
             ->join('suppliers', 'account_payables.supplier_id', '=', 'suppliers.id')
             ->join('accounts', 'account_payables.account_id', '=', 'accounts.id')
@@ -152,6 +153,7 @@ class AccountPayableRepository implements AccountPayableInterface
                 'account_payables.amount as amount',
                 DB::raw("DATE_FORMAT(account_payables.created_at, '%M %d %Y %H:%i') as date"),
             )
+            ->where('suppliers.id',$request->supplier_id)
             ->where('account_payables.type','settlement')
             ->get();
         // $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
