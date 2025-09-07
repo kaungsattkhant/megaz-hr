@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\Staff;
 use App\Models\TimeShift;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StaffTimeshift extends Model
@@ -36,5 +37,14 @@ class StaffTimeshift extends Model
     public function area()
     {
         return $this->belongsTo(Area::class);
+    }
+    public function participants(): MorphMany
+    {
+        return $this->morphMany(Participant::class, 'participantable');
+    }
+
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
     }
 }
