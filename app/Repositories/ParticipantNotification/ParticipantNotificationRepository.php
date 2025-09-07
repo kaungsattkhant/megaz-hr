@@ -1168,8 +1168,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     $notificationUsers = NotificationUser::with(['notification' => function($query) use ($type) {
       $query->with('notificationable');
       if ($type) {
-          $query->where('notificationable_type', $type)
-                ->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+          $query->where('notificationable_type', $type);
+                // ->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
       } else {
           $query->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
       }
@@ -1178,6 +1178,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       ->orderBy('id', 'desc')
       ->get();
     foreach ($notificationUsers as $notificationUser) {
+      $notificationUser->load('notification');
+
       $notificationType = $notificationUser->notification->notificationable_type;
       $notificationUser->notification->load(['notificationable']);
       if ($notificationType === 'staff_timeshift') {
