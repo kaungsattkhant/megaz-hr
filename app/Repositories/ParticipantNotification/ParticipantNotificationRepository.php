@@ -1165,13 +1165,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     // return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
 
     $type = $request->query('type');
-    $notificationUsers = NotificationUser::with(['notification' => function($query) use ($type) {
+    $notificationUsers = NotificationUser::with(['notification' => function ($query) use ($type) {
       $query->with('notificationable');
       if ($type) {
-          $query->where('notificationable_type', $type)
-                ->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+        $query->where('notificationable_type', $type)
+          ->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
       } else {
-          $query->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+        $query->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
       }
     }])
       ->where('staff_id', $staffId)
@@ -1185,7 +1185,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           'notificationable.timeshift.shift',
           'notificationable.area'
         ]);
-      } elseif (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
+      } else if (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
         $notificationUser->notification->load([
           'notificationable.participants',
           'notificationable.participants.department.roles',
@@ -1193,7 +1193,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           'notificationable.participants.staff.department',
           'notificationable.participants.staff.roles'
         ]);
-        
+
         if ($notificationType === 'meeting') {
           $notificationUser->notification->load('notificationable.chairedBy');
         } elseif ($notificationType === 'training') {
@@ -1204,10 +1204,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
   }
 
-  public function getMeetingsByStaffId($staffId,$request)
+  public function getMeetingsByStaffId($staffId, $request)
   {
-    $staff = Staff::with('department','roles')->find($staffId);
-    if(!$staff){
+    $staff = Staff::with('department', 'roles')->find($staffId);
+    if (!$staff) {
       return ResponseData(null, 404, false, 'Staff not found.');
     }
 
@@ -1223,28 +1223,28 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role',
       'participants.role.department',
     ])
-    ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
-      $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
-        $subQuery->where('staff_id', $staffId)
-          ->orWhere('department_id', $departmentId)
-          ->orWhereIn('role_id', $roleIds);
-      });
-    })
-    ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '>=', $currentDateTime);
-    })
-    ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '<', $currentDateTime);
-    })
-    ->orderBy('id', 'desc')
-    ->get();
+      ->whereHas('participants', function ($query) use ($staffId, $departmentId, $roleIds) {
+        $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+          $subQuery->where('staff_id', $staffId)
+            ->orWhere('department_id', $departmentId)
+            ->orWhereIn('role_id', $roleIds);
+        });
+      })
+      ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '>=', $currentDateTime);
+      })
+      ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '<', $currentDateTime);
+      })
+      ->orderBy('id', 'desc')
+      ->get();
     return ResponseData(MeetingResource::collection($meetings), 200, true, 'Meetings retrieved successfully.');
   }
 
-  public function getTrainingsByStaffId($staffId,$request)
+  public function getTrainingsByStaffId($staffId, $request)
   {
-    $staff = Staff::with('department','roles')->find($staffId);
-    if(!$staff){
+    $staff = Staff::with('department', 'roles')->find($staffId);
+    if (!$staff) {
       return ResponseData(null, 404, false, 'Staff not found.');
     }
 
@@ -1260,43 +1260,43 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role',
       'participants.role.department',
     ])
-    ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
-      $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
-        $subQuery->where('staff_id', $staffId)
-          ->orWhere('department_id', $departmentId)
-          ->orWhereIn('role_id', $roleIds);
-      });
-    })
-    ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '>=', $currentDateTime);
-    })
-    ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '<', $currentDateTime);
-    })
-    ->orderBy('id', 'desc')
-    ->get();
+      ->whereHas('participants', function ($query) use ($staffId, $departmentId, $roleIds) {
+        $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+          $subQuery->where('staff_id', $staffId)
+            ->orWhere('department_id', $departmentId)
+            ->orWhereIn('role_id', $roleIds);
+        });
+      })
+      ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '>=', $currentDateTime);
+      })
+      ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '<', $currentDateTime);
+      })
+      ->orderBy('id', 'desc')
+      ->get();
     return ResponseData(MeetingResource::collection($trainings), 200, true, 'Trainings retrieved successfully.');
   }
 
-  public function getShiftsByStaffId($staffId,$request)
+  public function getShiftsByStaffId($staffId, $request)
   {
-    $shifts = StaffTimeshift::with('staff','timeshift.shift','area')->where('staff_id',$staffId)
-    ->where('status','confirmed')->orderBy('id','desc')->paginate(config('common.list_count'));
-    if($shifts->isEmpty()){
+    $shifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')->where('staff_id', $staffId)
+      ->where('status', 'confirmed')->orderBy('id', 'desc')->paginate(config('common.list_count'));
+    if ($shifts->isEmpty()) {
       return [];
     }
     return StaffTimeShiftResource::collection($shifts);
   }
 
-  public function getConfirmedShiftsByStaffIdTimeShiftId($staffId,$staffTimeshiftId){
-    $shift = StaffTimeshift::with('staff','timeshift.shift','area')
-    ->where('staff_id',$staffId)
-    ->where('id',$staffTimeshiftId)
-    ->where('status','confirmed')->get();
-    if($shift->isEmpty()){
+  public function getConfirmedShiftsByStaffIdTimeShiftId($staffId, $staffTimeshiftId)
+  {
+    $shift = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
+      ->where('staff_id', $staffId)
+      ->where('id', $staffTimeshiftId)
+      ->where('status', 'confirmed')->get();
+    if ($shift->isEmpty()) {
       return [];
     }
     return StaffTimeShiftResource::collection($shift);
   }
-
 }
