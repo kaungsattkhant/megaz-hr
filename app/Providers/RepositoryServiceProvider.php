@@ -186,9 +186,10 @@ use App\Repositories\AssetInventoryLedger\AssetInventoryLedgerRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
 use App\Repositories\SaleLedgerReport\SaleLedgerReportRepositoryInterface;
 use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
+use App\Repositories\CustomerDepositReport\CustomerDepositReportRepository;
+
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
-
 use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
@@ -196,13 +197,17 @@ use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
+
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository;
-
+use App\Repositories\CustomerDepositReport\CustomerDepositReportRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
+
+use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
+use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -306,5 +311,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AccruedRepositoryInterface::class, AccruedRepository::class);
         $this->app->bind(SaleLedgerReportRepositoryInterface::class, SaleLedgerReportRepository::class);
         $this->app->bind(LoanRepositoryInterface::class, LoanRepository::class);
+        $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
+        $this->app->bind(DepositAndReceivableReportRepositoryInterface::class, DepositAndReceivableReportRepository::class);
     }
 }

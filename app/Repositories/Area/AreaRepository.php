@@ -106,7 +106,8 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getSellingAreas($request)
     {
-        $areas = Area::with(['areaCategory', 'areaType'])->where('is_active', 1)
+        $areas = Area::with(['areaCategory', 'areaType','inventoryable.inventory'
+        ])->where('is_active', 1)
             ->whereHas('areaCategory', function ($query) {
                 $query->where('name', 'Selling Area');
             })
@@ -120,12 +121,11 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getCookingAreas($request)
     {
-        $areas = Area::with(['areaCategory', 'areaType'])->where('is_active', 1)
+        $areas = Area::with(['areaCategory', 'areaType','inventoryable.inventory'])->where('is_active', 1)
             ->whereHas('areaCategory', function ($query) {
                 $query->where('name', 'Cooking Area');
             })
             ->get();
-
         return $areas;
     }
 }

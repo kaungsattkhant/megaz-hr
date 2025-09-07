@@ -13,4 +13,9 @@ class SubAccount extends Model
     public function head_account(){
         return $this->belongsTo(\App\Models\HeadAccount::class);
     }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
+    }
 }

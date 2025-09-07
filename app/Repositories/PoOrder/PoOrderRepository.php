@@ -4,6 +4,7 @@ namespace App\Repositories\PoOrder;
 
 use App\Models\PoOrder;
 use App\Models\ItemLeft;
+use App\Models\Supplier;
 use App\Models\Inventory;
 use App\Models\PoInvoice;
 use App\Models\ArrivalItem;
@@ -1237,7 +1238,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   private function storeInventoryLedger($validatedData, $arrivalItem)
   {
-    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
+    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])
+    ->where('is_active',1)
+    ->pluck('id')->first();
     if (!$inventoryId) {
       ResponseMessage('Main Inventory not found.', 404);
     }
@@ -1361,6 +1364,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       's.name as supplier_name',
       // 'i.name as i_name',
       's.account_id',
+      's.creditor_account_id',
       'po_invoices.is_complete',
       'po_invoices.completed_at',
       DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands'),
@@ -1380,6 +1384,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'ai.supplier_id',
         's.name',
         's.account_id',
+      's.creditor_account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',
       )
@@ -1422,6 +1427,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         's.name',
         'i.name',
         's.account_id',
+        's.creditor_account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',
       )
@@ -1441,6 +1447,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $cashAccountId = $request->cash_account_id;
     $discountValue = (float) $request->discount_value;
     $poInvoice = PoInvoice::find($poInvoiceId);
+    $supplierCreditorAccountId=$request->creditor_account_id;
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
     }
@@ -1451,7 +1458,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     try {
       $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId, $supplierId);
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
-        $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
+        $this->storeAP($transaction, $apAmount, $supplierId, $supplierCreditorAccountId, $cashAccountId);
       }
       $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();

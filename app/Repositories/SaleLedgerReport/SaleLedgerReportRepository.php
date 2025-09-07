@@ -26,12 +26,12 @@ class SaleLedgerReportRepository implements SaleLedgerReportRepositoryInterface
         ->join('ledgers as le', 'le.transaction_id', '=', 't.id')
         ->selectRaw("
             DATE(i.invoice_date) as report_date,
-            SUM(CASE WHEN le.account_id={$ktvFoodAccount->id} THEN le.value ELSE 0 END) as Food_Total,
-            SUM(CASE WHEN le.account_id={$ktvBeverageAccount->id} THEN le.value ELSE 0 END) as Beverage_Total,
-            SUM(CASE WHEN le.account_id={$ktvRoomChargesAccount->id} THEN le.value ELSE 0 END) as Room_Charges,
-            SUM(CASE WHEN le.account_id={$otherChargesAccount->id} THEN le.value ELSE 0 END) as Other_Charges,
-            SUM(CASE WHEN le.account_id={$serviceChargeAccount->id} THEN le.value ELSE 0 END) as Service_Charge,
-            (
+            CAST(SUM(CASE WHEN le.account_id={$ktvFoodAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Food_Total,
+            CAST(SUM(CASE WHEN le.account_id={$ktvBeverageAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Beverage_Total,
+            CAST(SUM(CASE WHEN le.account_id={$ktvRoomChargesAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Room_Charges,
+            CAST(SUM(CASE WHEN le.account_id={$otherChargesAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Other_Charges,
+            CAST(SUM(CASE WHEN le.account_id={$serviceChargeAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Service_Charge,
+            CAST((
                 SUM(CASE WHEN le.account_id IN (
                     {$ktvFoodAccount->id},
                     {$ktvBeverageAccount->id},
@@ -39,7 +39,7 @@ class SaleLedgerReportRepository implements SaleLedgerReportRepositoryInterface
                     {$otherChargesAccount->id},
                     {$serviceChargeAccount->id}
                 ) THEN le.value ELSE 0 END)
-            ) as All_Total
+            ) AS DOUBLE) as All_Total
         ")
         ->where('at.type', 'ktv') // or 'bar_and_restaurant'
         ->where('le.action', 'credit')
@@ -72,11 +72,13 @@ class SaleLedgerReportRepository implements SaleLedgerReportRepositoryInterface
         ->join('ledgers as le', 'le.transaction_id', '=', 't.id')
         ->selectRaw("
             DATE(i.invoice_date) as report_date,
-            SUM(CASE WHEN le.account_id={$rtFoodAccount->id} THEN le.value ELSE 0 END) as Food_Total,
-            SUM(CASE WHEN le.account_id={$rtBeverageAccount->id} THEN le.value ELSE 0 END) as Beverage_Total,
-            SUM(CASE WHEN le.account_id={$rtRoomChargesAccount->id} THEN le.value ELSE 0 END) as Room_Charges,
-            SUM(CASE WHEN le.account_id={$otherChargesAccount->id} THEN le.value ELSE 0 END) as Other_Charges,
-            SUM(CASE WHEN le.account_id={$serviceChargeAccount->id} THEN le.value ELSE 0 END) as Service_Charge,
+            CAST(SUM(CASE WHEN le.account_id={$rtFoodAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Food_Total,
+            CAST(SUM(CASE WHEN le.account_id={$rtBeverageAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Beverage_Total,
+            CAST(SUM(CASE WHEN le.account_id={$rtRoomChargesAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Room_Charges,
+            CAST(SUM(CASE WHEN le.account_id={$otherChargesAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Other_Charges,
+            CAST(SUM(CASE WHEN le.account_id={$serviceChargeAccount->id} THEN le.value ELSE 0 END) AS DOUBLE) as Service_Charge,
+
+            CAST(
             (
                 SUM(CASE WHEN le.account_id IN (
                     {$rtFoodAccount->id},
@@ -85,7 +87,7 @@ class SaleLedgerReportRepository implements SaleLedgerReportRepositoryInterface
                     {$otherChargesAccount->id},
                     {$serviceChargeAccount->id}
                 ) THEN le.value ELSE 0 END)
-            ) as All_Total
+            ) AS DOUBLE) as All_Total
         ")
         ->where('at.type', 'bar_and_restaurant')
         ->where('le.action', 'credit')

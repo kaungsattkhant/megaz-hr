@@ -12,6 +12,8 @@ import { store } from './Store';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/messaging';
 import Notifications from '@kyvg/vue3-notification';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -515,9 +517,10 @@ app.component('SaleLedgerComponent',SaleLedgerComponent);
 app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
 app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
 
-
+const toastificationOptions = {};
 app.use(store);
 app.use(Notifications);
+app.use(Toast, toastificationOptions);
 app.mount('#app');
 
 

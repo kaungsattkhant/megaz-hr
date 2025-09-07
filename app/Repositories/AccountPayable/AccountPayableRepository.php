@@ -4,6 +4,7 @@ namespace App\Repositories\AccountPayable;
 
 use App\Models\Ledger;
 use App\Models\Account;
+use App\Models\Supplier;
 use App\Models\AccountPayable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,7 @@ class AccountPayableRepository implements AccountPayableInterface
                 'supplier_id',
                 'suppliers.name as supplier_name',
                 'suppliers.account_id',
+                'suppliers.creditor_account_id',
                 DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) as credit_amount'),
                 DB::raw('SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) as debit_amount'),
                 DB::raw('SUM(CASE WHEN type = "addition" THEN amount ELSE 0 END) - SUM(CASE WHEN type = "settlement" THEN amount ELSE 0 END) as total_credit_amount')
@@ -94,6 +96,10 @@ class AccountPayableRepository implements AccountPayableInterface
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['is_confirmed'] = 1;
+            // $supplier=Supplier::find($request->supplier_id);
+            // if(!$supplier){
+            //     ResponseMessage('Supplier Not found',419);
+            // }
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
@@ -109,7 +115,7 @@ class AccountPayableRepository implements AccountPayableInterface
             $debitLedger = (new StoreTransactionLedger())->storeLedger([
                 'value' => $request->value,
                 'transaction_id' => $transaction->id,
-                'account_id' => $request->account_id,
+                'account_id' => $request->creditor_account_id,
                 'personable_id' => $request->supplier_id,
                 'personable_type' => 'supplier',
                 'action' => 'debit',
@@ -120,7 +126,7 @@ class AccountPayableRepository implements AccountPayableInterface
                 'date_time' => now(),
                 'amount' => $request->value,
                 'supplier_id' => $request->supplier_id,
-                'account_id' => $request->account_id,
+                'account_id' => $request->creditor_account_id,
                 'cash_account_id' => $request->cash_account_id,
                 'created_by' => UserData()->id,
             ]);
@@ -135,7 +141,7 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function listOfAccountPayableTransaction($request)
     {
-
+        // dd($request->all());
         $ledger = DB::table('account_payables')
             ->join('suppliers', 'account_payables.supplier_id', '=', 'suppliers.id')
             ->join('accounts', 'account_payables.account_id', '=', 'accounts.id')
@@ -147,6 +153,7 @@ class AccountPayableRepository implements AccountPayableInterface
                 'account_payables.amount as amount',
                 DB::raw("DATE_FORMAT(account_payables.created_at, '%M %d %Y %H:%i') as date"),
             )
+            ->where('suppliers.id',$request->supplier_id)
             ->where('account_payables.type','settlement')
             ->get();
         // $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')

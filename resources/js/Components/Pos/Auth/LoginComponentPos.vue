@@ -10,7 +10,7 @@
                 <div class="px-8" @keyup.enter="login">
                     <div>
                         <p class=" text-4xl font-black text-[#153063] mb-4">
-                            Sign Up
+                            Login to POS
                         </p>
                     </div>
                     <div class=" mb-4">
@@ -18,14 +18,20 @@
                             Phone Number
                         </label>
                         <input type="text" id="phoneNumber" autocomplete="off" v-model="phoneNumber"
-                            class=" border border-gray-400 bg-white w-full rounded">
+                            class=" border border-gray-400 bg-white w-full rounded" placeholder="Enter phone number">
                     </div>
                     <div class=" mb-12">
                         <label for="password" class="text-sm text-black mb-2 block">
                             Password
                         </label>
                         <input type="password" id="password" autocomplete="off" v-model="password"
-                            class=" border border-gray-400 bg-white w-full rounded">
+                            class=" border border-gray-400 bg-white w-full rounded" placeholder="Enter password">
+                    </div>
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" v-model="remember" checked class="form-checkbox mr-2" >
+                            <span class="text-sm">Remember me next time</span>
+                        </label>
                     </div>
                     <div class="w-full text-center">
                         <button @click="login"
@@ -40,6 +46,7 @@
                     <input type="hidden" v-model="phoneNumber" name="phone_number">
                     <input type="hidden" v-model="password" name="password">
                     <input type="hidden" v-model="fcmToken" name="fcm_token">
+                    <input type="hidden" v-model="remember" name="remember">
                 </form>
 
             </div>
@@ -52,6 +59,7 @@
 
     import firebase from 'firebase/compat/app';
     import 'firebase/messaging';
+    import { notify } from '../../../utilities/vue-toastification-helper';
 
     export default {
         name: "LoginComponent",
@@ -63,6 +71,7 @@
                 phoneNumber: null,
                 password: null,
                 fcmToken: null,
+                remember: true,
             }
         },
 
@@ -74,7 +83,9 @@
                 let formData = new FormData();
                 formData.append('phone_number', this.phoneNumber);
                 formData.append('password', this.password);
-                formData.append('fcm_token', this.fcmToken);
+                if(this.fcmToken){
+                    formData.append('fcm_token', this.fcmToken);
+                }
 
                 let response = await postApiData({ url: url, form_data: formData });
                 console.log(response);
@@ -92,11 +103,13 @@
                     });
 
                     this.setRoles(roles);
+                    notify('Login successful','success');
                     this.$refs.signinForm.submit();
 
                     return true;
                 }
                 else {
+                    notify(response.message,'warning');
                     return false;
                 }
             }

@@ -4,6 +4,7 @@ namespace App\Repositories\Supplier;
 
 use App\Models\Account;
 use App\Models\Supplier;
+use Illuminate\Support\Str;
 use App\Imports\BrandImport;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
@@ -50,7 +51,7 @@ class SupplierRepository implements SupplierInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-
+            $supplierCode=!isset($data['supplier_code']) ? strtolower(str_replace(' ', '_', $data['name']))."_". Str::random(10) : $data['supplier_code'];
             if (isset($data['credit_term_type'])) {
                 switch ($data['credit_term_type']) {
                     case "day":
@@ -74,6 +75,7 @@ class SupplierRepository implements SupplierInterface
                         break;
                 }
             }
+            $data['supplier_code']=$supplierCode;
             $supplier = Supplier::updateOrCreate(
                 ['id' => $data['id']],
                 $data
@@ -215,14 +217,14 @@ class SupplierRepository implements SupplierInterface
             $accountPayable = AccountPayable::updateOrCreate(
                 [
                     'supplier_id' => $supplier->id,
-                    'account_id' => $supplier->account_id
+                    'account_id' => $supplier->creditor_account_id
                 ],
                 [
                     'type' => 'addition',
                     'date_time' => $supplier->credit_opening_date,
                     'amount' => $supplier->credit_opening_amount,
                     'supplier_id' => $supplier->id,
-                    'account_id' => $supplier->account_id,
+                    'account_id' => $supplier->creditor_account_id,
                     'created_by' => UserData()->id,
                 ]
             );
