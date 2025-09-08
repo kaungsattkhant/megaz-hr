@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\Staff;
+use App\Models\Participant;
+use App\Models\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

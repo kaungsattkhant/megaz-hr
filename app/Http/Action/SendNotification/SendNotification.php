@@ -67,6 +67,10 @@ trait SendNotification
         foreach ($user_ids as $user_id) {
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $user_id,
+            ], [
+                'title' => $data['title'],
+                'preview' => $data['body'],
+                'type' => $type
             ]);
         }
         if ($users->isNotEmpty()) {
