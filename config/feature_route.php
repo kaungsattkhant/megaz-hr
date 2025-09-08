@@ -84,6 +84,11 @@ return [
     'customer-birthday' => 'CRM.customers.birthdays',
     'birthday-promotion' => 'CRM.birthday_discounts.index',
     'used-defected-item' => 'used_defected_items.index',
+    'jd'=>'job_description.index',
+    'js'=>'job_specifications.index',
+    'sop'=>'SOP.index',
+    'cv'=>'CV.index',
+    
     
     //financial
     'chartofaccount' => 'accounting',
@@ -97,6 +102,7 @@ return [
     'prepaid' => 'prepaid.index',
     'ar' => 'AR.index',
     'cashbook' => 'cashbook',
+    'accrual'=>'accruals.index',
     //end financial
 
     //pos
@@ -108,5 +114,6 @@ return [
     'pos-booking' => 'pos.booking.index',
     'pos-food-order' => 'pos.menu_order.index',
     'pos-ar' => 'pos.ar',
+    'pos-menu-sale-report'=>'pos.sale_reports',
 
 ];
