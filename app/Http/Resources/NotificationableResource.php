@@ -58,6 +58,7 @@ class NotificationableResource extends JsonResource
         }
         if($this->notification->notificationable_type === "staff_timeshift"){
             $notificationable['staff_id'] = $this->staff_id ?? null;
+            $notificationable['staff_name'] = $this->staff->name ?? null;
             $notificationable['status'] = $this->status ?? null;
             $notificationable['timeshift_id'] = $this->timeshift_id ?? null;
             $notificationable['timeshift'] = $this->whenLoaded('timeshift', function() {

@@ -1269,8 +1269,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $itemsData = [];
     $itemLeadTimes = [];
 
-    $poOrderlist = PoOrder::with(['purchaseOrder', 'item', 'arrivalItems', 'supplier'])
+    $poOrderlist = PoOrder::with(['purchaseOrder','item','supplier'])
       ->where('supplier_id', $supplierId)
+      ->with(['arrivalItems' => function($query) use ($supplierId) {
+        $query->where('supplier_id', $supplierId);
+      }])
       ->get();
 
     if ($poOrderlist->isEmpty()) {
@@ -1292,8 +1295,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
       foreach ($poOrder->arrivalItems as $arrival) {
         $arrivalTime = new \Carbon\Carbon($arrival->created_at);
-
-
         $leadTime = abs($arrivalTime->diffInSeconds($orderTime));
         $avgLeadtime = $leadTime / $totalArrivalItemCount;
         $totalAvgLeadTime += $avgLeadtime;
@@ -1304,7 +1305,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'count' => 0
           ];
         }
-
         // Add lead time and increase count for unique items
         $itemLeadTimes[$arrival->item_id]['total_lead_time'] += $leadTime;
         $itemLeadTimes[$arrival->item_id]['count']++;
@@ -1313,10 +1313,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
     // Calculate average lead time per unique item and format
     foreach ($itemLeadTimes as $itemId => $data) {
-
       $avgOrderTime = $data['total_lead_time'] / $data['count'];
       $formattedAvgOrderTime = $this->formatTime($avgOrderTime);
-
       $poOrder = $poOrderlist->firstWhere('item_id', $itemId);
       $item = $poOrder ? $poOrder->item : null;
       $itemName = $item ? $item->name : 'Unknown Item';
