@@ -39,8 +39,6 @@ class NotificationableResource extends JsonResource
                 }
                 return $participantData;
             }),
-            
-            
         ];
         if ($this->notification->notificationable_type === "meeting") {
             $notificationable['type'] = $this->meeting_type ?? null;
