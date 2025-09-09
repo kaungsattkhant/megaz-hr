@@ -65,7 +65,6 @@ class LoanRepository implements LoanRepositoryInterface
 
     private function generateNextAccountCode($baseCode)
     {
-
         $latestAccount = Account::where('account_code', 'like', $baseCode . '-%')
             ->orderBy('account_code', 'desc')
             ->first();
@@ -254,7 +253,6 @@ class LoanRepository implements LoanRepositoryInterface
                 'loans.account_id',
                 'accounts.name as account_name',
                 'accounts.account_code',
-                'loans.interest_rate',
                 // Calculate loan additions
                 DB::raw('CAST(SUM(CASE WHEN loans.type = "addition" THEN loans.amount ELSE 0 END) AS DECIMAL(15,2)) as total_loan_additions'),
                 DB::raw('CAST(SUM(CASE WHEN loans.type = "interest addition" THEN loans.amount ELSE 0 END) AS DECIMAL(15,2)) as total_interest_additions'),
@@ -262,7 +260,6 @@ class LoanRepository implements LoanRepositoryInterface
                 //DB::raw('CAST(SUM(CASE WHEN loans.type = "settlement" AND loans.category = "loan" THEN loans.amount ELSE 0 END) AS DECIMAL(15,2)) as total_loan_settlements'),
                 //DB::raw('CAST(SUM(CASE WHEN loans.type = "interest settlement" THEN loans.amount ELSE 0 END) AS DECIMAL(15,2)) as total_interest_settlements'),
                 //DB::raw('CAST(SUM(CASE WHEN loans.type = "addition" THEN (loans.amount * loans.interest_rate / 100) ELSE 0 END) AS DECIMAL(15,2)) as total_interest_amount'),
-
                 DB::raw('CAST((
                     SUM(CASE WHEN loans.type = "addition" THEN loans.amount ELSE 0 END) +
                     SUM(CASE WHEN loans.type = "interest addition" THEN loans.amount ELSE 0 END) -
@@ -271,13 +268,13 @@ class LoanRepository implements LoanRepositoryInterface
                 ) AS DECIMAL(15,2)) as total_balance')
             )
             ->groupBy('loans.account_id', 'accounts.name', 'accounts.account_code')
+            ->orderBy('loans.id', 'desc')
             ->paginate(config('common.list_count'));
         $loanSummary->transform(function ($item) {
             $item->total_loan_additions = (float)$item->total_loan_additions;
             $item->total_interest_additions = (float)$item->total_interest_additions;
             // $item->total_loan_settlements = (float)$item->total_loan_settlements;
             // $item->total_interest_settlements = (float)$item->total_interest_settlements;
-            $item->interest_rate = (float)$item->interest_rate;
             // $item->total_interest_amount = (float)$item->total_interest_amount;
             $item->total_balance = (float)$item->total_balance;
             return $item;
