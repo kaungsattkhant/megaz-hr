@@ -53,7 +53,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData($meeting, 201, true, "Meeting created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false,  $e->getMessage());
+      return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
 
@@ -139,7 +139,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $meeting->id,
+                'participantable_id' => $meeting->id,
                 'participantable_type' => 'meeting',
                 'department_id' => $dep
               ];
@@ -178,7 +178,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $meeting->id,
+                'participantable_id' => $meeting->id,
                 'participantable_type' => 'meeting',
                 'role_id' => $role
               ];
@@ -217,7 +217,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $meeting->id,
+                'participantable_id' => $meeting->id,
                 'participantable_type' => 'meeting',
                 'staff_id' => $staff
               ];
@@ -297,7 +297,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData($training, 201, true, "Training created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false,  $e->getMessage());
+      return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
 
@@ -388,7 +388,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $training->id,
+                'participantable_id' => $training->id,
                 'participantable_type' => 'training',
                 'department_id' => $dep
               ];
@@ -427,7 +427,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $training->id,
+                'participantable_id' => $training->id,
                 'participantable_type' => 'training',
                 'role_id' => $role
               ];
@@ -466,7 +466,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $training->id,
+                'participantable_id' => $training->id,
                 'participantable_type' => 'training',
                 'staff_id' => $staff
               ];
@@ -574,7 +574,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role.department',
       'participants.role.staffs',
     ])->orderBy('id', 'desc')->get();
-    return  $orgNew;
+    return $orgNew;
   }
   public function getOrgNewsById($orgNewsId)
   {
@@ -616,7 +616,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
-  public function  updateOrgNews($orgNewsId, $data)
+  public function updateOrgNews($orgNewsId, $data)
   {
     DB::beginTransaction();
     try {
@@ -653,7 +653,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $orgNew->id,
+                'participantable_id' => $orgNew->id,
                 'participantable_type' => 'orgNew',
                 'department_id' => $dep
               ];
@@ -693,7 +693,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $orgNew->id,
+                'participantable_id' => $orgNew->id,
                 'participantable_type' => 'orgNew',
                 'role_id' => $role
               ];
@@ -732,7 +732,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $orgNew->id,
+                'participantable_id' => $orgNew->id,
                 'participantable_type' => 'orgNew',
                 'staff_id' => $staff
               ];
@@ -815,7 +815,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $query->whereBetween('date_time', [$fromDate, $toDate]);
     }
 
-    $warning =  $query->get();
+    $warning = $query->get();
 
     return ResponseData($warning, 200, true, 'Warning retrieved successfully.');
   }
@@ -876,7 +876,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $warning->update($data);
 
       if (isset($data['previous_warning_type']) && isset($data['warning_type'])) {
-        if ($data['previous_warning_type'] ===  $data['warning_type']) {
+        if ($data['previous_warning_type'] === $data['warning_type']) {
 
           if ($data['warning_type'] === "dep_type" && isset($data['department'])) {
 
@@ -899,7 +899,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $warning->id,
+                'participantable_id' => $warning->id,
                 'participantable_type' => 'warning',
                 'department_id' => $dep
               ];
@@ -938,7 +938,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $warning->id,
+                'participantable_id' => $warning->id,
                 'participantable_type' => 'warning',
                 'role_id' => $role
               ];
@@ -977,7 +977,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $warning->id,
+                'participantable_id' => $warning->id,
                 'participantable_type' => 'warning',
                 'staff_id' => $staff
               ];
@@ -1029,8 +1029,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       if (!$warning) {
         return ResponseData(null, 404, false, 'Warning not found.');
       }
-      $existingNotification = $warning->notification()->where('notificationable_id',  $warning->id)
-        ->where('notificationable_type',  'warning')
+      $existingNotification = $warning->notification()->where('notificationable_id', $warning->id)
+        ->where('notificationable_type', 'warning')
         ->first();
       $existingNotification->notificationUsers()->delete();
       $existingNotification->delete();
@@ -1134,7 +1134,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $type = $request->query('type');
 
       $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift'];
-      $notificationUsers = NotificationUser::with(['notification' => function ($query) use ($type, $validTypes) {
+      $notificationUsers = NotificationUser::with(['notification' => function ($query) {
         $query->with('notificationable');
     }])
     ->where('staff_id', $staffId)
@@ -1146,9 +1146,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         }
     })
     ->orderBy('id', 'desc')
-    ->get();
+    ->paginate(config('common.list_count'));
 
-    $filteredNotifications = $notificationUsers->filter(function ($notificationUser) {
+    $filteredNotifications = $notificationUsers->getCollection()->filter(function ($notificationUser) {
         return $notificationUser->notification && $notificationUser->notification->notificationable;
     });
 
@@ -1175,7 +1175,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               'area'
           ]);
       }
-  }
+    }
     return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
   }
 
