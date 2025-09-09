@@ -368,7 +368,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $is_column = 'is_financial_checked';
                     $status = 'financial_checked';
                 } else if (checkDepartmentAndRoles('Management', ['MD'])) {
-
                     $column = 'md_check';
                     $is_column = 'is_md_checked';
                     $status = 'md_checked';
