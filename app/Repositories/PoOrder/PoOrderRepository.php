@@ -1317,8 +1317,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       $avgOrderTime = $data['total_lead_time'] / $data['count'];
       $formattedAvgOrderTime = $this->formatTime($avgOrderTime);
 
-      $item = $poOrderlist->firstWhere('item_id', $itemId)->item;
-      $itemName = $item ? $item->name : 'null';
+      $poOrder = $poOrderlist->firstWhere('item_id', $itemId);
+      $item = $poOrder ? $poOrder->item : null;
+      $itemName = $item ? $item->name : 'Unknown Item';
 
       $itemsData[] = [
         'item_id' => $itemId,
