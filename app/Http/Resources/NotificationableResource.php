@@ -32,15 +32,13 @@ class NotificationableResource extends JsonResource
                         'department_id' => $participant->department_id ?? null,
                         'department_name' => $participant->department->name ?? null,
                         'role_id' => $participant->role_id ?? null,
-                        'role' => $participant->role->name ?? null,
+                        'role_name' => $participant->role->name ?? null,
                         'staff_id' => $participant->staff_id ?? null,
-                        'staff' => $participant->staff->name ?? null,
+                        'staff_name' => $participant->staff->name ?? null,
                     ];
                 }
                 return $participantData;
             }),
-            
-            
         ];
         if ($this->notification->notificationable_type === "meeting") {
             $notificationable['type'] = $this->meeting_type ?? null;

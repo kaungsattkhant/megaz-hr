@@ -35,71 +35,89 @@ class MonthlyLoanInterestAdditionSchedule extends Command
         DB::beginTransaction();
 
         try {
-            $loans = Loan::where('type', 'addition')->get();
-            foreach ($loans as $loan) {
-                $nextInterestDate = Carbon::parse($loan->date_time)->addMonth();
-
-                if (Carbon::now()->startOfDay()->eq($nextInterestDate->startOfDay())) {
+            $loansByAccount = Loan::where('type', 'addition')->get()->groupBy('account_id');
+            foreach ($loansByAccount as $accountId => $loans) {
+                $nextInterestDate = null;
+                $totalInterestAmount = 0;
+                foreach ($loans as $loan) {
+                    $loanNextDate = Carbon::parse($loan->date_time)->addMonth();
+                    if (is_null($nextInterestDate) || $loanNextDate->gt($nextInterestDate)) {
+                        $nextInterestDate = $loanNextDate;
+                    }
                     $interestAmount = ($loan->amount * $loan->interest_rate) / 100;
-                    $interestAdditionLoan = Loan::firstOrCreate(
-                        [
-                            'date_time' => $nextInterestDate,
-                            'type' => 'interest addition',
-                            'account_id' => $loan->account_id,
-                        ],
-                        [
-                            'date_time' => $nextInterestDate,
-                            'type' => 'interest addition',
-                            'category' => null,
-                            'account_id' => $loan->account_id,
-                            'main_account_id' => $loan->main_account_id,
-                            'cash_account_id' => null,
-                            'amount' => $interestAmount,
-                            'interest_rate' => $loan->interest_rate,
-                            'created_by' => $loan->created_by,
-                        ]
-                    );
+                    $totalInterestAmount += $interestAmount;
                 }
-                $loanCreditor = LoanCreditor::where('loan_creditor_account_id', $loan->account_id)->first();
-                if ($loanCreditor) {
-                    $interestOnLoanAccount = Account::find($loanCreditor->interest_on_loan_account_id); //debit
-                    $interestOnLoanCreditorAccount = Account::find($loanCreditor->interest_on_loan_creditor_account_id);
-                    $transaction = (new StoreTransactionLedger())->createTransaction([
-                        'date' => now(),
-                        'created_by' => $interestAdditionLoan->created_by,
-                        'description' => $interestAdditionLoan->type,
-                        'transactionable_id' => $interestAdditionLoan->id,
-                        'is_confirmed' => 1,
-                        'transactionable_type' => 'loan',
-                    ]);
-                    #debit
-                    if ($interestOnLoanAccount) {
-                        $debit = (new Account())->accountByCode($interestOnLoanAccount->account_code);
-                        if ($debit) {
-                            (new StoreTransactionLedger())->storeLedger([
-                                'value' => $interestAdditionLoan->amount,
-                                'transaction_id' => $transaction->id,
-                                'account_id' => $debit->id,
-                                'action' => 'debit',
+
+                if ($totalInterestAmount > 0 && $nextInterestDate) {
+                    if (Carbon::now()->startOfDay()->eq($nextInterestDate->startOfDay())) {
+                        $this->info("Account {$accountId} total interest: {$totalInterestAmount}");
+
+                        $firstLoan = $loans->first();
+                        $interestAdditionLoan = Loan::firstOrCreate(
+                            [
+                                'date_time' => $nextInterestDate,
+                                'type' => 'interest addition',
+                                'account_id' => $accountId,
+                            ],
+                            [
+                                'date_time' => $nextInterestDate,
+                                'type' => 'interest addition',
+                                'category' => null,
+                                'account_id' => $accountId,
+                                'main_account_id' => $firstLoan->main_account_id,
+                                'cash_account_id' => null,
+                                'amount' => $totalInterestAmount,
+                                'interest_rate' => null,
+                                'created_by' => $firstLoan->created_by,
+                            ]
+                        );
+
+                        $loanCreditor = LoanCreditor::where('loan_creditor_account_id', $accountId)->first();
+                        if ($loanCreditor) {
+                            $interestOnLoanAccount = Account::find($loanCreditor->interest_on_loan_account_id); //debit
+                            $interestOnLoanCreditorAccount = Account::find($loanCreditor->interest_on_loan_creditor_account_id);
+                            $transaction = (new StoreTransactionLedger())->createTransaction([
+                                'date' => now(),
+                                'created_by' => $interestAdditionLoan->created_by,
+                                'description' => $interestAdditionLoan->type,
+                                'transactionable_id' => $interestAdditionLoan->id,
+                                'is_confirmed' => 1,
+                                'transactionable_type' => 'loan',
                             ]);
-                        } else {
-                            ResponseMessage('Account is Invalid', 419);
+                            #debit
+                            if ($interestOnLoanAccount) {
+                                $debit = (new Account())->accountByCode($interestOnLoanAccount->account_code);
+                                if ($debit) {
+                                    (new StoreTransactionLedger())->storeLedger([
+                                        'value' => $interestAdditionLoan->amount,
+                                        'transaction_id' => $transaction->id,
+                                        'account_id' => $debit->id,
+                                        'action' => 'debit',
+                                    ]);
+                                } else {
+                                    ResponseMessage('Account is Invalid', 419);
+                                }
+                            }
+                            #credit
+                            if ($interestOnLoanCreditorAccount) {
+                                $credit = (new Account())->accountByCode($interestOnLoanCreditorAccount->account_code);
+                                if ($credit) {
+                                    (new StoreTransactionLedger())->storeLedger([
+                                        'value' => $interestAdditionLoan->amount,
+                                        'transaction_id' => $transaction->id,
+                                        'account_id' =>  $credit->id,
+                                        'action' => 'credit',
+                                    ]);
+                                } else {
+                                    ResponseMessage('Account is Invalid', 419);
+                                }
+                            }
                         }
+                    } else {
+                        $this->info("Skipping interest for account {$accountId} - today is not the interest date");
                     }
-                    #credit
-                    if ($interestOnLoanCreditorAccount) {
-                        $credit = (new Account())->accountByCode($interestOnLoanCreditorAccount->account_code);
-                        if ($credit) {
-                            (new StoreTransactionLedger())->storeLedger([
-                                'value' => $interestAdditionLoan->amount,
-                                'transaction_id' => $transaction->id,
-                                'account_id' =>  $credit->id,
-                                'action' => 'credit',
-                            ]);
-                        } else {
-                            ResponseMessage('Account is Invalid', 419);
-                        }
-                    }
+                } else {
+                    $this->info("Account {$accountId} total interest: {$totalInterestAmount}");
                 }
             }
             DB::commit();
