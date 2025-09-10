@@ -44,6 +44,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     private $morphMapName;
     public function listAllData(Request $request)
     {
+        
         $staff = UserData();
         $from_date = $request->from_date;
         $to_date = $request->to_date;
@@ -352,83 +353,87 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function updateIsCheck($request)
     {
-        $staff = UserData();
-        DB::beginTransaction();
-        try {
-            $model = Model($request->type)::find($request->id);
-            $this->validateModel($model, $staff, $request->type);
-            if ($model) {
-                if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                    // if (!checkDepartmentAndRoles('Finance', ['Manager']) && checkRoles(['Manager']) && !checkDepartmentAndRoles('Procurement', ['Manager'])) {
-                    $column = 'manager_check';
-                    $is_column = 'is_manager_checked';
-                    $status = 'manager_checked';
-                } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
-                    $column = 'financial_check';
-                    $is_column = 'is_financial_checked';
-                    $status = 'financial_checked';
-                } else if (checkDepartmentAndRoles('Management', ['MD'])) {
-                    $column = 'md_check';
-                    $is_column = 'is_md_checked';
-                    $status = 'md_checked';
-                } else if (checkDepartmentAndRoles('Procurement', ['Manager'])) {
-                    $column = 'procurement_manager_check';
-                    $is_column = 'is_procurement_manager_checked';
-                    $status = 'procurement_manager_checked';
-                }
-                if ($request->type == 'purchase_order_item') {
-                    // $is_column = 'is_manager_checked';
-                    $model->$is_column = $request->value;
-                    $model->save();
-                }
-                if ($request->type == 'purchase_order') {
-                    $column_id = $column . '_' . 'id';
-                    $column_time = $column . '_' . 'time';
-                    // $column='is_financial_check';
-                    // $items = $this->existIsCheck($model, $is_column, 0);
-                    // if ($items->isNotEmpty()) {
-                    //     ResponseMessage('Some items are left to check', 422);
-                    // }
-                    checkDepartmentAndRoles('Management', ['MD']) ?
-                        $model->$is_column = 1 : $model->$column_id = $staff->id;
-                    $model->$column_time = now();
-                    $model->status = $status;
-                    $model->save();
-                    $this->existIsCheckAndUpdate($model, $is_column, $request->value);
-                    #send notification by specific role
-                    #notification
-                    $users = collect([]);
-                    // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+        if (checkMultipleFeaturePermission('purchase-order.confirm')) {
+            $staff = UserData();
+            DB::beginTransaction();
+            try {
+                $model = Model($request->type)::find($request->id);
+                $this->validateModel($model, $staff, $request->type);
+                if ($model) {
                     if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                        $users = $this->getUserByRole('Procurement', ['Manager']);
-                        $title = 'You have received a new PO to confirm';
-                    } elseif (checkDepartmentAndRoles('Procurement', ['Manager'])) {
-                        $users = $this->getUserByRole('Finance', ['Chief Accountant']);
-                        $title = 'You have received a new PO to confirm From Procurement';
+                        // if (!checkDepartmentAndRoles('Finance', ['Manager']) && checkRoles(['Manager']) && !checkDepartmentAndRoles('Procurement', ['Manager'])) {
+                        $column = 'manager_check';
+                        $is_column = 'is_manager_checked';
+                        $status = 'manager_checked';
                     } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
-                        $users = $this->getUserByRole('Management', ['MD']);
-                        $title = 'You have received a new PO to confirm';
+                        $column = 'financial_check';
+                        $is_column = 'is_financial_checked';
+                        $status = 'financial_checked';
                     } else if (checkDepartmentAndRoles('Management', ['MD'])) {
-                        $users = $this->getUserByRole('Finance', ['Chief Accountant']);
-                        $title = 'You have received a new PO to confirm From MD';
+                        $column = 'md_check';
+                        $is_column = 'is_md_checked';
+                        $status = 'md_checked';
+                    } else if (checkDepartmentAndRoles('Procurement', ['Manager'])) {
+                        $column = 'procurement_manager_check';
+                        $is_column = 'is_procurement_manager_checked';
+                        $status = 'procurement_manager_checked';
                     }
-                    $data = [
-                        'date' => $model->created_at,
-                        'title' => $title,
-                        'body' => 'New Purchase Order',
-                    ];
-                    $this->send($model, $users, $data);
-                    #end notification
+                    if ($request->type == 'purchase_order_item') {
+                        // $is_column = 'is_manager_checked';
+                        $model->$is_column = $request->value;
+                        $model->save();
+                    }
+                    if ($request->type == 'purchase_order') {
+                        $column_id = $column . '_' . 'id';
+                        $column_time = $column . '_' . 'time';
+                        // $column='is_financial_check';
+                        // $items = $this->existIsCheck($model, $is_column, 0);
+                        // if ($items->isNotEmpty()) {
+                        //     ResponseMessage('Some items are left to check', 422);
+                        // }
+                        checkDepartmentAndRoles('Management', ['MD']) ?
+                            $model->$is_column = 1 : $model->$column_id = $staff->id;
+                        $model->$column_time = now();
+                        $model->status = $status;
+                        $model->save();
+                        $this->existIsCheckAndUpdate($model, $is_column, $request->value);
+                        #send notification by specific role
+                        #notification
+                        $users = collect([]);
+                        // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                        if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                            $users = $this->getUserByRole('Procurement', ['Manager']);
+                            $title = 'You have received a new PO to confirm';
+                        } elseif (checkDepartmentAndRoles('Procurement', ['Manager'])) {
+                            $users = $this->getUserByRole('Finance', ['Chief Accountant']);
+                            $title = 'You have received a new PO to confirm From Procurement';
+                        } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
+                            $users = $this->getUserByRole('Management', ['MD']);
+                            $title = 'You have received a new PO to confirm';
+                        } else if (checkDepartmentAndRoles('Management', ['MD'])) {
+                            $users = $this->getUserByRole('Finance', ['Chief Accountant']);
+                            $title = 'You have received a new PO to confirm From MD';
+                        }
+                        $data = [
+                            'date' => $model->created_at,
+                            'title' => $title,
+                            'body' => 'New Purchase Order',
+                        ];
+                        $this->send($model, $users, $data);
+                        #end notification
+                    }
+                    DB::commit();
+                    ResponseMessage('Update successfully', 200);
                 }
-                DB::commit();
-                ResponseMessage('Update successfully', 200);
+                ResponseMessage("Data isn't found", 404);
+            } catch (\Exception $e) {
+                DB::rollback();
+                ResponseMessage($e->getMessage(), 402);
+                throw $e;
             }
-            ResponseMessage("Data isn't found", 404);
-        } catch (\Exception $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
         }
+        ResponseMessage('Permission denied ', 410);
+
     }
 
     public function existIsCheckAndUpdate($model, $is_column, $value)
@@ -535,7 +540,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         foreach ($supplierItems as $supplierItem) {
             $itemPrice = $supplierItem->item_price;
             if ($itemPrice) {
-                $totalPrice +=  $itemPrice->price;
+                $totalPrice += $itemPrice->price;
                 $count++;
             }
         }
