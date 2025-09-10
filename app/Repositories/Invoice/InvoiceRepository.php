@@ -1684,7 +1684,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // }
             $entity->save();
             DB::commit();
-            broadcast(new WaiterNotificationRequest($entity, UserData()->department_id));
+            $catering_department = Department::where('name', 'Catering')->first();
+            if ($catering_department) {
+                broadcast(new WaiterNotificationRequest($entity, $catering_department->department_id));
+            }
             Responsemessage('Room status updated');
         } catch (\Exception $e) {
             DB::rollBack();
