@@ -58,6 +58,10 @@ class ItemRepository implements ItemRepositoryInterface
             })
             ->when($searchInput, function ($q) use ($searchInput) {
                 $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
+                $q->orWhere('items.code', 'LIKE', '%' . $searchInput . '%');
+                $q->orWhereHas('category', function($categoryQuery) use ($searchInput) {
+                    $categoryQuery->where('categories.name', 'LIKE', '%' . $searchInput . '%');
+                });
             })
             ->orderByDesc('id');
     }
