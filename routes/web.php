@@ -519,9 +519,9 @@ Route::middleware(['departments:po-order'])->group(function () {
 Route::middleware(['departments:arrival-item'])->group(function () {
     Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
 });
-Route::middleware(['departments:po-order-invoice'])->group(function () {
+// Route::middleware(['departments:po-order-invoice'])->group(function () {
     Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
-});
+// });
 Route::middleware(['departments:po-order-invoice.paid'])->group(function () {
     Route::view('/purchase_order_invoices/{id}/confirm', 'purchase_order_invoices.confirm')->name('purchase_order_invoices.confirm');
 });
