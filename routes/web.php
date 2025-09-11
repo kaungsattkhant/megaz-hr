@@ -176,10 +176,10 @@ Route::middleware(['departments:purchase-order.confirm'])->group(function () {
 Route::middleware(['departments:confirm-purchase-order-item.list'])->group(function () {
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
 });
-Route::middleware(['departments:purchase-order-item-left'])->group(function () {
+Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
 });
-Route::middleware(['departments:purchase-order-item-left-confirmation'])->group(function () {
+Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
 });
 
@@ -689,7 +689,7 @@ Route::middleware(['departments:resignation'])->group(function () {
 });
 
 
-    
+
     Route::view('/exams', 'exams.index');
     Route::view('/exam/create', 'exams.create')->name('exams.create');
     Route::view('/exam/{id}/edit', 'exams.edit');
@@ -755,6 +755,8 @@ Route::middleware(['departments:resignation'])->group(function () {
     Route::view('/cashbook_history', 'cashbook.history')->name('cashbook.history');
     Route::view('/accruals', 'accruals.index')->name('accruals.index');
     Route::view('/accruals/detail/{id}', 'accruals.detail')->name('accruals.detail');
+    Route::view('/loans', 'loans.index')->name('loans.index');
+    Route::view('/loans/{id}/details', 'loans.details')->name('loans.details');
     Route::view('/sale_ledger', 'sale_ledgers.index')->name('sale_ledgers.index');
     Route::view('/sale_ledger_ktv', 'sale_ledgers.sale_ledger_ktv')->name('sale_ledgers.sale_ledger_ktv');
     Route::view('/sale_ledger_restaurant', 'sale_ledgers.sale_ledger_restaurant')->name('sale_ledgers.sale_ledger_restaurant');

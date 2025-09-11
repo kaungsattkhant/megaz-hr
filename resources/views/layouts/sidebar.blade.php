@@ -758,7 +758,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('purchase-order-item-left'))
+                    @if (checkFeaturePermission('purchase-order'))
                         <li>
                             <a href="{{ route('purchase_orders.left_items_index') }}"
                                 class="flex items-center @yield('purchase_order_left_items') sidebar-gap-x">
@@ -1399,6 +1399,13 @@
                             <i class="fal fa-door-open"></i>
                             <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
                             Accruals
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/loans" class="flex items-center @yield('loans') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            Loans
                         </a>
                     </li>
 

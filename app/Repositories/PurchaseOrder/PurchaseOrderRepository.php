@@ -44,7 +44,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     private $morphMapName;
     public function listAllData(Request $request)
     {
-        
+
         $staff = UserData();
         $from_date = $request->from_date;
         $to_date = $request->to_date;
@@ -123,13 +123,27 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            //edit check
+            if ($request->id) {
+                $purchaseOrderCheck = PurchaseOrder::find($request->id);
+                if (
+                    in_array($purchaseOrderCheck->status, [
+                        'manager_checked',
+                        'procurement_manager_checked',
+                        'financial_checked',
+                        'md_checked'
+                    ])
+                ) {
+                    return ResponseMessage("Permission doesn't access for edit", 419);
+                }
+            }
+            //end
             $data['total_price'] = (int) $data['total_price']; //wrong data from frontend
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
             $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['po_id'] = $po_id;
-
             if (!$request->id) {
                 $data['created_by'] = $staff->id;
                 if (checkRoles(['Manager'])) {
@@ -160,12 +174,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
-                if (checkRoles(['Staff'])) {
+                // if (checkRoles(['Staff'])) {
 
-                    $item_data['original_quantity'] = $item->quantity;
-                } else {
-                    $item_data['original_quantity'] = (isset($item->later_buy) && $item->later_buy) ? $item->original_quantity : $item->quantity;
-                }
+                //     $item_data['original_quantity'] = $item->quantity;
+                // } else {
+                // $purchaseOrderItem = PurchaseOrderItem::find($item->id);
+                // $item_data['original_quantity'] = (isset($item->later_buy) && $item->later_buy) ? $item->original_quantity : $item->quantity;
+                // }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
                 $item_data['brand_id'] = $item->brand_id;
@@ -180,13 +195,15 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['is_exceed_max_limitation'] = $item->is_exceed_max_limitation ?? 0;
 
                 if (isset($item->later_buy) && $item->later_buy) {
-
+                    $poItem = PurchaseOrderItem::find($item->id);
+                    $item_data['original_quantity']=$poItem->quantity;
+                    // $item_data['original_quantity'] = (isset($item->later_buy) && $item->later_buy) ? $item->original_quantity : $item->quantity;
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
-
                     if ($purchaseOrderItem) {
                         if ($item->quantity > $purchaseOrderItem->quantity) {
                             ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                         }
+
                         if ($item->quantity < $purchaseOrderItem->quantity) {
                             $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
 
@@ -353,19 +370,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function updateIsCheck($request)
     {
-        if (checkMultipleFeaturePermission('purchase-order.confirm')) {
+        if (checkMultipleFeaturePermission(['purchase-order.confirm'])) {
             $staff = UserData();
             DB::beginTransaction();
             try {
                 $model = Model($request->type)::find($request->id);
                 $this->validateModel($model, $staff, $request->type);
                 if ($model) {
-                    if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                        // if (!checkDepartmentAndRoles('Finance', ['Manager']) && checkRoles(['Manager']) && !checkDepartmentAndRoles('Procurement', ['Manager'])) {
-                        $column = 'manager_check';
-                        $is_column = 'is_manager_checked';
-                        $status = 'manager_checked';
-                    } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
+                    // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                    // if (!checkDepartmentAndRoles('Finance', ['Manager']) && checkRoles(['Manager']) && !checkDepartmentAndRoles('Procurement', ['Manager'])) {
+
+                    if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
                         $column = 'financial_check';
                         $is_column = 'is_financial_checked';
                         $status = 'financial_checked';
@@ -377,6 +392,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         $column = 'procurement_manager_check';
                         $is_column = 'is_procurement_manager_checked';
                         $status = 'procurement_manager_checked';
+                    } else {
+                        $column = 'manager_check';
+                        $is_column = 'is_manager_checked';
+                        $status = 'manager_checked';
                     }
                     if ($request->type == 'purchase_order_item') {
                         // $is_column = 'is_manager_checked';
@@ -400,11 +419,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         #send notification by specific role
                         #notification
                         $users = collect([]);
+                        //access mannager check all department
                         // if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                        if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                            $users = $this->getUserByRole('Procurement', ['Manager']);
-                            $title = 'You have received a new PO to confirm';
-                        } elseif (checkDepartmentAndRoles('Procurement', ['Manager'])) {
+                        $users = $this->getUserByRole('Procurement', ['Manager']);
+                        $title = 'You have received a new PO to confirm';
+                        // } else
+                        //end
+                        if (checkDepartmentAndRoles('Procurement', ['Manager'])) {
                             $users = $this->getUserByRole('Finance', ['Chief Accountant']);
                             $title = 'You have received a new PO to confirm From Procurement';
                         } else if (checkDepartmentAndRoles('Finance', ['Chief Accountant'])) {
@@ -445,17 +466,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
-            if (checkDepartmentAndRoles('HR', ['Staff']) || checkDepartmentAndRoles('HR', ['Supervisor'])) {
-                ResponseMessage("Permission isn't allowed", 422);
-            }
+            // if (checkDepartmentAndRoles('HR', ['Staff']) || checkDepartmentAndRoles('HR', ['Supervisor'])) {
+            //     ResponseMessage("Permission isn't allowed", 422);
+            // }
             $departmentName = UserData()->department->name;
             $roles = UserData()->roles;
             if ($type == 'purchase_order') {
-                if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                    if ($model->manager_check_id != null) {
-                        ResponseMessage('This Purchase Order is already checked By Manager', 419);
-                    }
-                } else if (checkDepartmentAndRoles('Procurement', ['Manager'])) {
+                // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+
+                // } 
+                if (checkDepartmentAndRoles('Procurement', ['Manager'])) {
                     if ($model->procurement_manager_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Procurement Manager', 422);
                     }
@@ -480,8 +500,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     //     ResponseMessage('Inventory is required', 422);
                     // }
                 } else {
-                    ResponseMessage("Permission isn't allowed", 422);
+                    if ($model->manager_check_id != null) {
+                        ResponseMessage('This Purchase Order is already checked By Manager', 419);
+                    }
                 }
+                // else {
+                //     ResponseMessage("Permission isn't allowed", 422);
+                // }
             }
         }
     }

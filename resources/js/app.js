@@ -266,6 +266,8 @@ import PosCashbookHistoryComponent from './Components/Pos/Cashbook/PosCashbookHi
 import CashbookHistoryComponent from './Components/Cashbook/CashbookHistoryComponent.vue';
 import AccrualsCrudComponent from './Components/Accruals/AccrualsCrudComponent.vue';
 import AccrualsListComponent from './Components/Accruals/AccrualsListComponent.vue';
+import LoansListComponent from './Components/Loans/LoansListComponent.vue';
+import LoanDetailsComponent from './Components/Loans/LoanDetailsComponent.vue';
 import SaleLedgerComponent from './Components/SaleLedgers/SaleLedgerComponent.vue';
 import SaleLedgerKtvComponent from './Components/SaleLedgers/SaleLedgerKtvComponent.vue';
 import SaleLedgerRestaurantComponent from './Components/SaleLedgers/SaleLedgerRestaurantComponent.vue';
@@ -513,6 +515,8 @@ app.component('PosCashbookHistoryComponent',PosCashbookHistoryComponent);
 app.component('CashbookHistoryComponent',CashbookHistoryComponent);
 app.component('AccrualsCrudComponent',AccrualsCrudComponent);
 app.component('AccrualsListComponent',AccrualsListComponent);
+app.component('LoansListComponent',LoansListComponent);
+app.component('LoanDetailsComponent', LoanDetailsComponent);
 app.component('SaleLedgerComponent',SaleLedgerComponent);
 app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
 app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
