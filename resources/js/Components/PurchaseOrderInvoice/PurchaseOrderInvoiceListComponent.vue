@@ -45,7 +45,10 @@
                                     Amount
                                 </th>
                                 <th scope="col" class="">
-
+                                    Status
+                                </th>
+                                <th scope="col" class="">
+                                    Action  
                                 </th>
                             </tr>
                         </thead>
@@ -76,22 +79,31 @@
                                     <td class="whitespace-nowrap">
                                         <span v-if="item.total_invoice_amount"> {{ item.total_invoice_amount.toLocaleString() }} </span>
                                     </td>
+                                    <span :class="item.is_complete === 1 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800 '" class="px-2 py-1 rounded capitalize font-semibold text-sm">
+                                        {{ item.is_complete === 1 ? 'Complete' : 'Not Yet' }}
+                                    </span>
                                     <td class="whitespace-nowrap">
-                                        <div v-if="item.is_complete === 1">
+                                        <div class="flex gap-x-6 justify-center">
                                             <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                             </button> -->
-                                            <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-6"
+                                            <button :disabled="item.is_complete === 1" 
+                                                :class="item.is_complete === 1 ? 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-60' : 'bg-blue-500 text-white hover:bg-blue-600'"  
+                                                class=" px-4 py-1.5 text-sm rounded-lg" data-te-toggle="modal" data-te-target="#check_modal" 
+                                                @click="checkBtnClicked(item.arrival_items[0], index, item)" v-show="feature.includes('po-order-invoice.paid')">
+                                                <i class="far fa-check-double" :class="item.is_complete === 1 ? 'text-gray-500' : ''"></i>
+                                            </button>
+                                            <!-- <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-6"
                                             @click="checkBtnClicked(item.arrival_items[0], index, item)" v-show="feature.includes('po-order-invoice.paid')">
                                                 <i class="fal fa-check"></i>
-                                            </button>
-                                            <a class="pr-2" :href="'/purchase_order_invoices/' + item.id + '/confirm'">
+                                            </button> -->
+                                            <a class="pr-2 py-1.5" :href="'/purchase_order_invoices/' + item.id + '/confirm'">
                                                 <i class="fal fa-pen"></i>
                                             </a>
                                         </div>
-                                        <div v-else>
+                                        <!-- <div v-else>
                                             <span class=" text-green-600">Complete</span>
-                                        </div>
+                                        </div> -->
                                     </td>
                                 </tr>
                                 <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_items" :key="arrivalIndex">
@@ -105,6 +117,7 @@
                                         {{ arrival.base_uom_quantity > 0 ? arrival.base_uom_quantity : '' }}  {{ arrival.base_uom_quantity > 0 ? arrival.base_uom_name : '' }}     
                                     </td>
                                     <td class="whitespace-nowrap"> {{ arrival.amount.toLocaleString() }} </td>
+                                    <td></td>
                                     <td class="whitespace-nowrap">
                                         <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
