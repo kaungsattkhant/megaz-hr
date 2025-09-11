@@ -5,23 +5,20 @@ namespace App\Repositories\Accrued;
 use App\Models\Account;
 use App\Models\Accrued;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class AccruedRepository implements AccruedRepositoryInterface
 {
     public function getExpenseAccount($request)
     {
-        return  Account::with('sub_account')->where(function ($query) {
-            $query->where('account_code', 'like', '6-2%')
-                ->orWhere('account_code', 'like', '6-3%')
-                ->orWhere('account_code', 'like', '6-4%')
-                ->orWhere('account_code', 'like', '6-5%')
-                ->orWhere('account_code', 'like', '6-6%')
-                ->orWhere('account_code', 'like', '6-7%')
-                ->orWhere('account_code', 'like', '6-8%')
-                ->orWhere('account_code', 'like', '6-9%');
-        })->orderBy('account_code', 'asc')
-            ->get();
+        $expenseAccountCodes = Config::get('common.expense_account_codes', []);
+        if (!empty($expenseAccountCodes)) {
+            $expenseAccounts = Account::whereIn('account_code', $expenseAccountCodes)
+                ->orderBy('account_code', 'asc')
+                ->get();
+        }
+        return $expenseAccounts;
     }
     public function createAccrued($request)
     {
@@ -242,17 +239,11 @@ class AccruedRepository implements AccruedRepositoryInterface
 
     public function getOtherPayable($request)
     {
-        $account = Account::with('sub_account')
-        ->where('link_account_id', null)
-        ->where('account_id', null)
-        ->where(DB::raw('LOWER(REPLACE(TRIM(name), " ", ""))'), 'like', '%otherpayable%')
-        ->whereNotIn('account_code', ['4-4001', '4-4002'])
-        ->where('account_code', 'like', '4-4%')
-        ->whereHas('sub_account', function ($query) {
-            $query->where('account_code', '4-4000');
-        })->orderBy('id', 'desc')
+        $otherPayableAccountCodes = Config::get('common.other_payable_account_codes', []);
+        $otherPayableAccounts = Account::with('sub_account')
+        ->whereIn('account_code', $otherPayableAccountCodes)
+        ->orderBy('id', 'desc')
         ->get();
-    
-    return $account;
+        return $otherPayableAccounts;
     }
 }

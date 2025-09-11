@@ -77,7 +77,7 @@
                                         <span v-if="item.total_invoice_amount"> {{ item.total_invoice_amount.toLocaleString() }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <div>
+                                        <div v-if="item.is_complete === 0">
                                             <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                             </button> -->
@@ -254,11 +254,11 @@ export default {
             this.apAmount = this.totalInvoiceAmount - this.invoiceAmount
         },
         async confirmBtnClicked(){
-            if(!this.invoiceAmount || this.invoiceAmount < 1){
+            if(!this.invoiceAmount || this.invoiceAmount < 0){
                 this.alertValidationMessage('Amount');
                 return 1;
             }
-            if(!this.selectedCashAccount){
+            if(this.invoiceAmount != 0 && !this.selectedCashAccount){
                 this.alertValidationMessage('Account');
                 return 1;
             }

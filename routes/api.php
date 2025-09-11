@@ -152,7 +152,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('accruals', 'createAccrued');
         Route::get('accruals', 'getAccrued');
         Route::get('accruals/{accountId}', 'detailAccrued');
-        Route::get('other-payables', 'getOtherPayable');
+        Route::get('other-payable-accounts', 'getOtherPayable');
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     // Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
