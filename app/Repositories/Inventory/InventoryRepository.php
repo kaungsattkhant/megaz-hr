@@ -44,7 +44,8 @@ class InventoryRepository implements InventoryRepositoryInterface
             // ->whereHas('staff', function ($query) {
             //     $query->where('id', UserData()->id);
             // })
-            ->with(['inventoryable']);
+            ->with(['inventoryable'])
+            ->orderBy('id', 'desc');
         if ($inventory_id) {
             $query->where('id', $inventory_id);
         }
@@ -84,6 +85,18 @@ class InventoryRepository implements InventoryRepositoryInterface
                 $inventoryables = json_decode($data['inventoryable'], true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     return ResponseMessage('Invalid JSON data provided for inventoryable.', 400);
+                }
+                $currentInventoryableIds = collect($inventoryables)
+                ->pluck('id')
+                ->filter()
+                ->toArray();
+
+                if ($inventory->exists && !empty($currentInventoryableIds)) {
+                    $inventory->inventoryable()
+                        ->whereNotIn('id', $currentInventoryableIds)
+                        ->delete();
+                } elseif ($inventory->exists) {
+                    $inventory->inventoryable()->delete();
                 }
                 foreach ($inventoryables as $inventoryable) {
                     Inventoryable::updateOrCreate(
