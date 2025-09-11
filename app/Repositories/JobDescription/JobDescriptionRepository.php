@@ -108,9 +108,8 @@ class JobDescriptionRepository implements JobDescriptionRepositoryInterface
     public function getSop(Request $request)
     {
         $roleId = $request->role_id;
-        $query =  JdSop::with(['jobDescription' => function ($query){
-            $query->withTrashed();
-        },'jobDescription.role.department', 'sops.role.department'])
+        $query =  JdSop::with([
+        'jobDescription.role.department', 'sops.role.department'])
             ->when($roleId, function ($query) use ($roleId) {
                 return $query->whereHas('sops', function ($q) use ($roleId) {
                     $q->where('role_id', $roleId);
