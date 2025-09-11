@@ -1401,6 +1401,13 @@
                             Accruals
                         </a>
                     </li>
+                    <li>
+                        <a href="/loans" class="flex items-center @yield('loans') sidebar-gap-x">
+                            <i class="fal fa-door-open"></i>
+                            <!-- <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt=""> -->
+                            Loans
+                        </a>
+                    </li>
 
                 </ul>
 

@@ -20,6 +20,7 @@ use App\Http\Resources\MeetingResource;
 use Illuminate\Support\Facades\Request;
 use App\Http\Resources\StaffTimeShiftResource;
 use App\Http\Resources\NotificationUserResource;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Http\Action\SendNotification\SendNotification;
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
@@ -1130,96 +1131,59 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getallNoties($request, $staffId)
   {
+      $type = $request->query('type');
 
-    // $type = $request->query('type');
-    // $notifications = NotificationUser::with([
-    //   'notification.notificationable',
-    //   'notification.notificationable.participants',
-    //   'notification.notificationable.participants.department.roles',
-    //   'notification.notificationable.participants.role.department',
-    //   'notification.notificationable.participants.staff.department',
-    //   'notification.notificationable.participants.staff.roles',
-    // ])
-    //   ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
-    //   ->where('notification_users.staff_id', '=', $staffId)
-    //   ->when($type, function ($query) use ($type) {
-    //     return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew'])
-    //       ->where('notifications.notificationable_type', $type);
-    //   }, function ($query) {
-    //     return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew']);
-    //   })->orderBy('notifications.created_at', 'desc')
-    //   ->get();
-    // foreach ($notifications as $notification) {
-    //   $notificationable = $notification->notification->notificationable;
-    //   if ($notificationable) {
-    //     switch ($notification->notification->notificationable_type) {
-    //       case 'meeting':
-    //         $notificationable->load('chairedBy');
-    //         break;
-    //       case 'training':
-    //         $notificationable->load('trainedBy');
-    //         break;
-    //     }
-    //   }
-    // }
-    // return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
-
-    $type = $request->query('type');
-    $notificationUsers = NotificationUser::with([
-      'notification' => function ($query) use ($type) {
+      $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift'];
+      $notificationUsers = NotificationUser::with(['notification' => function ($query) {
         $query->with('notificationable');
-      }
-    ])
-      ->whereHas('notification', function ($query) use ($type) {
-        if ($type) {
-          $query->where('notificationable_type', $type);
+    }])
+    ->where('staff_id', $staffId)
+    ->whereHas('notification', function ($query) use ($type, $validTypes) {
+        if ($type && in_array($type, $validTypes)) {
+            $query->where('notificationable_type', $type);
         } else {
-          $query->whereIn('notificationable_type', [
-            'meeting',
-            'training',
-            'warning',
-            'orgNew',
-            'staff_timeshift'
-          ]);
+            $query->whereIn('notificationable_type', $validTypes);
         }
-      })
-      ->where('staff_id', $staffId)
-      ->orderBy('id', 'desc')
-      ->get();
-    foreach ($notificationUsers as $notificationUser) {
-      $notificationUser->load('notification');
+    })
+    ->orderBy('id', 'desc')
+    ->paginate(config('common.list_count'));
 
+    $filteredNotifications = $notificationUsers->getCollection()->filter(function ($notificationUser) {
+        return $notificationUser->notification && $notificationUser->notification->notificationable;
+    });
+
+    foreach ($filteredNotifications as $notificationUser) {
       $notificationType = $notificationUser->notification->notificationable_type;
-      $notificationUser->notification->load(['notificationable']);
-      if ($notificationType === 'staff_timeshift') {
-        $notificationUser->notification->load([
-          'notificationable.timeshift.shift',
-          'notificationable.area'
-        ]);
-      } elseif (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
-        $notificationUser->notification->load([
-          'notificationable.participants',
-          'notificationable.participants.department.roles',
-          'notificationable.participants.role.department',
-          'notificationable.participants.staff.department',
-          'notificationable.participants.staff.roles'
-        ]);
 
-        if ($notificationType === 'meeting') {
-          $notificationUser->notification->load('notificationable.chairedBy');
-        } elseif ($notificationType === 'training') {
-          $notificationUser->notification->load('notificationable.trainedBy');
-        }
+      if (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
+          $notificationUser->notification->notificationable->load([
+              'participants',
+              'participants.department.roles',
+              'participants.role.department',
+              'participants.staff.department',
+              'participants.staff.roles'
+          ]);
+
+          if ($notificationType === Relation::getMorphedModel('meeting') || $notificationType === 'meeting') {
+              $notificationUser->notification->notificationable->load('chairedBy');
+          } elseif ($notificationType === Relation::getMorphedModel('training') || $notificationType === 'training') {
+              $notificationUser->notification->notificationable->load('trainedBy');
+          }
+      } elseif ($notificationType === Relation::getMorphedModel('staff_timeshift') || $notificationType === 'staff_timeshift') {
+          $notificationUser->notification->notificationable->load([
+              'timeshift.shift',
+              'area'
+          ]);
       }
     }
-    return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
+    return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
   }
 
   public function getMeetingsByStaffId($staffId, $request)
   {
     $staff = Staff::with('department', 'roles')->find($staffId);
     if (!$staff) {
-      return ResponseData(null, 404, false, 'Staff not found.');
+      return ResponseData(null, 400, false, 'Staff not found.');
     }
 
     $departmentId = $staff->department_id;
@@ -1256,7 +1220,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   {
     $staff = Staff::with('department', 'roles')->find($staffId);
     if (!$staff) {
-      return ResponseData(null, 404, false, 'Staff not found.');
+      return ResponseData(null, 400, false, 'Staff not found.');
     }
 
     $departmentId = $staff->department_id;
@@ -1310,5 +1274,4 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     }
     return StaffTimeShiftResource::collection($shift);
   }
-
 }

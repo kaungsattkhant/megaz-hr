@@ -98,14 +98,14 @@ trait PoInvoiceTransaction
 
     public function storeAP($transaction,$ap_amount, $supplier_id, $supplier_account_id, $cash_account_id)
     {
-        if ($ap_amount > 0) {
+        if ($ap_amount >= 0) {
             $accountPayable = AccountPayable::create([
                 'type' => 'addition',
                 'date_time' => now(),
                 'amount' => $ap_amount,
                 'supplier_id' => $supplier_id,
                 'account_id' => $supplier_account_id,
-                'cash_account_id' => $cash_account_id,
+                'cash_account_id' => $cash_account_id ?? null,
                 'created_by' => UserData()->id,
             ]);
             $creditLedger = (new StoreTransactionLedger())->storeLedger([

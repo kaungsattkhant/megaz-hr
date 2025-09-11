@@ -193,7 +193,7 @@ class SupplierRepository implements SupplierInterface
             if($request->name==null){
                 // dd($request);
             }
-            $otherPayableCode = config('common.payable_account_code');
+            $otherPayableCode = config('common.payable_account_code'); // '4-4000',
             $creditorCode = config('common.creditor_account_code');
             $otherPayable = $this->createAccountBySubAccount('Other Payable-' . $request->name, $otherPayableCode);
             $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);

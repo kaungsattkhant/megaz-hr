@@ -134,7 +134,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
       })
       ->orderBy('id', 'desc')->get();
       if($equipmentAssigns->isEmpty()){
-        return ResponseData([], 404, false, 'Equipment Assigns not found.');
+        return [];
     }
     return $equipmentAssigns;
   }

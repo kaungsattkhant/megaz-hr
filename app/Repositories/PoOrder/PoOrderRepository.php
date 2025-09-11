@@ -1269,8 +1269,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $itemsData = [];
     $itemLeadTimes = [];
 
-    $poOrderlist = PoOrder::with(['purchaseOrder', 'item', 'arrivalItems', 'supplier'])
+    $poOrderlist = PoOrder::with(['purchaseOrder','item','supplier'])
       ->where('supplier_id', $supplierId)
+      ->with(['arrivalItems' => function($query) use ($supplierId) {
+        $query->where('supplier_id', $supplierId);
+      }])
       ->get();
 
     if ($poOrderlist->isEmpty()) {
@@ -1292,8 +1295,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
       foreach ($poOrder->arrivalItems as $arrival) {
         $arrivalTime = new \Carbon\Carbon($arrival->created_at);
-
-
         $leadTime = abs($arrivalTime->diffInSeconds($orderTime));
         $avgLeadtime = $leadTime / $totalArrivalItemCount;
         $totalAvgLeadTime += $avgLeadtime;
@@ -1304,7 +1305,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'count' => 0
           ];
         }
-
         // Add lead time and increase count for unique items
         $itemLeadTimes[$arrival->item_id]['total_lead_time'] += $leadTime;
         $itemLeadTimes[$arrival->item_id]['count']++;
@@ -1313,12 +1313,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
     // Calculate average lead time per unique item and format
     foreach ($itemLeadTimes as $itemId => $data) {
-
       $avgOrderTime = $data['total_lead_time'] / $data['count'];
       $formattedAvgOrderTime = $this->formatTime($avgOrderTime);
-
-      $item = $poOrderlist->firstWhere('item_id', $itemId)->item;
-      $itemName = $item ? $item->name : 'null';
+      $poOrder = $poOrderlist->firstWhere('item_id', $itemId);
+      $item = $poOrder ? $poOrder->item : null;
+      $itemName = $item ? $item->name : 'Unknown Item';
 
       $itemsData[] = [
         'item_id' => $itemId,
@@ -1389,6 +1388,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.completed_at',
       )
       // ->where('is_complete', 0) // retriev all invoice
+      ->orderBy('is_complete', 'asc')
+      ->orderBy('po_invoices.date_time', 'desc')
       ->paginate(config('common.list_count'));
     $poInvoices->getCollection()->each(function ($invoice) {
       $invoice->item_names = $invoice->arrivalItems->pluck('item.name')->unique()->implode(', ');
@@ -1457,7 +1458,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     DB::beginTransaction();
     try {
       $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId, $supplierId);
-      if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
+      if ($apAmount >= 0 || ($request->total_invoice_amount < $request->amount)) {
         $this->storeAP($transaction, $apAmount, $supplierId, $supplierCreditorAccountId, $cashAccountId);
       }
       $poInvoice->is_complete = 1;
@@ -1465,7 +1466,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       $poInvoice->discount_value = $discountValue;
       $poInvoice->sub_total = (float) $poInvoice->total_invoice_amount - $discountValue;
       $poInvoice->paid_amount = $request->paid_amount;
-      $poInvoice->cash_account_id = $cashAccountId;
+      $poInvoice->cash_account_id = $cashAccountId ?? null;
       $poInvoice->save();
       DB::commit();
       return ResponseMessage('Transaction created successfully', 200);
