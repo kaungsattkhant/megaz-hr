@@ -67,7 +67,10 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
                 ResponseMessage('Brand Id is invalid', 419);
             }
             if (!$supplier) {
-                ResponseMessage('Supplier Id is invalid', 419);
+            }
+            if(!$uom){
+                $sg=$row['uom_code'].' - Uom Id is invalid '.$row['item_code'];
+                ResponseMessage($sg, 419);
             }
             $supplierItem = SupplierItem::create([
                 'supplier_id' => $supplier->id,
