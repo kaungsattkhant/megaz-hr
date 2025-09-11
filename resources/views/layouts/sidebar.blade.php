@@ -758,7 +758,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('purchase-order-item-left'))
+                    @if (checkFeaturePermission('purchase-order'))
                         <li>
                             <a href="{{ route('purchase_orders.left_items_index') }}"
                                 class="flex items-center @yield('purchase_order_left_items') sidebar-gap-x">
