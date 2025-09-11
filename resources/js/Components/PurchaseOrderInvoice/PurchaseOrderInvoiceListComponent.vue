@@ -77,7 +77,7 @@
                                         <span v-if="item.total_invoice_amount"> {{ item.total_invoice_amount.toLocaleString() }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <div v-if="item.is_complete === 1">
+                                        <div v-if="item.is_complete === 0">
                                             <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                             </button> -->
