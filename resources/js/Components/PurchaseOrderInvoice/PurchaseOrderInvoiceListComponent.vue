@@ -290,6 +290,7 @@ export default {
             else{
                 this.invoiceAmount = this.selectedInvoice.total_invoice_amount;
             }
+            this.invoiceAmountChange();
         },
         async confirmBtnClicked(){
             if(this.invoiceAmount < 0){
