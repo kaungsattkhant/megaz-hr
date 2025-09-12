@@ -184,7 +184,7 @@
                         </label>
                         <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Type"
+                            <select data-te-select-init data-te-select-placeholder="Select Type" @change="getApAccountList"
                                 data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black">
                                 <option :value="type" v-for="(type, index) in typeList"
                                     :key="index"> {{ type.name }} </option>
@@ -213,6 +213,21 @@
                                     :key="index"> {{ category.name }} </option>
                             </select>
                         </div>
+                    </div>
+                    <div class="mb-6 col-span-3" v-if="selectedType?.value === 'addition' && selectedCategory?.value === 'other_payable'">
+                        <label for="" class="label-form mb-3">
+                            AP Account
+                        </label>
+                        <multiselect
+                        v-model="selectedApAccount"
+                        :options="apAccountList"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Account"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="false" ></multiselect>
                     </div>
                     <div class="mb-6 col-span-3">
                         <label for="" class="label-form mb-3">
@@ -308,10 +323,12 @@ export default {
                 {name : 'Other_payable', value: 'other_payable'},
             ],
             cashbookList: [],
+            apAccountList: [],
             accountList: [],
 
             selectedType: null,
             selectedCategory: null,
+            selectedApAccount: null,
             selectedAccount: null,
             amount: null,
             selectedCashbook: null,
@@ -350,8 +367,24 @@ export default {
                 this.currentPage = response.pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
-                this.selectedCategory = this.categoryList.find(item => item.value = this.primaryList[0].category);
+                this.selectedCategory = this.categoryList.find(item => item.value === this.primaryList[0].category);
                 this.selectedAccount = this.accountList.find(item => item.value = this.primaryList[0].category);
+            }
+        },
+        async getApAccountList(){
+            if(this.selectedType && this.selectedCategory){
+                let url = `/api/other-payable-accounts`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.apAccountList = response.data;
+                }
+                else{
+                    this.$notify({
+                        title: 'Input validation',
+                        text: response.error,
+                        type: 'warn'
+                    });
+                }
             }
         },
         async getExpenseAccountList() {
@@ -420,6 +453,10 @@ export default {
             let formData = new FormData();
             formData.append('type', this.selectedType.value);
             formData.append('category', this.selectedCategory.value);
+            if(this.selectedType.value === 'addition' && this.selectedCategory.value === 'other_payable'){
+                formData.append('other_payable_account_id',this.selectedApAccount.id);
+                formData.append('other_payable_account_code',this.selectedApAccount.account_code);
+            }
             formData.append('expense_account_id', this.selectedAccount.id);
             formData.append('expense_account_code', this.selectedAccount.account_code);
             formData.append('amount',this.amount);

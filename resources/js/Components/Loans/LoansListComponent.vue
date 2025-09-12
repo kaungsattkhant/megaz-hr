@@ -142,7 +142,7 @@
                             placeholder="Type"
                             ></multiselect>
                         </div>
-                        <div class="mb-6 col-span-3">
+                        <div class="mb-6 col-span-3" v-if="type == 'settlement' || type=='interest_settlement'">
                             <label for="" class="label-form mb-3">
                                 Category
                             </label>
@@ -360,7 +360,7 @@ export default {
                 return;
             }
             if(this.type != 'addition' && !this.category){
-                this.alertValidationMessage('Category must be selected when setelling');
+                this.alertValidationMessage('Category must be selected when settling');
                 return;
             }
             if(!this.selectedCreditorAccount){
@@ -395,7 +395,6 @@ export default {
                 formData.append('interest_rate', this.interestRate);
             }
             postApiData({url: `/api/loans`, form_data: formData, token: this.getToken()}).then((response)=>{
-                console.log(response);
                 if(response.success){
                     this.type = null;
                     this.category = null;

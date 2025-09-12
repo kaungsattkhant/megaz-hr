@@ -71,18 +71,18 @@
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left">
+                                    <td class=" text-left">
                                         <!-- {{ item.sop }} -->
                                         <span class="font-inter after-coma pr-1" v-for="sop in item.sops">{{ sop.sop }}</span>
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ item.job_description.job_description }}
+                                    <td class="">
+                                        {{ item.job_description?.job_description }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.job_description.role.department.name }}
+                                        {{ item.job_description?.role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.job_description.role.name }}
+                                        {{ item.job_description?.role.name }}
                                     </td>
                                     
                                     <td class="whitespace-nowrap" >
