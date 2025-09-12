@@ -269,6 +269,7 @@ export default {
         },
 
         checkBtnClicked(arrivalItem, index, invoice){
+            this.is_credit = false;
             console.log(arrivalItem);
             this.selectedPoInvoice = arrivalItem;
             this.selectedInvoice = invoice;
@@ -322,6 +323,7 @@ export default {
                     type: 'info'
                 });
                 document.getElementById("close_check_modal").click();
+                this.getItems();
             }
             else{
                 this.$notify({

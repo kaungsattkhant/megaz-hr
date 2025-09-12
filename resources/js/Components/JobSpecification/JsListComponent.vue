@@ -78,7 +78,7 @@
                                         {{ js.job_specification }}
                                     </td>
                                     <td class="">
-                                        {{ js.job_description.job_description }}
+                                        {{ js.job_description?.job_description }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
                                         --
