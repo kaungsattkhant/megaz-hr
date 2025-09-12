@@ -176,10 +176,10 @@ Route::middleware(['departments:purchase-order.confirm'])->group(function () {
 Route::middleware(['departments:confirm-purchase-order-item.list'])->group(function () {
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
 });
-Route::middleware(['departments:purchase-order-item-left'])->group(function () {
+Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
 });
-Route::middleware(['departments:purchase-order-item-left-confirmation'])->group(function () {
+Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
 });
 

@@ -411,7 +411,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-x-4">
+                        <!-- <div class="grid grid-cols-3 gap-x-4">
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
                                     Qty
@@ -431,7 +431,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
@@ -728,11 +728,14 @@ export default {
             }
         },
         btnClickPoModal(raw){
+            this.po_base_quantity = 0;
+            this.po_brand = null;
             this.selectedItem = raw;
             this.itemBrands = raw.brands;
             this.itemSelectChanged();
             this.po_base_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.base_uom_id)
-            this.po_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.uom_id)
+            this.po_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.uom_id);
+            this.getPoList();
         },
         async selectedBrandChange(){
             console.log('brand change')
@@ -744,7 +747,7 @@ export default {
         },
         btnClickedCreatePo(){
 
-            if(this.po_base_quantity < 1 && this.po_quantity < 1){
+            if(this.po_base_quantity){
                 this.alertValidationMessage('Quantiy');
                 return 1;
             }
@@ -829,7 +832,7 @@ export default {
         donePoModal() {
             document.getElementById("close_po").click();
             this.po_uom = null;
-            this.po_quantity = null;
+            this.po_quantity = 0;
             this.selectedPo = null;
         },
         alertValidationMessage(field) {

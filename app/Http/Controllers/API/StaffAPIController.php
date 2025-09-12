@@ -36,7 +36,6 @@ class StaffAPIController extends Controller
     }
 
     public function getStaffData(Request $request)
-
     {
         $staffs = $this->staffRepo->listAllData($request);
         ResponseData($staffs);
@@ -130,8 +129,13 @@ class StaffAPIController extends Controller
         $staff = Staff::find($request->user()->id);
 
         $roles = $staff->roles->pluck('name')->toArray();
-        $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Bartender', $roles) || in_array('Helper', $roles);
-        if (!$isSupervisorOrManager) {
+        // $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Chief Accountant', $roles) || in_array('Demi Chef', $roles);
+        // if (!$isSupervisorOrManager) {
+        //     ResponseMessage('Not authorized', 403);
+        // }
+        $allowedRoles = ['Supervisor', 'Manager', 'Captain', 'Chief Accountant', 'Sous Chef','Senior Receptionist'];
+
+        if (!array_intersect($roles, $allowedRoles)) {
             ResponseMessage('Not authorized', 403);
         }
 
