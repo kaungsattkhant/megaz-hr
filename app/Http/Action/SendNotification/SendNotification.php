@@ -75,16 +75,24 @@ trait SendNotification
         }
         if ($users->isNotEmpty()) {
             if ($type === "dep_type") {
-                $department_id = $users->first()->department_id;
-                broadcast(new SendDepartmentNotification($notification, $department_id));
+                // $department_id = $users->first()->department_id;
+                // $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
+                $staff_ids = $users->pluck('id');
+                foreach ($staff_ids as $staff_id) {
+                    broadcast(new SendDepartmentNotification($notification, $staff_id));
+                }
             } elseif ($type === "role_type") {
-                $role_id = $users->pluck('roles.*.id')->flatten()->first();
-                broadcast(new SendRoleNotification($notification, $role_id));
+                // $role_id = $users->pluck('roles.*.id')->flatten()->first();
+                $staff_ids = $users->pluck('id');
+                foreach ($staff_ids as $staff_id) {
+                    broadcast(new SendDepartmentNotification($notification, $staff_id));
+                }
+                // broadcast(new SendRoleNotification($notification, $role_id));
             } elseif ($type === "staff_type") {
 
                 $staff_ids = $users->pluck('id');
                 foreach ($staff_ids as $staff_id) {
-                    broadcast(new SendStaffNotification($notification, $staff_id));
+                    broadcast(new SendDepartmentNotification($notification, $staff_id));
                 }
             }
         }
