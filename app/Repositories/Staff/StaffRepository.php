@@ -283,7 +283,7 @@ class StaffRepository implements StaffRepositoryInterface
     {
 
         $allowedRoles = $roles ? ((in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Chief Accountant', $roles) || in_array('Sous Chef', $roles) || in_array('Senior Receptionist', $roles))
-            ? ['Supervisor', 'Staff','Helper','Bartender','Demi Chef']
+            ? ['Supervisor', 'Staff','Helper','Bartender','Demi Chef','Receptionist']
             : ['Staff','Helper','Demi Chef','Waiter','Receptionist','Driver','M&E','Security','Staff Cook','Accountant','Cashier']) : null;
             
         if ($request->per_page || $request->page) {
