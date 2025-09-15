@@ -24,7 +24,7 @@ trait PoInvoiceTransaction
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
             $category_id = $po_category->category_id;
             // $account_code = null;
-            $account_code = '2-1021'; #Inventory Food
+            $account_code = '2-1021'; #Inventory Food //example account code
             // switch ($category_id) {
             //     case "1":
             //         $account_code = '2-1021'; #Inventory Food
@@ -98,7 +98,7 @@ trait PoInvoiceTransaction
 
     public function storeAP($transaction,$ap_amount, $supplier_id, $supplier_account_id, $cash_account_id)
     {
-        if ($ap_amount >= 0) {
+        if ($ap_amount >0) {
             $accountPayable = AccountPayable::create([
                 'type' => 'addition',
                 'date_time' => now(),

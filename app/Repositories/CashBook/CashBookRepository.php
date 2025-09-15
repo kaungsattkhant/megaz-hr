@@ -171,7 +171,6 @@ class CashBookRepository implements CashBookInterface
         $date = isset($request->date) || $request->date != null ? Carbon::parse($request->date) : today();
         // $is_closing_column = 'is_pos_closing';
         // $closing_date_column = 'pos_closing_date';
-
         $is_closing_column = null;
         $closing_date_column = null;
         if ($isPos) {
