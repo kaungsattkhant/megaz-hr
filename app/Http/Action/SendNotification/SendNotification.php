@@ -47,7 +47,7 @@ trait SendNotification
         }
     }
 
-    public function sendParticipantNoti($object, $users, $data, $type)
+    public function sendParticipantNoti($object, $users, $data)
     {
         $morphMapName = RelationMorphName($object);
         $user_ids = $users->pluck('id');
@@ -70,33 +70,65 @@ trait SendNotification
             ], [
                 'title' => $data['title'],
                 'preview' => $data['body'],
-                'type' => $type
+                'type' => $morphMapName
             ]);
         }
         if ($users->isNotEmpty()) {
-            if ($type === "dep_type") {
-                // $department_id = $users->first()->department_id;
-                // $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
-                $staff_ids = $users->pluck('id');
-                foreach ($staff_ids as $staff_id) {
-                    broadcast(new SendDepartmentNotification($notification, $staff_id));
-                }
-            } elseif ($type === "role_type") {
-                // $role_id = $users->pluck('roles.*.id')->flatten()->first();
-                $staff_ids = $users->pluck('id');
-                foreach ($staff_ids as $staff_id) {
-                    broadcast(new SendDepartmentNotification($notification, $staff_id));
-                }
-                // broadcast(new SendRoleNotification($notification, $role_id));
-            } elseif ($type === "staff_type") {
+            $staff_ids = $users->pluck('id')->filter()->values()->toArray();
+            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            // if ($type === "dep_type") {
+            //     $department_id = $users->first()->department_id;
+            //     $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
+                
+            //     foreach ($staff_ids as $staff_id) {
+            //         broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            //     }
+            // } elseif ($type === "role_type") {
+            //     // $role_id = $users->pluck('roles.*.id')->flatten()->first();
+            //     $staff_ids = $users->pluck('id')->toArray();
+            //     // foreach ($staff_ids as $staff_id) {
+            //         broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            //     // }
+            //     // broadcast(new SendRoleNotification($notification, $role_id));
+            // } elseif ($type === "staff_type") {
 
-                $staff_ids = $users->pluck('id');
-                foreach ($staff_ids as $staff_id) {
-                    broadcast(new SendDepartmentNotification($notification, $staff_id));
-                }
-            }
+            //     $staff_ids = $users->pluck('id');
+            //     foreach ($staff_ids as $staff_id) {
+            //         broadcast(new SendDepartmentNotification($notification, $staff_id,$morphMapName));
+            //     }
+            // }
         }
     }
+
+    public function LeaveUpdateNotificationRequest($leave, $staff_id)
+    {
+        try {
+            $morphMapName = RelationMorphName($leave);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $leave->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Leave Status Update',
+                    'preview' => "Leave Status Update",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staff_id,
+            ],[
+                'title' => 'Leave Status Update',
+                'preview' => "Leave Status Update",
+            ]);
+            broadcast(new SendDepartmentNotification($notification,$staff_id,$morphMapName));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
     public function getTokensByStaff($user_ids)
     {
         return StaffFcmToken::whereIn('id', $user_ids)->pluck('fcm_token')->toArray();
@@ -221,7 +253,9 @@ trait SendNotification
                 'title' => 'Shift Assigned',
                 'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
             ]);
-            broadcast(new StaffTimeshiftNotification($staffTimeshift, $notification));
+            broadcast(new SendDepartmentNotification($notification, $staffTimeshift->staff_id, $morphMapName));
+
+            //broadcast(new StaffTimeshiftNotification($staffTimeshift, $notification));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);
