@@ -621,6 +621,13 @@
                             </a>
                         </li>
                     @endif
+                    <li>
+                        <a href="{{ route('cashbook.history') }}"
+                            class="flex items-center @yield('cashbook_history') sidebar-gap-x">
+                            <i class="fal fa-tasks"></i>
+                            Cash Book History
+                        </a>
+                    </li>
                     @if (checkFeaturePermission('cashbook'))
                         <li>
                             <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button"
