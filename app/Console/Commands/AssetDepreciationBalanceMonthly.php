@@ -160,7 +160,7 @@ class AssetDepreciationBalanceMonthly extends Command
                 );
 
 
-                Log::info("Depreciation created for Asset {$asset->id} → {$depreciationMonth->format('M-Y')}");
+                Log::info("Depreciation created for Asset {$asset->name} → {$depreciationMonth->format('M-Y')}");
 
                 // Carry forward total depreciation
                 $previousTotalDepreciation = $totalDep;
