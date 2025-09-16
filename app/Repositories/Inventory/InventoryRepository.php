@@ -62,7 +62,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         $staffId = UserData()->id;
         $inventories = Inventory::where('is_active', 1)
             ->whereHas('staff', function ($query) use ($staffId) {
-                $query->where('staff_id', $staffId);
+                // $query->where('staff_id', $staffId);
             })
             ->with(['inventoryable'])
             ->get();
