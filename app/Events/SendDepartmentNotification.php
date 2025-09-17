@@ -20,14 +20,16 @@ class SendDepartmentNotification implements ShouldBroadcast
     public $date;
     public $title;
     public $body;
+    public $morphMapName;
 
-    public function __construct(Notification $notification,  $user_ids)
+    public function __construct(Notification $notification,$user_ids,$morphMapName)
     {
         $this->user_ids = is_array($user_ids) ? $user_ids : [$user_ids];
         // $this->department_id = $department_id;
         $this->date = $notification->date_time;
         $this->title = $notification->title;
         $this->body = $notification->preview;
+        $this->morphMapName = $morphMapName;
     }
 
     /**
@@ -41,24 +43,25 @@ class SendDepartmentNotification implements ShouldBroadcast
         //     new Channel("send-notification.department.{$this->department_id}"),
         // ];
 
-        $channels = [];
-        
-        foreach ($this->user_ids as $user_id) {
-            $channels[] = new Channel("send-notification.staff.{$user_id}");
-        }
         Log::info('SendDepartmentNotification broadcasting to channels', [
-            'channels' => array_map(function($channel) {
-                return $channel->name;
-            }, $channels),
+            'channels' => 'request-notification.staff',
             'user_count' => count($this->user_ids),
             'payload' => [
                 'date' => $this->date,
                 'title' => $this->title,
                 'body' => $this->body,
+                'noti_type' => $this->morphMapName,
+                'user_ids' => $this->user_ids,
             ]
         ]);
-        return $channels;
 
+        
+        // foreach ($this->user_ids as $user_id) {
+        //     $channels[] = new Channel("request-notification.staff");
+        // }
+        return [
+            new Channel("request-notification.staff"),
+        ];
     }
 
     public function broadcastWith()
@@ -67,6 +70,8 @@ class SendDepartmentNotification implements ShouldBroadcast
             'date' => $this->date,
             'title' => $this->title,
             'body' => $this->body,
+            'noti_type' => $this->morphMapName,
+            'user_ids' => $this->user_ids,
         ];
     }
 }
