@@ -75,7 +75,7 @@ trait SendNotification
         }
         if ($users->isNotEmpty()) {
             $staff_ids = $users->pluck('id')->filter()->values()->toArray();
-            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));//this is common broadcast channel for mobilenoti for staff notification
             // if ($type === "dep_type") {
             //     $department_id = $users->first()->department_id;
             //     $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
@@ -123,6 +123,35 @@ trait SendNotification
                 'preview' => "Leave Status Update",
             ]);
             broadcast(new SendDepartmentNotification($notification,$staff_id,$morphMapName));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+    public function complaintNotification($complaint, $staff_id)
+    {
+        try {
+            $morphMapName = RelationMorphName($complaint);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $complaint->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Complaints',
+                    'preview' => $complaint->title,
+                    'date_time' => $complaint->created_at,
+                    'created_by' => UserData()->id,
+            ]);
+
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staff_id,
+            ],[
+                'title' => 'Complaints',
+                'preview' => $complaint->title,
+            ]);
+            broadcast(new SendDepartmentNotification($notification, $staff_id, $morphMapName, $complaint));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);
@@ -196,8 +225,9 @@ trait SendNotification
         $users = Staff::whereIn('id', $userIds)->get();
 
         if ($notiDatas->isNotEmpty()) {
-            $role_id = $users->pluck('roles.*.id')->flatten()[0];
-            broadcast(new EventsSendNotification($notification, $role_id));
+            // $role_id = $users->pluck('roles.*.id')->flatten()[0];
+            // broadcast(new EventsSendNotification($notification, $role_id));
+            broadcast(new SendDepartmentNotification($notification, $userIds, $morphMapName));
         }
     }
 
