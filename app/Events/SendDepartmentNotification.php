@@ -21,8 +21,9 @@ class SendDepartmentNotification implements ShouldBroadcast
     public $title;
     public $body;
     public $morphMapName;
+    public $complaint;
 
-    public function __construct(Notification $notification,$user_ids,$morphMapName)
+    public function __construct(Notification $notification,$user_ids,$morphMapName,$complaint = null)
     {
         $this->user_ids = is_array($user_ids) ? $user_ids : [$user_ids];
         // $this->department_id = $department_id;
@@ -30,6 +31,7 @@ class SendDepartmentNotification implements ShouldBroadcast
         $this->title = $notification->title;
         $this->body = $notification->preview;
         $this->morphMapName = $morphMapName;
+        $this->complaint = $complaint;
     }
 
     /**
@@ -39,10 +41,6 @@ class SendDepartmentNotification implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        // return [
-        //     new Channel("send-notification.department.{$this->department_id}"),
-        // ];
-
         Log::info('SendDepartmentNotification broadcasting to channels', [
             'channels' => 'request-notification.staff',
             'user_count' => count($this->user_ids),
@@ -66,12 +64,18 @@ class SendDepartmentNotification implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return [
+        $data = [
             'date' => $this->date,
             'title' => $this->title,
             'body' => $this->body,
             'noti_type' => $this->morphMapName,
             'user_ids' => $this->user_ids,
         ];
+        if ($this->complaint) {
+            $data['complaint'] = $this->complaint;
+            $data['complaint_by'] = $this->complaint->postedBy ?? null;
+        }
+
+        return $data;
     }
 }
