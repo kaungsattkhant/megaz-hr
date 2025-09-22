@@ -219,7 +219,7 @@ export default {
                 uom_name: this.selectedEquipment.item_uom,
                 quantity: this.amount,
                 uom_conversion: this.selectedEquipment.uom_conversion,
-                uom_type: 'uom_type',
+                uom_type: 'base_uom',
             })
             this.selectedEquipment = null;
             this.amount = null;

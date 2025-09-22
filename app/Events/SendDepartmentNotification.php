@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Notification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -15,17 +16,20 @@ class SendDepartmentNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $department_id;
+    public $user_ids;
     public $date;
     public $title;
     public $body;
+    public $morphMapName;
 
-    public function __construct(Notification $notification, $department_id)
+    public function __construct(Notification $notification,$user_ids,$morphMapName)
     {
-        $this->department_id = $department_id;
+        $this->user_ids = is_array($user_ids) ? $user_ids : [$user_ids];
+        // $this->department_id = $department_id;
         $this->date = $notification->date_time;
         $this->title = $notification->title;
         $this->body = $notification->preview;
+        $this->morphMapName = $morphMapName;
     }
 
     /**
@@ -35,8 +39,28 @@ class SendDepartmentNotification implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        // return [
+        //     new Channel("send-notification.department.{$this->department_id}"),
+        // ];
+
+        Log::info('SendDepartmentNotification broadcasting to channels', [
+            'channels' => 'request-notification.staff',
+            'user_count' => count($this->user_ids),
+            'payload' => [
+                'date' => $this->date,
+                'title' => $this->title,
+                'body' => $this->body,
+                'noti_type' => $this->morphMapName,
+                'user_ids' => $this->user_ids,
+            ]
+        ]);
+
+        
+        // foreach ($this->user_ids as $user_id) {
+        //     $channels[] = new Channel("request-notification.staff");
+        // }
         return [
-            new Channel("send-notification.department.{$this->department_id}"),
+            new Channel("request-notification.staff"),
         ];
     }
 
@@ -46,6 +70,8 @@ class SendDepartmentNotification implements ShouldBroadcast
             'date' => $this->date,
             'title' => $this->title,
             'body' => $this->body,
+            'noti_type' => $this->morphMapName,
+            'user_ids' => $this->user_ids,
         ];
     }
 }
