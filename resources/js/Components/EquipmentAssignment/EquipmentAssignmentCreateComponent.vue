@@ -249,7 +249,7 @@ export default {
             let response = await postApiData({url:`/api/hr/equipment-assignments`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/equipment_assignment`);
+                window.location.replace(`/equipment_assignment`);
             }else {
                 this.$notify({
                     title: `Input validation`,
