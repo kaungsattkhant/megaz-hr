@@ -1458,7 +1458,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     DB::beginTransaction();
     try {
       $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId, $supplierId);
-      if ($apAmount >= 0 || ($request->total_invoice_amount < $request->amount)) {
+      if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
         $this->storeAP($transaction, $apAmount, $supplierId, $supplierCreditorAccountId, $cashAccountId);
       }
       $poInvoice->is_complete = 1;

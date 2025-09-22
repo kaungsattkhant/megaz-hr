@@ -635,6 +635,11 @@
         "slug": "cashbook"
     },
     {
+        "module": "cashbook-closing-history",
+        "name": "Cashbook Closing History ",
+        "slug": "cashbook-closing-history"
+    },
+    {
         "module": "purchase-order",
         "name": "purchase-order create",
         "slug": "purchase-order.create"
@@ -1318,6 +1323,11 @@
         "module": "pos-cashbook",
         "name": "pos-cashbook list ",
         "slug": "pos-cashbook"
+    },
+      {
+        "module": "pos-cashbook-closing-history",
+        "name": "POS Cashbook Closing History ",
+        "slug": "pos-cashbook-closing-history"
     },
     {
         "module": "pos-booking",
