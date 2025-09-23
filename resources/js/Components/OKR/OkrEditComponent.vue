@@ -195,7 +195,9 @@ export default {
         },
         async addDetail(detail){
             this.selectedDepartment = this.departmentList.find(dep => dep.id === detail.role.department_id);
-            this.roleList = this.selectedDepartment.roles;
+            if(this.selectedDepartment){
+                this.roleList = this.selectedDepartment.roles;
+            }
             this.selectedRole = this.roleList.find(role => role.id === detail.role_id);
 
             let response = await getApiData({url: `/api/sops?role_id=` + detail.role_id, token: this.getToken()});
