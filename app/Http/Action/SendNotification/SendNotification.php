@@ -47,7 +47,7 @@ trait SendNotification
         }
     }
 
-    public function sendParticipantNoti($object, $users, $data, $type)
+    public function sendParticipantNoti($object, $users, $data)
     {
         $morphMapName = RelationMorphName($object);
         $user_ids = $users->pluck('id');
@@ -70,25 +70,94 @@ trait SendNotification
             ], [
                 'title' => $data['title'],
                 'preview' => $data['body'],
-                'type' => $type
+                'type' => $morphMapName
             ]);
         }
         if ($users->isNotEmpty()) {
-            if ($type === "dep_type") {
-                $department_id = $users->first()->department_id;
-                broadcast(new SendDepartmentNotification($notification, $department_id));
-            } elseif ($type === "role_type") {
-                $role_id = $users->pluck('roles.*.id')->flatten()->first();
-                broadcast(new SendRoleNotification($notification, $role_id));
-            } elseif ($type === "staff_type") {
+            $staff_ids = $users->pluck('id')->filter()->values()->toArray();
+            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));//this is common broadcast channel for mobilenoti for staff notification
+            // if ($type === "dep_type") {
+            //     $department_id = $users->first()->department_id;
+            //     $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
+                
+            //     foreach ($staff_ids as $staff_id) {
+            //         broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            //     }
+            // } elseif ($type === "role_type") {
+            //     // $role_id = $users->pluck('roles.*.id')->flatten()->first();
+            //     $staff_ids = $users->pluck('id')->toArray();
+            //     // foreach ($staff_ids as $staff_id) {
+            //         broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            //     // }
+            //     // broadcast(new SendRoleNotification($notification, $role_id));
+            // } elseif ($type === "staff_type") {
 
-                $staff_ids = $users->pluck('id');
-                foreach ($staff_ids as $staff_id) {
-                    broadcast(new SendStaffNotification($notification, $staff_id));
-                }
-            }
+            //     $staff_ids = $users->pluck('id');
+            //     foreach ($staff_ids as $staff_id) {
+            //         broadcast(new SendDepartmentNotification($notification, $staff_id,$morphMapName));
+            //     }
+            // }
         }
     }
+
+    public function LeaveUpdateNotificationRequest($leave, $staff_id)
+    {
+        try {
+            $morphMapName = RelationMorphName($leave);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $leave->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Leave Status Update',
+                    'preview' => "Leave Status Update",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staff_id,
+            ],[
+                'title' => 'Leave Status Update',
+                'preview' => "Leave Status Update",
+            ]);
+            broadcast(new SendDepartmentNotification($notification,$staff_id,$morphMapName));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+    public function complaintNotification($complaint, $staff_id)
+    {
+        try {
+            $morphMapName = RelationMorphName($complaint);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $complaint->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Complaints',
+                    'preview' => $complaint->title,
+                    'date_time' => $complaint->created_at,
+                    'created_by' => UserData()->id,
+            ]);
+
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staff_id,
+            ],[
+                'title' => 'Complaints',
+                'preview' => $complaint->title,
+            ]);
+            broadcast(new SendDepartmentNotification($notification, $staff_id, $morphMapName, $complaint));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
     public function getTokensByStaff($user_ids)
     {
         return StaffFcmToken::whereIn('id', $user_ids)->pluck('fcm_token')->toArray();
@@ -156,8 +225,9 @@ trait SendNotification
         $users = Staff::whereIn('id', $userIds)->get();
 
         if ($notiDatas->isNotEmpty()) {
-            $role_id = $users->pluck('roles.*.id')->flatten()[0];
-            broadcast(new EventsSendNotification($notification, $role_id));
+            // $role_id = $users->pluck('roles.*.id')->flatten()[0];
+            // broadcast(new EventsSendNotification($notification, $role_id));
+            broadcast(new SendDepartmentNotification($notification, $userIds, $morphMapName));
         }
     }
 
@@ -213,7 +283,9 @@ trait SendNotification
                 'title' => 'Shift Assigned',
                 'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
             ]);
-            broadcast(new StaffTimeshiftNotification($staffTimeshift, $notification));
+            broadcast(new SendDepartmentNotification($notification, $staffTimeshift->staff_id, $morphMapName));
+
+            //broadcast(new StaffTimeshiftNotification($staffTimeshift, $notification));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);
