@@ -150,7 +150,8 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
     ->leftJoin('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
     ->leftJoin('uom_conversions', function($join) {
       $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
-          ->where('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+          ->on('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+          ->on('uom_conversions.item_id', '=', 'items.id')
           ->where('uom_conversions.is_active', '=', 1);
   })
     ->leftJoinSub($handoverSubquery, 'handovers', function($join) {
@@ -167,26 +168,25 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
       'base_uom.name as base_uom_name',
       'staff_equipment_assigns.uom_type',
       'staff_equipment.staff_id as staff_id',
-      'inventory_ledger_items.quantity',
-      'inventory_ledgers.action',
-      DB::raw('COALESCE(uom_conversions.conversion) as uom_conversion'),
+      // 'inventory_ledger_items.quantity',
+      // 'inventory_ledgers.action',
+      'uom_conversions.conversion as uom_conversion',
       DB::raw('COALESCE(handovers.handover_quantity, 0) as handover_quantity')
     )
-
-    ->selectRaw('
-      SUM(CASE 
-          WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign" AND inventory_ledgers.action = "in"
-        THEN inventory_ledger_items.quantity
-        ELSE 0
-      END) as assign_quantity_in
-  ')
-  ->selectRaw('
-            SUM(CASE 
-                WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign" AND inventory_ledgers.action = "out"
-                THEN inventory_ledger_items.quantity
-                ELSE 0
-            END) as assign_quantity_out
-        ')
+  //   ->selectRaw('
+  //     SUM(CASE 
+  //         WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign" AND inventory_ledgers.action = "in"
+  //       THEN inventory_ledger_items.quantity
+  //       ELSE 0
+  //     END) as assign_quantity_in
+  // ')
+  // ->selectRaw('
+  //           SUM(CASE 
+  //               WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign" AND inventory_ledgers.action = "out"
+  //               THEN inventory_ledger_items.quantity
+  //               ELSE 0
+  //           END) as assign_quantity_out
+  //       ')
         ->selectRaw('
             (SUM(CASE 
                 WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign" AND inventory_ledgers.action = "in"
