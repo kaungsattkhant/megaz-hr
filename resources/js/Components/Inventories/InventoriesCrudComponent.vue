@@ -628,6 +628,18 @@ export default {
             }
         },
         addSelectedItemBtnClicked() {
+            if(this.selectedDepartment.slug === 'kitchen' && !this.selectedArea){
+                this.alertValiationMessage('Area');
+                return 1;
+            }
+            if(this.selectedDepartment.slug === 'catering' && !this.selectedArea){
+                this.alertValiationMessage('Area');
+                return 1;
+            }
+            if(this.selectedDepartment.slug === 'bar' && !this.selectedArea){
+                this.alertValiationMessage('Area');
+                return 1;
+            }
             let selectedId = null;
             let selectedName = null;
             // if(this.selectedInventoryType === 'area'){
@@ -639,13 +651,21 @@ export default {
             //         }
             //     )
             // }
-            this.selectedItem.push(
-                {
-                    inventoryable_type: 'department',
-                    inventoryable_id: this.selectedDepartment.id,
-                    inventoryable_name: this.selectedDepartment.name
-                }
-            )
+
+
+            if(this.selectedItem.some(item => item.inventoryable_id === this.selectedDepartment.id)){
+                console.log('same dep')
+            }
+            else{
+                this.selectedItem.push(
+                    {
+                        inventoryable_type: 'department',
+                        inventoryable_id: this.selectedDepartment.id,
+                        inventoryable_name: this.selectedDepartment.name
+                    }
+                )
+            }
+            
             if (this.selectedDepartment.slug === 'kitchen') {
                 this.selectedItem.push(
                     {
@@ -884,6 +904,13 @@ export default {
             if (index != -1) {
                 list.splice(index, 1);
             }
+        },
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
     },
 
