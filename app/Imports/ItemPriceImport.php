@@ -56,10 +56,9 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
             $brand = Brand::where('id', $row['brand_id'])->first();
             $supplier = Supplier::where('supplier_code', $row['supplier_code'])->first();
             if (!$supplier) {
-                // DB::rollback();
-                // return null;
+                DB::rollback();
+                return null;
             }
-            $uom = Uom::where('uom_code', $row['uom_code'])->first();
             if (!$item) {
                 ResponseMessage('Item Code is invalid', 419);
             }
@@ -68,6 +67,7 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
             }
             if (!$supplier) {
             }
+            $uom = Uom::where('id', $item->base_uom_id)->first();
             if(!$uom){
                 $sg=$row['uom_code'].' - Uom Id is invalid '.$row['item_code'];
                 ResponseMessage($sg, 419);
