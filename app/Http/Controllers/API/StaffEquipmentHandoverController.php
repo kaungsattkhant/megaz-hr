@@ -31,4 +31,10 @@ class StaffEquipmentHandoverController extends Controller
         $staffEquipmentHandover = $this->staffEquipmentHandoverRepository->confirmHandover($id, $request->all());
         ResponseData($staffEquipmentHandover);
     }
+
+    public function cancelHandover($id, Request $request)
+    {
+        $staffEquipmentHandover = $this->staffEquipmentHandoverRepository->cancelHandover($id, $request->all());
+        ResponseData($staffEquipmentHandover);
+    }
 }

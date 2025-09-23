@@ -149,6 +149,7 @@ Route::middleware('auth:api')->group(function () {
   Route::controller(StaffEquipmentHandoverController::class)->group(function () {
     Route::post('/staff-equipment-handovers', 'createStaffEquipmentHandover');
     Route::post('/staff-equipment-handovers/{id}/confirm', 'confirmHandover');
+    Route::post('/staff-equipment-handovers/{id}/cancel', 'cancelHandover');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

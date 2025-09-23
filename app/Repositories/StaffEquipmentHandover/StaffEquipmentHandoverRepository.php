@@ -222,5 +222,26 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
     }
     return true;
     }
+
+    public function cancelHandover($id, array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $handover = StaffEquipmentHandover::with('staffEquipmentHandoverItems')->where('status', 'pending')->findOrFail($id);
+            
+            $handover->update([
+                'status' => 'cancelled',
+                'cancelled_by' => $data['cancelled_by'],
+                'cancelled_at' => now()
+            ]);
+            $this->sendHandoverNotificationFromStaff($handover);
+            DB::commit();
+            ResponseData($handover);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
     
 }
