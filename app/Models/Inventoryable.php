@@ -23,4 +23,9 @@ class Inventoryable extends Model
     {
         return $this->belongsTo(Inventory::class);
     }
+
+    // public function department()
+    // {
+    //     return $this->belongsTo(Department::class);
+    // }
 }
