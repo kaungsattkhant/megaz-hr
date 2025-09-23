@@ -75,7 +75,6 @@ class SendDepartmentNotification implements ShouldBroadcast
             $data['complaint'] = $this->complaint;
             $data['complaint_by'] = $this->complaint->postedBy ?? null;
         }
-
         return $data;
     }
 }

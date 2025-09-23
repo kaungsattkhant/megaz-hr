@@ -193,17 +193,19 @@ use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
+use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepository;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
-use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
 
+use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository;
 use App\Repositories\CustomerDepositReport\CustomerDepositReportRepositoryInterface;
-use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 
+use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
+use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
@@ -313,5 +315,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(LoanRepositoryInterface::class, LoanRepository::class);
         $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
         $this->app->bind(DepositAndReceivableReportRepositoryInterface::class, DepositAndReceivableReportRepository::class);
+        $this->app->bind(StaffEquipmentHandoverRepositoryInterface::class, StaffEquipmentHandoverRepository::class);
     }
 }
