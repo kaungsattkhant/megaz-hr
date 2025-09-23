@@ -190,7 +190,7 @@ class OrderRepository implements OrderRepositoryInterface
             ")
                 ->where('inventory_ledgers.inventory_id', $inventoryId)
                 ->first();
-            dd($itemInventory);
+            // dd($itemInventory);
             // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
         }
 

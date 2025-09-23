@@ -70,7 +70,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             if ($complaint) {
                 $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
                 $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
-                if (!empty($complaintCarbonCopies)) {
+                if (!empty($complaintResponsibles)) {
 
                     foreach ($complaintResponsibles as $responsible) {
                         $complaint->complaintResponsibles()->create([

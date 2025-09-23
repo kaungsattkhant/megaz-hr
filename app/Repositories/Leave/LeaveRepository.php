@@ -537,6 +537,7 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->with(['department', 'roles'])
       ->orderByDesc('id')
       ->where('is_cv', 0)
+      ->where('is_active', 1)
       ->paginate(config('common.list_count'));
     ResponseData($staffs);
   }

@@ -67,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
             'staff_equipment_assign' => 'App\Models\StaffEquipmentAssign',
             'accrued' => 'App\Models\Accrued',
             'leave' => 'App\Models\Leave',
+            'staff_equipment_handover' => 'App\Models\StaffEquipmentHandover',
+            'staff_equipment_handover_item' => 'App\Models\StaffEquipmentHandoverItem',
         ]);
     }
 }
