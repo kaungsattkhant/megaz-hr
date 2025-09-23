@@ -1174,7 +1174,7 @@ export default {
             formData.append('id',this.itemId);
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
-                window.location.replace("/items");
+                // window.location.replace("/items");
             }
             else {
                 this.$notify({

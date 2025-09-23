@@ -16,7 +16,7 @@
                 </div>
                 <div class="flex justify-end flex-col">
 
-                    <button type="button" v-show="feature.includes('complaint.create')"
+                    <button type="button" v-show="feature.includes('complain.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
                         Add New
