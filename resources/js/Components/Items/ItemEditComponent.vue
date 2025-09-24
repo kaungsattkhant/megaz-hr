@@ -694,7 +694,8 @@ export default {
             this.name = detail.name;
             this.selectedCategory = this.itemCategoryList.find(cat => cat.id === detail.category_id);
             this.selectedItemType = this.itemTypeList.find(type => type.id === detail.item_type_id);
-            this.selectedTag = this.tagList.find(tag => tag.id = detail.tag_id);
+            let tag = this.tagList.find(tag => tag.id === detail.tag_id);
+            this.selectedTag = tag;
             this.selectedCode = detail.code;
             this.selectedLimitType = this.limitTypeList.find(limit => limit.value === detail.limitation_type);
             
@@ -1174,7 +1175,7 @@ export default {
             formData.append('id',this.itemId);
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
-                // window.location.replace("/items");
+                window.location.replace("/items");
             }
             else {
                 this.$notify({
