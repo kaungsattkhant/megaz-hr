@@ -43,6 +43,7 @@ class AssetItemEquipmentAssignController extends Controller
     public function getEquipmentAssignsByStaffId(Request $request){
         
         $equipmentAssigns = $this->assetItemEquipmentAssignRepo->getEquipmentAssignsByStaffId($request);
-        ResponseData(StaffEquipmentAssignResource::collection($equipmentAssigns));
+        ResponseData($equipmentAssigns);
+        // ResponseData(StaffEquipmentAssignResource::collection($equipmentAssigns));
     }
 }

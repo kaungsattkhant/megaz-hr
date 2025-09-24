@@ -2,36 +2,32 @@
 
 namespace App\Models;
 
-use App\Models\StaffEquipment;
+use App\Models\StaffEquipmentHandover;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class StaffEquipmentAssign extends Model
+class StaffEquipmentHandoverItem extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'staff_equipment_id',
+        'staff_equipment_handover_id',
         'item_id',
         'uom_id',
         'uom_quantity',
         'quantity',
-        'uom_type'
+        'uom_type',
     ];
 
-    public function staffEquipment()
+    public function staffEquipmentHandover()
     {
-        return $this->belongsTo(StaffEquipment::class, 'staff_equipment_id');
+        return $this->belongsTo(StaffEquipmentHandover::class, 'staff_equipment_handover_id');
     }
+
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
-
-    // public function baseUom()
-    // {
-    //     return $this->belongsTo(Uom::class, 'base_uom_id');
-    // }
 
     public function uom()
     {

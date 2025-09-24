@@ -29,10 +29,12 @@ class StaffEquipmentAssignResource extends JsonResource
             'item' => $this->item->name ?? null,
             'base_quantity' => $baseQuantity,
             'base_uom_name' => $this->item->base_uom_name ?? null,
+            'base_uom_id' => $this->item->base_uom_id ?? null,
             'uom_quantity' => $uomQuantity,
             'uom_name' => $this->item->item_uom ?? null,
-            // 'uom_type' => $this->uom_type,
-            // 'uom_conversion' => $this->item->uom_conversion ?? null,
+            'uom_id' => $this->item->uom_id ?? null,
+            'uom_type' => $this->uom_type,
+            'uom_conversion' => $this->item->uom_conversion ?? null,
         ];
     }
 }
