@@ -9,4 +9,5 @@ interface StaffEquipmentHandoverRepositoryInterface
     public function cancelHandover($id, array $data);
     // public function updateStaffEquipmentHandover($id, array $data);
     // public function deleteStaffEquipmentHandover($id);
+    public function getStaffTimeshift($staffId);
 }

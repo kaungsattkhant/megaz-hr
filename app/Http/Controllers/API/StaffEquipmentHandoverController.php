@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\StaffTimeShiftResource;
+use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 
 class StaffEquipmentHandoverController extends Controller
 {
@@ -12,6 +13,12 @@ class StaffEquipmentHandoverController extends Controller
     public function __construct(StaffEquipmentHandoverRepositoryInterface $staffEquipmentHandoverRepository)
     {
         $this->staffEquipmentHandoverRepository = $staffEquipmentHandoverRepository;
+    }
+
+    public function getStaffTimeshift($staffId)
+    {
+        $staffTimeshift = $this->staffEquipmentHandoverRepository->getStaffTimeshift($staffId);
+        ResponseData(StaffTimeShiftResource::collection($staffTimeshift));
     }
 
     public function createStaffEquipmentHandover(Request $request)
