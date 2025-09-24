@@ -85,9 +85,12 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 ]);
             }
             $this->sendHandoverNotificationToStaff($handover);
-            
+            $data=[
+                'id' => $handover->id,
+                'status' => $handover->status
+            ];
             DB::commit();
-            ResponseData($handover);
+            ResponseData($data);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
@@ -147,9 +150,13 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 'confirmed_by' => $data['confirmed_by'],
                 'confirmed_at' => now()
             ]);
+            $data=[
+                'id' => $handover->id,
+                'status' => $handover->status
+            ];
             $this->sendHandoverNotificationFromStaff($handover);
             DB::commit();
-            ResponseData($handover);
+            ResponseData($data);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
@@ -235,8 +242,12 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 'cancelled_at' => now()
             ]);
             $this->sendHandoverNotificationFromStaff($handover);
+            $data=[
+                'id' => $handover->id,
+                'status' => $handover->status
+            ];
             DB::commit();
-            ResponseData($handover);
+            ResponseData($data);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);

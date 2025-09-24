@@ -68,8 +68,12 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             $data['posted_by'] = UserData()->id;
             $complaint = Complaint::create($data);
             if ($complaint) {
-                $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
-                $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
+                if (isset($data['complaintResponsibles']) && !empty($data['complaintResponsibles'])) {
+                    $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
+                }
+                if (isset($data['complaintCarbonCopies']) && !empty($data['complaintCarbonCopies'])) {
+                    $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
+                }
                 if (!empty($complaintResponsibles)) {
 
                     foreach ($complaintResponsibles as $responsible) {
