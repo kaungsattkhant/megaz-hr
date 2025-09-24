@@ -359,7 +359,7 @@ trait SendNotification
                     'notificationable_type' => $morphMapName
                 ],
                 [
-                    'title' => 'Handover Status ${handOver->status} Update from '. $handOver->staffTimeshift->timeshift->shift->name,
+                    'title' => "Handover Status {$handOver->status} Update from " . $handOver->staffTimeshift->timeshift->shift->name,
                     'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
@@ -367,7 +367,7 @@ trait SendNotification
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $handOver->fromStaff->id,
             ],[
-                'title' => 'Handover Status {$handOver->status} Update from '. $handOver->staffTimeshift->timeshift->shift->name,
+                'title' => "Handover Status {$handOver->status} Update from " . $handOver->staffTimeshift->timeshift->shift->name,
                 'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}" ,
             ]);
             broadcast(new SendDepartmentNotification($notification, $handOver->fromStaff->id, $morphMapName));

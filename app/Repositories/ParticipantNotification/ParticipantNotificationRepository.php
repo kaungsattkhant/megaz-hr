@@ -1096,7 +1096,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   {
       $type = $request->query('type');
 
-      $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift'];
+      $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift','staff_equipment_handover'];
       $notificationUsers = NotificationUser::with(['notification' => function ($query) {
         $query->with('notificationable');
     }])
@@ -1136,6 +1136,16 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           $notificationUser->notification->notificationable->load([
               'timeshift.shift',
               'area'
+          ]);
+      }
+      elseif ($notificationType === Relation::getMorphedModel('staff_equipment_handover') || $notificationType === 'staff_equipment_handover') {
+          $notificationUser->notification->notificationable->load([
+              'fromStaff',
+              'toStaff',
+              'staffTimeshift',
+              'staffTimeshift.timeshift',
+              'staffTimeshift.timeshift.shift',
+              'staffTimeshift.area'
           ]);
       }
     }

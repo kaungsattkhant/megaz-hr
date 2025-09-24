@@ -138,7 +138,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         DB::raw('SUM(inventory_ledger_items.quantity) as handover_quantity')
       )
       ->groupBy('staff_equipment_handover_items.item_id');
-    // dd($handoverOutSubquery->get());
+
     $inventoryItems = InventoryLedgerItem::join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
       ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
       ->leftJoin('uoms', 'items.uom_id', '=', 'uoms.id')
@@ -146,7 +146,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
       // ->join('uoms', 'items.uom_id', '=', 'uoms.id')
       ->leftJoin('staff_equipment_assigns', function ($join) {
         $join->on('inventory_ledgers.ledgerable_id', '=', 'staff_equipment_assigns.id')
-          ->where('inventory_ledgers.ledgerable_type', '=', 'staff_equipment_assign');
+          ->where('inventory_ledgers.ledgerable_type', '=', "staff_equipment_assign");
       })
       ->leftJoin('staff_equipment', 'staff_equipment_assigns.staff_equipment_id', '=', 'staff_equipment.id')
       ->leftJoin('uom_conversions', function ($join) {
@@ -178,8 +178,8 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         DB::raw('
     SUM(CASE 
         WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign"
-         AND inventory_ledgers.action = "out"
-         AND staff_equipment.staff_id = ' . $staff_id . '
+        AND inventory_ledgers.action = "out"
+        AND staff_equipment.staff_id = ' . $staff_id . '
         THEN inventory_ledger_items.quantity
         ELSE 0
     END) as handover_quantity
@@ -238,6 +238,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         'base_uom.name',
         'uom_conversions.conversion'
       )
+      ->havingRaw('(handover_quantity > 0 OR current_quantity > 0)')
       ->get();
     return $inventoryItems;
   }
