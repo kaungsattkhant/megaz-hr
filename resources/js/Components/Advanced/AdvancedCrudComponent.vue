@@ -1,26 +1,29 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Advanced
-        </p>
-    </div>
+   
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Advanced
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-show="feature.includes('staff-balance.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -225,11 +228,13 @@
                 perPage: 0,
                 lastPage: 0,
                 totalData:0,
+
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             monthChange(){
                 let selectedNewMonth = this.selectedMonth.slice(5,7);

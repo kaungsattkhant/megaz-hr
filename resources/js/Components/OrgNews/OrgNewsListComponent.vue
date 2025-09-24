@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Org News
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Org News
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/org_news/create" class="add-btn ">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/org_news/create" class="add-btn " v-if="feature.includes('org-new.create')">
+                        Add New
+                    </a>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -46,7 +48,7 @@
                                 <th scope="col" class=" ">
                                     Role
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['org-new.edit', 'org-new.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -78,13 +80,13 @@
                                             {{ role.role ? role.role.name : ''}} 
                                         </span>
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/org_news/' + news.id + '/edit'">
+                                    <td class="whitespace-nowrap " v-show="['org-new.edit', 'org-new.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/org_news/' + news.id + '/edit'" v-if="feature.includes('org-new.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(news.id)"
+                                            @click="deleteBtnClicked(news.id)" v-show="feature.includes('org-new.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -168,7 +170,7 @@
 </template>
 
 <script>
-import { Modal, Ripple, initTE, Input } from "tw-elements";
+// import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
@@ -185,11 +187,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getNewsList(pageNumber) {
             let url = `/api/org_news`;

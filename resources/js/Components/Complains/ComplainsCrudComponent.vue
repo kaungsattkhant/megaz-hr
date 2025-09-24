@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Complaints
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Complaints
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-show="feature.includes('complain.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -85,13 +87,13 @@
                                     </button> -->
 
                                         <button id="edit-btn" class="pr-1" @click="statusChangeClick(complain.id)"
-                                            data-te-toggle="modal" data-te-target="#statusChange"
+                                            data-te-toggle="modal" data-te-target="#statusChange" v-show="feature.includes('complaint.update')"
                                             :disabled="complain.status === 'Done'">
                                             <i class="far fa-info-circle"></i>
                                         </button>
 
 
-                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(complain.id)"
+                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(complain.id)" v-show="feature.includes('complaint.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -314,11 +316,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getComplain(pageNumber) {
 

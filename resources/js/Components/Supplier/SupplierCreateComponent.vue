@@ -5,7 +5,7 @@
                 Add New Supplier
             </p>
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md card-shadow">
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Supplier Name
@@ -20,13 +20,13 @@
                 <input type="text" v-model="shopName"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Limit
                 </label>
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
+            </div> -->
             <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Lead Time
@@ -34,44 +34,44 @@
                 <input type="text" v-model="lead_time"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div> -->
-            <div class="mb-4 col-span-3 pb-6 relative">
-                <label for="" class="block text-sm text-black mb-3 absolute -top-6 text-center w-full">
-                    (Lead Time)
+            <div class="mb-4 col-span-6 pb-6 relative">
+                <label for="" class="block text-sm text-black mb-3  text-center w-full">
+                    Lead Time
                 </label>
-                <div class="grid grid-cols-3 gap-x-4">
-                    <div>
+                <div class="grid grid-cols-6 gap-x-8">
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_day"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Day
                         </label>
-                        <input type="number" v-model="lead_time_day"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div>
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_hour"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Hour
                         </label>
-                        <input type="number" v-model="lead_time_hour"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div>
+                    <div class="col-span-2 flex items-center gap-x-4">
+                        <input type="number" v-model="lead_time_min"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <label for="" class="block text-sm text-black mb-3">
                             Min 
                         </label>
-                        <input type="number" v-model="lead_time_min"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                 </div>
                 
             </div>
             
-            <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Terms
                 </label>
                 <textarea name="" v-model="credit_terms"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="7"></textarea>
-            </div>
+            </div> -->
             <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
@@ -113,6 +113,38 @@
                     </p>
                 </div>
             </div>
+            <div class="col-span-3"></div>
+            <div class="mb-12 col-span-3 pb-0 rounded-md">
+                <label class="label-form mb-3">Credit Terms</label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Credit Term" v-model="selectedTermType" class="input-ui !text-black"
+                    data-te-select-filter="false">
+                        <option :value="type.value" v-for="type in termList">{{ type.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4 col-span-3 " v-if="selectedTermType === 'day'">
+                <label for="" class="block text-sm text-black mb-3">
+                    Day
+                </label>
+                <input type="number" v-model="term_day"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3 " v-if="selectedTermType === 'exact_date'">
+                <label for="" class="block text-sm text-black mb-3">
+                    Exact Date
+                </label>
+                <input type="date" v-model="term_exact_date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3" v-if="selectedTermType === 'amount_limitation'">
+                <label for="" class="block text-sm text-black mb-3">
+                    Amount Limitation
+                </label>
+                <input type="number" v-model="term_limitation_amount"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-12"></div>
             <!-- <div class="col-span-3 mb-4 flex gap-x-4">
                 <div class=" flex-grow">
                     <label for="" class="block text-sm text-black mb-3">
@@ -165,7 +197,7 @@
                 </div>
             </div> -->
 
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -220,20 +252,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ selectedItem.name }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <span class="text-sm"v-for="(brand) in selectedItem.brands" > {{ brand.name }}, </span>
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <button>
-                                    <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
-                                </button>
-                            </td>
-                        </tr> -->
-
                         <div class="contents" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <tr v-for="(brand) in selectedItem.brands" >
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
@@ -251,7 +269,7 @@
                         </div>
                     </tbody>
                 </table>
-            </div>
+            </div> -->
 
             <!-- supplier phone list -->
             <div class="contents">
@@ -365,6 +383,7 @@
             </div>
         </div>
         <div>
+            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none mr-4" @click="btnClickCancel"> Cancel </button>
             <button class="add-btn" @click="createBtnClicked">
                 Create Supplier
             </button>
@@ -493,6 +512,8 @@ import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 
 export default {
+    props: ['route-location'],
+    emits: ['cancel','finish'],
     components: {
         Multiselect
     },
@@ -542,7 +563,16 @@ export default {
             typeList:[
                 {value:'phone',name:'Phone'},
                 {value:'kpay',name:'Kpay'}
-            ]
+            ],
+            termList:[
+                {value:'day',name:'Day'},
+                {value:'amount_limitation',name:'Amount Limitation'},
+                {value:'exact_date',name:'Exact Date'}
+            ],
+            selectedTermType: null,
+            term_day: null,
+            term_exact_date: null,
+            term_limitation_amount: null,
         };
     },
 
@@ -662,10 +692,10 @@ export default {
                 this.alertValidationMessage(`Supplier Address`);
                 return 1;
             }
-            if(this.selectedItems.length < 1){
-                this.alertValidationMessage(`Supplier selling Items`);
-                return 1;
-            }
+            // if(this.selectedItems.length < 1){
+            //     this.alertValidationMessage(`Supplier selling Items`);
+            //     return 1;
+            // }
             if(this.phoneNumberList.length < 1){
                 this.alertValidationMessage(`Supplier Phone Number`);
                 return 1;
@@ -674,10 +704,10 @@ export default {
             //     this.alertValidationMessage(`supplier Bank Account`);
             //     return 1;
             // }
-            if(!this.maxCredit){
-                this.alertValidationMessage(`Supplier Credit Limit`);
-                return 1;
-            }
+            // if(!this.maxCredit){
+            //     this.alertValidationMessage(`Supplier Credit Limit`);
+            //     return 1;
+            // }
             if(!this.selectedAccount){
                 this.alertValidationMessage(`Supplier Account Payable`);
                 return 1;
@@ -686,8 +716,8 @@ export default {
                 this.alertValidationMessage(`Lead Time`);
                 return 1;
             }
-            if(!this.credit_terms){
-                this.alertValidationMessage(`Credit Terms`);
+            if(!this.selectedTermType){
+                this.alertValidationMessage(`Credit Terms Type`);
                 return 1;
             }
             if(!this.selectedCreditAccount){
@@ -699,11 +729,20 @@ export default {
             formData.append("name", this.name);
             formData.append("shop_name", this.shopName);
             // formData.append("phone_number", this.phoneNumber);
-            formData.append("credit_limit", this.maxCredit);
+            // formData.append("credit_limit", this.maxCredit);
             formData.append("lead_time_day", this.lead_time_day);
             formData.append("lead_time_hour", this.lead_time_hour);
             formData.append("lead_time_minutes", this.lead_time_min);
-            formData.append("credit_terms", this.credit_terms);
+            formData.append("credit_term_type", this.selectedTermType);
+            if(this.selectedTermType === 'day'){
+                formData.append("day", this.term_day);
+            }
+            if(this.selectedTermType === 'exact_date'){
+                formData.append("exact_date", this.term_exact_date);
+            }
+            if(this.selectedTermType === 'amount_limitation'){
+                formData.append("amount_limitation", this.term_limitation_amount);
+            }
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
@@ -721,7 +760,7 @@ export default {
                 });
             });
 
-            formData.append("supplier_items", JSON.stringify(itemBrandList));
+            // formData.append("supplier_items", JSON.stringify(itemBrandList));
             formData.append("supplier_phones", JSON.stringify(this.phoneNumberList));
             if(this.bankAccountList.length > 0){
                 formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));
@@ -730,7 +769,14 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/suppliers");
+                if(this.routeLocation){
+                    // window.location.replace(this.routeLocation);
+                    this.$emit('finish')
+                }
+                else{
+                    window.location.replace("/suppliers");
+                }
+                // window.location.replace("/suppliers");
             }
         },
 
@@ -787,6 +833,14 @@ export default {
                 list.splice(index, 1);
             }
         },
+        btnClickCancel(){
+            if(this.routeLocation){
+                this.$emit('cancel')
+            }
+            else{
+                window.location.replace("/suppliers");
+            }
+        }
     },
 
     created(){

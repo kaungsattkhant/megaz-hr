@@ -9,7 +9,7 @@
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 
-	<title> {{Config::get('app.name')}} | @yield('page_title') </title>
+	<title> Mega Z ERP | @yield('page_title')</title>
     @vite('resources/js/app.js')
 
     <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
@@ -23,6 +23,10 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+  <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 </head>
 
 <body>
@@ -86,7 +90,7 @@
         $(window).on('load', function() {
             scrollToActiveLink();
         });
-        
+
     });
 </script>
 <script>

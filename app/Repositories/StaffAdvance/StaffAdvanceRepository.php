@@ -13,13 +13,13 @@ use Illuminate\Support\Facades\Log;
 class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
 {
 
-    public function createStaffAdvance(Request $reqeust)
+    public function createStaffAdvance($request)
     {
         DB::beginTransaction();
         try {
             $currentYear = date('Y');
             $currentMonth = date('m');
-            $data = $reqeust->all();
+            $data = $request->all();
             $data['date_time'] = CurrentTime();
             // $data['date_time'] = "2024-07-13 07:30";
             $data['created_by'] = UserData()->id;
@@ -40,6 +40,8 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                     'transaction_id' => $transaction->id,
                     'account_id' => $data['cash_account_id'],
                     'action' => 'credit',
+                    'personable_id'=>$data['staff_id'],
+                    'personable_type'=>'staff',
                     'is_cashier_confirmed' => 0
                 ]);
 
@@ -48,6 +50,8 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                     'transaction_id' => $transaction->id,
                     'account_id' => $advanceAccount->id,
                     'action' => 'debit',
+                    'personable_id'=>$data['staff_id'],
+                    'personable_type'=>'staff',
                     'is_cashier_confirmed' => 0
                 ]);
             } else {
@@ -56,6 +60,8 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                     'transaction_id' => $transaction->id,
                     'account_id' => $data['cash_account_id'],
                     'action' => 'debit',
+                    'personable_id'=>$data['staff_id'],
+                    'personable_type'=>'staff',
                     'is_cashier_confirmed' => 0
                 ]);
 
@@ -64,6 +70,8 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                     'transaction_id' => $transaction->id,
                     'account_id' => $advanceAccount->id,
                     'action' => 'credit',
+                    'personable_id'=>$data['staff_id'],
+                    'personable_type'=>'staff',
                     'is_cashier_confirmed' => 0
                 ]);
             }

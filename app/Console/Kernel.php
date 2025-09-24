@@ -17,8 +17,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:prepaid-monthly-schedule')->everyThirtySeconds();
         // $schedule->command('app:asset-depreciation-balance-monthly')->monthlyOn(1, '00:00');
         $schedule->command('app:asset-depreciation-balance-monthly')->everyMinute();
-        // $schedule->command('app:assign-objectives-to-staffs')->daily('00:00');
+        $schedule->command('app:assign-objectives-to-staffs')->daily('00:00');
         $schedule->command('app:self-check-out')->everyMinute();
+        $schedule->command('app:monthly-loan-interest-addition-schedule')->dailyAt('00:10');
     }
 
     /**

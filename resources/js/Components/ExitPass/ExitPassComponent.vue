@@ -1,40 +1,44 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Exit Pass
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button> -->
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
-                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
-                </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
-                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
-                        <option :value="role" v-for="(role, roleIndex) in searchRoleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" text-lg font-semibold font-inter">
+                    Exit Pass
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                
-                <button  data-te-toggle="modal" data-te-target="#add_exit_modal" @click="btnClickedCreateExitModal"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-            </button>
+        
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button> -->
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    
+                    <button  data-te-toggle="modal" data-te-target="#add_exit_modal" @click="btnClickedCreateExitModal"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -106,10 +110,12 @@
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(exit.id)" v-if="exit.status == 'confirmed' || exit.status == 'arrival_confirmed'"
-                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="far fa-trash-alt"></i>
-                                        </button>
+                                        <div class="contents" v-show="feature.includes('exit-pass.delete')">
+                                            <button @click="deleteBtnClicked(exit.id)" v-if="exit.status == 'confirmed' || exit.status == 'arrival_confirmed'"
+                                                data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                                <i class="far fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                         <div class="contents" v-if="exit.status != 'confirmed' && exit.status != 'arrival_confirmed'">
                                             <button @click="confirmedExit(exit)">
                                                 <i class="far fa-check text-sm mr-3 p-1"></i>
@@ -380,11 +386,12 @@ export default {
             deleteId:null,
 
             testdata: null,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getExitList(pageNumber) {
             let url = this.url + this.url_department + this.url_role;
@@ -562,7 +569,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/leave_allowances/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/exit_passes/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getExitList(1);
             }

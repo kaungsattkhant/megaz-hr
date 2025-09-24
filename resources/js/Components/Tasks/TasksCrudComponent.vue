@@ -1,24 +1,26 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Tasks
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Tasks
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button type="button" v-show="feature.includes('task.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -100,8 +102,8 @@
                                             task.task_details[0].double_checked_by.name }} </div>
                                     </td>
 
-                                    <td class="whitespace-nowrap ">
-                                        <input :checked="task.is_active == 1" @change="isActiveToggled(task.id)"
+                                    <td class="whitespace-nowrap " >
+                                        <input :checked="task.is_active == 1" @change="isActiveToggled(task.id)" v-show="feature.includes('task.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -336,12 +338,14 @@ export default {
             totalData: 0,
 
             currentGroup: 0,
-            kpi: 0
+            kpi: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async doubleChecked(id) {
             let url = `/api/tasks/${id}/double_checked`;

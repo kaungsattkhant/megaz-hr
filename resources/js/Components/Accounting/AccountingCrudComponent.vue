@@ -1,30 +1,32 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Accounting
-        </p>
-    </div>
     
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <button class="add-btn" @click="searchBtnClicked">Search</button>
-                <button class="add-btn" @click="clearSearchBtnClicked">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Accounting
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
 
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button class="add-btn" @click="searchBtnClicked">Search</button>
+                    <button class="add-btn" @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('account.create')">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="block rounded-xl">
+        <div class="box-container-table">
 
             <div class="overflow-x-auto">
                 <div class="overflow-hidden ">
@@ -66,13 +68,13 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3"
-                                        @click="editBtnClicked(account.id, index)">
+                                        @click="editBtnClicked(account.id, index)"  v-show="feature.includes('account.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <!-- <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <input
+                                        <input v-show="feature.includes('account.toggle')"
                                         :checked="account.is_active == 1"
                                         @change="isActiveToggled(account.id)"
                                         class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
@@ -396,11 +398,13 @@
                 currentGroup: 0,
                 isFirstGroup: true,
                 isLastGroup: false,
+
+                feature: this.getFeature(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getHeadAccountList(){
                 let url = `/api/head_accounts`;

@@ -1,31 +1,33 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Roles
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="filterDepartment"
-                    data-te-select-filter="true" @change="filterDepartmentChange()" class="input-ui w-full !text-sm">
-                        <!-- <option value="all">All</option> -->
-                        <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
-                    </select>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Roles
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" v-model="filterDepartment"
+                        data-te-select-filter="true" @change="filterDepartmentChange()" class="input-ui w-full !text-sm">
+                            <!-- <option value="all">All</option> -->
+                            <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end flex-col">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="name = null, selectedDepartment = null">
-                    Add New
-                </button>
+                    <button type="button" v-if="getFeature().includes('role.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="name = null, selectedDepartment = null">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -65,7 +67,7 @@
                                         {{ role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <button type="button" class="pr-3"
+                                        <button type="button" class="pr-3" v-if="getFeature().includes('role.edit')"
                                             data-te-toggle="modal" data-te-target="#edit_modal" @click="editRolesBtnClicked(role)">
                                             <i class="fas fa-pen"></i>
                                         </button>
@@ -310,12 +312,13 @@ export default {
             lastPage: 0,
             totalData: 0,
 
-            department_url:''
+            department_url:'',
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getDepartmentList() {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
@@ -362,7 +365,10 @@ export default {
                 console.log("success")
             }
             else {
-                alert('some errors occur');
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
         editRolesBtnClicked(role) {

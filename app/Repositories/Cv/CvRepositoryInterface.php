@@ -15,4 +15,8 @@ interface CvRepositoryInterface
 
   public function deleteCv($id);
   public function updateCvStatus($id, array $data);
+
+  public function getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId);
+  public function createNewStaffSalary(array $data);
+  public function storeNewStaffJoinDate(array $data);
 }

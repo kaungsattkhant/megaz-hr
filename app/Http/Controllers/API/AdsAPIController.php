@@ -24,6 +24,10 @@ class AdsAPIController extends Controller
     {
         $ads = $this->adsRepo->createData($request->all());
     }
+    public function adsDetail(int $id)
+    {
+        $ads = $this->adsRepo->adsDetail($id);
+    }
 
     public function editAds(Request $request, int $id)
     {
@@ -33,5 +37,10 @@ class AdsAPIController extends Controller
     public function deleteAds(int $id)
     {
         $ads = $this->adsRepo->deleteData($id);
+    }
+
+    public function latestAds()
+    {
+        $ads = $this->adsRepo->latestAds();
     }
 }

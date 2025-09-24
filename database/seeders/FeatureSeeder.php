@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Feature;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class FeatureSeeder extends Seeder
 {
@@ -13,70 +15,58 @@ class FeatureSeeder extends Seeder
      */
     public function run(): void
     {
-        $features = [
-            'staff',
-            'role',
-            'task',
-            'complaint',
-            'department',
-            'area',
-            'room',
-            'table',
-            'service',
-            'item',
-            'uom conversion',
-            'uom',
-            'menu',
-            'item usage forecast',
-            'purchase order',
-            'purchase order confirmation',
-            'inventory',
-            'inventory confirmation',
-            'inventory transfer list',
-            'inventory receive list',
-            'brand',
-            'supplier',
-            'cashbook',
-            'fixed asset',
-            'customer',
-            'purchase order item left',
-            'purchase order item left confirmation',
-            'pos',
-            'room discount',
-            'package',
-            'menu service discount',
-            'account payables',
-            'inventory stocks',
-            'crm',
-            'sale target',
-            'duty',
-            // financial
-            'asset depreciation balance',
-            'journal',
-            'staff balance',
-            'prepaid',
-            'ar',
-            'financial report', 
-            //financial
-            'skill',
-            'cooking place',
-            'custom task',
-            'feature',
-            'accessory',
-            'MRP',
-            'Objective',
-            'Ktv Product Tree',
-            'po-order',
-            'arrival-item',
-            'po-order-invoice',
-            'check in',
-            'hr',
-        ];
-        foreach ($features as $feature) {
-            Feature::create([
-                'name' => Str::title($feature),
-                'slug' => Str::slug($feature, '-')
-            ]);
+        $modules = config('feature.modules');
+        $names = config('feature.names');
+        $slugs = config('feature.slug');
+        $items = [];
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('features')->truncate();
+        // DB::table('department_feature')->truncate();
+        // DB::table('feature_staff')->truncate();
+        $data = [];
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        // $path = app_path('Console/Commands/data/modules.json'); // Full path
+        // if (!file_exists(dirname($path))) {
+        //     mkdir(dirname($path), 0755, true);
+        // }
+        $json = File::get(base_path('app/Console/Commands/data/features.json'));
+        $modules = json_decode($json);
+        DB::beginTransaction();
+        try {
+            foreach ($modules as $i => $module) {
+                // dd($module);
+
+                // $data[] = [
+                //     "module" => $module->module,
+                //     "name" => $module->name,
+                //     "slug" => $module->slug,
+                // ];
+                $data[] = [
+                    'module' => $module->module,
+                    'name' => $module->name,
+                    'slug' => $module->slug,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+                // $feature = Feature::firstOrCreate(
+                //     [
+                //         'slug' => $slugs[$i],
+                //     ],
+                //     [
+                //         'module' => $module->module,
+                //         'name' => $module->name,
+                //         'slug' => $module->slug,
+                //     ]
+                // );
+            }
+            Feature::insertOrIgnore($data);
+            // file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT));
+            DB::commit();
+            // ResponseMessage('Feature insert successfully',200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
     }
 }

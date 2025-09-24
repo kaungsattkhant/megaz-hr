@@ -11,7 +11,7 @@ use App\Http\Action\Transaction\StoreTransactionLedger;
 
 trait PoInvoiceTransaction
 {
-    public function storeInvoiceTransaction($model, $amount,$cashAccountId)
+    public function storeInvoiceTransaction($model, $amount,$cashAccountId,$supplierId)
     {
         $purchaseOrderItemGroupedByCategory = $this->groupedByCategoryAndSupplier($model);
         $data['date'] = now();
@@ -23,24 +23,25 @@ trait PoInvoiceTransaction
         $transaction = (new StoreTransactionLedger())->createTransaction($data);
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
             $category_id = $po_category->category_id;
-            $account_code = null;
-            switch ($category_id) {
-                case "1":
-                    $account_code = '2-1021'; #Inventory Food
-                    break;
-                case "2":
-                    $account_code = '2-1023'; #Inventory Tobacco
-                    break;
-                case "3":
-                    $account_code = '2-1024'; #Inventory General
-                    break;
-                case "4":
-                    $account_code = '2-1022'; #Inventory Beverage
-                    break;
-                case "5":
-                    $account_code = '2-1025'; #Inventory Stationery
-                    break;
-            }
+            // $account_code = null;
+            $account_code = '2-1021'; #Inventory Food //example account code
+            // switch ($category_id) {
+            //     case "1":
+            //         $account_code = '2-1021'; #Inventory Food
+            //         break;
+            //     case "2":
+            //         $account_code = '2-1023'; #Inventory Tobacco
+            //         break;
+            //     case "3":
+            //         $account_code = '2-1024'; #Inventory General
+            //         break;
+            //     case "4":
+            //         $account_code = '2-1022'; #Inventory Beverage
+            //         break;
+            //     case "5":
+            //         $account_code = '2-1025'; #Inventory Stationery
+            //         break;
+            // }
             if ($account_code == null) {
                 ResponseMessage('Transaction fail', 419);
             }
@@ -97,14 +98,14 @@ trait PoInvoiceTransaction
 
     public function storeAP($transaction,$ap_amount, $supplier_id, $supplier_account_id, $cash_account_id)
     {
-        if ($ap_amount > 0) {
+        if ($ap_amount >0) {
             $accountPayable = AccountPayable::create([
                 'type' => 'addition',
                 'date_time' => now(),
                 'amount' => $ap_amount,
                 'supplier_id' => $supplier_id,
                 'account_id' => $supplier_account_id,
-                'cash_account_id' => $cash_account_id,
+                'cash_account_id' => $cash_account_id ?? null,
                 'created_by' => UserData()->id,
             ]);
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
@@ -112,6 +113,8 @@ trait PoInvoiceTransaction
                 'transaction_id' => $transaction->id,
                 'account_id' => $supplier_account_id,
                 'action' => 'credit',
+                'personable_id'=>$supplier_id,
+                'personable_type'=>'supplier',
             ]);
         }
     }

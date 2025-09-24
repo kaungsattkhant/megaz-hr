@@ -1,40 +1,42 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Resignations
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
-                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
-                </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
-                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
-                        <option :value="role" v-for="(role, roleIndex) in searchRoleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
-                </div> -->
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Resignations
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                
-                <button  data-te-toggle="modal" data-te-target="#add_modal" @click="btnClickedAddModal"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-            </button>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                    <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div> -->
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    
+                    <button  data-te-toggle="modal" data-te-target="#add_modal" @click="btnClickedAddModal" v-show="feature.includes('resignation.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -94,7 +96,7 @@
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="far fa-trash-alt"></i>
                                         </button> -->
-                                        <div class="contents" v-if="item.status === 'received'">
+                                        <div class="contents" v-if="item.status === 'received' && feature.includes('resignation.status')">
                                             <button @click="confirmedItem(item)">
                                                 <i class="far fa-check text-sm mr-3 p-1"></i>
                                             </button>
@@ -342,11 +344,13 @@ export default {
             url:'/api/hr/resignations',
             url_search:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
             let url = this.url + this.url_search;
@@ -510,7 +514,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/leave_allowances/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/resignations/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getExitList(1);
             }

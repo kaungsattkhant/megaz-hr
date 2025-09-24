@@ -1,31 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Areas
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category" v-model="filterCategory" @change="filterCategoryChange()" class="input-ui w-full !text-sm">
-                        <!-- <option value="all">All</option> -->
-                        <option v-for="(category,index) in categoryList" :key="index" :value="category"> {{ category.name }} </option>
-                    </select>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Areas
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category" v-model="filterCategory" @change="filterCategoryChange()" class="input-ui w-full !text-sm">
+                            <!-- <option value="all">All</option> -->
+                            <option v-for="(category,index) in categoryList" :key="index" :value="category"> {{ category.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-if="feature.includes('area.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addBtnClicked"
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -47,7 +50,7 @@
                                 <th scope="col" class="">
                                     Category
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['area.edit', 'area.toggle'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -63,19 +66,18 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
                                     </td>
-
                                     <td class="whitespace-nowrap  ">
-                                        {{ area.area_type.name }}
+                                        {{ area.area_type ? area.area_type.name : '' }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_category.name }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <!-- <button @click="deleteBtnClicked(area.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
-                                        <input :checked="area.is_active == 1" @change="isActiveToggled(area.id)"
+                                    <td class="whitespace-nowrap " v-show="['area.edit', 'area.toggle'].some(f => feature.includes(f))">
+                                        <button @click="editBtnClicked(area)" v-if="feature.includes('area.edit')"
+                                            data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-1">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <input :checked="area.is_active == 1" @change="isActiveToggled(area.id)" v-if="feature.includes('area.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -129,7 +131,7 @@
                                 id="create_modalLabel">
                                 Create Area
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_create_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -144,13 +146,13 @@
                                 </label>
                                 <input type="text" placeholder="Area Name" v-model="name" class="input-ui">
                             </div>
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label class="label-form mb-3">Department</label>
                                 <multiselect v-model="selectedDepartment" :options="departmentList"
                                     :close-on-select="true" :clear-on-select="false" :preserve-search="true"
                                     placeholder="Select Department" label="name" track-by="id" :preselect-first="false">
                                 </multiselect>
-                            </div>
+                            </div> -->
                             <div class="mb-4">
                                 <label class="label-form mb-3">Area Category</label>
                                 <multiselect v-model="selectedCategory" :options="categoryList" :close-on-select="true"
@@ -167,7 +169,7 @@
                                 </div> -->
                             </div>
                             
-                            <div class="mb-4">
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Selling Area'">
                                 <label for="" class="label-form mb-3">Area Type</label>
                                 <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Area Type"
@@ -186,7 +188,7 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button data-te-modal-dismiss type="button" @click="createAreasBtnClicked"
+                            <button type="button" @click="createAreasBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
                             </button>
@@ -194,6 +196,52 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="edit_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="create_modalLabel">
+                                Edit Area
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_edit_modal"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Area Name
+                                </label>
+                                <input type="text" placeholder="Area Name" v-model="editName" class="input-ui">
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button type="button" @click="editAreasBtnClicked"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
 
             <!--Delete Modal -->
             <div data-te-modal-init
@@ -272,6 +320,12 @@ export default {
             selectedType: null,
             selectedCategory: null,
             selectedDepartment: null,
+
+            selectedId: null,
+            editName: null,
+            editSelectedType: null,
+            editSelectedCategory: null,
+
             deleteId: null,
 
             currentPage: 0,
@@ -281,11 +335,12 @@ export default {
             
             filterCategory:null,
             category_url:'',
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async filterCategoryChange(){
             this.category_url = 'area_category_id='+this.filterCategory.id+'&'
             this.getAreasList(1);
@@ -327,18 +382,38 @@ export default {
                 this.typeList = response.data;
             }
         },
-
+        addBtnClicked(){
+            this.selectedType = null;
+            this.selectedCategory = null;
+            this.selectedDepartment = null;
+            this.name = null;
+        },
         createAreasBtnClicked() {
-
-            this.createArea();
+            if(!this.name){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(!this.selectedCategory){
+                this.alertValidationMessage(`Category`);
+                return 1;
+            }
+            else if(this.selectedCategory.name === 'Selling Area' && !this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else{
+                this.createArea();
+            }
         },
 
         async createArea() {
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('area_type_id', this.selectedType.id);
+            if(this.selectedCategory.name === 'Selling Area'){
+                formData.append('area_type_id', this.selectedType.id);
+            }
             formData.append('area_category_id', this.selectedCategory.id);
-            formData.append('department_id', this.selectedDepartment.id);
+            // formData.append('department_id', this.selectedDepartment.id);
             // if(this.isPos = true){
             //     formData.append('is_pos', 1);
             // }
@@ -352,11 +427,77 @@ export default {
                 this.selectedCategory = null;
                 this.selectedDepartment = null;
                 this.name = null;
+                document.getElementById('close_create_modal').click();
             }
             else {
-
+                this.$notify({
+                    text: `Menu create failed`,
+                    type: "error"
+                });
             }
         },
+
+
+        editBtnClicked(item){
+            this.selectedId = item.id;
+            this.selectedType = null;
+            // this.selectedCategory = null;
+            this.editName = item.name;
+            this.editSelectedCategory = this.categoryList.find(cat => cat.id === item.area_category_id);
+            if(this.editSelectedCategory.name === 'Selling Area'){
+                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
+            }
+        },
+        editAreasBtnClicked() {
+            if(!this.editName){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(!this.editSelectedCategory){
+                this.alertValidationMessage(`Category`);
+                return 1;
+            }
+            else if(this.editSelectedCategory.name === 'Selling Area' && !this.editSelectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else{
+                this.editArea();
+            }
+        },
+
+        async editArea() {
+            let formData = new FormData();
+            formData.append('id', this.selectedId);
+            formData.append('name', this.editName);
+            if(this.editSelectedCategory.name === 'Selling Area'){
+                formData.append('area_type_id', this.editSelectedType.id);
+            }
+            formData.append('area_category_id', this.editSelectedCategory.id);
+            // formData.append('department_id', this.selectedDepartment.id);
+            // if(this.isPos = true){
+            //     formData.append('is_pos', 1);
+            // }
+            // else{
+            //     formData.append('is_pos', 0);
+            // }
+            let response = await postApiData({ url: '/api/areas', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getAreasList(1);
+                this.editSelectedType = null;
+                this.editSelectedCategory = null;
+                this.editName = null;
+                document.getElementById('close_edit_modal').click();
+            }
+            else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
+        },
+
+
 
         isActiveToggled(id) {
             let index = this.areaList.findIndex(area => area.id == id);
@@ -387,7 +528,14 @@ export default {
                 this.getAreasList(1);
                 console.log(`deleted`);
             }
-        }
+        },
+        alertValidationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
+        },
 
     },
     mounted() {

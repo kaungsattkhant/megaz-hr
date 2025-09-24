@@ -1,40 +1,43 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Leave Allowance
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button> -->
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
-                </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedRoleChange()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                        <option :value="role" v-for="(role, roleIndex) in roleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Leave Allowance
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                
-                <a href="/leave_allowance/create"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button> -->
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedRoleChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    
+                    <a href="/leave_allowance/create" v-if="feature.includes('leave-allowance.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -50,13 +53,19 @@
                                     Leave Days
                                 </th>
                                 <th scope="col" class="">
+                                    Type
+                                </th>
+                                <th scope="col" class="">
                                     Department
                                 </th>
                                 <th scope="col" class="">
                                     Role
                                 </th>
                                 <th scope="col" class="">
-                                    Type
+                                    Staff
+                                </th>
+                                <th scope="col" class="">
+                                    Leave Type
                                 </th>
                                 <th scope="col" class="">
                                     
@@ -74,20 +83,26 @@
                                     <td class="whitespace-nowrap">
                                         {{ leave.day }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ leave.role.department.name }}
+                                    <td class="whitespace-nowrap capitalize">
+                                        {{ leave.allowanceable_type }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.role.name }}
+                                        {{ leave.allowanceable?.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.leave_category.name }}
+                                        {{ leave.allowanceable?.roles ? leave.allowanceable.roles[0].name : leave.allowanceable?.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ leave.allowanceable_type === 'staff' ? leave.allowanceable?.name : '--' }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ leave.leave_category?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(leave.id)"
+                                        <button @click="deleteBtnClicked(leave.id)" v-if="feature.includes('leave-allowance.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -101,13 +116,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="leaveAllowanceList(currentPage - 1)">«</button>
+                                @click="getLeaveAllowanceList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="leaveAllowanceList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getLeaveAllowanceList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -196,17 +211,23 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getLeaveAllowanceList(pageNumber) {
-            let url = this.url + this.url_department + this.url_role;
+            let url = this.url + '?page=' + pageNumber + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.leaveAllowanceList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         async getDepartmentList(){
@@ -216,13 +237,13 @@ export default {
             }
         },
         selectedDepartmentChange(){
-            this.url_department = '?department_id='+this.selectedDepartment.id;
+            this.url_department = '&department_id='+this.selectedDepartment.id;
             this.roleList = this.selectedDepartment.roles;
-            this.getLeaveAllowanceList();
+            this.getLeaveAllowanceList(1);
         },
         selectedRoleChange(){
             this.url_role = '&role_id='+this.selectedRole.id;
-            this.getLeaveAllowanceList();
+            this.getLeaveAllowanceList(1);
         },
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput

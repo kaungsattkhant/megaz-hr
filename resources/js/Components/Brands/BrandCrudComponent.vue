@@ -1,28 +1,33 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Brands
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4 ">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
-
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Brands
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex gap-x-4 ">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="createBtnClicked">
-                    Add New
-                </button>
+                    <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+
+                </div>
+                <div class="flex justify-end gap-x-4">
+                    <label for="excel_import_supplier" class="add-btn h-8 cursor-pointer">
+                        Import 
+                        <input type="file" placeholder="Excel" id="excel_import_supplier" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
+                    <button type="button" v-show="feature.includes('brand.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="createBtnClicked">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -34,7 +39,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
-                                <th></th>
+                                <th v-show="feature.includes('brand.edit')"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +52,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ brand.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="feature.includes('brand.edit')">
                                         <button id="edit-btn" class="pr-2" data-te-toggle="modal"
                                             data-te-target="#create_modal" @click="editBtnClicked(brand)">
                                             <i class="fas fa-pen"></i>
@@ -228,11 +233,14 @@ export default {
             selectedItem:[],
 
             editId: null,
+
+            selectedImportItem: null,
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({
@@ -329,6 +337,33 @@ export default {
             }
         },
 
+        handleFileChange(event) {
+            console.log("Event object:", event);
+            const selectedImportItem = event.target.files[0];
+            this.selectedImportItem = selectedImportItem;
+            if(this.selectedImportItem){
+                this.importBrand();
+            }
+        },
+        async importBrand() {
+            let formData = new FormData();
+            formData.append('sheet', this.selectedImportItem);
+            let response = await postApiData({ url: '/api/brands/import', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedImportItem = null;
+                this.getBrandList(1);
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
         async searchBtnClicked() {
             let url = null;
             if (this.searchInput && this.searchCategory) {

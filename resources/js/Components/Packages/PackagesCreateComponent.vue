@@ -44,8 +44,87 @@
                 <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg"
                     ref="image">
             </div>
-
             <div class="mb-3 col-span-3 rounded-md">
+                <label class="label-form mb-3">Package Type </label>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedPackageTypeChanged"
+                        data-te-select-filter="true" name="" id="" v-model="selectedPackageType" class="input-ui">
+                        <option value="ktv"> KTV </option>
+                        <option value="restaurant"> Restaurant </option>
+                        <option value="event"> Event </option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 col-span-3 rounded-md" v-if="selectedPackageType === 'event'">
+                <label for="" class="label-form mb-3">
+                    Event Date
+                </label>
+                <div class="relative">
+                    <input type="date" class="input-ui" :min="today" v-model="eventdate">
+                </div>
+            </div>
+            <div class="col-span-6" v-if="selectedPackageType != 'event'">
+            </div>
+            <div class="col-span-3" v-else></div>
+
+            <!-- <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Sessions
+                </label>
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
+            </div> -->
+
+            <div class="contents" v-show="selectedPackageType === 'ktv'">
+                <div class="mb-3 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Paid Sessions
+                    </label>
+                    <input type="number" class="input-ui" v-model="paySession"
+                        placeholder="Paid Sessions">
+                </div>
+
+                <div class="mb-3 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Free Sessions
+                    </label>
+                    <input type="number" class="input-ui" v-model="freeSession"
+                        placeholder="Free Sessions">
+                </div>
+                <div class="mb-0 col-span-3 rounded-md">
+                    <label class="label-form mb-3"> Room </label>
+                    <multiselect v-model="selectedRoom" :options="roomList" :close-on-select="false"
+                        :multiple="true"
+                        :clear-on-select="false" :preserve-search="true" placeholder="Select Room" label="name"
+                        track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                            Room selected</span>
+                        </template>
+                    </multiselect>
+                </div>
+                <div class="col-span-3"></div>
+            </div>
+            
+            <!-- <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Session Price
+                </label>
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice"
+                    placeholder="Session Price">
+            </div> -->
+            
+            
+            <div class="mb-3 col-span-3 rounded-md">
+                <label class="label-form mb-3"> Type </label>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                        <option value="menu"> Menu </option>
+                        <option value="accessory"> Accessory </option>
+                    </select>
+                </div>
+            </div>
+            <!-- <div class="mb-3 col-span-3 rounded-md">
                 <div class="block ps-[1.5rem]">
                     <label for="" class="label-from mb-3 block relative">&nbsp;</label>
                     <input
@@ -56,7 +135,7 @@
                         Package for KTV
                     </label>
                 </div>
-            </div>
+            </div> -->
 
             <div class="mb-3 col-span-3 rounded-md">
                 <div class="block ps-[1.5rem]">
@@ -68,63 +147,6 @@
                     <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
                         Can changeable?
                     </label>
-                </div>
-            </div>
-
-            <div class="mb-3 col-span-3"></div>
-
-            <!-- <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
-            </div> -->
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Paid Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession"
-                    placeholder="Paid Sessions">
-            </div>
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Free Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession"
-                    placeholder="Free Sessions">
-            </div>
-
-            <!-- <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Session Price
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice"
-                    placeholder="Session Price">
-            </div> -->
-            
-            <div class="mb-3 col-span-6"></div>
-            <div class="mb-0 col-span-3 rounded-md">
-                <label class="label-form mb-3"> Room </label>
-                <multiselect v-model="selectedRoom" :options="roomList" :close-on-select="false"
-                    :multiple="true"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select Room" label="name"
-                    track-by="id" :preselect-first="true">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
-                        Room selected</span>
-                    </template>
-                </multiselect>
-            </div>
-            <div class="mb-3 col-span-3 rounded-md">
-                <label class="label-form mb-3"> Type </label>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option value="menu"> Menu </option>
-                        <option value="accessory"> Accessory </option>
-                    </select>
                 </div>
             </div><div class="col-span-6"></div>
             <div v-show="selectedType == 'menu'" class="contents">
@@ -359,7 +381,7 @@ export default {
         return {
             today: getCurrentDate(),
 
-            isKTVPackage: false,
+            // isKTVPackage: false,
             isChangeable: false,
 
             menuCategoryList: [],
@@ -369,11 +391,13 @@ export default {
             selectedMenus: [],
             roomList:[],
 
+            selectedPackageType: null,
+            eventdate: null,
             sessionDuration: null,
             paySession: null,
             freeSession: null,
             sessionPrice: null,
-            selectedRoom:null,
+            selectedRoom: [],
 
             name: null,
             price: null,
@@ -506,6 +530,10 @@ export default {
                 this.alertValiationMessage(`package name`);
                 return 1;
             }
+            if (!this.selectedPackageType) {
+                this.alertValiationMessage(`package Type`);
+                return 1;
+            }
             if (!this.startDate) {
                 this.alertValiationMessage(`from date`);
                 return 1;
@@ -514,31 +542,39 @@ export default {
                 this.alertValiationMessage(`to date`);
                 return 1;
             }
+            if (this.selectedPackageType === 'event' && !this.eventdate) {
+                this.alertValiationMessage(`Event date`);
+                return 1;
+            }
             if (!this.price) {
                 this.alertValiationMessage(`package price`);
                 return 1;
             }
-            if (this.selectedMenus.length < 1 && this.selectedAccessoryList.length < 1) {
+            if (this.selectedMenus.length < 1) {
                 this.alertValiationMessage(`package menus`);
                 return 1;
             }
+            // if (this.selectedAccessoryList.length < 1) {
+            //     this.alertValiationMessage(`Package Accessory`);
+            //     return 1;
+            // }
             if (!this.selectedImage) {
                 this.alertValiationMessage(`package image`);
                 return 1;
             }
 
             formData.append('name', this.name);
+            formData.append('type', this.selectedPackageType);
+            if (this.selectedPackageType === 'event') {
+                formData.append('event_date', this.eventdate);
+            }
             formData.append('from_date', this.startDate);
             formData.append('to_date', this.endDate);
             formData.append('price', this.price);
-            formData.append('is_ktv', (this.isKTVPackage) ? 1 : 0);
+            // formData.append('is_ktv', (this.isKTVPackage) ? 1 : 0);
             formData.append('is_changeable', (this.isChangeable) ? 1 : 0);
             formData.append('image', this.selectedImage);
-            if (this.isKTVPackage) {
-                // if(!this.sessionDuration){
-                //     this.alertValiationMessage(`session`);
-                //     return 1;
-                // }
+            if (this.selectedPackageType === 'ktv') {
                 if (!this.paySession) {
                     this.alertValiationMessage(`paid session`);
                     return 1;
@@ -547,15 +583,17 @@ export default {
                     this.alertValiationMessage(`free sessions`);
                     return 1;
                 }
-                // if (!this.sessionPrice) {
-                //     this.alertValiationMessage(`session price`);
-                //     return 1;
-                // }
-
-                // formData.append('session', this.sessionDuration);
+                if (this.selectedRoom.length < 1) {
+                    this.alertValiationMessage(`Room`);
+                    return 1;
+                }
                 formData.append('pay_session', this.paySession);
                 formData.append('free_session', this.freeSession);
-                // formData.append('session_price', this.sessionPrice);
+                let room_ids = [];
+                this.selectedRoom.forEach((room) => {
+                    room_ids.push(room.id)
+                    formData.append('rooms[]', room.id);
+                });
             }
 
             let menuIds = [];
@@ -563,17 +601,15 @@ export default {
                 menuIds.push({ menu_id: menu.id, quantity: menu.quantity });
             });
             formData.append('menuIds', JSON.stringify(menuIds));
-            let accessoryIds = [];
-            this.selectedAccessoryList.forEach((accessory) => {
-                accessoryIds.push({ accessory_id: accessory.id, quantity: accessory.quantity });
-            });
+            if(this.selectedAccessoryList.length > 0){
+                let accessoryIds = [];
+                this.selectedAccessoryList.forEach((accessory) => {
+                    accessoryIds.push({ accessory_id: accessory.id, quantity: accessory.quantity });
+                });
 
-            formData.append('accessories', JSON.stringify(accessoryIds));
-            let room_ids = [];
-            this.selectedRoom.forEach((room) => {
-                room_ids.push(room.id)
-                formData.append('rooms[]', room.id);
-            });
+                formData.append('accessories', JSON.stringify(accessoryIds));
+            }
+            
             // formData.append('rooms', room_ids);
 
             let url = `/api/packages`;

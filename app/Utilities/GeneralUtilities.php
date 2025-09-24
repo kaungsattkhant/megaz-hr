@@ -24,6 +24,25 @@ if (!function_exists('CurrentDate')) {
     }
 }
 
+if (!function_exists('MonthStartAndEndDatesFromDateString')) {
+    function MonthStartAndEndDatesFromDateString(string $dateString): array
+    {
+        // Convert the date string to a timestamp
+        $timestamp = strtotime($dateString);
+
+        // Get the first day of the month
+        $startDate = date('Y-m-01', $timestamp);
+
+        // Get the last day of the month
+        $endDate = date('Y-m-t', $timestamp);
+
+        return [
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ];
+    }
+}
+
 if (!function_exists('DayStartEndTimestamps')) {
     function DayStartEndTimestamps(DateTime $date): Collection
     {
@@ -339,6 +358,18 @@ if (!function_exists('checkFeaturePermission')) {
         $features = UserData()->features;
         if ($features->contains('slug', $name)) {
             return true;
+        }
+        return false;
+    }
+}
+if (!function_exists('checkMultipleFeaturePermission')) {
+    function checkMultipleFeaturePermission($names)
+    {
+        $features = UserData()->features;
+        foreach ($names as $name) {
+            if ($features->contains('slug', $name)) {
+                return true;
+            }
         }
         return false;
     }

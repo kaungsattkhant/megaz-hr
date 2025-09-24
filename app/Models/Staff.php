@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Bank;
 use App\Models\Role;
 use App\Models\Leave;
 use App\Models\Gender;
@@ -10,8 +11,11 @@ use App\Models\Overtime;
 use App\Models\Inventory;
 use App\Models\Department;
 use App\Models\TaskDetail;
+use App\Models\LeaveAllowance;
+use App\Models\StaffTimeshift;
 use App\Models\SalaryBatchStaff;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\StaffCertification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,7 +31,11 @@ class Staff extends Authenticatable
         'alt_phone_number',
         'email',
         'joined_date',
+        'nrc_code',
+        'nrc_township_code',
+        'nrc_type',
         'nrc_number',
+        'bank_id',
         'birthdate',
         'father_name',
         'mother_name',
@@ -52,7 +60,9 @@ class Staff extends Authenticatable
         'confirmed_by',
         'cancelled_at',
         'cancelled_by',
-        'is_cv'
+        'is_cv',
+        'profile_image_url',
+        'profile_image_path',
     ];
 
     protected $hidden = [
@@ -213,25 +223,25 @@ class Staff extends Authenticatable
 
     public function completed_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'completed_by');
+        return $this->hasMany(ObjectiveStaff::class, 'completed_by');
     }
     public function in_progressed_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'in_progressed_by');
+        return $this->hasMany(ObjectiveStaff::class, 'in_progressed_by');
     }
     public function approved_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'approved_by');
+        return $this->hasMany(ObjectiveStaff::class, 'approved_by');
     }
 
     public function cancelled_objectives()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'cancelled_by');
+        return $this->hasMany(ObjectiveStaff::class, 'cancelled_by');
     }
 
     public function objectiveKeyStaff()
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'staff_id');
+        return $this->hasMany(ObjectiveStaff::class, 'staff_id');
     }
 
     public function checkIns()
@@ -257,5 +267,24 @@ class Staff extends Authenticatable
     public function leaves()
     {
         return $this->hasMany(Leave::class);
+    }
+
+    public function staffCertifications()
+    {
+        return $this->hasMany(StaffCertification::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
+    }
+
+    public function leaveAllowances()
+    {
+        return $this->morphMany(LeaveAllowance::class, 'allowanceable');
+    }
+    public function staffTimeshifts()
+    {
+        return $this->hasMany(StaffTimeshift::class, 'staff_id');
     }
 }

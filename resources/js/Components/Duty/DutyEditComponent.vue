@@ -138,7 +138,7 @@
 
 
         <div>
-            <button class="add-btn" @click="btnClickedAddDuty()">
+            <button class="add-btn" @click="btnClickedAddDuty()" v-if="feature.includes('duty.update')">
                 Update Duty
             </button>
         </div>

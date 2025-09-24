@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\WEB;
 
 use Illuminate\Http\Request;
-use App\Models\StaffFcmToken;
 
+use App\Models\StaffFcmToken;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class AuthController extends Controller
 {
@@ -17,44 +18,47 @@ class AuthController extends Controller
         if (isset($request->remember)) {
             $remember = true;
         }
-        if(Auth::attempt(['phone_number'=>$request->phone_number,'password' => $request->password], $remember)){
-            // $this->storeFcmToken($request->fcm_token);
-            $firstFeaturePermission=UserData()->features->first();
-            if($firstFeaturePermission){
-                $routeName=config('feature_route.'.$firstFeaturePermission->slug);
-                return redirect()->route($routeName);
-                // if(checkDepartmentPermission(['HR'])){
-                //     return redirect()->route($routeName);
-                // }
-                // if(checkDepartmentPermission(['Finance'])){
-                //     return redirect()->route('financial_transactions');
-                // }
-                // if(checkDepartmentPermission(['Management'])){
-                //     return redirect()->route('purchase_orders');
-                // }
-                // if(checkDepartmentPermission(['Inventory'])){
-                //     return redirect()->route('inventories');
-                // }
-                // if(checkDepartmentPermission(['Catering'])){
-                //     return redirect()->route('pos.index');
-                // }
-                // if(checkDepartmentPermission(['Kitchen'])){
-                //     return redirect()->route('pos.index');
-                // }
+        if (Auth::attempt(['phone_number' => $request->phone_number, 'password' => $request->password], $remember)) {
+            // $firstFeaturePermission = UserData()->features->first(); 
+            // if ($firstFeaturePermission) {
+            //     $routeName = config('feature_route.' . $firstFeaturePermission->module);
+            //     if ($routeName) {
+            //         return redirect()->route($routeName);
+            //     }
+            //     return redirect()->back();
+            // }
+            // return redirect()->back();
+            $features = UserData()->features;
+            $i = 0;
+            while ($i < $features->count()) {
+                $feature = $features[$i];
+                $routeName = config('feature_route.' . $feature->module);
+
+                if ($routeName && Route::has($routeName)) {
+                    return redirect()->route($routeName);
+                }
+
+                $i++;
             }
             return redirect()->back();
-        }else{
+
+
+        } else {
             return redirect()->back();
         }
     }
-    public function storeFcmToken($token){
-        if($token){
+    public function storeFcmToken($token)
+    {
+        if ($token) {
             $staff = StaffFcmToken::firstOrCreate(
-                ['fcm_token' =>$token,
-                'user_id'=>UserData()->id,
-            ],
-                ['fcm_token' =>$token,
-                 'user_id'=>UserData()->id]
+                [
+                    'fcm_token' => $token,
+                    'user_id' => UserData()->id,
+                ],
+                [
+                    'fcm_token' => $token,
+                    'user_id' => UserData()->id
+                ]
             );
             return $staff;
         }

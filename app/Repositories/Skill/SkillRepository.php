@@ -8,9 +8,14 @@ use Illuminate\Support\Facades\DB;
 
 class SkillRepository implements SkillRepositoryInterface
 {
-    public function listAllSkill()
+    public function listAllSkill($request)
     {
-        $skills = Skill::with('role')->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        $roleId = $request->role_id;
+        $skills = Skill::with('role')
+        ->when($roleId, function ($query) use ($roleId) {
+            return $query->where('role_id', $roleId);
+        })
+        ->orderBy('created_at','desc')->paginate(config('common.list_count'));
         ResponseData($skills);
     }
 
@@ -61,7 +66,7 @@ class SkillRepository implements SkillRepositoryInterface
 
     public function skillByRole(int $role_id)
     {
-        $skills = Skill::where('role_id',$role_id)->get();
+        $skills = Skill::with('role')->where('role_id',$role_id)->get();
         ResponseData($skills);
     }
 

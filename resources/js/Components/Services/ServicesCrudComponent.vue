@@ -1,28 +1,31 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Services
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Services
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label>
+
+                    <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-show="feature.includes('service.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -44,7 +47,7 @@
                                 <th scope="col" class="">
                                     Price Per Hour
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['service.toggle', 'service.update'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -65,7 +68,7 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ service.price_per_hour }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
+                                    <td class="whitespace-nowrap " v-if="feature.includes('service.toggle')">
                                         <input :checked="service.is_available == 1" @change="isActiveToggled(service.id)"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
@@ -79,7 +82,7 @@
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
                                             type="checkbox" role="switch" />
                                     </td>
-                                    <td class="whitespace-nowrap ">
+                                    <td class="whitespace-nowrap " v-if="feature.includes('service.update')">
                                         <button id="edit-btn" class="pr-1" @click="editBtnClick(service.id)"
                                             data-te-toggle="modal" data-te-target="#edit_modal">
                                             <i class="fal fa-pen"></i>
@@ -392,11 +395,12 @@ export default {
             lastPage: 0,
             totalData: 0,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getServiceList(pageNumber) {
             let url = `/api/services?page=${pageNumber}`;

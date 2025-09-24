@@ -1,25 +1,28 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Skill
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-    
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Skill
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-    
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="[skill = null, selectedRole = null, selectedDepartment = null]">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <notifications position="top center" />
+        
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+        
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " v-show="feature.includes('skill.create')"
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="[skill = null, selectedRole = null, selectedDepartment = null]">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -38,7 +41,7 @@
                                     Role
                                 </th>
     
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['skill.edit', 'skill.delete'].some(f => feature.includes(f))">
                                 </th>
                             </tr>
                         </thead>
@@ -55,14 +58,10 @@
                                     <td class="whitespace-nowrap">
                                         {{ skill.role.name }}
                                     </td>
-    
-                                    <td class="whitespace-nowrap">
-                                    </td>
-    
-                                    <td class="whitespace-nowrap flex justify-center gap-3">
-                                        <i class="fal fa-pen cursor-pointer" data-te-toggle="modal"
+                                    <td class="whitespace-nowrap flex justify-center gap-3" v-show="['skill.edit', 'skill.delete'].some(f => feature.includes(f))">
+                                        <i class="fal fa-pen cursor-pointer" data-te-toggle="modal" v-if="feature.includes('skill.edit')"
                                             data-te-target="#update_modal" @click="getSkillDetail(skill.id)"></i>
-                                        <i class="far fa-trash-alt cursor-pointer" @click="deleteSkill(skill.id)"></i>
+                                        <i class="far fa-trash-alt cursor-pointer" @click="deleteSkill(skill.id)"  v-if="feature.includes('skill.delete')"></i>
                                     </td>
     
                                 </tr>
@@ -264,11 +263,13 @@ export default {
             lastPage: 0,
             totalData: 0,
 
+            feature: this.getFeature(),
+
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getRoleByDepartment(id) {
             const response = await getApiData({ url: `/api/role_by_department/` + id, token: this.getToken() });

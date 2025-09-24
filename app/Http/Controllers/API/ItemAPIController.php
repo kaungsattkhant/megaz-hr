@@ -23,7 +23,11 @@ class ItemAPIController extends Controller
         $items = $this->itemRepo->listAllData($request);
         ResponseData($items);
     }
-
+    public function detail($id)
+    {
+        $items = $this->itemRepo->detail($id);
+        ResponseData($items);
+    }
     public function createItem(ItemRequest $request)
     {
         $item = $this->itemRepo->createData($request->all());
@@ -114,5 +118,15 @@ class ItemAPIController extends Controller
     {
         $item = $this->itemRepo->importUom($request);
         return $item;
+    }
+
+    public function itemPriceImport(Request $request){
+        $item = $this->itemRepo->importItemPrice($request);
+        return $item;
+    }
+    public function equipmentItem(Request $request)
+    {
+        $item = $this->itemRepo->equipmentItem($request);
+        ResponseData($item);
     }
 }

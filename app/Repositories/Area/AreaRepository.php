@@ -12,7 +12,6 @@ class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-
         $areasQuery = Area::with(['areaType', 'areaCategory'])->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
@@ -26,7 +25,7 @@ class AreaRepository implements AreaRepositoryInterface
         } elseif (isset($request->page)) {
             $areas = $areasQuery->paginate(config('common.list_count'));
         } else {
-            $areas = $areasQuery->get();
+            $areas = $areasQuery->where('is_active', 1)->get();
         }
 
         return $areas;
@@ -36,15 +35,18 @@ class AreaRepository implements AreaRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
-            $area = Area::create($data);
-            $sellingAreaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])
-                ->first();
-            if (($area->areaCategory->id === $sellingAreaCategory->id) && ($area->areaCategory->name === $sellingAreaCategory->name)) {
-                $menuCategoryIds = MenuCategory::all()->pluck('id')->toArray();
-                $area->menuCategories()->sync($menuCategoryIds);
+            if (!isset($data['id'])) {
+                $data['id'] = null;
             }
-
+            $area = Area::updateOrCreate(['id'=>$data['id']],$data);
+            if (!isset($data['id'])) {
+                $sellingAreaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])
+                    ->first();
+                if (($area->areaCategory->id === $sellingAreaCategory->id) && ($area->areaCategory->name === $sellingAreaCategory->name)) {
+                    $menuCategoryIds = MenuCategory::all()->pluck('id')->toArray();
+                    $area->menuCategories()->sync($menuCategoryIds);
+                }
+            }
             DB::commit();
             return $area;
         } catch (\Exception $e) {
@@ -64,7 +66,7 @@ class AreaRepository implements AreaRepositoryInterface
     public function getAreaByAreaType(int $id)
     {
 
-        $areas = Area::where('is_active', 1)->where('area_type_id', $id)->get();
+        $areas = Area::where('is_active', 1)->where('area_category_id', $id)->get();
         return $areas;
     }
 
@@ -99,28 +101,31 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getAreaByDepartment($department_id)
     {
-        return Area::where('department_id', $department_id)->get();
+        return Area::orderBy('id','desc')->get();
     }
 
     public function getSellingAreas($request)
     {
-        $areas = Area::with(['areaCategory', 'areaType'])->where('is_active', 1)
+        $areas = Area::with(['areaCategory', 'areaType','inventoryable.inventory'
+        ])->where('is_active', 1)
             ->whereHas('areaCategory', function ($query) {
                 $query->where('name', 'Selling Area');
             })
             ->get();
+            if($areas->isEmpty()){
+                return ResponseData([], 404, false, 'Areas not found.');
+            }
 
         return $areas;
     }
 
     public function getCookingAreas($request)
     {
-        $areas = Area::with(['areaCategory', 'areaType'])->where('is_active', 1)
+        $areas = Area::with(['areaCategory', 'areaType','inventoryable.inventory'])->where('is_active', 1)
             ->whereHas('areaCategory', function ($query) {
                 $query->where('name', 'Cooking Area');
             })
             ->get();
-
         return $areas;
     }
 }

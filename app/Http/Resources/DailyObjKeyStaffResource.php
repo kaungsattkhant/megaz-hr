@@ -16,13 +16,13 @@ class DailyObjKeyStaffResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'assign_date' => $this->objectiveKeyDuty->assign_date,
-            'staff_id' => $this->staff_id,
-            'objective_key_id' => $this->objective_key_id,
             'status' => $this->status,
-            // 'created_at' => $this->created_at,
-            // 'updated_at' => $this->updated_at,
-            'objective_key' => new ObjectiveKeyResource($this->objectiveKey),
+            "staff_id" => $this->staff_id,
+            "objective_id" => $this->objective_id,
+            "start_date" => $this->start_date,
+            "end_date" => $this->end_date,
+            "status" => $this->status,
+            'objective' => new ObjectiveResource($this->objective),
         ];
     }
 }

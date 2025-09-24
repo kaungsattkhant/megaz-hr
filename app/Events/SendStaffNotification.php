@@ -11,7 +11,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class SendStaffNotification
+class SendStaffNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -37,7 +37,7 @@ class SendStaffNotification
     {
         return [
             new Channel("send-notification.role.{$this->staff_id}"),
-        ];;
+        ];
     }
 
     public function broadcastWith()

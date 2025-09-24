@@ -1,31 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Duties
-        </p>
-    </div>
+    
     <notifications position="top center" />
 
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <input type="date" class="input-ui  mr-2 h-8" v-model="selectedDate" @change="dateChange()">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Duties
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/duty/create"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <!-- hidden btn -->
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 hidden"
-                    data-te-toggle="modal" data-te-target="#create_modal"></button>
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <input type="date" class="input-ui  mr-2 h-8" v-model="selectedDate" @change="dateChange()">
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/duty/create" v-if="feature.includes('duty.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+                        Add New
+                    </a>
+
+                    <!-- hidden btn -->
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 hidden"
+                        data-te-toggle="modal" data-te-target="#create_modal"></button>
+                </div>
             </div>
         </div>
 
@@ -50,7 +53,7 @@
                                 <th scope="col" class="">
                                     Tasks
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['duty.edit', 'duty.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -81,17 +84,17 @@
                                             </li>
                                         </ul> -->
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['duty.edit', 'duty.delete'].some(f => feature.includes(f))">
                                         <!-- <a :href="'/duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
 
-                                        <button @click="btnClickedEditModal(listItem)" class="mr-3"
+                                        <button @click="btnClickedEditModal(listItem)" class="mr-3" v-if="feature.includes('duty.edit')"
                                             data-te-toggle="modal" data-te-target="#create_payment_modal"
                                             >
                                             <i class="fal fa-pen" ></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(listItem.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(listItem.id)" data-te-toggle="modal" v-if="feature.includes('duty.delete')"
                                             data-te-target="#deleteModal" id="edit-btn" class="pl-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -234,7 +237,7 @@
                                     data-te-modal-dismiss aria-label="Close">
                                     Cancel
                                 </button>
-                                <button type="button" @click="btnClickedEditDuty()"
+                                <button type="button" @click="btnClickedEditDuty()" v-if="feature.includes('duty.update')"
                                     class="add-btn focus:outline-none focus:ring-0 ">
                                     Edit
                                 </button>
@@ -321,17 +324,19 @@
             selectedDutyDate:null,
             selectedDutyDetail:null,
             deletedId:null,
+            selectedTask: null,
 
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData:0,
+            feature: this.getFeature(),
         };
     },
 
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getDutyList(pageNumber) {
                 const response = await getApiData({ url: '/api/duties?date=' + this.selectedDate + '&page=' + pageNumber, token: this.getToken() });
@@ -359,7 +364,7 @@
                 if (response.data) {
                     this.dutyList = response.data.data;
                     this.lastPage = response.data.last_page;
-                    this.currentPage = pageNumber;
+                    this.currentPage = 1;
                     this.perPage = response.data.per_page;
                     this.totalData = response.data.total;
                 }

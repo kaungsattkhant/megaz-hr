@@ -4,17 +4,21 @@ namespace App\Repositories\Leave;
 
 use App\Models\Leave;
 use App\Models\Staff;
+use App\Models\ExitPass;
 use App\Models\ExitCategory;
 use App\Models\LeaveCategory;
 use App\Models\LeaveAllowance;
+use App\Services\LeaveService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Events\SendDepartmentNotification;
 use App\Events\LeaveUpdateNotificationRequest;
-use App\Models\ExitPass;
-use App\Services\LeaveService;
+use App\Http\Action\SendNotification\SendNotification;
 
 class LeaveRepository implements LeaveRepositoryInterface
 {
+  use SendNotification;
+
   private LeaveService $leaveService;
   public function __construct(LeaveService $leaveService)
   {
@@ -50,8 +54,11 @@ class LeaveRepository implements LeaveRepositoryInterface
         $leave_allowances  = json_decode($data['leave_allowances'], true);
         $currentYear = date('Y');
         foreach ($leave_allowances as $leave_allowance) {
-
-          $existingAllowance = LeaveAllowance::where('role_id', $leave_allowance['role_id'])
+          if (!isset($leave_allowance['allowance_type']) || !in_array($leave_allowance['allowance_type'], ['role', 'staff'])) {
+            return ResponseMessage('Allowance type is required and must be either "role" or "staff"', 422);
+          }
+          $existingAllowance = LeaveAllowance::where('allowanceable_type', $leave_allowance['allowance_type'])
+            ->where('allowanceable_id', $leave_allowance['allowanceable_id'])
             ->where('leave_category_id', $leave_allowance['leave_category_id'])
             ->whereYear('created_at', $currentYear)
             ->exists();
@@ -61,7 +68,8 @@ class LeaveRepository implements LeaveRepositoryInterface
         }
         foreach ($leave_allowances as $leave_allowance) {
           $leave_allowance = LeaveAllowance::create([
-            'role_id' => $leave_allowance['role_id'],
+            'allowanceable_type' => $leave_allowance['allowance_type'],
+            'allowanceable_id' => $leave_allowance['allowanceable_id'],
             'leave_category_id' => $leave_allowance['leave_category_id'],
             'day' => $leave_allowance['day'],
             'created_by' => UserData()->id,
@@ -81,16 +89,44 @@ class LeaveRepository implements LeaveRepositoryInterface
 
   public function getLeaveAllowance($request)
   {
-    $query = LeaveAllowance::with('role.department', 'leaveCategory')
-      ->orderByDesc('id');
 
+    $query = LeaveAllowance::with([
+      'leaveCategory',
+      'allowanceable' => function ($morphTo) {
+        $morphTo->morphWith([
+          \App\Models\Staff::class => ['roles', 'department'],
+          \App\Models\Role::class => ['department'],
+        ]);
+      },
+    ])->orderByDesc('id');
     if ($request->has('department_id')) {
-      $query->whereHas('role.department', function ($query) use ($request) {
-        $query->where('id', $request->input('department_id'));
+      $departmentId = $request->input('department_id');
+      $query->where(function ($q) use ($departmentId) {
+        $q->where('allowanceable_type', 'role')
+          ->whereHas('allowanceable', function ($query) use ($departmentId) {
+            $query->where('department_id', $departmentId);
+          });
+        $q->orWhere('allowanceable_type', 'staff')
+          ->whereHas('allowanceable', function ($query) use ($departmentId) {
+            $query->where('department_id', $departmentId);
+          });
       });
     }
     if ($request->has('role_id')) {
-      $query->where('role_id', $request->input('role_id'));
+      $roleId = $request->input('role_id');
+      $query->where(function ($q) use ($roleId) {
+        $q->where('allowanceable_type', 'role')
+          ->where('allowanceable_id', $roleId);
+        $q->orWhereHasMorph(
+          'allowanceable',
+          ['staff'], //check Staff models
+          function ($staffQuery) use ($roleId) {
+            $staffQuery->whereHas('roles', function ($roleQuery) use ($roleId) {
+              $roleQuery->where('roles.id', $roleId);
+            });
+          }
+        );
+      });
     }
     return $query->paginate(config('common.list_count'));
   }
@@ -124,6 +160,18 @@ class LeaveRepository implements LeaveRepositoryInterface
       $startDate = \Carbon\Carbon::parse($data['start_date']);
       $endDate = \Carbon\Carbon::parse($data['end_date']);
       $day = $startDate->diffInDays($endDate) + 1;
+
+      $leaveExist = Leave::where('staff_id', $data['staff_id'])
+        ->where('leave_category_id', $data['leave_category_id'])
+        ->where('start_date', '<=', $data['end_date'])
+        ->where('end_date', '>=', $data['start_date'])
+        ->where('status', '!=', 'cancelled')
+        ->where('status', '!=', 'rejected')
+        ->exists();
+
+      if ($leaveExist) {
+        ResponseMessage('Leave already exists for this staff and category.', 422);
+      }
 
       $this->leaveService->checkLeaveAllowance($data, $day);
       $leave = Leave::create([
@@ -171,9 +219,8 @@ class LeaveRepository implements LeaveRepositoryInterface
         'is_unpaid_leave' => $data['is_unpaid_leave'] ?? null,
       ]);
       if ($wasConfirmed || $wasCancelled) {
-        broadcast(new LeaveUpdateNotificationRequest($leave, $leave->staff_id));
+        $this->LeaveUpdateNotificationRequest($leave, $leave->staff_id);
       }
-
       DB::commit();
       ResponseData($leave);
     } catch (\Exception $e) {
@@ -204,14 +251,23 @@ class LeaveRepository implements LeaveRepositoryInterface
           'total_leave_taken' => 0,
           'total_leave_allowance' => 0,
         ];
-
-        $staffRoles = $leave->staff->roles;
-        foreach ($staffRoles as $role) {
-          $leaveAllowances = $role->leaveAllowances;
-          foreach ($leaveAllowances as $leaveAllowance) {
-            $staffRemainingLeave[$staffId]['total_leave_allowance'] += $leaveAllowance->day;
+        $totalAllowance = 0;
+        if ($leave->staff->leaveAllowances) {
+          foreach ($leave->staff->leaveAllowances as $allowance) {
+            $totalAllowance += $allowance->day;
           }
         }
+
+        if ($leave->staff->roles) {
+          foreach ($leave->staff->roles as $role) {
+            if ($role->leaveAllowances) {
+              foreach ($role->leaveAllowances as $leaveAllowance) {
+                $totalAllowance += $leaveAllowance->day;
+              }
+            }
+          }
+        }
+        $staffRemainingLeave[$staffId]['total_leave_allowance'] = $totalAllowance;
       }
       if ($leave->status !== 'cancelled') {
         $staffRemainingLeave[$staffId]['total_leave_taken'] += $leave->day;
@@ -264,10 +320,15 @@ class LeaveRepository implements LeaveRepositoryInterface
 
   public function getLeaveTotalByStaff($staffId)
   {
-
-    $staff = Staff::where('id', $staffId)->firstOrFail();
-    $roles = $staff->roles;
-    $leaveAllowances = LeaveAllowance::whereIn('role_id', $roles->pluck('id'))->get();
+    $staff = Staff::with('roles.leaveAllowances', 'leaveAllowances')->findOrFail($staffId);
+    $allAllowances = $staff->leaveAllowances->merge(
+      $staff->roles->flatMap(function ($role) {
+        return $role->leaveAllowances;
+      })
+    );
+    $leaveAllowances = $allAllowances->groupBy('leave_category_id')->map(function ($group) {
+      return $group->sortByDesc('day')->first();
+    });
     $confirmedLeaveRecords = Leave::where('staff_id', $staffId)
       ->where('status', '!=', 'cancelled')
       ->whereNotNull('confirmed_at')
@@ -288,7 +349,7 @@ class LeaveRepository implements LeaveRepositoryInterface
 
     $totalLeaveAllowance = 0;
     $totalLeaveTaken = 0;
-
+    $result = [];
     foreach ($leaveAllowances as $leaveAllowance) {
       $leaveCategoryId = $leaveAllowance->leave_category_id;
       $totalLeaveAllowance += $leaveAllowance->day;
@@ -475,6 +536,8 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->where('department_id', $departmentId)
       ->with(['department', 'roles'])
       ->orderByDesc('id')
+      ->where('is_cv', 0)
+      ->where('is_active', 1)
       ->paginate(config('common.list_count'));
     ResponseData($staffs);
   }

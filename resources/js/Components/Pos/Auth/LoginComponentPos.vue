@@ -1,26 +1,41 @@
 <template>
     <notifications position="top center" />
-    <div class="w-full relative block h-[100vh] bg-black">
-        <div class="w-10/12 lg:w-2/6 mx-auto min-h-[80vh] pt-36">
-            <div class="mb-6">
+    <div class="w-4/5 relative flex h-[100vh] bg-white mx-auto items-center gap-x-8">
+        <div class="w-1/2">
+            <img src="../../../../../public/img/login_bg.svg" alt="">
+        </div>
+        <div class="w-10/12 lg:w-1/2 ">
+            <div class="mb-6 w-4/5">
+                <img src="../../../../../public/img/logo.png" class="w-1/3 mx-auto" alt="">
                 <div class="px-8" @keyup.enter="login">
+                    <div>
+                        <p class=" text-4xl font-black text-[#153063] mb-4">
+                            Login to POS
+                        </p>
+                    </div>
                     <div class=" mb-4">
-                        <label for="phoneNumber" class="text-sm text-white mb-2 block">
+                        <label for="phoneNumber" class="text-sm text-black mb-2 block">
                             Phone Number
                         </label>
                         <input type="text" id="phoneNumber" autocomplete="off" v-model="phoneNumber"
-                            class=" border border-gray-400 bg-white w-full rounded">
+                            class=" border border-gray-400 bg-white w-full rounded" placeholder="Enter phone number">
                     </div>
                     <div class=" mb-12">
-                        <label for="password" class="text-sm text-white mb-2 block">
+                        <label for="password" class="text-sm text-black mb-2 block">
                             Password
                         </label>
                         <input type="password" id="password" autocomplete="off" v-model="password"
-                            class=" border border-gray-400 bg-white w-full rounded">
+                            class=" border border-gray-400 bg-white w-full rounded" placeholder="Enter password">
+                    </div>
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" v-model="remember" checked class="form-checkbox mr-2" >
+                            <span class="text-sm">Remember me next time</span>
+                        </label>
                     </div>
                     <div class="w-full text-center">
                         <button @click="login"
-                            class="bg-[#0BA348] w-full mx-auto text-white text-sm rounded-md px-8 py-2 block mb-2.5">
+                            class="bg-[#5d7fff] w-full mx-auto text-white text-sm rounded-md px-8 py-3 block mb-2.5">
                             Login
                         </button>
                     </div>
@@ -31,6 +46,7 @@
                     <input type="hidden" v-model="phoneNumber" name="phone_number">
                     <input type="hidden" v-model="password" name="password">
                     <input type="hidden" v-model="fcmToken" name="fcm_token">
+                    <input type="hidden" v-model="remember" name="remember">
                 </form>
 
             </div>
@@ -43,6 +59,7 @@
 
     import firebase from 'firebase/compat/app';
     import 'firebase/messaging';
+    import { notify } from '../../../utilities/vue-toastification-helper';
 
     export default {
         name: "LoginComponent",
@@ -54,6 +71,7 @@
                 phoneNumber: null,
                 password: null,
                 fcmToken: null,
+                remember: true,
             }
         },
 
@@ -65,7 +83,9 @@
                 let formData = new FormData();
                 formData.append('phone_number', this.phoneNumber);
                 formData.append('password', this.password);
-                formData.append('fcm_token', this.fcmToken);
+                if(this.fcmToken){
+                    formData.append('fcm_token', this.fcmToken);
+                }
 
                 let response = await postApiData({ url: url, form_data: formData });
                 console.log(response);
@@ -83,11 +103,13 @@
                     });
 
                     this.setRoles(roles);
+                    notify('Login successful','success');
                     this.$refs.signinForm.submit();
 
                     return true;
                 }
                 else {
+                    notify(response.message,'warning');
                     return false;
                 }
             }

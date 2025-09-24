@@ -1,35 +1,38 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Purchase Orders
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        <div class="btn-container pt-10">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-            </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded " @change="dateChange()">
-                </div>
-
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
-                    <input type="date" v-model="toDate" class="search-input rounded" @change="dateChange()">
-                </div>
-                <div class="flex justify-end flex-col">
-                    <a href="/purchase_orders/create" class="add-btn ">
-                        Add New
-                    </a>
     
+    <div class="mt-4 bg-white">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Purchase Orders
+                </p>
+            </div>
+            <div class="btn-container pt-10">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
+                        <input type="date" v-model="fromDate" class="search-input rounded " @change="dateChange()">
+                    </div>
+
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
+                        <input type="date" v-model="toDate" class="search-input rounded" @change="dateChange()">
+                    </div>
+                    <div class="flex justify-end flex-col">
+                        <a href="/purchase_orders/create" class="add-btn " v-if="feature.includes('purchase-order.create')">
+                            Add New
+                        </a>
+        
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,13 +126,13 @@
                                             <i class="far fa-shopping-basket"></i>
                                         </a>
                                     </td>
-                                    <td class="whitespace-nowrap  space-x-4">
-                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/edit'" id="" class="pr-1">
+                                    <td class="whitespace-nowrap  space-x-4" v-if="feature.includes('purchase-order.edit')">
+                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/edit'" id="" class="pr-1" >
                                             <i class="far fa-pen"></i>
                                         </a>
                                     </td>
-                                    <td class="whitespace-nowrap  space-x-4">
-                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/confirm'" id="" class="pr-1">
+                                    <td class="whitespace-nowrap  space-x-4" v-if="feature.includes('purchase-order.confirm')">
+                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/confirm'" id="" class="pr-1" >
                                             <i class="far fa-bars"></i>
                                         </a>
                                     </td>
@@ -293,11 +296,13 @@ export default {
             url_from:'',
             ur_to:'',
             url_date:'',
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken', 'getUser', 'getRoles', 'getDepartment']),
+        ...mapGetters(['getToken', 'getUser', 'getRoles', 'getDepartment', 'getFeature']),
 
         async getPurhaseOrderList(pageNumber) {
             let url_page = '';

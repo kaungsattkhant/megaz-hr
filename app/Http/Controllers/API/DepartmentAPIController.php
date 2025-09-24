@@ -25,6 +25,12 @@ class DepartmentAPIController extends Controller
         ResponseData($departments);
     }
 
+    public function getDepartments()
+    {
+        $departments = $this->repoDepartment->getDepartments();
+        ResponseData($departments);
+    }
+
     public function createDepartment(DepartmentCreateRequest $request)
     {
         $department = $this->repoDepartment->createData($request->all());

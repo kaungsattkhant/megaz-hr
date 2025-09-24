@@ -1,30 +1,32 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Working Capital
-        </p>
-    </div>
 
     <div class="mt-4 bg-white">
-        <div class="btn-container pt-10">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Working Capital
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded " @change="fromDateChanged()">
+            <div class="btn-container pt-10">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
+                <div class="flex pr-0 gap-x-4">
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
+                        <input type="date" v-model="fromDate" class="search-input rounded " @change="fromDateChanged()">
+                    </div>
 
-                <div class="relative">
-                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
-                    <input type="date" v-model="toDate" class="search-input rounded" @change="toDateChanged()">
+                    <div class="relative">
+                        <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
+                        <input type="date" v-model="toDate" class="search-input rounded" @change="toDateChanged()">
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,13 +186,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getWorkingCapitalList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getWorkingCapitalList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>

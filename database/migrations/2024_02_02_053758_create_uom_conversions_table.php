@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('base_unit_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('conversion_unit_id')->constrained()->onDelete('cascade');
             $table->double('conversion');
+            $table->unsignedBigInteger('item_id');
             $table->boolean('is_show')->default(1);
             $table->boolean('is_active')->default(1);
             $table->unsignedBigInteger('created_by');

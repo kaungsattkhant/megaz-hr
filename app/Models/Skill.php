@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\JobSpecification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Skill extends Model
 {
@@ -27,6 +29,12 @@ class Skill extends Model
 
     public function staffs()
     {
-        return $this->belongsToMany(Staff::class, 'skill_staff');
+
+        return $this->belongsToMany(Staff::class,'skill_staff');
+    }
+
+    public function jobSpecifications(): BelongsToMany
+    {
+        return $this->belongsToMany(JobSpecification::class, 'job_specification_skill','skill_id','job_specification_id');
     }
 }

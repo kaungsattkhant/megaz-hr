@@ -4,13 +4,18 @@ namespace App\Repositories\Supplier;
 
 use App\Models\Account;
 use App\Models\Supplier;
+use Illuminate\Support\Str;
+use App\Imports\BrandImport;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\SupplierPhone;
 use App\Models\AccountPayable;
-use PhpParser\Node\Expr\Isset_;
+use App\Imports\SupplierImport;
 use Illuminate\Support\Facades\DB;
 use App\Models\SupplierBankAccount;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
+use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class SupplierRepository implements SupplierInterface
 {
@@ -26,7 +31,7 @@ class SupplierRepository implements SupplierInterface
                     ->orWhere('shop_name', 'LIKE', '%' . $searchTerm . '%')
                     ->orWhere('phone_number', 'LIKE', '%' . $searchTerm . '%')
                     ->orWhere('address', 'LIKE', '%' . $searchTerm . '%')
-                    ->orWhere('credit_limit', 'LIKE', '%' . $searchTerm . '%');
+                    ->orWhere('credit_limit', 'LIKE',    '%' . $searchTerm . '%');
             });
         }
 
@@ -46,51 +51,77 @@ class SupplierRepository implements SupplierInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            $supplierCode=!isset($data['supplier_code']) ? strtolower(str_replace(' ', '_', $data['name']))."_". Str::random(10) : $data['supplier_code'];
+            if (isset($data['credit_term_type'])) {
+                switch ($data['credit_term_type']) {
+                    case "day":
+                        $data['amount_limitation'] = null;
+                        $data['exact_date'] = null;
+                        break;
+                    case "amount_limitation":
+                        $data['day'] = null;
+                        $data['exact_date'] = null;
+                        break;
+                    case "exact_date":
+                        $data['day'] = null;
+                        $data['amount_limitation'] = null;
+                        if (isset($data['exact_date']) && $data['exact_date'] !== 'null') {
+                            $decodedExactDate = json_decode($data['exact_date'], true);
+                            if (json_last_error() !== JSON_ERROR_NONE) {
+                                return ResponseMessage('Invalid JSON data provided for exact_date.', 400);
+                            }
+                            $data['exact_date'] = json_encode($decodedExactDate);
+                        }
+                        break;
+                }
+            }
+            $data['supplier_code']=$supplierCode;
             $supplier = Supplier::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );
-            $decodedSupplierItems = json_decode($request->supplier_items);
+            //remove supplier item at 
+            // $decodedSupplierItems = json_decode($request->supplier_items);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return ResponseMessage('Invalid JSON data provided for supplier items.', 400);
-            }
+            // if (json_last_error() !== JSON_ERROR_NONE) {
+            //     return ResponseMessage('Invalid JSON data provided for supplier items.', 400);
+            // }
 
 
-            if (empty($decodedSupplierItems)) {
-                ResponseMessage('Supplier Item is empty', 419);
-            }
-            $syncData = [];
-            foreach ($decodedSupplierItems as $supplierItems) {
-                if (isset($request->id)) {
-                    if (!isset($supplierItems->id)) {
-                        $isExistSupplierItem = SupplierItem::where('supplier_id', $supplier->id)
-                            ->where('item_id', $supplierItems->item_id)
-                            ->where('brand_id', $supplierItems->brand_id)
-                            ->exists();
-                        if ($isExistSupplierItem) {
-                            ResponseMessage('Brand and Item are already created to this supplier', 419);
-                        }
-                        $syncData[] = [
-                            'supplier_id' => $supplier->id,
-                            'item_id' => $supplierItems->item_id,
-                            'brand_id' => $supplierItems->brand_id,
-                        ];
-                    }
-                } else {
-                    // $supplieItem=SupplierItem::create([
-                    //     'supplier_id'=>$supplier->id,
-                    //     'item_id'=>$supplierItems->item_id,
-                    //     'brand_id'=>$supplierItems->brand_id,
-                    // ]);
-                    $syncData[] = [
-                        'supplier_id' => $supplier->id,
-                        'item_id' => $supplierItems->item_id,
-                        'brand_id' => $supplierItems->brand_id,
-                    ];
-                }
-            }
-            DB::table('supplier_items')->insert($syncData);
+            // if (empty($decodedSupplierItems)) {
+            //     ResponseMessage('Supplier Item is empty', 419);
+            // }
+            // $syncData = [];
+            // foreach ($decodedSupplierItems as $supplierItems) {
+            //     if (isset($request->id)) {
+            //         if (!isset($supplierItems->id)) {
+            //             $isExistSupplierItem = SupplierItem::where('supplier_id', $supplier->id)
+            //                 ->where('item_id', $supplierItems->item_id)
+            //                 ->where('brand_id', $supplierItems->brand_id)
+            //                 ->exists();
+            //             if ($isExistSupplierItem) {
+            //                 ResponseMessage('Brand and Item are already created to this supplier', 419);
+            //             }
+            //             $syncData[] = [
+            //                 'supplier_id' => $supplier->id,
+            //                 'item_id' => $supplierItems->item_id,
+            //                 'brand_id' => $supplierItems->brand_id,
+            //             ];
+            //         }
+            //     } else {
+            //         // $supplieItem=SupplierItem::create([
+            //         //     'supplier_id'=>$supplier->id,
+            //         //     'item_id'=>$supplierItems->item_id,
+            //         //     'brand_id'=>$supplierItems->brand_id,
+            //         // ]);
+            //         $syncData[] = [
+            //             'supplier_id' => $supplier->id,
+            //             'item_id' => $supplierItems->item_id,
+            //             'brand_id' => $supplierItems->brand_id,
+            //         ];
+            //     }
+            // }
+            // DB::table('supplier_items')->insert($syncData);
 
             if (isset($request->supplier_phones)) {
                 $supplierPhones = json_decode($request->supplier_phones, true);
@@ -102,7 +133,6 @@ class SupplierRepository implements SupplierInterface
                         [
                             'supplier_id' => $supplier->id,
                             'id' => $phone['id'] ?? null,
-
                         ],
                         [
                             'phone_number' => $phone['phone_number'],
@@ -160,11 +190,13 @@ class SupplierRepository implements SupplierInterface
     {
         DB::beginTransaction();
         try {
-            $otherPayableCode = config('common.payable_account_code');
+            if($request->name==null){
+                // dd($request);
+            }
+            $otherPayableCode = config('common.payable_account_code'); // '4-4000',
             $creditorCode = config('common.creditor_account_code');
             $otherPayable = $this->createAccountBySubAccount('Other Payable-' . $request->name, $otherPayableCode);
             $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);
-
             if ($otherPayable && $creditor) {
                 DB::commit();
                 return ['other_payable' => $otherPayable, 'creditor' => $creditor];
@@ -185,14 +217,14 @@ class SupplierRepository implements SupplierInterface
             $accountPayable = AccountPayable::updateOrCreate(
                 [
                     'supplier_id' => $supplier->id,
-                    'account_id' => $supplier->account_id
+                    'account_id' => $supplier->creditor_account_id
                 ],
                 [
                     'type' => 'addition',
                     'date_time' => $supplier->credit_opening_date,
                     'amount' => $supplier->credit_opening_amount,
                     'supplier_id' => $supplier->id,
-                    'account_id' => $supplier->account_id,
+                    'account_id' => $supplier->creditor_account_id,
                     'created_by' => UserData()->id,
                 ]
             );
@@ -274,5 +306,20 @@ class SupplierRepository implements SupplierInterface
         } else {
             ResponseMessage('Supplier Bank Account not found.', 404);
         }
+    }
+
+    public function supplierImport($request)
+    {
+        $file = $request->file('sheet');
+        $headings = (new HeadingRowImport)->toArray($file);
+        Excel::import(new SupplierImport($this), $file);
+        ResponseMessage('Import Successfully', 200);
+    }
+
+    public function brandImport($request)
+    {
+        $file = $request->file('sheet');
+        Excel::import(new BrandImport(), $file);
+        ResponseMessage('Import Successfully', 200);
     }
 }

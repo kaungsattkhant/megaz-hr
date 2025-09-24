@@ -2,18 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\CompletedObjectiveKey;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ObjectiveKey extends Model
 {
     protected $fillable = [
         'objective_id',
-        'role_id',
-        'name',
-        'okr_point',
-        'duration',
+        'name'
     ];
 
     public function objective(): BelongsTo
@@ -21,19 +19,13 @@ class ObjectiveKey extends Model
         return  $this->belongsTo(Objective::class, 'objective_id');
     }
 
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
+    // public function getAssignedDaysAttribute($value)
+    // {
+    //     return explode(',', $value);
+    // }
 
-    public function objKeyStaff(): HasMany
+    public function completedObjectiveKeys(): HasMany
     {
-        return $this->hasMany(ObjectivekeyStaff::class, 'objective_key_id');
-    }
-
-
-    public function getAssignedDaysAttribute($value)
-    {
-        return explode(',', $value);
+        return $this->hasMany(CompletedObjectiveKey::class, 'objective_key_id');
     }
 }

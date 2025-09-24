@@ -15,4 +15,9 @@ class Ads extends Model
         'image_path',
         'image_url',
     ];
+
+    protected $hidden =[
+        'created_at',
+        'updated_at',
+    ];
 }

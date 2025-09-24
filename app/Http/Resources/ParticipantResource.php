@@ -15,7 +15,7 @@ class ParticipantResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->id ?? null,
             'department_id' => $this->department_id ?? null,
             'department_name' => $this->department->name ?? null,
             'role_id' => $this->role_id ?? null,

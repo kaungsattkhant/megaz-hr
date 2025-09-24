@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AreaEquipmentResource;
 use App\Http\Requests\Inventory\InventoryItemRequest;
 use App\Http\Requests\Inventory\InventoryCreateRequest;
 use App\Http\Requests\Inventory\InventoryUpdateRequest;
@@ -87,5 +88,11 @@ class InventoryAPIController extends Controller
     {
         $inventory = $this->inventoryRepo->createInventoryItem($request->validated());
         ResponseData($inventory);
+    }
+
+    public function getInventoryItemsByStaff($areaId)
+    {
+        $inventoryItems = $this->inventoryRepo->getInventoryItemsByStaff($areaId);
+        ResponseData($inventoryItems);
     }
 }

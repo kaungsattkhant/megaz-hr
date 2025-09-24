@@ -1,8 +1,79 @@
 <template>
     <notifications position="top center" />
-    <main class="w-full block relative ">
+
+
+    <div class="w-4/5 relative flex h-[100vh] bg-white mx-auto items-center gap-x-8">
+        <div class="w-1/2">
+            <img src="../../../../public/img/login_bg.svg" alt="">
+        </div>
+        <div class="w-10/12 lg:w-1/2 ">
+            <div class="mb-6 w-4/5">
+                <img src="../../../../public/img/logo.png" class="w-1/3 mx-auto" alt="">
+                <div class="px-8" @keyup.enter="login">
+                    <div>
+                        <p class=" text-4xl font-black text-[#153063] mb-4">
+                            Login
+                        </p>
+                    </div>
+                    <div class=" mb-4">
+                        <label for="phoneNumber" class="text-sm text-black mb-2 block">
+                            Phone Number
+                        </label>
+                        <input type="text" id="phoneNumber" autocomplete="off" v-model="phoneNumber"
+                            class=" border border-gray-400 bg-white w-full rounded" placeholder="Enter phone number">
+                    </div>
+                    <div class=" mb-12">
+                        <label for="password" class="text-sm text-black mb-2 block">
+                            Password
+                        </label>
+                        <input type="password" id="password" autocomplete="off" v-model="password"
+                            class=" border border-gray-400 bg-white w-full rounded" placeholder="Enter password">
+                    </div>
+                    <div class="mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox" v-model="remember" checked class="form-checkbox mr-2" >
+                            <span class="text-sm">Remember me next time</span>
+                        </label>
+                    </div>
+                    <div class="w-full text-center">
+                        <button @click="login"
+                            class="bg-[#5d7fff] w-full mx-auto text-white text-sm rounded-md px-8 py-3 block mb-2.5">
+                            Login
+                        </button>
+                    </div>
+                </div>
+
+                <form method="POST" id="signin-form" ref="signinForm" action="/login">
+                    <input type="hidden" v-model="csrfToken" name="_token">
+                    <input type="hidden" v-model="phoneNumber" name="phone_number">
+                    <input type="hidden" v-model="password" name="password">
+                    <input type="hidden" v-model="remember" name="remember">
+                    <input type="hidden" v-model="fcmToken" name="fcm_token">
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <main class="w-full block relative ">
         <div class="w-[100vw] h-[100vh] overflow-hidden">
-            <!-- <img class="h-auto w-full" src="../../../public/img/loginbackground.jpg" alt=""> -->
             <div class=" mx-auto rounded-md" style="width:30vw;left:calc(50% - 15vw);top:24%;position:absolute;padding:3rem">
                 <div class="mb-3">
                     <p class=" text-2xl text-black primary-font relative dash-under">Login</p>
@@ -43,7 +114,7 @@
                 <input type="hidden" v-model="fcmToken" name="fcm_token">
             </form>
         </div>
-    </main>
+    </main> -->
 </template>
 
 <script>
@@ -52,6 +123,7 @@
 
     import firebase from 'firebase/compat/app';
     import 'firebase/messaging';
+    import { notify } from '../../utilities/vue-toastification-helper';
 
     export default {
         name: "LoginComponent",
@@ -67,17 +139,18 @@
         },
 
         methods: {
-            ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles']),
+            ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles', 'setFeature']),
 
             async login(){
                 let url = '/api/login';
                 let formData = new FormData();
                 formData.append('phone_number', this.phoneNumber);
                 formData.append('password', this.password);
-                formData.append('fcm_token', this.fcmToken);
+                if(this.fcmToken){
+                    formData.append('fcm_token', this.fcmToken);
+                }
 
                 let response = await postApiData({url: url, form_data: formData});
-                console.log(response);
                 if(response.data){
                     this.token = response.data.token;
                     this.setToken(this.token);
@@ -90,13 +163,18 @@
                     response.data.user.roles.forEach(role => {
                         roles.push({name: role.name, id: role.id});
                     });
-
                     this.setRoles(roles);
+
+                    let features = [];
+                    features = JSON.parse(JSON.stringify(response.data.features));
+                    this.setFeature(features);
+                    notify('Login successful','success');
                     this.$refs.signinForm.submit();
 
                     return true;
                 }
                 else{
+                    notify(response.message,'warning');
                     return false;
                 }
             }
@@ -130,8 +208,8 @@
             catch (error) {
                 console.log(error);
                 this.$notify({
-                    text: 'Firebase error',
-                    type: "error"
+                    text: 'Firebase notification unavailable, using only WS notification',
+                    type: "warn"
                 });
             }
         }

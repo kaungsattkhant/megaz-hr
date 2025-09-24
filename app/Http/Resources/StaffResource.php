@@ -17,8 +17,7 @@ class StaffResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            // 'email' => $this->email,
-            // 'phone_number' => $this->phone_number,
+            'profile_image_url' => $this->profile_image_url,
             'department_id' => $this->department->id ?? null,
             'department_name' => $this->department->name ?? null,
             'roles' => $this->roles->map(function ($role) {

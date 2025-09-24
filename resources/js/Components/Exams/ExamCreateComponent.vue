@@ -177,7 +177,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedQuestionType" class="input-ui !text-black"
-                        data-te-select-filter="true" >
+                        data-te-select-filter="true" @change="typeChange">
                             <option :value="type" v-for="(type, typeIndex) in questionTypeList" :key="typeIndex">
                                 {{ type.name }}
                             </option>
@@ -197,10 +197,10 @@
                                 <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Question Name
                                 </th>
-                                <th scope="col" class=" pr-6 pl-2 py-4 ">
+                                <th scope="col" class=" pr-6 pl-2 py-4 whitespace-nowrap">
                                     Question Type
                                 </th>
-                                <th scope="col" class=" px-6 py-4 ">
+                                <th scope="col" class=" px-6 py-4 whitespace-nowrap">
                                     Action
                                 </th>
                             </tr>
@@ -210,10 +210,10 @@
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ question.question }}
                                 </td>
-                                <td class=" pr-6 pl-2 py-3 font-medium ">
+                                <td class=" pr-6 pl-2 py-3 font-medium whitespace-nowrap">
                                     {{ question.type }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium relative">
+                                <td class=" px-6 py-3 font-medium relative whitespace-nowrap">
                                     <input :checked="question.is_active == 1" @change="isActiveToggled(question)"
                                             class="mt-[0.1rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-white before:pointer-events-none before:absolute before:h-3.5 relative mx-3
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:-mt-[0.2875rem] after:h-5 after:-left-1
@@ -267,7 +267,7 @@
                             Question
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close">
+                            aria-label="Close" id="close_add_answer_modal">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -341,7 +341,7 @@
                             Cancel
                         </button>
                         <button type="button" @click="addAnswerToQuestion()"
-                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -443,6 +443,7 @@ export default {
             deleteIndex: null,
             isQuestion: false,
 
+            test:null,
             
         };
     },
@@ -466,6 +467,7 @@ export default {
             if(this.selectedDepartment){
                 this.roleList = this.selectedDepartment.roles;
             }
+            this.selectedSkillsetList = [];
             // let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             // if (rolesResponse.data) {
             //     this.roleList = rolesResponse.data;
@@ -476,6 +478,13 @@ export default {
             if(response.data){
                 this.skillsetList = response.data.data;
             }
+            this.selectedSkillsetList = [];
+        },
+        typeChange(){
+            this.selectedSkillsetList = [];
+            // if(this.selectedType === 'exam'){
+
+            // }
         },
 
         alertValidationMessage(field) {
@@ -554,6 +563,14 @@ export default {
             }
         },
         btnClickedAddAnswer(){
+            if(!this.answer){
+                this.alertValidationMessage(`Answer`);
+                return 1;
+            }
+            if(!this.answerMark){
+                this.alertValidationMessage(`Mark`);
+                return 1;
+            }
             this.selectedAnswerList.push({
                 answer: this.answer,
                 mark: this.answerMark,
@@ -562,7 +579,12 @@ export default {
             this.answerMark = null;
         },
         addAnswerToQuestion(){
+            if(this.selectedAnswerList.length < 1){
+                this.alertValidationMessage(`Answers`);
+                return 1;
+            }
             this.selectedQuestionList[this.selectedQuestionIndex].answers = this.selectedAnswerList
+            document.getElementById("close_add_answer_modal").click();
         },
         isActiveToggled(question) {
             let index = this.selectedQuestionList.findIndex(item => item == question);
@@ -606,7 +628,11 @@ export default {
                 this.alertValidationMessage(`Question`);
                 return 1;
             }
-
+            const allAnswered = this.selectedQuestionList.every(q => Array.isArray(q.answers) && q.answers.length > 0);;
+            if (!allAnswered) {
+                this.alertValidationMessage(`Answer`);
+                return 1;
+            }
             let exam_skills = [];
             this.selectedSkillsetList.forEach(skill => {
                 exam_skills.push(skill.id)
@@ -624,6 +650,11 @@ export default {
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 window.location.replace("/exams");
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 

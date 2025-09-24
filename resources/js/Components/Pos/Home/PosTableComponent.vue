@@ -1,7 +1,8 @@
 <template>
     <div class="">
         <div class="mb-6">
-            <div class="opacity-100 transition-opacity duration-150 ease-linear" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
+            <div class="opacity-100 transition-opacity duration-150 ease-linear"
+                :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div v-for="(room, roomIndex) in roomList" :key="roomIndex"
                         :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
@@ -23,35 +24,43 @@
                                 </p>
                             </div>
                         </button>
-                    </div>                            
+                    </div>
                 </div>
             </div>
 
-            <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
+            <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2"
+                :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
                     <div class="fixed right-4 top-4 z-40" :class="isShowSidebar == true ? 'block' : 'hidden' ">
                         <button @click="isShowSidebar = false"><i class="far fa-times"></i></button>
                     </div>
-                    <div class="relative h-full " v-if="isOpenRoom.open_1 == true"  id="open_room_1">
+                    <div class="relative h-full " v-if="isOpenRoom.open_1 == true" id="open_room_1">
                         <div class="w-full h-full flex justify-center flex-col">
                             <div class="w-2/3 mx-auto">
                                 <div class="text-center">
                                     <p class="mb-2 text-black font-semibold">
                                         <!-- {{ selectedRoom ? (selectedRoom.start_time).slice(0,5) : '' }} -->
-                                          <!-- no start time in selected Room -->
+                                        <!-- no start time in selected Room -->
                                     </p>
                                     <p class="mb-2 text-black font-semibold">
                                         {{ selectedRoom ? selectedRoom.name : '' }}
                                     </p>
                                     <p class="mb-4 text-black font-semibold">
-                                        Price : {{ selectedRoom ? selectedRoom.price_per_hour.toLocaleString() : '' }} MMKs
+                                        Price : {{ selectedRoom ? selectedRoom.price_per_hour.toLocaleString() : '' }}
+                                        MMKs
                                     </p>
                                 </div>
-                                <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
+                                <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png"
+                                    alt="">
                                 <button @click="btnClickedOpenRoom"
-                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
-                                    Open Room
+                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3 mb-2">
+                                    Open Table
                                 </button>
+                                <button @click="confirmRoomBtnClicked"
+                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                                    Open Now
+                                </button>
+                                
                             </div>
                         </div>
                     </div>
@@ -105,11 +114,39 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
+                                        Pre Deposit?
+                                    </label>
+                                    <input type="checkbox" v-model="isPreDeposit" class="rounded">
+                                </div>
+                                <div class="mb-4" v-if="isPreDeposit">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Deposit
+                                    </label>
+                                    <input type="text" placeholder="Deposit Amount" v-model="deposit"
+                                        :disabled="!isPreDeposit"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                </div>
+                                <div class="mb-4" v-if="isPreDeposit">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Cash Account
+                                    </label>
+                                    <div class="relative">
+                                        <select name="" id="" v-model="selectedCashAccount" :disabled="!isPreDeposit"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                            <option disabled selected> Select Cash Account </option>
+                                            <option v-for="cashAccount in cashAccounts" :value="cashAccount"> {{
+                                                cashAccount.name }} </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
                                     <input type="text" placeholder="Deposit" v-model="deposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                </div>
+                                </div> -->
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Male
@@ -143,7 +180,7 @@
                         <div class="flex justify-between padding-section border-b">
                             <div>
                                 <p class="text-black text-xl" v-if="selectedRoom">
-                                    {{ selectedRoom ? selectedRoom.name : '' }} 
+                                    {{ selectedRoom ? selectedRoom.name : '' }}
                                 </p>
                             </div>
                             <div class="flex gap-x-3">
@@ -152,17 +189,20 @@
                                     data-te-target="#change_table_modal">
                                     <i class="far fa-random"></i>
                                 </button>
-                                <button @click="btnClickAddMenu()"
+                                <!-- <button @click="btnClickAddMenu()"
                                     class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_menu_table_modal">
                                     <i class="far fa-cocktail"></i>
-                                </button>
+                                </button> -->
+                                <a :href="'/pos/pos_order/'+selectedRoom?.id"><i class="far fa-cocktail"></i></a>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_accessory_modal" @click="getAccessoryCategoryList()">
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal"
+                                    @click="getAccessoryCategoryList()">
                                     <i class="far fa-plus-circle"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_service_modal" @click="btnClickAddService()">
+                                    data-te-toggle="modal" data-te-target="#add_service_modal"
+                                    @click="btnClickAddService()">
                                     <i class="far fa-user-music"></i>
                                 </button>
                                 <!-- <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
@@ -177,7 +217,7 @@
                                     <p class="text-sm text-black" v-if="selectedRoom">
                                         Invoice Id
                                         {{ selectedRoom.invoice ? (selectedRoom.invoice.invoice_id ?
-                                            selectedRoom.invoice.invoice_id : '')
+                                        selectedRoom.invoice.invoice_id : '')
                                         : '' }}
 
                                     </p>
@@ -188,7 +228,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit" v-if="selectedRoom">
-                                        
+
                                         {{ selectedRoom.name ? selectedRoom.name : ''}}
                                     </p>
                                 </div>
@@ -210,13 +250,15 @@
                                         Menu Total
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        {{ purchaseMenuList.length > 0 ? (purchaseMenuList[0].total).toLocaleString() : '0' }}
+                                        {{ purchaseMenuList.length > 0 ? (purchaseMenuList[0].total).toLocaleString() :
+                                        '0' }}
                                         MMks
                                     </p>
                                 </div>
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div v-for="(menu, index) in purchaseMenuList" class="contents" :key="index">
-                                        <div v-for="menu2 in menu.order_items" class="contents" :key="menu2">
+
+                                        <div v-for="menu2 in combinedMenuList" class="contents" :key="menu2">
                                             <p class=" col-span-4 text-sm">
                                                 {{ menu2.menu.name }}
                                             </p>
@@ -237,33 +279,53 @@
                                                 {{ (menu2.price).toLocaleString() }} MMKs
                                             </p>
                                         </div>
+
+
+                                        <!-- <div v-for="menu2 in menu.order_items" class="contents" :key="menu2">
+                                            <p class=" col-span-4 text-sm">
+                                                {{ menu2.menu.name }}
+                                            </p>
+                                            <p class=" col-span-1 text-center text-sm">
+                                                {{ menu2.quantity }}
+                                            </p>
+                                            <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                                class=" col-span-2 text-center text-xs pt-0.5">
+                                                {{ menu2.status }}
+                                            </p>
+                                            <p class=" col-span-3 text-sm text-right">
+                                                {{ (menu2.price).toLocaleString() }} MMKs
+                                            </p>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
-                                <!-- services -->
+                            <!-- services -->
                             <div class="padding-section border-b" v-if="serviceList.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
-                                            Services
+                                        Services
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                            {{ selectedRoom.total_service_value.toLocaleString() }} MMks
+                                        {{ selectedRoom.total_service_value.toLocaleString() }} MMks
                                     </p>
                                 </div>
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
-                                    <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-400'">
+                                    <div class="contents" v-for="(service,index) in serviceList" :key="index"
+                                        :class="service.is_active == 1 ? 'text-black' : 'text-gray-400'">
                                         <div class=" col-span-3 text-sm">
-                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service)">
-                                                {{ service.service.name ? service.service.name : service.service.staff.name }}
+                                            <button data-te-toggle="modal" data-te-target="#service_end_modal"
+                                                @click="btnClickedEndService(service)">
+                                                {{ service.service.name ? service.service.name :
+                                                service.service.staff.name }}
                                             </button>
                                         </div>
-                                            <!-- <p class=" col-span-3 text-sm" v-else>
+                                        <!-- <p class=" col-span-3 text-sm" v-else>
                                                 {{ service.service.staff.name }}
                                             </p> -->
                                         <p class=" col-span-3 text-center text-sm">
                                             {{ service.minutes }}
                                         </p>
-                                            <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                        <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
                                                 class=" col-span-2 text-center text-xs pt-0.5">
                                                 {{ menu2.status }}
                                             </p> -->
@@ -273,8 +335,8 @@
                                     </div>
                                 </div>
                             </div>
-    
-                                    <!-- accessories -->
+
+                            <!-- accessories -->
                             <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -285,7 +347,8 @@
                                     </p>
                                 </div>
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
-                                    <div class="contents" v-for="(accessory,index) in accessoryListSidebar" :key="index">
+                                    <div class="contents" v-for="(accessory,index) in accessoryListSidebar"
+                                        :key="index">
                                         <div class=" col-span-3 text-sm">
                                             {{ accessory.accessory.name }}
                                         </div>
@@ -293,7 +356,8 @@
                                             {{ accessory.quantity }}
                                         </p>
                                         <p class=" col-span-4 text-sm text-right">
-                                            {{ (accessory.accessory.accessory_price.price * accessory.quantity).toLocaleString() }} MMKs
+                                            {{ (accessory.accessory.accessory_price.price *
+                                            accessory.quantity).toLocaleString() }} MMKs
                                         </p>
                                     </div>
                                 </div>
@@ -327,28 +391,30 @@
 
                                     }} -->
                                     {{
-                                        (selectedRoom ?
-                                            (
-                                                (purchaseMenuList.length > 0 ? 
-                                                    ( 
-                                                        purchaseMenuList[0].total - (selectedRoom.invoice.package ? selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0)
-                                                    )
-                                                    :
-                                                    (
-                                                        selectedRoom.invoice.package ? selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0
-                                                    )
-                                                ) 
-                                                + selectedRoom.total_service_value+selectedRoom.total_accessory_value
-                                            ).toLocaleString()
-                                            
-                                        : 0 )
+                                    (selectedRoom ?
+                                    (
+                                    (purchaseMenuList.length > 0 ?
+                                    (
+                                    purchaseMenuList[0].total - (selectedRoom.invoice.package ?
+                                    selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0)
+                                    )
+                                    :
+                                    (
+                                    selectedRoom.invoice.package ?
+                                    selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0
+                                    )
+                                    )
+                                    + selectedRoom.total_service_value+selectedRoom.total_accessory_value
+                                    ).toLocaleString()
+
+                                    : 0 )
 
 
                                     }}
                                     MMKs
                                 </p>
                             </div>
-                            <div class="" >
+                            <div class="">
                                 <button @click="btnClickedDoneSession()"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Done Session
@@ -380,7 +446,9 @@
                                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                             <option value="fix_amount"> Fix Ammount </option>
                                             <option value="percentage"> Percentage </option>
-                                            <option value="customer_level" :disabled="roomSessionData.customer_level == 'no customer level'"> Customer Level </option>
+                                            <option value="customer_level"
+                                                :disabled="roomSessionData.customer_level == 'no customer level'">
+                                                Customer Level </option>
                                             <option value="birthday_discount"
                                                 v-if="roomSessionData ? roomSessionData.is_birthday : ''"> Birthday
                                             </option>
@@ -395,18 +463,18 @@
                                         <select name="" id="" v-model="birthday_discount"
                                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                             @change="birthdayDiscountSelectChanged">
-                                            <option v-for="bd in birthdayDiscountList" :value="bd" :key="bd"> {{ bd.name }} </option>
+                                            <option v-for="bd in birthdayDiscountList" :value="bd" :key="bd"> {{ bd.name
+                                                }} </option>
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-4"
                                     v-show="discount_type != 'customer_level' && discount_type != 'birthday_discount'">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Discount
                                     </label>
                                     <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
-                                        
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <!-- <div class="mb-4">
@@ -430,17 +498,21 @@
                                 </div>
                                 <div class="mb-4">
                                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
-                                        <input class="input-check-pos" type="checkbox" v-model="printInvoiceData.isTax" @click="btnClickedTax()"
-                                            value="" id="tax" />
+                                        <input class="input-check-pos" type="checkbox" v-model="printInvoiceData.isTax"
+                                            @click="btnClickedTax()" value="" id="tax" />
                                         <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="tax">
                                             Tax
                                         </label>
                                     </div>
+                                    <input type="number" v-show="printInvoiceData.isTax" placeholder="Discount" v-model="selectedTaxPercent"
+                                    @change="btnClickedTax()"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0 mt-2">
                                 </div>
                                 <div class="mb-4">
                                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
-                                        <input class="input-check-pos" type="checkbox" @click="btnClickedServiceCharge()"
-                                            v-model="printInvoiceData.service_charge" value="" id="service" />
+                                        <input class="input-check-pos" type="checkbox"
+                                            @click="btnClickedServiceCharge()" v-model="printInvoiceData.service_charge"
+                                            value="" id="service" />
                                         <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="service">
                                             Service Charges
                                         </label>
@@ -480,7 +552,7 @@
                                 </p>
                                 <p class=" w-28">
                                     {{ printInvoiceData.service_charge == true ? (printInvoiceData.service_tax ?
-                                        printInvoiceData.service_tax.toLocaleString() :
+                                    printInvoiceData.service_tax.toLocaleString() :
                                     0) : 0 }} MMKs
                                 </p>
                             </div>
@@ -490,7 +562,7 @@
                                 </p>
                                 <p class=" w-28">
                                     {{ printInvoiceData.isTax == true ? (printInvoiceData.tax ?
-                                        printInvoiceData.tax.toLocaleString() :
+                                    printInvoiceData.tax.toLocaleString() :
                                     0) : 0 }} MMKs
                                 </p>
                             </div>
@@ -507,27 +579,32 @@
                                     Package Discount
                                 </p>
                                 <p class=" w-28">
-                                    {{ selectedRoom.room_sessions[0].invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.room_sessions[0].invoice.package.package_discount }}
+                                    {{ selectedRoom.room_sessions[0].invoice.package.package_discount > 0 ? '- ' : '' }}
+                                    {{ selectedRoom.room_sessions[0].invoice.package.package_discount }}
                                 </p>
                             </div>
-                            <div v-show="discount_type != 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <div v-show="discount_type != 'customer_level'"
+                                class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Discount
                                 </p>
                                 <p class=" w-28">
                                     {{ printInvoiceData.discount > 0 ? '- ' : '' }} {{ printInvoiceData.discount }} {{
-                                        this.discount_type == 'percentage' ? '%' : 'MMKs' }}
+                                    this.discount_type == 'percentage' ? '%' : 'MMKs' }}
                                 </p>
                             </div>
-                            <div v-show="discount_type == 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <div v-show="discount_type == 'customer_level'"
+                                class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Customer Discount
                                 </p>
                                 <p class=" w-28">
-                                    {{ printInvoiceData.customer_discount > 0 ? '- ' : '' }} {{ printInvoiceData.customer_discount }} MMKs
+                                    {{ printInvoiceData.customer_discount > 0 ? '- ' : '' }} {{
+                                    printInvoiceData.customer_discount }} MMKs
                                 </p>
                             </div>
-                            <div v-show="roomSessionData.is_service == 1" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <div v-show="roomSessionData.is_service == 1"
+                                class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Service Price
                                 </p>
@@ -535,7 +612,8 @@
                                     {{ printInvoiceData.service_total_value.toLocaleString() }} MMKs
                                 </p>
                             </div>
-                            <div v-show="roomSessionData.total_accessory_value > 0" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <div v-show="roomSessionData.total_accessory_value > 0"
+                                class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Accessories Price
                                 </p>
@@ -546,12 +624,13 @@
                             <div class=" text-right pr-3 mb-3">
                                 <p class="font-semibold">
                                     Total &nbsp;
-                                    {{  (  (printInvoiceData.total ? printInvoiceData.total : 0)
-                                        + (printInvoiceData.service_charge == true ? (printInvoiceData.service_tax ?
-                                            printInvoiceData.service_tax : 0) : 0)
-                                        + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) 
-                                        - foodDiscount
-                                        ).toLocaleString()
+                                    {{ ( (printInvoiceData.total ? printInvoiceData.total : 0)
+                                    + (printInvoiceData.service_charge == true ? (printInvoiceData.service_tax ?
+                                    printInvoiceData.service_tax : 0) : 0)
+                                    + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax :
+                                    0) : 0)
+                                    - foodDiscount
+                                    ).toLocaleString()
                                     }} MMKs
                                 </p>
                             </div>
@@ -601,7 +680,7 @@
                                             <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
                                                 <td class=" py-4 text-sm  ">
                                                     {{ pm.name }}
-                                                </td>                                                
+                                                </td>
                                                 <td class=" py-4 text-sm  ">
                                                     <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
                                                         class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
@@ -696,16 +775,16 @@
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
                             <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true"
-                                class=" h-10"
-                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name"
-                                track-by="id" :preselect-first="false"></multiselect>
+                                class=" h-10" @select="selectedMenuChange()" :clear-on-select="false"
+                                :preserve-search="true" placeholder="Select Menu" label="name"
+                                :custom-label="nameWithPrice" track-by="id" :preselect-first="false"></multiselect>
 
 
                             <!-- <select name="" id="" placeholder="Menu" v-model="selectedMenu" @change="selectedMenuChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select> -->
-                            
+
                         </div>
                         <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
@@ -714,14 +793,53 @@
                             </select>
                         </div> -->
                         <div class="mb-4">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" v-model="hasSellingExtras" class="sr-only peer" />
+                                <div
+                                    class="w-5 h-5 bg-gray-300 rounded-sm peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-blue-400 flex items-center justify-center transition-colors">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
+                                        <path d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            </label>
+                            <span class="text-sm mx-2"> Add Extras? </span>
+                        </div>
+
+                        <div class="mb-4" v-if="hasSellingExtras">
+                            <multiselect v-model="selectedTableSellingExtras" :options="tableSellingExtras"
+                                :close-on-select="false" class=" h-10" :multiple="true" :clear-on-select="false"
+                                :preserve-search="true" placeholder="Select Extras" :custom-label="sellingExtraName"
+                                track-by="id" :preselect-first="false"></multiselect>
+                        </div>
+
+                        <div class="mb-4">
                             <input type="number" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-                        <div>
+
+                        <div class="mb-4">
+                            <div class="flex space-x-4 items-center justify-center">
+                                <div class="w-3/4">
+                                    <multiselect v-model="selectedTableRemark" :options="remarks"
+                                        :close-on-select="true" class=" h-10" :clear-on-select="false"
+                                        :preserve-search="true" placeholder="Remark" label="name" track-by="id"
+                                        :preselect-first="false"></multiselect>
+                                </div>
+                                <div class="w-1/4 text-center h-8 pt-1 text-lg">
+                                    <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                        data-te-toggle="modal" data-te-target="#add_remark_modal">
+                                        <i class="far fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- <div>
                             <textarea v-model="remark"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                 name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -735,7 +853,8 @@
         <!-- add Package Menu modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_package_menu_table_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="add_package_menu_table_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true"
+            role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -756,9 +875,11 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage" @change="selectedPackageMenuChange()"
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage"
+                                @change="selectedPackageMenuChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}
+                                </option>
                             </select>
                         </div>
                         <!-- <div class="mb-4">
@@ -774,7 +895,8 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnConfirmAddPackageMenu()"
+                            class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Menu
                         </button>
                     </div>
@@ -825,7 +947,7 @@
         </div>
 
 
-            <!-- add Service modal -->
+        <!-- add Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="add_service_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
@@ -852,10 +974,10 @@
                             <label for="" class="label-form mb-3">
                                 Service Category
                             </label>
-                            <select name="" id="" v-model="selectedServiceCategory" class="input-ui" @change="serviceCategoryChange()">
-                                <option :value="service" v-for="(service, index) in serviceCategoryList"
-                                    :key="index">{{
-                                        service.name }}</option>
+                            <select name="" id="" v-model="selectedServiceCategory" class="input-ui"
+                                @change="serviceCategoryChange()">
+                                <option :value="service" v-for="(service, index) in serviceCategoryList" :key="index">{{
+                                    service.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'Lady' : ''">
@@ -863,9 +985,8 @@
                                 Lady
                             </label>
                             <select name="" id="" v-model="selectedLady" class="input-ui">
-                                <option :value="lady" v-for="(lady, index) in ladyList"
-                                    :key="index">{{
-                                        lady.staff ? lady.staff.name : '' }}</option>
+                                <option :value="lady" v-for="(lady, index) in ladyList" :key="index">{{
+                                    lady.staff ? lady.staff.name : '' }}</option>
                             </select>
                         </div>
                         <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
@@ -873,9 +994,8 @@
                                 DJ
                             </label>
                             <select name="" id="" v-model="selectedDj" class="input-ui">
-                                <option :value="dj" v-for="(dj, index) in djList"
-                                    :key="index">{{
-                                        dj.name }}</option>
+                                <option :value="dj" v-for="(dj, index) in djList" :key="index">{{
+                                    dj.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -903,7 +1023,7 @@
                 </div>
             </div>
         </div>
-            <!-- end Service modal -->
+        <!-- end Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
@@ -945,10 +1065,11 @@
         </div>
 
 
-            <!-- add accessory modal -->
+        <!-- add accessory modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            id="add_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true"
+            role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -972,10 +1093,11 @@
                             <label for="" class="label-form mb-3">
                                 Accessory Category
                             </label>
-                            <select name="" id="" v-model="selectedAccessoryCategory" class="input-ui" @change="accessoryCategoryChange()">
+                            <select name="" id="" v-model="selectedAccessoryCategory" class="input-ui"
+                                @change="accessoryCategoryChange()">
                                 <option :value="accessory" v-for="(accessory, index) in accessoryCategoryList"
                                     :key="index">{{
-                                        accessory.name }}</option>
+                                    accessory.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -983,8 +1105,7 @@
                                 Accessory
                             </label>
                             <select name="" id="" v-model="selectedAccessory" class="input-ui">
-                                <option :value="accessory" v-for="(accessory, index) in accessoryList"
-                                    :key="index">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryList" :key="index">
                                     {{ accessory.name }}</option>
                             </select>
                         </div>
@@ -1009,6 +1130,42 @@
 
     </div>
 
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="add_remark_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true"
+        role="dialog">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div
+                class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                <div class="relative  p-4">
+                    <p class="text-xl w-full text-center">
+                        New Remark
+                    </p>
+                    <button type="button" id="closeAddPackageMenuTableModal"
+                        class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="relative px-16 py-4" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <input type="text" placeholder="Remark" v-model="newRemarkText" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                </div>
+
+                <div class="flex justify-center px-12 mb-6">
+                    <button @click="addNewRemarkBtnClicked()" class="pos-add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        Add Remark
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <script>
     import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
@@ -1027,8 +1184,17 @@
             area:{
                 type: Object,
                 required: true
+            },
+            sellingExtras: {
+                type: Array,
+                required: true
+            },
+            remarks: {
+                type: Array,
+                required: true
             }
         },
+        emits: ['callParent'],
         components:{
             Multiselect
         },
@@ -1069,8 +1235,9 @@
 
                 selectedCustomer:null,
                 invoice_date:null,
-                type:'session',
+                type: null,
                 selectedPackage:null,
+                isPreDeposit: false,
                 deposit:null,
                 duration:null,
                 male:null,
@@ -1173,15 +1340,53 @@
                 selectedAccessory:null,
                 selectedAccessoryQuantity:null,
 
+                cashAccounts: [],
+                selectedCashAccount: null,
 
                 currentTime: getCurretDateTime(),
                 isShowSidebar:false,
                 entityType:null,
+
+                tableSellingExtras: [],
+                selectedTableSellingExtras: [],
+                hasSellingExtras: false,
+
+                tableRemarks: [],
+                selectedTableRemark: null,
+
+                newRemarkText: null,
+                selectedTaxPercent: 5
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
+
+            addNewRemarkBtnClicked(){
+                if(!this.newRemarkText){
+                    this.showToastMessage('Please provide remark');
+                    return;
+                }
+                let formData = new FormData();
+                formData.append('name',this.newRemarkText);
+                postApiData({url: `/api/remarks`, form_data: formData, token: this.getToken()})
+                .then((response)=>{
+                    if(response.success){
+                        this.showToastMessage('New remark created', 'success', 'Success');
+                        this.selectedTableRemark = response.data;
+                        this.tableRemarks.push(response.data);
+                        this.newRemarkText = null;
+                    }
+                });
+            },
+
+            showToastMessage(message, type="warn", title="Input Validation") {
+                this.$notify({
+                    title: `${title}`,
+                    text: `${message}`,
+                    type: `${type}`
+                });
+            },
 
             handleClick() {
                 this.$emit('callParent');
@@ -1204,6 +1409,8 @@
                 }
             },
             async btnClickedIsOpenRoom(room , roomIndex) {
+                this.tableSellingExtras = this.sellingExtras;
+                this.tableRemarks = this.remarks;
                 this.isShowSidebar = true;
                 this.selectedRoom = null;
                 this.selectedRoomId = room.id;
@@ -1234,7 +1441,9 @@
                 this.getCustomerList();
                 this.selectedCustomer = null;
                 this.type = null;
+                this.isPreDeposit = false;
                 this.deposit = null;
+                this.selectedCashAccount = null;
                 this.male = null;
                 this.female = null;
                 this.child = null;
@@ -1344,15 +1553,33 @@
             },
 
             async createRoom() {
+                // if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
+                //     this.showToastMessage(`deposit amount or cash account`);
+                //     return;
+                // }
+                let nullData = "";
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
-                formData.append('customer_id', this.selectedCustomer.id);
+                if(this.selectedCustomer){
+                    formData.append('customer_id', this.selectedCustomer.id);
+                }
+                else{
+                    formData.append('customer_id', nullData);
+                }
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
                     formData.append('orders', JSON.stringify(this.packageMenuList));
                 }
                 formData.append('type', this.type);
-                formData.append('deposit', this.deposit);
+                let isDeposit = (this.isPreDeposit)? 1: 0;
+                formData.append('is_deposit', isDeposit);
+                if(this.deposit){
+                    formData.append('deposit', this.deposit);
+                }
+                if(this.selectedCashAccount){
+                    formData.append('cash_account_id', this.selectedCashAccount.id);
+                    formData.append('account_id', this.selectedCustomer.account_id);
+                }
                 if (this.female > 0) {
                     formData.append('female', +this.female);
                 }
@@ -1374,7 +1601,7 @@
                         if (this.selectedRoom.invoice.orders.length > 0) {
                             this.getPurchaseMenuList();
                         }
-                    
+
                         else if (this.selectedRoom.invoice.orders.length < 1) {
                             this.purchaseMenuList = [];
                         }
@@ -1514,10 +1741,12 @@
             },
             btnClickedTax(){
                 if (this.isTax = true) {
-                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
+                    // this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
+                    let tax = this.selectedTaxPercent * 0.01
+                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * tax
                 }
             },
-            
+
             birthdayDiscountSelectChanged() {
                 this.printInvoiceData.discount = this.birthday_discount.discount_value
                 if (this.selectedRoom.invoice.invoice_type == 'package') {
@@ -1530,7 +1759,7 @@
                 this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount - this.foodDiscount
             },
 
-            
+
             discountChanged() {
                 // let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
                 let roomTotalAmount = this.printInvoiceData.food - this.printInvoiceData.package_discount - this.foodDiscount
@@ -1744,37 +1973,65 @@
                     this.menuList = response.data;
                 }
             },
-            // async selectedMenuChange() {
+            async selectedMenuChange() {
             //     const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
             //     if (response.data) {
             //         this.menuAreaList = response.data.areas;
             //         this.menuQuantity = 1;
             //     }
-            // },
+                this.menuQuantity = 1;
+            },
             btnClickAddMenu() {
                 this.invoiceId = this.selectedRoom.invoice.id;
                 console.log('invoice id ' + this.invoiceId)
+                this.menuQuantity = null;
+                this.selectedMenu = null;
+                this.remark = null;
                 this.getMenuList();
             },
             btnConfirmAddMenu() {
                 this.addMenu();
             },
             async addMenu() {
+                if(!this.selectedMenu){
+                    this.showToastMessage('What menu do you want to order?');
+                    return;
+                }
+                if(this.hasSellingExtras && this.selectedTableSellingExtras.length < 1){
+                    this.showToastMessage('At least one extra must be selected');
+                    return;
+                }
+                if(!this.menuQuantity){
+                    this.showToastMessage('How much do you want to order?');
+                    return;
+                }
                 let formData = new FormData();
                 formData.append('invoice_id', this.invoiceId);
                 formData.append('menu_id', this.selectedMenu.id);
                 // formData.append('area_id', this.selectedMenuArea.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
-                formData.append('remark', this.remark);
+                // formData.append('remark', this.remark);
                 formData.append('selling_area_id', this.area.id);
+                if(this.hasSellingExtras){
+                    this.selectedTableSellingExtras.forEach(extra => {
+                        formData.append('selling_extra_id[]', extra.id);
+                    });
+                }
+                if(this.selectedTableRemark){
+                    formData.append('remark_id',this.selectedTableRemark.id);
+                }
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
+                    this.hasSellingExtras = false;
+                    this.selectedTableSellingExtras = [];
+                    this.selectedTableRemark = null;
                     this.closeModal('closeAddMenuTableModal');
                     this.clearMenuForm();
                     // this.getPurchaseMenuList();
                     this.getSelectedRoom();
+                    this.showToastMessage('New menu has been ordered, thank you!', 'success', 'Order Received');
                 }
                 else {
                     console.log('some errors occur');
@@ -1865,7 +2122,7 @@
                     else{
                         this.ladyList = response.data;
                     }
-                    
+
                 }
             },
             btnConfirmAddService() {
@@ -1901,7 +2158,7 @@
             },
             btnClickedEndService(service){
                 this.serviceEnd = service;
-            },  
+            },
             async btnConfirmEndService(){
                 let formData = new FormData();
                 formData.append('invoice_service_id', this.serviceEnd.id);
@@ -2001,7 +2258,7 @@
             },
             clearOpenRoomForm() {
                 this.selectedCustomer = null
-                this.type = 'session'
+                this.type = null;
                 this.selectedPackage = null
                 this.deposit = null
                 this.invoice_date = null
@@ -2034,20 +2291,69 @@
                     }
                 }
             },
+            async getCashAccounts(){
+                let response = await getApiData({url: `/api/get_cash_account`, token: this.getToken()});
+                if(response.success){
+                    let posCashAccount = response.data.find(account => account.account_code === '2-1011');
+                    if (posCashAccount) {
+                        this.cashAccounts.push(posCashAccount);
+                    }
+                    let posBankAccount = response.data.find(account => account.account_code === '2-1012');
+                    if (posBankAccount) {
+                        this.cashAccounts.push(posBankAccount);
+                    }
+                    // this.cashAccounts = response.data;
+                }
+            },
+
+            nameWithPrice ({name, prices}) {
+                return `${name} (${prices[0].price}Ks)`
+            },
+
+            sellingExtraName(sellingExtra){
+                return `${sellingExtra.item.name}`;
+            },
 
         },
-        
+
         watch: {
+            hasSellingExtras(){
+                if(!this.hasSellingExtras){
+                    this.selectedTableSellingExtras = [];
+                }
+            },
             selectedRoom(val, oldVal) {
                 console.log(`new: ${val}, old: ${oldVal}`)
             },
-        
+
             // tableAreaId(newId) {
             //     this.getTableList(newId);
             // },
             area(area){
                 this.getTableList(area);
-            }
+            },
+            isPreDeposit(){
+                if(!this.isPreDeposit){
+                    this.deposit = null;
+                    this.selectedCashAccount = null;
+                }
+            },
+        },
+        computed: {
+            combinedMenuList() {
+                const map = {};
+                this.purchaseMenuList[0].order_items.forEach(item => {
+                    const key = item.menu_id + '-' + item.status;
+                    if (!map[key]) {
+                        map[key] = { ...item };
+                    }
+                    else {
+                        map[key].quantity += item.quantity;
+                        map[key].price += item.price;
+                    }
+                });
+                return Object.values(map);
+            },
         },
         created(){
             // this.getCustomerList();
@@ -2055,11 +2361,12 @@
             // this.getMenuList();
             // this.getDivisionList();
             this.getPackageList(this.currentTime);
-
+            this.getCashAccounts();
             // this.getServiceCategoryList();
             // this.getLadyList();
 
             // this.getAccessoryCategoryList();
+
         },
         mounted()
         {

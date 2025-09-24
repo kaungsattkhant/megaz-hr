@@ -129,7 +129,7 @@
                                 <td class="">
                                     {{ purchaseOrderItem.uom.name }}
                                 </td>
-                                <td class="">
+                                <td class="" :class="purchaseOrderItem.is_exceed_max_limitation != 0 ? '!text-red-600 !font-medium' : ''">
                                     {{ purchaseOrderItem.original_quantity }}
                                 </td>
                                 <td class="">

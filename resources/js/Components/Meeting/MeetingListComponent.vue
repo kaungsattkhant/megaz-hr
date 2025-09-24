@@ -1,25 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Meeting
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Meeting
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/meeting/create" class="add-btn ">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/meeting/create" class="add-btn " v-if="feature.includes('meeting.create')">
+                        Add New
+                    </a>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -52,7 +54,7 @@
                                 <th scope="col" class=" ">
                                     Chaired By
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['meeting.edit', 'meeting.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -91,13 +93,13 @@
                                         
                                         {{ meeting.chaired_by.name }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'">
+                                    <td class="whitespace-nowrap " v-show="['meeting.edit', 'meeting.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'" v-if="feature.includes('meeting.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(meeting.id)"
+                                            @click="deleteBtnClicked(meeting.id)" v-show="feature.includes('meeting.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -198,11 +200,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getMeetingList(pageNumber) {
             let url = `/api/meetings`;

@@ -70,7 +70,6 @@ class AssetRepository implements AssetInterface
         try {
             $data['created_by'] = UserData()->id;
             $model = Asset::create($data);
-
             if ($model) {
                 #asset inventory ledger
                 $data['asset_id'] = $model->id;
@@ -99,8 +98,9 @@ class AssetRepository implements AssetInterface
                     'action' => 'credit',
                 ]);
                 #end transaction
+
                 #add depreciation for next month
-                // $assetDepreciation = (new DepreciationBalance())->addDepreciationBalance($model->id);
+                $assetDepreciation = (new DepreciationBalance())->addDepreciationBalance($model->id);
                 #end
             }
             DB::commit();
@@ -326,7 +326,6 @@ class AssetRepository implements AssetInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
     }
     public function updateOrCreateDepreciationBalance($data)
     {
@@ -415,12 +414,12 @@ class AssetRepository implements AssetInterface
             // $final_original_cost=$final_additon_year=$final_total=$c=$final_depreciation=$final_book_value=0;
             $deptBalance->fix_asset_tangiable = $fix_asset_tangiable;
             $deptBalance->fix_asset_untangible = $fix_asset_untangible;
-            $deptBalance->final_original_cost=$fix_asset_tangiable['total_original_cost']+$fix_asset_untangible['total_original_cost'];
-            $deptBalance->final_addition_year=$fix_asset_tangiable['total_addition_year']+$fix_asset_untangible['total_addition_year'];
-            $deptBalance->final_total=$fix_asset_tangiable['total']+$fix_asset_untangible['total'];
-            $deptBalance->final_addition_during_year=$fix_asset_tangiable['total_addition_during_year']+$fix_asset_untangible['total_addition_during_year'];
-            $deptBalance->final_depreciation=$fix_asset_tangiable['total_depreciation']+$fix_asset_untangible['total_depreciation'];
-            $deptBalance->final_book_value=$fix_asset_tangiable['total_book_value']+$fix_asset_untangible['total_book_value'];
+            $deptBalance->final_original_cost = $fix_asset_tangiable['total_original_cost'] + $fix_asset_untangible['total_original_cost'];
+            $deptBalance->final_addition_year = $fix_asset_tangiable['total_addition_year'] + $fix_asset_untangible['total_addition_year'];
+            $deptBalance->final_total = $fix_asset_tangiable['total'] + $fix_asset_untangible['total'];
+            $deptBalance->final_addition_during_year = $fix_asset_tangiable['total_addition_during_year'] + $fix_asset_untangible['total_addition_during_year'];
+            $deptBalance->final_depreciation = $fix_asset_tangiable['total_depreciation'] + $fix_asset_untangible['total_depreciation'];
+            $deptBalance->final_book_value = $fix_asset_tangiable['total_book_value'] + $fix_asset_untangible['total_book_value'];
         }
         // ->groupBy('main_account.sub_account_id');
         ResponseData($deptBalance);
@@ -470,5 +469,4 @@ class AssetRepository implements AssetInterface
         //     ->get();
 
     }
-
 }

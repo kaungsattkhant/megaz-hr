@@ -6,7 +6,7 @@
             </p>
         </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 gap-y-3 mb-6 bg-white p-8 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 gap-y-3 mb-6 bg-white p-8 rounded-md container-card">
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Title

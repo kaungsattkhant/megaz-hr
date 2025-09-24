@@ -2,12 +2,15 @@
 
 namespace App\Repositories\Inventory;
 
+use App\Models\Staff;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use App\Models\Inventoryable;
-use Illuminate\Support\Facades\DB;
-use App\Actions\Inventory\GetInventoryStockAction;
 use App\Models\InventoryItem;
+use App\Models\InventoryLedger;
+use Illuminate\Support\Facades\DB;
+use App\Models\InventoryLedgerItem;
+use App\Actions\Inventory\GetInventoryStockAction;
 
 class InventoryRepository implements InventoryRepositoryInterface
 {
@@ -38,10 +41,11 @@ class InventoryRepository implements InventoryRepositoryInterface
         // }
 
         $query = Inventory::where('is_active', 1)
-            ->whereHas('staff', function ($query) {
-                $query->where('id', UserData()->id);
-            })
-            ->with(['inventoryable']);
+            // ->whereHas('staff', function ($query) {
+            //     $query->where('id', UserData()->id);
+            // })
+            ->with(['inventoryable'])
+            ->orderBy('id', 'desc');
         if ($inventory_id) {
             $query->where('id', $inventory_id);
         }
@@ -54,11 +58,11 @@ class InventoryRepository implements InventoryRepositoryInterface
     }
 
     public function getInventory($request)
-    {
+    { 
         $staffId = UserData()->id;
         $inventories = Inventory::where('is_active', 1)
             ->whereHas('staff', function ($query) use ($staffId) {
-                $query->where('staff_id', $staffId);
+                // $query->where('staff_id', $staffId);
             })
             ->with(['inventoryable'])
             ->get();
@@ -70,39 +74,62 @@ class InventoryRepository implements InventoryRepositoryInterface
         $data = $request->all();
         DB::beginTransaction();
         try {
-            if (!isset($request->id)) {
+            if (!isset($data['id'])) {
                 $data['id'] = null;
             }
-            $request_inventoryable_id = $request->inventoryable_id;
-
             $inventory = Inventory::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );
-            if (!isset($request->id)) {
-                foreach ($request_inventoryable_id as $id) {
-                    $inventoryable = $inventory->inventoryable()->create([
-                        'inventoryable_type' => $request->inventoryable_type,
-                        'inventoryable_id' => $id,
-                    ]);
+            if(isset($data['inventoryable'])){
+                $inventoryables = json_decode($data['inventoryable'], true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ResponseMessage('Invalid JSON data provided for inventoryable.', 400);
                 }
-            } else {
-                $inventoryable_id = $inventory->inventoryable->pluck('inventoryable_id')->toArray();
-                // $difference=$request_inventoryable_id->diff($inventoryable_id);
-                $created_ids = array_diff($request_inventoryable_id, $inventoryable_id);
-                $deleted_ids = array_diff($inventoryable_id, $request_inventoryable_id);
+                $currentInventoryableIds = collect($inventoryables)
+                ->pluck('id')
+                ->filter()
+                ->toArray();
 
-                if (count($created_ids)) {
-                    // dd('ab');
-                    foreach ($created_ids as $id) {
-                        $inventoryable = $inventory->inventoryable()->create([
-                            'inventoryable_type' => 'department',
-                            'inventoryable_id' => $id,
-                        ]);
-                    }
+                if ($inventory->exists && !empty($currentInventoryableIds)) {
+                    $inventory->inventoryable()
+                        ->whereNotIn('id', $currentInventoryableIds)
+                        ->delete();
+                } elseif ($inventory->exists) {
+                    $inventory->inventoryable()->delete();
                 }
-                if (count($deleted_ids)) {
-                    Inventoryable::whereIn('inventoryable_id', $deleted_ids)->where('inventoryable_type', $request->inventoryable_type)->delete();
+                foreach ($inventoryables as $inventoryable) {
+                    if($inventoryable['inventoryable_type'] === "department"){
+                        $existingDepartment = Inventoryable::where('inventoryable_type', 'department')
+                        ->where('inventoryable_id', $inventoryable['inventoryable_id'])
+                        ->first();
+                        if ($existingDepartment) {
+                            DB::rollback();
+                            return ResponseMessage('This department already has a inventory association. Only one inventory per department is allowed.', 400);
+                        }
+                        Inventoryable::updateOrCreate(
+                            [
+                                'id' => $inventoryable['id'] ?? null,
+                            ],
+                            [
+                                'inventory_id' => $inventory->id,
+                                'inventoryable_type' => $inventoryable['inventoryable_type'],
+                                'inventoryable_id' => $inventoryable['inventoryable_id'],
+                            ]
+                        );
+                    }
+                    else{
+                        Inventoryable::updateOrCreate(
+                            [
+                                'id' => $inventoryable['id'] ?? null,
+                            ],
+                            [
+                                'inventory_id' => $inventory->id,
+                                'inventoryable_type' => $inventoryable['inventoryable_type'],
+                                'inventoryable_id' => $inventoryable['inventoryable_id'],
+                            ]
+                        );
+                    }
                 }
             }
             DB::commit();
@@ -149,15 +176,17 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function getInventoryLedgerList($request)
     {
-        $inventoryId = UserData()->department->inventory->inventory_id;
+        // $inventoryId = UserData()->department->inventory->inventory_id;
+        $inventoryId=$request->inventory_id;
         $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
         return $ledgers;
     }
 
     public function inventoryList()
     {
+        $inventoryId = UserData()->inventories->pluck('id')->toArray();
         $toInventory = Inventory::where('is_active', 1)
-            ->whereNotIn('id', InventoryIds())
+            ->whereNotIn('id', $inventoryId)
             ->get();
         return [
             'source_inventories' => UserData()->inventories,
@@ -204,5 +233,64 @@ class InventoryRepository implements InventoryRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function getInventoryItemsByStaff($areaId)
+    {
+        $staffId = UserData()->id;
+        $inventoryId = $this->getInventory($staffId)->pluck('id')->first();
+        $inventoryItems = InventoryLedgerItem::with([
+            'inventory_ledger',
+            'inventory_ledger.inventory.inventoryable.inventoryable',
+            'item'
+        ])
+        ->whereHas('inventory_ledger', function($query) use ($inventoryId) {
+            $query->where('inventory_id', $inventoryId);
+        })
+        ->whereHas('inventory_ledger.inventory.inventoryable', function($query) use ($areaId) {
+            $query->where('inventoryable_type', 'area')
+                    ->where('inventoryable_id', $areaId);
+        })
+        ->get();
+
+        if($inventoryItems->isEmpty()){
+            return [];
+        }
+
+        $result = $inventoryItems->groupBy('item_id')
+        ->map(function ($items, $itemId) {
+            $firstItem = $items->first();
+            $item = $firstItem->item;
+            $conversion =  max(1, $item->conversion); //to prevent division by zero;
+            $baseUom =  $item->base_uom_name;
+            $uom =  $item->item_uom;
+            $inQuantity = $items->filter(function ($item) {
+                return $item->inventory_ledger->action === "in";
+            })->sum('quantity');
+            
+            $outQuantity = $items->filter(function ($item) {
+                return $item->inventory_ledger->action === "out";
+            })->sum('quantity');
+            $currentQuantity = max(0, $inQuantity - $outQuantity);
+
+            $baseQuantity =  floor($currentQuantity / $conversion);
+            $uomQuantity = $currentQuantity % $conversion;
+            // $areaInventoryable = collect($firstItem->inventory_ledger->inventory->inventoryable)
+            //     ->firstWhere('inventoryable_type', 'area');
+            // $area = $areaInventoryable ? $areaInventoryable->inventoryable : null;
+            
+            return [
+                'id' => $firstItem->id,
+                'item_id' => $itemId,
+                'item_name' => $item->name,
+                'base_quantity' =>  $baseQuantity,
+                'base_uom' => $baseUom,
+                'uom_quantity' => $uomQuantity,
+                'uom' => $uom,
+            ];
+        })
+        ->values();
+        
+    return $result;
     }
 }

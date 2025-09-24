@@ -18,7 +18,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getGPS($request)
   {
-    return Gps::all();
+    return Gps::orderBy('id', 'desc')->get();
   }
 
   public function getGPSById(int $gpsId)
@@ -35,7 +35,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getShifts($request)
   {
-    return Shift::all();
+    return Shift::orderBy('id', 'desc')->get();
   }
 
   public function getShiftsById(int $shiftId)
@@ -45,12 +45,15 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function storeShifts($data)
   {
-    return Shift::create($data);
+    return Shift::updateOrCreate(
+      ['id' => $data['id']  ?? null],
+      $data
+    );
   }
 
   public function getTimeShift($request)
   {
-    return TimeShift::with('shift')->get();
+    return TimeShift::with('shift')->orderBy('id', 'desc')->get();
   }
 
   public function getTimeShiftById($timeShiftId)
@@ -67,6 +70,14 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   {
     $timeShift = TimeShift::find($timeShiftId);
     $timeShift->update($data);
+    return $timeShift;
+  }
+  public function toggleTimeShift($timeShiftId)
+  {
+    $timeShift = TimeShift::find($timeShiftId);
+    $timeShift->update([
+      'is_active' => !$timeShift->is_active
+    ]);
     return $timeShift;
   }
 
@@ -95,6 +106,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $staffId = $request->input('staff_id');
     if (isset($staffId)) {
+
       if ($currentTimeShift) {
         $checkIn = CheckIn::where('staff_id', $staffId)
           ->where('time_shift_id', $currentTimeShift->id)
@@ -103,8 +115,9 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
         if (!$checkIn) {
           $response['check_in_status'] = 'check_in';
-        } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+        } elseif ($checkIn->is_current_checked_in){
           $response['check_in_status'] = 'already_checked_in';
+          $response['check_in'] = new mobileCheckInResource($checkIn);
         } else {
           $response['check_in_status'] = 'check_out';
           $response['check_in'] = new mobileCheckInResource($checkIn);
@@ -125,7 +138,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $query = CheckIn::with(['staff', 'timeShift.shift'])->checkInFilter($from_date, $to_date, $staff_id);
 
-    $checkIns = $query->paginate();
+    $checkIns = $query->paginate(config('common.list_count'));
     return CheckInResource::collection($checkIns);
   }
 

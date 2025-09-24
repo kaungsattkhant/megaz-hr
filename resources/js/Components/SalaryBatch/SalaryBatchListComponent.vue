@@ -1,39 +1,42 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Salary Batch
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Salary Batch
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange"
-                        data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange"
-                        data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
-                        <option :value="role" v-for="(role, roleIndex) in roleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
+                <div class="flex pr-0 gap-x-4">
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange"
+                            data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange"
+                            data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                    <a href="/salary_batch/create" v-if="feature.includes('salary-batch.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
                 </div>
-                <a href="/salary_batch/create"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-                </a>
             </div>
         </div>
         <div class="box-container-table">
@@ -54,7 +57,7 @@
                                 <th scope="col" class="">
                                     Salary Date
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['salary-batch.delete', 'salary-batch.edit'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -75,11 +78,11 @@
                                     <td class="whitespace-nowrap">
                                         {{ batch.day_of_monthly }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        <a :href="'/salary_batch/'+batch.id+'/edit'" class="pr-3">
+                                    <td class="whitespace-nowrap" v-show="['salary-batch.delete', 'salary-batch.edit'].some(f => feature.includes(f))">
+                                        <a :href="'/salary_batch/'+batch.id+'/edit'" class="pr-3"  v-if="feature.includes('salary-batch.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(batch.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(batch.id)" data-te-toggle="modal" v-show="feature.includes('salary-batch.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -198,11 +201,12 @@ export default {
             searchRole: null,
             deleteId:null,
 
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getSalaryBatchList(pageNumber) {
             let url = this.url + this.url_search + this.url_department + this.url_role;

@@ -57,6 +57,18 @@ class AppServiceProvider extends ServiceProvider
             'training' => 'App\Models\Training',
             'orgNew' => 'App\Models\OrgNew',
             'warning' => 'App\Models\Warning',
+            'customer_deposit' => 'App\Models\CustomerDeposit',
+            'role' => 'App\Models\Role',
+            'selling_extra' => 'App\Models\SellingExtra',
+            'staff_advance' => 'App\Models\StaffAdvance',
+            'cashbook_transfer' => 'App\Models\CashbookTransfer',
+            'staff_timeshift' => 'App\Models\StaffTimeshift',
+            'staff_equipment' => 'App\Models\StaffEquipment',
+            'staff_equipment_assign' => 'App\Models\StaffEquipmentAssign',
+            'accrued' => 'App\Models\Accrued',
+            'leave' => 'App\Models\Leave',
+            'staff_equipment_handover' => 'App\Models\StaffEquipmentHandover',
+            'staff_equipment_handover_item' => 'App\Models\StaffEquipmentHandoverItem',
         ]);
     }
 }

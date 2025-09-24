@@ -29,6 +29,7 @@
                                     <th scope="col" class="px-6 py-4">Food</th>
                                     <!-- <th scope="col" class="px-6 py-4">Services</th> -->
                                     <th scope="col" class="px-6 py-4">Amount</th>
+                                    <th scope="col" class="px-6 py-4">Status</th>
                                     <th scope="col" class="px-6 py-4">Action</th>
                                 </tr>
                             </thead>
@@ -41,11 +42,10 @@
                                         {{ invoice.invoice_date }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.customer.name }}
+                                        {{ invoice.customer ? invoice.customer.name : 'Default' }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <span v-if="invoice.room">{{ invoice.room.name }}</span>
-                                        <span v-if="invoice.table">{{ invoice.table.name }}</span>
+                                        <span v-if="invoice.entity">{{ invoice.entity.name }}</span>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ invoice.total_session_price}}
@@ -57,7 +57,12 @@
                                         Service?
                                     </td> -->
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.total }}
+                                        {{ invoice.sub_total }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <span :class="invoice.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800 '" class="px-2 py-1 rounded capitalize font-semibold text-sm">
+                                            {{ invoice.payment_status }}
+                                        </span>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <!-- <select name=""
@@ -67,7 +72,18 @@
                                             <option>Cash</option>
                                             <option>Bank</option>
                                         </select> -->
-                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked(invoice)">Confirm</button>
+                                        <!-- <button :disabled="invoice.payment_status === 'paid'" :class="invoice.payment_status === 'paid' ? 'cursor-not-allowed opacity-60' : ''"  class=" text-black px-4 py-1.5 text-base rounded-lg"
+                                         data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked(invoice)">
+                                            Confirm
+                                        </button> -->
+
+                                        <button :disabled="invoice.payment_status === 'paid'" 
+                                            :class="invoice.payment_status === 'paid' ? 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-60' : 'bg-blue-500 text-white hover:bg-blue-600'"  
+                                            class=" px-4 py-1.5 text-sm rounded-lg"
+                                            data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked(invoice)">
+                                            <i class="far fa-check-double" :class="invoice.payment_status === 'paid' ? 'text-gray-500' : ''"></i>
+                                            Confirm
+                                        </button>
                                     </td>
                                 </tr>
 
@@ -108,7 +124,7 @@
                                         Customer Name
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.customer.name }}
+                                        {{ invoiceDetail.customer  ? invoiceDetail.customer.name : "Default" }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -225,7 +241,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Paid Amount
                             </label>
-                            <input type="text" placeholder="Amount" v-model="paidAmount"
+                            <input type="number" placeholder="Amount" v-model="paidAmount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
@@ -282,12 +298,12 @@
                     this.invoiceList = response.data;
                 }
             },
-            async getRoomList(){
-                const response = await getApiData({ url: '/api/rooms' , token: this.getToken()});
-                if(response.data){
-                    this.roomList = response.data;
-                }
-            },
+            // async getRoomList(){
+            //     const response = await getApiData({ url: '/api/rooms' , token: this.getToken()});
+            //     if(response.data){
+            //         this.roomList = response.data;
+            //     }
+            // },
             btnClickedInvoice(invoice){
                 this.invoiceDetail = invoice
                 this.isList = false
@@ -300,15 +316,17 @@
             dateChange(){
                 this.getDateInvoiceList();
             },
-            // async getDateInvoiceList(){
-            //     const response = await getApiData({ url: '/api/invoices?date='+ this.invoice_date , token: this.getToken()});
-            //     if(response.data){
-            //         this.invoiceList = response.data;
-            //     }
-            //     else{
-            //         this.invoiceList = 'test'
-            //     }
-            // },
+            async getDateInvoiceList(){
+                const response = await getApiData({ url: '/api/pos/invoices?date='+ this.invoice_date , token: this.getToken()});
+                if(response.data){
+                    this.invoiceList = response.data;
+                }
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+            },
 
             isCateringCashier(){
                 let cashierRole = this.getRoles().find((role)=>role.name == 'Cashier');
@@ -320,7 +338,7 @@
             confirmBtnClicked(invoice){
                 this.selectedInvoice = invoice;
                 this.selectedPayment = null;
-                this.paidAmount = 0;
+                this.paidAmount = invoice.total;
             },
             async confirmInvoice(){
                 console.log('test confirm invoice')
@@ -340,7 +358,7 @@
         {
             this.getCustomerList();
             this.getInvoiceList();
-            this.getRoomList();
+            // this.getRoomList();
             initTE({ Modal, Select, Ripple, Datepicker });
             this.isCashier = this.isCateringCashier();
         }

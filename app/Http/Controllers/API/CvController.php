@@ -28,7 +28,7 @@ class CvController extends Controller
 
     public function createCv(Request $request)
     {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -43,6 +43,11 @@ class CvController extends Controller
             $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
+        }
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
         }
         $data = $this->cvRepository->createCv($data);
         ResponseData($data);
@@ -55,7 +60,7 @@ class CvController extends Controller
     }
     public function updateCv($id, Request $request)
     {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -70,6 +75,11 @@ class CvController extends Controller
             $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
+        }
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
         }
         $data = $this->cvRepository->updateCv($id, $data);
         ResponseData($data);
@@ -84,6 +94,24 @@ class CvController extends Controller
     public function updateCvStatus($id, Request $request)
     {
         $data = $this->cvRepository->updateCvStatus($id, $request->all());
+        ResponseData($data);
+    }
+
+    public function getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId)
+    {
+        $data = $this->cvRepository->getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId);
+        ResponseData($data);
+    }
+
+    public function createNewStaffSalary(Request $request)
+    {
+        $data = $this->cvRepository->createNewStaffSalary($request->all());
+        ResponseData($data);
+    }
+
+    public function storeNewStaffJoinDate(Request $request)
+    {
+        $data = $this->cvRepository->storeNewStaffJoinDate($request->all());
         ResponseData($data);
     }
 }

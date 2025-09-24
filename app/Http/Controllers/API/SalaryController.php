@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use App\Exports\SalaryExport;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\Hr\SalaryBatchRequest;
 use App\Repositories\Salary\SalaryRepositoryInterface;
 
@@ -59,6 +61,18 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->getSalaries($request);
         ResponseData($data);
     }
+
+    public function getSalarySetupByRoleId($roleId)
+    {
+        $data = $this->salaryRepository->getSalarySetupByRoleId($roleId);
+        ResponseData($data);
+    }
+
+    public function createSalary(Request $request){
+        $data = $this->salaryRepository->createSalary($request->all());
+        ResponseData($data);
+    }
+
     public function updateBasicSalary(Request $request, $id)
     {
         $data = $this->salaryRepository->updateBasicSalary($request->all(), $id);
@@ -181,5 +195,15 @@ class SalaryController extends Controller
     {
         $data = $this->salaryRepository->deletePaySlip($id);
         ResponseData($data);
+    }
+
+    public function exportSalary(Request $request)
+    {
+        $response = $this->salaryRepository->calculateSalary($request);
+        $salaryData = $response['data'] ?? [];
+        if (empty($salaryData)) {
+            ResponseMessage('No data to export', 400);
+        }
+        return Excel::download(new SalaryExport($salaryData), 'salary_export.xlsx');
     }
 }

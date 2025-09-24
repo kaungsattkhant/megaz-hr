@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Staff;
+
 use Illuminate\Http\Request;
 
+use Psy\Readline\Hoa\_Protocol;
 use App\Http\Controllers\Controller;
+
+use Illuminate\Support\Facades\Storage;
 
 use App\Http\Requests\Staff\StaffCreateRequest;
 use App\Http\Requests\Staff\StaffUpdateRequest;
-
-use App\Models\Staff;
-
 use App\Repositories\Staff\StaffRepositoryInterface;
-use Psy\Readline\Hoa\_Protocol;
 
 class StaffAPIController extends Controller
 {
@@ -35,7 +36,6 @@ class StaffAPIController extends Controller
     }
 
     public function getStaffData(Request $request)
-
     {
         $staffs = $this->staffRepo->listAllData($request);
         ResponseData($staffs);
@@ -43,7 +43,7 @@ class StaffAPIController extends Controller
 
     public function createStaff(Request $request)
     {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -59,7 +59,16 @@ class StaffAPIController extends Controller
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
-        $data['roles'] = explode(',', $request->roles);
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
+        }
+        // $data['roles'] = explode(',', $request->roles);
+        $data['role_id'] = $request->role_id;
+        $data['feature_ids'] = json_decode($request->feature_ids);
+        $data['inventory_ids'] = ($request->inventory_ids) ? json_decode($request->inventory_ids) : [];
+        $data['skill_ids'] = ($request->skill_ids) ? json_decode($request->skill_ids) : [];
         $staff = $this->staffRepo->createData($data);
 
         ResponseData($staff);
@@ -67,7 +76,7 @@ class StaffAPIController extends Controller
 
     public function updateStaff(Request $request, $id)
     {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -83,11 +92,25 @@ class StaffAPIController extends Controller
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
+        }
+        $data['role_id'] = $request->role_id;
+        $data['feature_ids'] = json_decode($request->feature_ids);
+        $data['inventory_ids'] = ($request->inventory_ids) ? json_decode($request->inventory_ids) : [];
+        $data['skill_ids'] = ($request->skill_ids) ? json_decode($request->skill_ids) : [];
         $staff = $this->staffRepo->updateData($data, $id);
 
         if (!$staff) {
             ResponseMessage('Staff not found with given ID', 404);
         }
+        ResponseData($staff);
+    }
+    public function changePassword(Request $request, int $staffId)
+    {
+        $staff = $this->staffRepo->changePassword($request->all(), $staffId);
         ResponseData($staff);
     }
 
@@ -106,20 +129,15 @@ class StaffAPIController extends Controller
         $staff = Staff::find($request->user()->id);
 
         $roles = $staff->roles->pluck('name')->toArray();
-        $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles);
-        if (!$isSupervisorOrManager) {
+        // $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Chief Accountant', $roles) || in_array('Demi Chef', $roles);
+        // if (!$isSupervisorOrManager) {
+        //     ResponseMessage('Not authorized', 403);
+        // }
+        $allowedRoles = ['Supervisor', 'Manager', 'Captain', 'Chief Accountant', 'Sous Chef','Senior Receptionist'];
+
+        if (!array_intersect($roles, $allowedRoles)) {
             ResponseMessage('Not authorized', 403);
         }
-        // $isASupervisor = false;
-        // foreach ($roles as $role) {
-        //     if ($role->name == 'Supervisor') {
-        //         $isASupervisor = true;
-        //         break;
-        //     }
-        // }
-        // if (!$isASupervisor) {
-        //     ResponseMessage('Not a supervisor', 403);
-        // }
 
         $staff = $this->staffRepo->getStaffByDepartment($request, $staff->department_id, $roles);
         ResponseData($staff);
@@ -167,5 +185,16 @@ class StaffAPIController extends Controller
     public function getStaffWithDuties(Request $request, int $id)
     {
         $this->staffRepo->staffDuty($request, $id);
+    }
+
+    public function nrcLists(Request $request)
+    {
+        $staff = $this->staffRepo->nrcLists($request);
+    }
+
+    public function staffList(Request $request)
+    {
+        $staff = $this->staffRepo->staffList($request);
+        ResponseData($staff);
     }
 }

@@ -11,7 +11,7 @@ class PoInvoiceTransactionRequest extends APIRequest
     {
         return [
             'cash_account_id' => ['required'],
-            'amount' => ['required', 'numeric', 'gt:0'],
+            'amount' => ['required', 'numeric', 'min:0'],
             'ap_amount' => ['required', 'numeric', 'min:0'],
             'total_invoice_amount' => ['required', 'numeric', 'gt:0'],
             'po_invoice_id' => ['required', 'exists:po_invoices,id'], // Check existence in the 'po_invoices' table

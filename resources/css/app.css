@@ -31,16 +31,25 @@
         @apply focus:outline-none focus:ring-0 focus:shadow-none active:ring-0 active:outline-none active:shadow-none
     }
     .box-container-table{
-        @apply block mx-4 mt-4 pb-4
+        @apply block mx-0 mt-4 pb-4 border border-gray-100
     }
     .btn-container{
-        @apply flex justify-between mb-3 px-4 py-4 border-b
+        @apply flex justify-between mb-2 px-4 py-4
+    }
+    .page-title{
+        @apply text-lg font-semibold
     }
     .input-form{
         @apply focus:ring-0 focus:outline-none focus:shadow-none
     }
     .container-card{
-        @apply bg-white mt-4 pt-4  px-5
+        @apply bg-white mt-4 pt-4  px-5 shadow-lg border border-gray-100
+    }
+    .sidebar-title{
+        @apply text-[#2a3547] text-xs font-semibold ml-1 pt-2
+    }
+    .group-first tr p{
+        @apply opacity-0
     }
 
     }

@@ -10,9 +10,11 @@ class EntityStartValidationRequest extends APIRequest
     public function rules()
     {
         $type=$this->get('type');
+        $entityType=$this->get('entity_type');
+        
         return [
-            'start_time'=>'required',
-            'customer_id'=>'required',
+            'start_time'=>$entityType=='room' ? 'required' : 'nullable',
+            'customer_id'=>$entityType=='room' ? 'required' : 'nullable',
             'entity_type'=>'required',
             'entity_id'=>'required|exists:entities,id',
             'session_duration'=>$type=='session' ? 'required' : 'nullable',

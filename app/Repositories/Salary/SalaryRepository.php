@@ -79,18 +79,23 @@ class SalaryRepository implements SalaryRepositoryInterface
       }
 
       $staffIds = Staff::whereHas('roles', function ($query) use ($data) {
-        $query->where('id', $data['role_id']);
+        $query->where('id', $data['role_id'])->where('is_cv', 0);
       })->pluck('id');
-      if ($staffIds->isEmpty()) {
-        ResponseMessage('No staff found for this role', 402);
-      }
-      foreach ($staffIds as $staffId) {
-        Salary::create([
-          'basic_salary' => $data['basic_salary'],
-          'staff_id' => $staffId,
-          'salary_setup_id' => $salarySetup->id,
-          'created_by' => UserData()->id,
-        ]);
+      if ($staffIds->isNotEmpty()) {
+        foreach ($staffIds as $staffId) {
+          Salary::updateOrCreate(
+            [
+              'staff_id' => $staffId,
+              'salary_setup_id' => $salarySetup->id,
+            ],
+            [
+              'basic_salary' => $data['basic_salary'],
+              'staff_id' => $staffId,
+              'salary_setup_id' => $salarySetup->id,
+              'created_by' => UserData()->id,
+            ]
+          );
+        }
       }
       DB::commit();
       ResponseData($salarySetup);
@@ -249,15 +254,47 @@ class SalaryRepository implements SalaryRepositoryInterface
     });
     ResponseData($data);
   }
+  public function getSalarySetupByRoleId($roleId)
+  {
+    $salarySetup = SalarySetup::with('salaryAllowances.allowance')->where('role_id', $roleId)->first();
+    if (!$salarySetup) {
+      ResponseMessage('Salary setup not found', 404);
+    }
+    return $salarySetup;
+  }
+
+  public function createSalary($data)
+  {
+    DB::beginTransaction();
+    try {
+      $salarySetup = SalarySetup::findOrFail($data['salary_setup_id']);
+      $existing = Salary::where('staff_id', $data['staff_id'])
+        ->where('salary_setup_id', $data['salary_setup_id'])
+        ->first();
+      if ($existing) {
+        ResponseMessage('Salary already exists for this staff with this setup', 409);
+      }
+
+      $salary = Salary::create([
+        'basic_salary'    => $data['basic_salary'] ?? $salarySetup->basic_salary,
+        'staff_id'        => $data['staff_id'],
+        'salary_setup_id' => $data['salary_setup_id'],
+        'created_by'      => UserData()->id,
+      ]);
+      DB::commit();
+      ResponseData($salary, 201);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
 
   public function updateBasicSalary($request, $id)
   {
     DB::beginTransaction();
     try {
-      $salary = Salary::find($id);
-      if (!$salary) {
-        ResponseMessage('Salary not found.', 404);
-      }
+      $salary = Salary::findOrFail($id);
       $salary->basic_salary = $request['basic_salary'];
       $salary->save();
       DB::commit();
@@ -300,6 +337,12 @@ class SalaryRepository implements SalaryRepositoryInterface
   {
     DB::beginTransaction();
     try {
+      $exits = OvertimeFee::where('role_id', $data['role_id'])
+        ->first();
+      if ($exits) {
+        DB::rollback();
+        ResponseMessage('Overtime fee already exists for this role.', 409);
+      }
       $overtimeFee = OvertimeFee::updateOrCreate(
         [
           'id' => $data['id'] ?? null,
@@ -648,6 +691,7 @@ class SalaryRepository implements SalaryRepositoryInterface
     $totalDays = $startDate->diffInDays($endDate) + 1;
     $salaryBatchStaffs = SalaryBatchStaff::where('salary_batch_id', $request->salary_batch_id)
       ->with([
+        'salaryBatch',
         'staff.overtimes',
         'staff.salary',
         'staff.salary.salarySetup',
@@ -818,6 +862,7 @@ class SalaryRepository implements SalaryRepositoryInterface
           'role_id' => $staff->roles->first() ? $staff->roles->first()->id : null,
           'role_name' => $staff->roles->first() ? $staff->roles->first()->name : null,
           'salary_batch_id' => $request->salary_batch_id,
+          'salary_batch_name' => $salaryBatchStaff->salaryBatch->name,
           'salary_id' => $salary->id,
           // 'formal_basic_salary' =>  $salary->basic_salary,
           'allowance' =>  round($totalAllowance, 2),
@@ -841,7 +886,7 @@ class SalaryRepository implements SalaryRepositoryInterface
       }
     }
 
-    return ResponseData([
+    return [
       'data' => $salaryDetails,
       'pagination' => [
         'total' => $salaryBatchStaffs->total(),
@@ -855,9 +900,9 @@ class SalaryRepository implements SalaryRepositoryInterface
         'next_page_url' => $salaryBatchStaffs->nextPageUrl(),
         'prev_page_url' => $salaryBatchStaffs->previousPageUrl(),
         'path' => $salaryBatchStaffs->path(),
-        'links' => $salaryBatchStaffs->links(), // This will give you pagination links
+        'links' => $salaryBatchStaffs->links(),
       ]
-    ]);
+    ];
   }
 
   public function getAllowanceTypes($request)

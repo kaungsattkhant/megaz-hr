@@ -20,6 +20,10 @@ interface SalaryRepositoryInterface
 
   public function getSalaries($request);
 
+  public function getSalarySetupByRoleId($roleId);
+
+  public function createSalary($data);
+
   public function updateBasicSalary($request, $id);
 
   public function getOvertimeFee($request);
