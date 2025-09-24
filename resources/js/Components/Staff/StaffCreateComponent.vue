@@ -692,7 +692,7 @@
             </div>
             <div>
                 <div v-for="(module,index) in featureList" class="mb-4 pb-6 px-2 border-b border-gray-200 flex">
-                    <p class=" capitalize mb-4 font-semibold w-[20%]">
+                    <p class=" capitalize mb-4 font-semibold w-[20%] cursor-pointer" @click="toggleGroup(module)">
                         {{ module.module }}
                     </p>
                     <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
@@ -1394,6 +1394,27 @@ export default {
         formatDate(date, dateSplitter='-', format='dd/mm/yyyy', separator='/', ordering = ['year', 'month', 'day']){
             return formatDate(date, dateSplitter, format, separator, ordering);
         },
+        toggleGroup(items) {
+            const allSelectedd = items.features.every(i => this.selectedFeatures.includes(i.id));
+            console.log('All fruit items selected?', allSelectedd); // true
+
+            items.features.forEach(item => {
+                // const allSelected = items.features.every(i => this.selectedFeatures.includes(i.id));
+                // console.log(`All items in  selected?`, allSelected);
+                // const exists = this.selectedFeatures.some(i => i === item.id);
+
+
+                if(allSelectedd){
+                    this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                }
+                else{
+                    this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                    this.selectedFeatures.push(item.id);
+                }
+                
+            });
+            
+        }
     },
 
     created() {
@@ -1405,7 +1426,7 @@ export default {
         this.getBanksList();
         // this.getInventoryList();
 
-        this.getFeatureList();
+        // this.getFeatureList();
     },
 
     mounted() {
