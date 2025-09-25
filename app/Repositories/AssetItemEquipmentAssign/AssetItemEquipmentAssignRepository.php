@@ -97,7 +97,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
           ]
         );
 
-        $batchDeductions = $this->processInventoryBatchDeductions($equipment['item_id'], $source_inventory_id, $destination_inventory_id, $staffEquip->id, 'staff_equipment', $uom_quantity, $equipAssign->id);
+        $batchDeductions = $this->processInventoryBatchDeductions($equipment['item_id'], $source_inventory_id, $destination_inventory_id, $staffEquip->id, 'staff_equipment', $uom_quantity);
         if (!$batchDeductions) {
           ResponseMessage('Failed to process inventory batch deductions.', 400);
         }
@@ -124,41 +124,36 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
   public function getEquipmentAssignsByStaffId($request)
   {
     $staff_id = UserData()->id;
-    $handoverSubquery = DB::table('inventory_ledger_items')
+    $handoverActionInSubquery = DB::table('inventory_ledger_items')
       ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-      ->join('staff_equipment_handover_items', function ($join) {
-        $join->on('inventory_ledgers.ledgerable_id', '=', 'staff_equipment_handover_items.id')
-          ->where('inventory_ledgers.ledgerable_type', '=', 'staff_equipment_handover_item');
-      })
-      ->join('staff_equipment_handovers', 'staff_equipment_handover_items.staff_equipment_handover_id', '=', 'staff_equipment_handovers.id')
+      ->join('staff_equipment_handovers', 'inventory_ledgers.ledgerable_id', '=', 'staff_equipment_handovers.id')
+      ->join('staff_equipment_handover_items', 'staff_equipment_handover_items.staff_equipment_handover_id', '=', 'staff_equipment_handovers.id')
       ->where('staff_equipment_handovers.to_staff_id', $staff_id)
       ->where('inventory_ledgers.action', 'in')
+      ->where('inventory_ledgers.ledgerable_type', 'staff_equipment_handover')
       ->select(
         'staff_equipment_handover_items.item_id',
         DB::raw('SUM(inventory_ledger_items.quantity) as handover_quantity')
       )
-      ->groupBy('staff_equipment_handover_items.item_id');
+      ->groupBy('staff_equipment_handover_items.item_id'); //handover qty for receiver staff 2
 
     $inventoryItems = InventoryLedgerItem::join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
       ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
       ->leftJoin('uoms', 'items.uom_id', '=', 'uoms.id')
       ->leftJoin('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
-      // ->join('uoms', 'items.uom_id', '=', 'uoms.id')
-      ->leftJoin('staff_equipment_assigns', function ($join) {
-        $join->on('inventory_ledgers.ledgerable_id', '=', 'staff_equipment_assigns.id')
-          ->where('inventory_ledgers.ledgerable_type', '=', "staff_equipment_assign");
-      })
-      ->leftJoin('staff_equipment', 'staff_equipment_assigns.staff_equipment_id', '=', 'staff_equipment.id')
+      ->leftJoin('staff_equipment_handovers', 'inventory_ledgers.ledgerable_id', '=', 'staff_equipment_handovers.id')
+      ->leftJoin('staff_equipment', 'inventory_ledgers.ledgerable_id', '=', 'staff_equipment.id')
+      ->leftJoin('staff_equipment_assigns', 'staff_equipment_assigns.staff_equipment_id', '=', 'staff_equipment.id')
       ->leftJoin('uom_conversions', function ($join) {
         $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
           ->on('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
           ->on('uom_conversions.item_id', '=', 'items.id')
           ->where('uom_conversions.is_active', '=', 1);
       })
-      ->leftJoinSub($handoverSubquery, 'handovers', function ($join) {
-        $join->on('items.id', '=', 'handovers.item_id');
+      ->leftJoinSub($handoverActionInSubquery, 'handover_action_in', function ($join) {
+        $join->on('items.id', '=', 'handover_action_in.item_id');
       })
-      // ->where('staff_equipment.staff_id', $staff_id)
+      // ->where('inventory_ledgers.ledgerable_type', 'staff_equipment_assign')
       ->select(
         'items.id as item_id',
         'items.name as item_name',
@@ -177,12 +172,12 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         DB::raw('MAX(staff_equipment_assigns.uom_type) as uom_type'),
         DB::raw('
     SUM(CASE 
-        WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign"
+        WHEN inventory_ledgers.ledgerable_type = "staff_equipment_handover"
         AND inventory_ledgers.action = "out"
-        AND staff_equipment.staff_id = ' . $staff_id . '
+        AND staff_equipment_handovers.from_staff_id = ' . $staff_id . '
         THEN inventory_ledger_items.quantity
         ELSE 0
-    END) as handover_quantity
+    END) as handover_quantity  
 ')
       )
       //   ->selectRaw('
@@ -211,22 +206,22 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
     (
         (
             SUM(CASE 
-                WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign"
-                 AND inventory_ledgers.action = "in"
-                 AND staff_equipment.staff_id = ' . $staff_id . '
+                WHEN inventory_ledgers.ledgerable_type = "staff_equipment"
+                AND inventory_ledgers.action = "in"
+                AND staff_equipment.staff_id = ' . $staff_id . '
                 THEN inventory_ledger_items.quantity
                 ELSE 0
             END)
             -
             SUM(CASE 
-                WHEN inventory_ledgers.ledgerable_type = "staff_equipment_assign"
-                 AND inventory_ledgers.action = "out"
-                 AND staff_equipment.staff_id = ' . $staff_id . '
+                WHEN inventory_ledgers.ledgerable_type = "staff_equipment_handover"
+                AND inventory_ledgers.action = "out"
+                AND staff_equipment_handovers.from_staff_id = ' . $staff_id . '
                 THEN inventory_ledger_items.quantity
                 ELSE 0
             END)
         )
-        + COALESCE(handovers.handover_quantity, 0)
+        + COALESCE(handover_action_in.handover_quantity, 0)
     ) as current_quantity
 ')
       ->groupBy(
@@ -238,7 +233,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
         'base_uom.name',
         'uom_conversions.conversion'
       )
-      ->havingRaw('(handover_quantity > 0 OR current_quantity > 0)')
+      // ->havingRaw('(handover_quantity > 0 OR current_quantity > 0)')
       ->get();
     return $inventoryItems;
   }
@@ -262,7 +257,7 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
     return $balanceQuantity;
   }
 
-  public function processInventoryBatchDeductions($item_id, $source_inventory_id, $destination_inventory_id, $ledgerable_id, $ledgerable_type, $uom_quantity, $destination_lederable_id)
+  public function processInventoryBatchDeductions($item_id, $source_inventory_id, $destination_inventory_id, $ledgerable_id, $ledgerable_type, $uom_quantity)
   {
     $inventoryItems = InventoryLedgerItem::where('inventory_ledger_items.item_id', $item_id)
       ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
@@ -314,8 +309,8 @@ class AssetItemEquipmentAssignRepository implements AssetItemEquipmentAssignRepo
       ]);
       $destinationLedger = InventoryLedger::create([
         'date' => now(),
-        'ledgerable_id' => $destination_lederable_id,
-        'ledgerable_type' => 'staff_equipment_assign',
+        'ledgerable_id' => $ledgerable_id,
+        'ledgerable_type' => $ledgerable_type,
         'inventory_id' => $destination_inventory_id,
         'action' => 'in',
         'batch_no' => $batchDeduction['batch_no'],

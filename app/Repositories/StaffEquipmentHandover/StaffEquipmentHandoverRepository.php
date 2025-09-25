@@ -3,6 +3,7 @@ namespace App\Repositories\StaffEquipmentHandover;
 
 use App\Models\Staff;
 use App\Models\StaffEquipment;
+use App\Models\StaffTimeshift;
 use App\Models\InventoryLedger;
 use Illuminate\Support\Facades\DB;
 use App\Models\InventoryLedgerItem;
@@ -15,6 +16,10 @@ use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInte
 class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverRepositoryInterface
 {
     use SendNotification;
+    public function getStaffTimeshift($staffId)
+    {
+        return StaffTimeshift::with('timeshift')->where('staff_id', $staffId)->where('status', 'confirmed')->get();
+    }
     public function createStaffEquipmentHandover(array $data)
     {
         DB::beginTransaction();
@@ -25,10 +30,11 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
             }
             
             $fromStaffEquipment = StaffEquipment::where('staff_id', $data['from_staff_id'])->first();
-            if (!$fromStaffEquipment) {
-                ResponseMessage('The source staff has no equipment assigned.', 400);
-                return;
-            }
+            //handover 
+            // if (!$fromStaffEquipment) {
+            //     ResponseMessage('The source staff has no equipment assigned.', 400);
+            //     return;
+            // }
             
             $handover = StaffEquipmentHandover::updateOrCreate(
                 [
@@ -51,17 +57,10 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
             }
             
             foreach ($handover_items as $handover_item) {
-                $staffEquipAssign = StaffEquipmentAssign::where('staff_equipment_id', $fromStaffEquipment->id)
-                    ->where('item_id', $handover_item['item_id'])
-                    ->first();
-                
-                if (!$staffEquipAssign) {
-                    ResponseMessage('Item not found in source staff equipment.', 400);
-                    DB::rollBack();
-                    return;
-                }
-                
-                if ($staffEquipAssign->quantity < $handover_item['quantity']) {
+                $currentItem = $this->getEquipmentAssignByItemAndStaff($handover_item['item_id'], $data['from_staff_id']);
+                $currentQty = (int) $currentItem->current_quantity ?? 0;
+                //need to check from inventory current item
+                if ($currentQty < $handover_item['quantity']) {
                     ResponseMessage('Insufficient quantity available for handover.', 400);
                     DB::rollBack();
                     return;
@@ -131,10 +130,10 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                             'item_id' => $handoverItem->item_id,
                             'source_inventory_id' => $source_inventory_id,
                             'destination_inventory_id' => $destination_inventory_id,
-                            'ledgerable_id' => $handoverItem->id,
-                            'ledgerable_type' => 'staff_equipment_handover_item',
+                            'ledgerable_id' => $handover->id,
+                            'ledgerable_type' =>  $handover,
                             'uom_quantity' => $handoverItem->uom_quantity,
-                            'source_ledgerable_id' => $fromStaffEquipmentAssign->id,
+                            // 'source_ledgerable_id' => $fromStaffEquipmentAssign->id,
                         ]
                     );
                     
@@ -166,6 +165,8 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
 
     private function processInventoryBatchDeductions(array $data)
     {
+        $ledgerable_type =  RelationMorphName($data['ledgerable_type']);
+
     $inventoryItems = InventoryLedgerItem::where('inventory_ledger_items.item_id',  $data['item_id'])
         ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
         ->where('inventory_ledgers.inventory_id', $data['source_inventory_id'])
@@ -202,8 +203,8 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
     foreach ($batchDeductions as $batchDeduction) {
         $sourceLedger = InventoryLedger::create([
             'date' => now(),
-            'ledgerable_id' => $data['source_ledgerable_id'],
-            'ledgerable_type' => 'staff_equipment_assign',
+            'ledgerable_id' => $data['ledgerable_id'],
+            'ledgerable_type' => $ledgerable_type,
             'inventory_id' =>  $data['source_inventory_id'],
             'action' => 'out',
             'batch_no' => $batchDeduction['batch_no'],
@@ -216,7 +217,7 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
         $destinationLedger = InventoryLedger::create([
             'date' => now(),
             'ledgerable_id' => $data['ledgerable_id'],
-            'ledgerable_type' => $data['ledgerable_type'],
+            'ledgerable_type' => $ledgerable_type,
             'inventory_id' => $data['destination_inventory_id'],
             'action' => 'in',
             'batch_no' => $batchDeduction['batch_no'],
@@ -253,6 +254,66 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+
+
+    public function getEquipmentAssignByItemAndStaff($itemId, $staffId)
+    {
+
+    $handoverActionInSubquery = DB::table('inventory_ledger_items')
+        ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+        ->join('staff_equipment_handovers', 'inventory_ledgers.ledgerable_id', '=', 'staff_equipment_handovers.id')
+        ->join('staff_equipment_handover_items', 'staff_equipment_handover_items.staff_equipment_handover_id', '=', 'staff_equipment_handovers.id')
+        ->where('staff_equipment_handovers.to_staff_id', $staffId)
+        ->where('inventory_ledgers.action', 'in')
+        ->where('inventory_ledgers.ledgerable_type', 'staff_equipment_handover')
+        ->select(
+        'staff_equipment_handover_items.item_id',
+        DB::raw('SUM(inventory_ledger_items.quantity) as handover_quantity')
+        )
+        ->groupBy('staff_equipment_handover_items.item_id');
+        return InventoryLedgerItem::join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+        ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
+        // ->leftJoin('uoms', 'items.uom_id', '=', 'uoms.id')
+        // ->leftJoin('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
+        ->leftJoin('staff_equipment_handovers', 'inventory_ledgers.ledgerable_id', '=', 'staff_equipment_handovers.id')
+        ->leftJoin('staff_equipment', 'inventory_ledgers.ledgerable_id', '=', 'staff_equipment.id')
+        ->leftJoin('staff_equipment_assigns', 'staff_equipment_assigns.staff_equipment_id', '=', 'staff_equipment.id')
+        // ->leftJoin('uom_conversions', function ($join) {
+        //     $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
+        //         ->on('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+        //         ->on('uom_conversions.item_id', '=', 'items.id')
+        //         ->where('uom_conversions.is_active', '=', 1);
+        //     })
+            ->leftJoinSub($handoverActionInSubquery, 'handover_action_in', function ($join) {
+            $join->on('items.id', '=', 'handover_action_in.item_id');
+            })
+        ->where('items.id', $itemId)
+        ->selectRaw('
+            (
+            (
+                SUM(CASE 
+                    WHEN inventory_ledgers.ledgerable_type = "staff_equipment"
+                    AND inventory_ledgers.action = "in"
+                    AND staff_equipment.staff_id = ?
+                    THEN inventory_ledger_items.quantity
+                    ELSE 0
+                END)
+                -
+                SUM(CASE 
+                    WHEN inventory_ledgers.ledgerable_type = "staff_equipment_handover"
+                    AND inventory_ledgers.action = "out"
+                    AND staff_equipment_handovers.from_staff_id = ?
+                    THEN inventory_ledger_items.quantity
+                    ELSE 0
+                END)
+            )
+            + COALESCE(handover_action_in.handover_quantity, 0)
+        ) as current_quantity
+    ', [$staffId, $staffId])   
+    ->groupBy('items.id')
+    ->first();
     }
     
 }

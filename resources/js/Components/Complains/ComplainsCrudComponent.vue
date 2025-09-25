@@ -144,7 +144,7 @@
                                 Create Complain
                             </h5>
                             <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss aria-label="Close">
+                                data-te-modal-dismiss aria-label="Close" id="close_create_modal">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -207,7 +207,7 @@
                                 Complain Status
                             </h5>
                             <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss aria-label="Close">
+                                data-te-modal-dismiss aria-label="Close" id="close_status_change_modal">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -355,11 +355,15 @@ export default {
             let response = await postApiData({ url: '/api/complaints', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.getComplain(1);
-                this.closeModal();
+                document.getElementById("close_create_modal").click();
                 this.clearForm();
             }
             else {
-                alert('some errors occur');
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
             }
         },
 
@@ -377,8 +381,13 @@ export default {
             this.change_status == "";
             if (response.success == true) {
                 this.getComplain(1);
+                document.getElementById('close_status_change_modal').click();
             } else {
-                alert(response.message);
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
             }
         },
 
@@ -397,9 +406,20 @@ export default {
             let url = `/api/complaints/${this.deleteId}`;
             let response = await deleteApiData({ url: url, token: this.getToken() });
             if (response.success) {
-                alert(`deleted`);
+                this.$notify({
+                    title: 'Error',
+                    text: 'Deleted',
+                    type: 'error'
+                });
             }
-        }
+        },
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
+        },
 
     },
     mounted() {

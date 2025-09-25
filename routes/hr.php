@@ -150,6 +150,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/staff-equipment-handovers', 'createStaffEquipmentHandover');
     Route::post('/staff-equipment-handovers/{id}/confirm', 'confirmHandover');
     Route::post('/staff-equipment-handovers/{id}/cancel', 'cancelHandover');
+    Route::get('/staff-timeshifts/{staffId}', 'getStaffTimeshift');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
