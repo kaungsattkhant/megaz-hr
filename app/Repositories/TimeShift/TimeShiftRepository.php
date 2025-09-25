@@ -106,16 +106,20 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $staffId = $request->input('staff_id');
     if (isset($staffId)) {
+
       if ($currentTimeShift) {
         $checkIn = CheckIn::where('staff_id', $staffId)
           ->where('time_shift_id', $currentTimeShift->id)
           ->orderBy('check_in_date_time', 'desc')
           ->first();
-
+        //if checkin not exist,need to checkin for this timeshift
+        //if checkin exist,need to checkout for this timeshift
+        //if user is once checkin out for this timeshift in a day,is_current_checked_in will be false and already checked in condition will be true
         if (!$checkIn) {
           $response['check_in_status'] = 'check_in';
         } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
           $response['check_in_status'] = 'already_checked_in';
+          $response['check_in'] = new mobileCheckInResource($checkIn);
         } else {
           $response['check_in_status'] = 'check_out';
           $response['check_in'] = new mobileCheckInResource($checkIn);
@@ -124,7 +128,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         $response['check_in_status'] = 'check_in';
       }
     }
-
     return $response;
   }
 

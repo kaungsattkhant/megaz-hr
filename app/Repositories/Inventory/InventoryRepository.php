@@ -62,7 +62,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         $staffId = UserData()->id;
         $inventories = Inventory::where('is_active', 1)
             ->whereHas('staff', function ($query) use ($staffId) {
-                $query->where('staff_id', $staffId);
+                // $query->where('staff_id', $staffId);
             })
             ->with(['inventoryable'])
             ->get();
@@ -99,16 +99,37 @@ class InventoryRepository implements InventoryRepositoryInterface
                     $inventory->inventoryable()->delete();
                 }
                 foreach ($inventoryables as $inventoryable) {
-                    Inventoryable::updateOrCreate(
-                        [
-                            'id' => $inventoryable['id'] ?? null,
-                        ],
-                        [
-                            'inventory_id' => $inventory->id,
-                            'inventoryable_type' => $inventoryable['inventoryable_type'],
-                            'inventoryable_id' => $inventoryable['inventoryable_id'],
-                        ]
-                    );
+                    if($inventoryable['inventoryable_type'] === "department"){
+                        $existingDepartment = Inventoryable::where('inventoryable_type', 'department')
+                        ->where('inventoryable_id', $inventoryable['inventoryable_id'])
+                        ->first();
+                        if ($existingDepartment) {
+                            DB::rollback();
+                            return ResponseMessage('This department already has a inventory association. Only one inventory per department is allowed.', 400);
+                        }
+                        Inventoryable::updateOrCreate(
+                            [
+                                'id' => $inventoryable['id'] ?? null,
+                            ],
+                            [
+                                'inventory_id' => $inventory->id,
+                                'inventoryable_type' => $inventoryable['inventoryable_type'],
+                                'inventoryable_id' => $inventoryable['inventoryable_id'],
+                            ]
+                        );
+                    }
+                    else{
+                        Inventoryable::updateOrCreate(
+                            [
+                                'id' => $inventoryable['id'] ?? null,
+                            ],
+                            [
+                                'inventory_id' => $inventory->id,
+                                'inventoryable_type' => $inventoryable['inventoryable_type'],
+                                'inventoryable_id' => $inventoryable['inventoryable_id'],
+                            ]
+                        );
+                    }
                 }
             }
             DB::commit();
@@ -240,7 +261,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         ->map(function ($items, $itemId) {
             $firstItem = $items->first();
             $item = $firstItem->item;
-            $conversion =  $item->conversion;
+            $conversion =  max(1, $item->conversion); //to prevent division by zero;
             $baseUom =  $item->base_uom_name;
             $uom =  $item->item_uom;
             $inQuantity = $items->filter(function ($item) {

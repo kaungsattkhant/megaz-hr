@@ -51,7 +51,7 @@ class CashBookRepository implements CashBookInterface
             foreach ($transaction->ledgers as $ledger) {
                 if (in_array(config('common.pos_cash'), $cashAccountId) && in_array($ledger->account_id, $cashAccountId)) {
                     $ledger->action == 'debit' ? $current_debit_amount += $transaction->amount : $current_credit_amount += $transaction->amount;
-                    
+
                     $transaction->title = $transaction->transactionable_type == 'invoice' ? $ledger->account->name . '(' . $transaction->transactionable->invoice_id . ')' : $ledger->account->name;
                     $transaction->type = $ledger->account->name;
                     $transaction->amount = $ledger->value;
@@ -141,7 +141,7 @@ class CashBookRepository implements CashBookInterface
                 ->isConfirmed(1)
                 ->whereDate('created_at', today())
                 ->first();
-            if ($latestTransaction&&$latestTransaction->$is_closing_column) {
+            if ($latestTransaction && $latestTransaction->$is_closing_column) {
                 ResponseMessage('Cashbook is already closed', 419);
             }
             if (isset($request->is_pos) && $request->is_pos) {
@@ -169,9 +169,6 @@ class CashBookRepository implements CashBookInterface
     {
         $isPos = $request->is_pos;
         $date = isset($request->date) || $request->date != null ? Carbon::parse($request->date) : today();
-        // $is_closing_column = 'is_pos_closing';
-        // $closing_date_column = 'pos_closing_date';
-
         $is_closing_column = null;
         $closing_date_column = null;
         if ($isPos) {

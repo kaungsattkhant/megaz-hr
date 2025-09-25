@@ -11,6 +11,7 @@ use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
 use App\Http\Controllers\API\StaffTimeShiftController;
+use App\Http\Controllers\API\StaffEquipmentHandoverController;
 use App\Http\Controllers\API\AssetItemEquipmentAssignController;
 
 Route::middleware('auth:api')->group(function () {
@@ -143,6 +144,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/hand-books/{id}', 'getHandBookById');
     Route::delete('/hand-books/{id}', 'deleteHandBook');
     Route::get('/handbooks', 'getHandBooks');
+  });
+
+  Route::controller(StaffEquipmentHandoverController::class)->group(function () {
+    Route::post('/staff-equipment-handovers', 'createStaffEquipmentHandover');
+    Route::post('/staff-equipment-handovers/{id}/confirm', 'confirmHandover');
+    Route::post('/staff-equipment-handovers/{id}/cancel', 'cancelHandover');
+    Route::get('/staff-timeshifts/{staffId}', 'getStaffTimeshift');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

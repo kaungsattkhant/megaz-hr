@@ -1612,22 +1612,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if (!$entity) {
             ResponseMessage('Entity No found', 404);
         }
-        $catering_department = Department::whereIn('name', ['Catering', 'Reception'])->first();
-        if (!$catering_department) {
-            ResponseMessage('Catering department not found', 404);
+        $catering_department = Department::whereIn('name', ['Catering'])->first();
+        if ($catering_department) {
+            // ResponseMessage('Catering department not found', 404);
+            $msg = "The {$entity->name} is now closed. Thank you.";
+            //i think this role is not reliable to send notification
+            //need to confirm  which role to send notification Catering'staff of Catering'waiter
+            $role = Role::whereIn('name', ['Waiter'])->first();
+            if ($role) {
+                // ResponseMessage('Role not found', 419);
+                broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+            }
+            // $catering_department = Department::where('name', 'Catering')->first();
+            // $msg = "The {$entity->name} is now closed. Thank you.";
+            // $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
         }
-        $msg = "The {$entity->name} is now closed. Thank you.";
-        //i think this role is not reliable to send notification
-        //need to confirm  which role to send notification Catering'staff of Catering'waiter
-        $role = Role::whereIn('name', ['Staff', 'Receptionist'])->where('department_id', $catering_department->id)->first();
-        if (!$role) {
-            ResponseMessage('Role not found', 404);
-        }
-        // $catering_department = Department::where('name', 'Catering')->first();
-        // $msg = "The {$entity->name} is now closed. Thank you.";
-        // $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
-        // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-        broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+
     }
 
     public function invoiceConfirm(array $data)

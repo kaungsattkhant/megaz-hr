@@ -75,7 +75,7 @@ trait SendNotification
         }
         if ($users->isNotEmpty()) {
             $staff_ids = $users->pluck('id')->filter()->values()->toArray();
-            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
+            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));//this is common broadcast channel for mobilenoti for staff notification
             // if ($type === "dep_type") {
             //     $department_id = $users->first()->department_id;
             //     $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
@@ -123,6 +123,35 @@ trait SendNotification
                 'preview' => "Leave Status Update",
             ]);
             broadcast(new SendDepartmentNotification($notification,$staff_id,$morphMapName));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+    public function complaintNotification($complaint, $staff_id)
+    {
+        try {
+            $morphMapName = RelationMorphName($complaint);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $complaint->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Complaints',
+                    'preview' => $complaint->title,
+                    'date_time' => $complaint->created_at,
+                    'created_by' => UserData()->id,
+            ]);
+
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $staff_id,
+            ],[
+                'title' => 'Complaints',
+                'preview' => $complaint->title,
+            ]);
+            broadcast(new SendDepartmentNotification($notification, $staff_id, $morphMapName, $complaint));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);
@@ -196,8 +225,9 @@ trait SendNotification
         $users = Staff::whereIn('id', $userIds)->get();
 
         if ($notiDatas->isNotEmpty()) {
-            $role_id = $users->pluck('roles.*.id')->flatten()[0];
-            broadcast(new EventsSendNotification($notification, $role_id));
+            // $role_id = $users->pluck('roles.*.id')->flatten()[0];
+            // broadcast(new EventsSendNotification($notification, $role_id));
+            broadcast(new SendDepartmentNotification($notification, $userIds, $morphMapName));
         }
     }
 
@@ -285,6 +315,62 @@ trait SendNotification
                 'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
             ]);
             broadcast(new ShiftAssignedEvent($staffTimeshift, $notification));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+
+    public function sendHandoverNotificationToStaff($handOver)
+    {
+        try {
+            $morphMapName = RelationMorphName($handOver);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $handOver->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => 'Handover from '. $handOver->staffTimeshift->timeshift->shift->name,
+                    'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $handOver->toStaff->id,
+            ],[
+                'title' => 'Handover from '. $handOver->staffTimeshift->timeshift->shift->name,
+                'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}" ,
+            ]);
+            broadcast(new SendDepartmentNotification($notification, $handOver->toStaff->id, $morphMapName));
+            return $notification;
+        } catch (\Exception $e) {
+            ResponseMessage($e->getMessage(), 402);
+        }
+    }
+    public function sendHandoverNotificationFromStaff($handOver)
+    {
+        try {
+            $morphMapName = RelationMorphName($handOver);
+            $notification = Notification::updateOrCreate(
+                [
+                    'notificationable_id' => $handOver->id,
+                    'notificationable_type' => $morphMapName
+                ],
+                [
+                    'title' => "Handover Status {$handOver->status} Update from " . $handOver->staffTimeshift->timeshift->shift->name,
+                    'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
+                    'date_time' => now(),
+                    'created_by' => UserData()->id,
+            ]);
+            $notification->notificationUsers()->updateOrCreate([
+                'staff_id' => $handOver->fromStaff->id,
+            ],[
+                'title' => "Handover Status {$handOver->status} Update from " . $handOver->staffTimeshift->timeshift->shift->name,
+                'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}" ,
+            ]);
+            broadcast(new SendDepartmentNotification($notification, $handOver->fromStaff->id, $morphMapName));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);

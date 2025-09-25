@@ -70,7 +70,6 @@ class AssetRepository implements AssetInterface
         try {
             $data['created_by'] = UserData()->id;
             $model = Asset::create($data);
-
             if ($model) {
                 #asset inventory ledger
                 $data['asset_id'] = $model->id;
@@ -99,8 +98,9 @@ class AssetRepository implements AssetInterface
                     'action' => 'credit',
                 ]);
                 #end transaction
+
                 #add depreciation for next month
-                // $assetDepreciation = (new DepreciationBalance())->addDepreciationBalance($model->id);
+                $assetDepreciation = (new DepreciationBalance())->addDepreciationBalance($model->id);
                 #end
             }
             DB::commit();

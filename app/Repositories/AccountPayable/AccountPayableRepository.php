@@ -181,7 +181,8 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function getAccountPayableBalance($request)
     {
-        $account_code = ['4-4000'];
+        
+        $account_code = ['4-2000'];
         $payableAccountList = Account::orderBy('accounts.id', 'asc')
             ->whereHas('sub_account', function ($q) use ($account_code) {
                 $q->whereIn('account_code', $account_code);
