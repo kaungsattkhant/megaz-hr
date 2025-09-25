@@ -76,11 +76,10 @@
                                     <td class="whitespace-nowrap">
                                         {{ item.balance }}
                                     </td>
-                                    
                                 </tr>
                             </div>
                             <tr class=" !text-center" v-if="primaryList.length < 1">
-                                <td class="" colspan="3">
+                                <td class="" colspan="5">
                                     No Data Here
                                 </td>
                             </tr>
