@@ -1,7 +1,7 @@
 <template>
     <tbody>
         <tr v-for="n in rows" :key="n">
-            <td v-for="header in cols" :key="header" scope="col" class="">
+            <td v-for="header in colsCount" :key="header" scope="col" class="">
                 <div class="skeleton-cell">&nbsp;</div>
             </td>
         </tr>
@@ -18,12 +18,17 @@ export default {
 
     data() {
         return {
-
+            colsCount: null,
         };
     },
 
     mounted(){
-
+        const table = this.$el.closest("table");
+        if (table) {
+            const thCount = table.querySelectorAll("thead th").length;
+            console.log("Number of columns:", thCount);
+            this.colsCount = thCount
+        }
     },
 };
 </script>

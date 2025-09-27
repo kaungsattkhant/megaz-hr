@@ -55,6 +55,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -92,6 +97,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="departmentList.length < 1">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -304,10 +314,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -336,6 +348,8 @@ export default {
             filterCategory:null,
             category_url:'',
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -346,9 +360,12 @@ export default {
             this.getAreasList(1);
         },
         async getAreasList(pageNumber) {
+                this.loading = true;
+                console.log('loading');
             let url = `/api/areas?${this.category_url}page=${pageNumber}`
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if(response.data.data){
                     this.areaList = response.data.data;
                 }

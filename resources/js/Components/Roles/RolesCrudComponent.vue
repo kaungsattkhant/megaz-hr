@@ -51,8 +51,12 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                            v-if="loading"
+                            :rows="20"
+                            :cols="6"
+                            />
                         <tbody>
-
                             <!-- looping start -->
                             <div class="contents" v-for="(role, index) in roleList" :key="index">
                                 <tr class="">
@@ -92,6 +96,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="roleList.length < 1">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -290,7 +299,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 
+import TableSkeleton from "../Common/TableSkeleton.vue";
+
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
 
@@ -314,6 +328,8 @@ export default {
 
             department_url:'',
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -335,14 +351,18 @@ export default {
             this.getRolesList(1);
         },
         async getRolesList(pageNumber) {
+            this.loading = true;
+            console.log('loading');
             const response = await getApiData({ url: `/api/roles?${this.department_url}page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.roleList = response.data.data;
 
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
+                console.log('loading done');
             }
         },
 

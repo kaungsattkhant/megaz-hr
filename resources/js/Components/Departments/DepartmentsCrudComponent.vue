@@ -42,6 +42,11 @@
                                 <th v-show="feature.includes('department.edit')"></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(department, index) in departmentList" :key="index">
                                 <tr class="">
@@ -100,6 +105,11 @@
 
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="departmentList.length < 1">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -363,10 +373,12 @@
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
         components: {
-            Multiselect
+            Multiselect,
+            TableSkeleton
         },
         data() {
             return {
@@ -393,6 +405,7 @@
                 feature: this.getFeature(),
 
                 isShow:false,
+                loading: true,
             };
         },
 
@@ -400,13 +413,17 @@
             ...mapGetters(['getToken', 'getFeature']),
 
             async getDepartmentList(pageNumber){
+                this.loading = true;
+                console.log('loading');
                 const response = await getApiData({ url: '/api/departments?page=${pageNumber}', token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.departmentList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;
                     this.perPage = response.data.per_page;
                     this.totalData = response.data.total;
+                    console.log('loading done');
                 }
             },
 
