@@ -18,7 +18,7 @@
                 </div>
                 <div class="flex justify-end gap-x-4">
                     <label for="excel_import_supplier" class="add-btn h-8 cursor-pointer">
-                        Import 
+                        Import
                         <input type="file" placeholder="Excel" id="excel_import_supplier" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                     </label>
                     <a href="/suppliers/create" class="add-btn " v-if="feature.includes('supplier.create')">
@@ -54,7 +54,18 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="supplierList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(supplier, supplierIndex) in supplierList" :key="supplierIndex">
                                 <tr class="">
@@ -63,7 +74,7 @@
 
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        
+
                                         <a :href="`/suppliers/${supplier.id}/detail`"
                                         class="hover:underline"> {{ supplier.name }} </a>
                                         <a :href="`/suppliers/${supplier.id}/lead_times`"
@@ -86,7 +97,7 @@
                                             <i class="fal fa-pen"></i>
                                         </a>
 
-                                        <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" 
+                                        <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
                                             class="pl-2" v-show="feature.includes('supplier.delete')">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -176,8 +187,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             supplierList: [],
@@ -188,10 +203,12 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
-            
+
             selectedImportItem: null,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -205,6 +222,7 @@ export default {
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.supplierList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="mt-4 bg-white">
         <div class="card-shadow">
             <div>
@@ -62,6 +62,17 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="salaryBatchList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
                         <tbody>
                             <div class="contents" v-for="(batch, index) in salaryBatchList" :key="index">
                                 <tr class="">
@@ -158,9 +169,9 @@
             </button>
         </div>
 
-        
+
     </div>
-    
+
 
 
 </template>
@@ -171,18 +182,20 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
+import TableSkeleton from '../Common/TableSkeleton.vue';
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton,
     },
     data() {
         return {
             salaryBatchList: [],
-            
+
             departmentList: [],
             roleList: [],
-            
+
             selectedDepartment:null,
             selectedRole:null,
 
@@ -202,6 +215,8 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -209,9 +224,11 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getSalaryBatchList(pageNumber) {
+            this.loading = true;
             let url = this.url + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
+            if (response.success) {
+                this.loading = false;
                 this.salaryBatchList = response.data.data;
             }
         },
@@ -231,7 +248,7 @@ export default {
             this.getSalaryBatchList();
         },
 
-        
+
         // async searchBtnClicked() {
         //     this.url_search = '&search=' + this.searchInput
         //     this.getSalaryBatchList(1);
@@ -261,7 +278,7 @@ export default {
                 });
             }
         },
-        
+
 
         alertValidationMessage(field) {
                 this.$notify({
@@ -274,7 +291,7 @@ export default {
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
-        
+
     },
     created() {
         this.getSalaryBatchList();

@@ -54,7 +54,7 @@
 
                 </div>
                 <div class="flex justify-end gap-x-4">
-                    
+
                     <!-- <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#import_modal">
@@ -87,7 +87,19 @@
                                 <!-- <th></th> -->
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="itemList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                                 <tr class="">
@@ -669,11 +681,12 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
-import { ref } from 'vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -733,6 +746,8 @@ export default {
             conversion: null,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -807,9 +822,11 @@ export default {
             }
         },
         async getItemList(pageNumber) {
+            this.loading = true;
             let url = `/api/items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.itemList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
@@ -980,7 +997,7 @@ export default {
                 this.importBtnClicked();
             }
         },
-        
+
         async importBtnClicked() {
             let formData = new FormData();
             formData.append('item_import', this.selectedFile);
@@ -1060,7 +1077,7 @@ export default {
             }
         },
 
-        
+
         handleItemPriceFileChange(event) {
             console.log("Event object:", event);
             const selectedItemPriceFile = event.target.files[0];
@@ -1088,8 +1105,6 @@ export default {
                 });
             }
         },
-
-
     },
 
     created() {

@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="mt-4 bg-white ">
         <div class="card-shadow">
             <div>
@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="flex pr-0 gap-x-4">
-                    
+
                     <!-- <a href="/leave_allowance/create"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
@@ -71,11 +71,22 @@
                                     Net Salary
                                 </th>
                                 <th scope="col" class="">
-                                    
+
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="paySlipList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <div class="contents" v-for="(salary, index) in paySlipList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
@@ -119,13 +130,13 @@
             </div>
         </div>
 
-        
+
 
 
     </div>
 
 
-    
+
 
 
 </template>
@@ -135,10 +146,12 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from '../Common/TableSkeleton.vue';
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -148,8 +161,10 @@ export default {
             roleList: [],
             selectedDepartment:null,
             selectedRole: null,
-            
+
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -157,9 +172,11 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getPaySlipList() {
+            this.loading = true;
             let url = '/api/hr/pay_slips';
             let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
+            if (response.success) {
+                this.loading = false;
                 this.paySlipList = response.data.data;
             }
         },
@@ -178,12 +195,12 @@ export default {
             // this.url_role = '&role_id='+this.selectedRole.id;
             // this.getLeaveAllowanceList();
         },
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
 
         // deleteBtnClicked(id) {
         //     this.deleteId = id;
@@ -215,7 +232,7 @@ export default {
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
-        
+
     },
     created() {
         this.getPaySlipList();
