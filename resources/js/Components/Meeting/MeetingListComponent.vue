@@ -58,7 +58,11 @@
 
                                 </th>
                             </tr>
-                        </thead>
+                        </thead><TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(meeting, meetingIndex) in meetingList" :key="meetingIndex">
@@ -106,6 +110,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="meetingList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -186,8 +195,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             meetingList: [],
@@ -202,6 +215,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -209,9 +223,11 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getMeetingList(pageNumber) {
-            let url = `/api/meetings`;
+            this.loading = true;
+            let url = `/api/meetings?page=` + pageNumber;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.meetingList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

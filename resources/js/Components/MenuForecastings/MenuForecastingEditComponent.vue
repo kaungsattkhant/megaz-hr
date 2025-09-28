@@ -758,7 +758,7 @@ export default {
         },
         btnClickedCreatePo(){
 
-            if(this.po_base_quantity){
+            if(this.po_base_quantity < 1){
                 this.alertValidationMessage('Quantiy');
                 return 1;
             }

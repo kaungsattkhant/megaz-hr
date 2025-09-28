@@ -61,6 +61,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(training, trainingIndex) in trainingList" :key="trainingIndex">
@@ -111,6 +116,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="trainingList.length < 1 && !loading">
+                                <td class="" colspan="10">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -191,8 +201,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             trainingList: [],
@@ -207,6 +221,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -214,9 +229,11 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getTrainingList(pageNumber) {
+            this.loading = true;
             let url = `/api/trainings`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.trainingList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

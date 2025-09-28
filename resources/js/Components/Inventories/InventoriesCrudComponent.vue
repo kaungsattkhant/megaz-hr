@@ -111,7 +111,7 @@
                                     </td>
                                 </tr>
                             </div>
-                            <tr class=" !text-center" v-if="inventoryList.length < 1">
+                            <tr class=" !text-center" v-if="inventoryList.length < 1 && !loading">
                                 <td class="" colspan="4">
                                     No Data Here
                                 </td>

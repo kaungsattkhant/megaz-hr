@@ -44,6 +44,11 @@
                                     </th>
                                 </tr>
                             </thead>
+                            <TableSkeleton
+                            v-if="loading"
+                            :rows="20"
+                            :cols="6"
+                            />
                             <tbody>
                                 <div class="contents" v-for="(sellingExtra, index) in sellingExtras" :key="index">
                                     <tr class="">
@@ -74,6 +79,11 @@
                                         </td>
                                     </tr>
                                 </div>
+                                <tr class=" !text-center" v-if="sellingExtras.length < 1 && !loading">
+                                    <td class="" colspan="7">
+                                        No Data Here
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -351,10 +361,12 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -381,6 +393,7 @@ export default {
             editIndex: null,
 
             categoryName: null,
+            loading: true,
         }
     },
 
@@ -536,8 +549,10 @@ export default {
         },
 
         getSellingExtras(){
+            this.loading = true;
             getApiData({url: `/api/selling_extras`, token: this.getToken()}).then((response)=>{
                 if(response.data){
+                    this.loading = false;
                     this.sellingExtras = response.data;
                 }
             });

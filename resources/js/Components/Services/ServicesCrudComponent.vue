@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(service, index) in serviceList" :key="index">
@@ -94,7 +99,11 @@
                                     </td>
                                 </tr>
                             </div>
-
+                            <tr class=" !text-center" v-if="serviceList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                             <!-- looping end -->
                         </tbody>
                     </table>
@@ -358,8 +367,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             serviceList: [],
@@ -396,6 +409,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -403,6 +417,7 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getServiceList(pageNumber) {
+            this.loading = true;
             let url = `/api/services?page=${pageNumber}`;
             if (this.searchInput) {
                 url = `/api/services?search_input=${this.searchInput}&page=${pageNumber}`;
@@ -410,6 +425,7 @@ export default {
             // let url = `/api/services`;
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.serviceList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
