@@ -174,6 +174,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         return $ledgers;
     }
 
+    //inventory closing means current inventory stock
     public function getInventoryLedgerList($request)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
@@ -261,7 +262,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         ->map(function ($items, $itemId) {
             $firstItem = $items->first();
             $item = $firstItem->item;
-            $conversion =  max(1, $item->conversion); //to prevent division by zero;
+            $conversion =  max(1, $item->uom_conversion); //to prevent division by zero;
             $baseUom =  $item->base_uom_name;
             $uom =  $item->item_uom;
             $inQuantity = $items->filter(function ($item) {
@@ -285,8 +286,12 @@ class InventoryRepository implements InventoryRepositoryInterface
                 'item_name' => $item->name,
                 'base_quantity' =>  $baseQuantity,
                 'base_uom' => $baseUom,
+                'base_uom_id' => $item->base_uom_id,
                 'uom_quantity' => $uomQuantity,
                 'uom' => $uom,
+                'uom_id' => $item->uom_id,
+                'uom_name' => $item->item_uom,
+                'conversion' => $conversion,
             ];
         })
         ->values();
