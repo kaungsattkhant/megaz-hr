@@ -236,6 +236,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         }
     }
 
+    //area equipment lists
     public function getInventoryItemsByStaff($areaId)
     {
         $staffId = UserData()->id;

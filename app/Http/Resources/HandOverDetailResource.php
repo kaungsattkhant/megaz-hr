@@ -29,7 +29,16 @@ class HandOverDetailResource extends JsonResource
             "handover_date" => $this->handover_date ?? null,
             "handover_note" => $this->handover_note ?? null,
             "handover_status" => $this->status,
-            "staff_equipment_handover_items" => HandOverItemsResource::collection($this->staffEquipmentHandoverItems),
+            //"staff_equipment_handover_items" => HandOverItemsResource::collection($this->staffEquipmentHandoverItems),
+            "inventory_closing_items" => HandOverItemsResource::collection(
+                $this->staffEquipmentHandoverItems->where('type', 'inventory_closing')
+            ),
+            "personal_equipment_items" => HandOverItemsResource::collection(
+                $this->staffEquipmentHandoverItems->where('type', 'personal_equipment')
+            ),
+            "area_equipment_items" => HandOverItemsResource::collection(
+                $this->staffEquipmentHandoverItems->where('type', 'area_equipment')
+            ),
         ];
     }
 }

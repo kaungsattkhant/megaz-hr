@@ -26,7 +26,7 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
     }
     public function getStaffTimeshift($staffId)
     {
-        return StaffTimeshift::with('timeshift')->where('staff_id', $staffId)->where('status', 'confirmed')->where('date_time', '>=', now())->get();
+        return StaffTimeshift::with('timeshift')->where('staff_id', $staffId)->where('status', 'confirmed')->where('date_time', '>=', now()->toDateString())->get();
     }
     public function createStaffEquipmentHandover(array $data)
     {
@@ -71,15 +71,16 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 }
                 
                 foreach ($handover_items as $handover_item) {
-                    if($handover_item['type'] == "personal_equipment"){
-                        $currentItem = $this->getEquipmentAssignByItemAndStaff($handover_item['item_id'], $data['from_staff_id']);
-                        $currentQty = (int) $currentItem->current_quantity ?? 0;
-                        if ($handover_item['quantity'] >= $currentQty) {
-                            ResponseMessage('Insufficient quantity available for handover.', 400);
-                            DB::rollBack();
-                            return;
-                        }
-                    }
+                    // if($handover_item['type'] === "personal_equipment"){
+                  
+                    //     $currentItem = $this->getEquipmentAssignByItemAndStaff($handover_item['item_id'], $data['from_staff_id']);
+                    //     $currentQty = (int) $currentItem->current_quantity ?? 0;
+                    //     if ($handover_item['quantity'] > $currentQty) {
+                    //         ResponseMessage('Insufficient quantity available for handover.', 400);
+                    //         DB::rollBack();
+                    //         return;
+                    //     }
+                    // }
                     $uom_quantity = $this->calculateUomQty($handover_item);
                     
                     StaffEquipmentHandoverItem::create([
@@ -126,6 +127,14 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                             'uom_quantity'=>$lostItem->uom_quantity,
                             'quantity'=>$lostItem->quantity,
                             'uom_type'=>$lostItem->uom_type,
+                        ]);
+                        $batchDeductions = $this->processInventoryBatchDeductions([
+                            'item_id' => $lostItem->item_id,
+                            'source_inventory_id' => $source_inventory_id,
+                            'destination_inventory_id' => $destination_inventory_id,
+                            'ledgerable_id' => $lostItem->id,
+                            'ledgerable_type' => $lostItem,
+                            'uom_quantity' => $lostItem->uom_quantity,
                         ]);
                     }
                 
@@ -181,7 +190,7 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
             ]);
 
             $personalEquipmentHandoverItems = $handover->staffEquipmentHandoverItems->where('type', 'personal_equipment');
-            $inventoryClosingHandoverItems = $handover->staffEquipmentHandoverItems->where('type', 'inventory_closing');
+            //$inventoryClosingHandoverItems = $handover->staffEquipmentHandoverItems->where('type', 'inventory_closing');
 
             if(isset($personalEquipmentHandoverItems)){
                 StaffEquipment::updateOrCreate([
@@ -204,18 +213,18 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 ]);
             }
         }
-        if(isset($inventoryClosingHandoverItems)){
-            foreach ($inventoryClosingHandoverItems as $inventoryClosingHandoverItem) {
-                $batchDeductions = $this->processInventoryBatchDeductions([
-                    'item_id' => $inventoryClosingHandoverItem->item_id,
-                    'source_inventory_id' => $source_inventory_id,
-                    'destination_inventory_id' => $destination_inventory_id,
-                    'ledgerable_id' => $inventoryClosingHandoverItem->id,
-                    'ledgerable_type' => 'staff_equipment_handover_item',
-                    'uom_quantity' => $inventoryClosingHandoverItem->uom_quantity,
-                ]);
-            }
-        }
+        // if(isset($inventoryClosingHandoverItems)){
+        //     foreach ($inventoryClosingHandoverItems as $inventoryClosingHandoverItem) {
+        //         $batchDeductions = $this->processInventoryBatchDeductions([
+        //             'item_id' => $inventoryClosingHandoverItem->item_id,
+        //             'source_inventory_id' => $source_inventory_id,
+        //             'destination_inventory_id' => $destination_inventory_id,
+        //             'ledgerable_id' => $inventoryClosingHandoverItem->id,
+        //             'ledgerable_type' => 'staff_equipment_handover_item',
+        //             'uom_quantity' => $inventoryClosingHandoverItem->uom_quantity,
+        //         ]);
+        //     }
+        // }
             $data=[
                 'id' => $handover->id,
                 'status' => $handover->status
@@ -281,19 +290,19 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
             'quantity' => $batchDeduction['deduction_amount'],
             'inventory_ledger_id' => $sourceLedger->id,
         ]);
-        $destinationLedger = InventoryLedger::create([
-            'date' => now(),
-            'ledgerable_id' => $data['ledgerable_id'],
-            'ledgerable_type' => $ledgerable_type,
-            'inventory_id' => $data['destination_inventory_id'],
-            'action' => 'in',
-            'batch_no' => $batchDeduction['batch_no'],
-        ]);
-        $destinationLedger->inventory_ledger_items()->create([
-            'item_id' => $data['item_id'],
-            'quantity' => $batchDeduction['deduction_amount'],
-            'inventory_ledger_id' => $destinationLedger->id,
-        ]);
+        // $destinationLedger = InventoryLedger::create([
+        //     'date' => now(),
+        //     'ledgerable_id' => $data['ledgerable_id'],
+        //     'ledgerable_type' => $ledgerable_type,
+        //     'inventory_id' => $data['destination_inventory_id'],
+        //     'action' => 'in',
+        //     'batch_no' => $batchDeduction['batch_no'],
+        // ]);
+        // $destinationLedger->inventory_ledger_items()->create([
+        //     'item_id' => $data['item_id'],
+        //     'quantity' => $batchDeduction['deduction_amount'],
+        //     'inventory_ledger_id' => $destinationLedger->id,
+        // ]);
     }
     return true;
     }
