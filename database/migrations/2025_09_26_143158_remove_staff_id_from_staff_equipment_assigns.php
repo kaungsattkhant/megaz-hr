@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('staff_equipment_assigns', function (Blueprint $table) {
+            $table->dropForeign('staff_equipment_assigns_staff_equipment_id_foreign');
             $table->dropColumn('staff_equipment_id');
         });
     }
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('staff_equipment_assigns', function (Blueprint $table) {
-            $table->unsignedBigInteger('staff_equipment_id')->constrained('staff_equipments')->cascadeOnDelete();
+            $table->foreignId('staff_equipment_id')->constrained('staff_equipment')->onDelete('cascade');
         });
     }
 };
