@@ -147,6 +147,11 @@
                                 </tr>
                             </div>
 
+                            <tr class=" !text-center" v-if="itemList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -681,6 +686,7 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import { ref } from 'vue';
 import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {

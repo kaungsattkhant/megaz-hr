@@ -97,7 +97,7 @@
                                     </td>
                                 </tr>
                             </div>
-                            <tr class=" !text-center" v-if="departmentList.length < 1">
+                            <tr class=" !text-center" v-if="departmentList.length < 1 && !loading">
                                 <td class="" colspan="5">
                                     No Data Here
                                 </td>

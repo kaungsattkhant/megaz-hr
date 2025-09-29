@@ -86,6 +86,11 @@
                                         </td>
                                     </tr>
                                 </div>
+                                <tr class=" !text-center" v-if="sellingExtras.length < 1 && !loading">
+                                    <td class="" colspan="7">
+                                        No Data Here
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

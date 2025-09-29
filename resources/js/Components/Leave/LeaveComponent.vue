@@ -79,6 +79,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(leave, index) in leaveList" :key="index">
@@ -134,6 +139,12 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="leaveList.length < 1 && !loading">
+                                <td class="" colspan="10">
+                                    No Data Here
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
 
@@ -424,8 +435,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             leaveList: [],
@@ -476,6 +491,8 @@ export default {
             isUnpaidConfirmModal: false,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -483,9 +500,11 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken','getFeature']),
 
         async getLeaveList(pageNumber) {
+            this.loading = true;
             let url = this.url + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.leaveList = response.data.leave_records;
                 this.currentPage = response.data.pagination.current_page;
                 this.perPage = response.data.pagination.per_page;

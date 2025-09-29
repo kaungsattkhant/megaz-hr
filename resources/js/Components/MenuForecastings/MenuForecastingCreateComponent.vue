@@ -44,7 +44,18 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Menu
                     </label>
-                    <div class="mb-0 w-full text-sm inline-block h-max select-ui"
+                    <multiselect v-model="selectedMenu"
+                    :options="menuList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Select Menu"
+                    track-by="id"
+                    label="name"
+                    :preselect-first="false">
+                    </multiselect>
+                    <!-- <div class="mb-0 w-full text-sm inline-block h-max select-ui"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
                          
@@ -52,7 +63,7 @@
                             <option :value="menu" v-for="(menu, menuIndex) in menuList"
                                 :key="menuIndex"> {{ menu.name }} </option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">

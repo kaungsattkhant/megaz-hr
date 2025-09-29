@@ -71,6 +71,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(checkIn, index) in checkInList" :key="index">
@@ -113,6 +118,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="checkInList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -141,8 +151,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             checkInList: [],
@@ -165,6 +179,7 @@ export default {
             url_to:'',
             deleteId:null,
 
+            loading: true,
         };
     },
 
@@ -178,10 +193,12 @@ export default {
             }
         },
         async getCheckInList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
             let url = this.url + this.url_search + this.url_staff + this.url_from + this.url_to;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.checkInList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

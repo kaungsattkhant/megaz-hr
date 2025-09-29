@@ -75,7 +75,7 @@
                                 No Data Here
                             </td>
                         </tr>
-                        <tbody>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(uom, itemIndex) in uomConversionList" :key="itemIndex">
                                 <tr class="">
@@ -114,8 +114,12 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="uomConversionList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
 
-                            <!-- looping end -->
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -422,6 +426,7 @@ export default {
 
             selectedFile: null,
             feature: this.getFeature(),
+            loading: true,
         };
     },
 

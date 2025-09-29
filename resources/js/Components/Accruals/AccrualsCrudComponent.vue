@@ -78,7 +78,7 @@
                                     </td>
                                 </tr>
                             </div>
-                            <tr class=" !text-center" v-if="primaryList.length < 1">
+                            <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
                                 <td class="" colspan="5">
                                     No Data Here
                                 </td>

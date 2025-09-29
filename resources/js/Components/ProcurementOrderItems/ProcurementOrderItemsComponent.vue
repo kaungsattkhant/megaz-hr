@@ -59,6 +59,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in orderItems" :key="index">
@@ -126,6 +131,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="orderItems.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -364,10 +374,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 // import { set } from 'vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
         Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -412,7 +424,8 @@ export default {
                 { id: 'opt1', name: 'Option One' },
                 { id: 'opt2', name: 'Option Two' },
                 { id: 'opt3', name: 'Option Three' }
-            ]
+            ],
+            loading: true,
         };
     },
 
@@ -557,14 +570,18 @@ export default {
         },
 
         async getOrderItems(pageNumber) {
-            let url = this.url;
+            this.loading = true;
+            let url = this.url + '?page=' + pageNumber;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.orderItems = response.data.data;
                 this.orderItems.map(item => ({ ...item, showPurchaseOrders: false }));
+
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 

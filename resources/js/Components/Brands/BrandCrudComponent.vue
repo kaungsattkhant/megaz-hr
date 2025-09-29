@@ -42,6 +42,11 @@
                                 <th v-show="feature.includes('brand.edit')"></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                              <div class="contents" v-for="(brand, index) in brandsList" :key="index" >
@@ -60,6 +65,11 @@
                                     </td>
                                 </tr>
                              </div>
+                             <tr class=" !text-center" v-if="brandsList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -205,10 +215,12 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -236,6 +248,8 @@ export default {
 
             selectedImportItem: null,
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -251,6 +265,7 @@ export default {
         },
 
         async getBrandList(pageNumber) {
+            this.loading = true;
             let url = `/api/brands?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -259,6 +274,7 @@ export default {
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
+                this.loading = false;
             }
         },
         createBtnClicked(){

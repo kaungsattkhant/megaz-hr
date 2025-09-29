@@ -53,6 +53,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(news, newsIndex) in newsList" :key="newsIndex">
@@ -93,6 +98,12 @@
                                     </td>
                                 </tr>
                             </div>
+
+                            <tr class=" !text-center" v-if="newsList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -173,8 +184,12 @@
 // import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             newsList: [],
@@ -189,6 +204,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -196,10 +212,12 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getNewsList(pageNumber) {
+            this.loading = true;
             let url = `/api/org_news`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.newsList = response.data;
+                this.loading = false;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
                 // this.perPage = response.data.per_page;
