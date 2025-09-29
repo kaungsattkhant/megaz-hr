@@ -273,7 +273,6 @@ class GetInventoryStockAction
             ->values();
 
         return $grouped;
-      
     }
 
     public function test($request)
