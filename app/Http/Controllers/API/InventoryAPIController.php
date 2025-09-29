@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AreaEquipmentResource;
+use App\Http\Resources\InventoryLedgerResource;
 use App\Http\Requests\Inventory\InventoryItemRequest;
 use App\Http\Requests\Inventory\InventoryCreateRequest;
 use App\Http\Requests\Inventory\InventoryUpdateRequest;
@@ -81,7 +82,7 @@ class InventoryAPIController extends Controller
     public function getInventoryLedgerList(Request $request)
     {
         $data = $this->inventoryRepo->getInventoryLedgerList($request);
-        ResponseData($data);
+        return InventoryLedgerResource::collection($data);
     }
 
     public function createInventoryItem(InventoryItemRequest $request)

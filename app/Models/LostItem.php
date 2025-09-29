@@ -2,30 +2,28 @@
 
 namespace App\Models;
 
+use App\Models\Uom;
+use App\Models\Item;
+use App\Models\Staff;
 use App\Models\StaffEquipmentAssign;
-use App\Models\StaffEquipmentHandover;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class StaffEquipmentHandoverItem extends Model
+class LostItem extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'staff_equipment_handover_id',
         'item_id',
         'uom_id',
         'uom_quantity',
         'quantity',
         'uom_type',
-        'type'
+        'type',
+        'lost_note',
+        'staff_id',
     ];
-
-    public function staffEquipmentHandover()
-    {
-        return $this->belongsTo(StaffEquipmentHandover::class, 'staff_equipment_handover_id');
-    }
 
     public function item()
     {
@@ -35,5 +33,15 @@ class StaffEquipmentHandoverItem extends Model
     public function uom()
     {
         return $this->belongsTo(Uom::class, 'uom_id');
+    }
+
+    public function equipmentTypeable() : MorphMany
+    {
+        return $this->morphMany(StaffEquipmentAssign::class, 'equipment_typeable');
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id');
     }
 }

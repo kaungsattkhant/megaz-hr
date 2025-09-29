@@ -150,6 +150,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/staff-equipment-handovers', 'createStaffEquipmentHandover');
     Route::post('/staff-equipment-handovers/{id}/confirm', 'confirmHandover');
     Route::post('/staff-equipment-handovers/{id}/cancel', 'cancelHandover');
+    Route::get('/staff-timeshifts/{staffId}', 'getStaffTimeshift');
+    Route::get('/handover-staffs', 'getHandoverStaffs');
+    Route::get('/staff-equipment-handovers/{id}', 'getStaffEquipmentHandoverById');
+    Route::get('/lost-items', 'getLostItems'); //admin panel
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

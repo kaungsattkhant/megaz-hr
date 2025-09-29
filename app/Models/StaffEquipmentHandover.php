@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\StaffEquipmentAssign;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StaffEquipmentHandover extends Model
 {
@@ -15,6 +17,7 @@ class StaffEquipmentHandover extends Model
         'staff_timeshift_id',
         'handover_date',
         'handover_note',
+        'reject_note',
         'status',
         'created_at',
         'created_by',
@@ -62,5 +65,10 @@ class StaffEquipmentHandover extends Model
     public function notification()
     {
         return $this->morphOne(Notification::class, 'notificationable');
+    }
+
+    public function equipmentTypeable() : MorphMany
+    {
+        return $this->morphMany(StaffEquipmentAssign::class, 'equipmentTypeable');
     }
 }
