@@ -81,6 +81,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(ot, index) in overtimeList" :key="index">
                                 <tr class="">
@@ -138,6 +143,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="overtimeList.length < 1 && !loading">
+                                <td class="" colspan="10">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -418,10 +428,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -466,6 +478,7 @@ export default {
             currentTime: getCurretDateTime(),
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -473,9 +486,11 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getOvertimeList(pageNumber) {
+            this.loading = true;
             let url = this.url + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.overtimeList = response.data.data;
             }
         },

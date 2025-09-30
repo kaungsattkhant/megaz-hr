@@ -221,23 +221,23 @@ export default {
                 this.alertValidationMessage(`Amount`);
                 return 1;
             }
-            else if(!this.selectedUomType){
-                this.alertValidationMessage(`Uom Type`);
-                return 1;
-            }
+            // else if(!this.selectedUomType){
+            //     this.alertValidationMessage(`Uom Type`);
+            //     return 1;
+            // }
             else{
                 this.addEquipment();
             }
         },
         async addEquipment(){
-            
+            // uom = select box change yan
             this.selectedEquipmentList.push({
                 item_id: this.selectedEquipment.id,
                 item_name: this.selectedEquipment.name,
-                uom_id: this.selectedEquipment.uom_id,
-                uom_name: this.selectedEquipment.item_uom,
                 quantity: this.amount,
                 uom_conversion: this.selectedEquipment.uom_conversion,
+                uom_id: this.selectedEquipment.uom_id,  
+                uom_name: this.selectedEquipment.item_uom,
                 uom_type: 'uom',
             })
             this.selectedEquipment = null;

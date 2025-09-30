@@ -51,7 +51,11 @@
 
                                 </th>
                             </tr>
-                        </thead>
+                        </thead><TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(cookingPlace, index) in cookingPlaces" :key="index">
@@ -87,6 +91,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="cookingPlaces.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -116,8 +125,13 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
+
     data() {
         return {
             cookingPlaces: [],
@@ -128,6 +142,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -135,8 +150,10 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getCookingPlaces(pageNumber) {
+            this.loading = true;
             const response = await getApiData({ url: `/api/cooking_places?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.cookingPlaces = response.data.data;
 
                 this.lastPage = response.data.last_page;

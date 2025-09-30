@@ -75,6 +75,11 @@
                                 <th scope="col" class=""></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div
                                 class="contents"
@@ -147,6 +152,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="menuList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -462,8 +472,12 @@ import {
     deleteApiData,
 } from "../../utilities/ajax-helpers";
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             menuCategoryList: [],
@@ -481,6 +495,8 @@ export default {
             editId: null,
             editIndex: null,
             newPrice: null,
+
+            loading: false,
         };
     },
 
@@ -499,6 +515,7 @@ export default {
         },
 
         async getMenuList(pageNumber) {
+            this.loading = true;
             let url = `/api/mrp?page=${pageNumber}`;
             if (this.searchInput && this.searchCategory) {
                 url = `/api/mrp?search=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -515,6 +532,7 @@ export default {
                 token: this.getToken(),
             });
             if (response.data) {
+                this.loading = false;
                 this.menuList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

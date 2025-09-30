@@ -64,6 +64,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(uom, itemIndex) in uomConversionList" :key="itemIndex">
@@ -103,8 +108,12 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="uomConversionList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
 
-                            <!-- looping end -->
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -376,8 +385,12 @@
 import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, putApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             uomConversionList: [],
@@ -407,6 +420,7 @@ export default {
 
             selectedFile: null,
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -414,12 +428,14 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getUomConversionList(pageNumber) {
+            this.loading = true;
             let url = `/api/uom_conversions?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/uom_conversions?page=' + pageNumber + '&search=' + this.searchInput;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.uomConversionList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

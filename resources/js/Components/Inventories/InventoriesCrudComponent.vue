@@ -59,6 +59,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -106,6 +111,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="inventoryList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -462,8 +472,12 @@
 import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             inventoryList: [],
@@ -506,6 +520,8 @@ export default {
             selectedArea: null,
 
             modalType: 'create',
+
+            loading: true,
         };
     },
 
@@ -543,12 +559,15 @@ export default {
         },
 
         async getInventoryList(pageNumber) {
+                this.loading = true;
+                console.log('loading');
             let url_page = ''
             if (pageNumber) {
                 url_page = '&page=' + pageNumber
             }
             const response = await getApiData({ url: `/api/inventories?${this.url_inventory}${url_page}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if (pageNumber) {
                     this.inventoryList = response.data.data;
                 }

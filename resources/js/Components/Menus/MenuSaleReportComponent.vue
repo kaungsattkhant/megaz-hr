@@ -63,6 +63,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -91,6 +96,11 @@
                                     
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="saleReportList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                             <!-- looping end -->
                         </tbody>
                     </table>
@@ -131,8 +141,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 
 import { getCurrentDate } from '../../utilities/datetime-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             saleReportList: [],
@@ -150,19 +164,26 @@ export default {
             perPage:null,
             currentPage:null,
             lastPage:null,
+            totalData: null,
+
+            loading: false,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
         async getSaleReportList(pageNumber) {
+            this.loading = true;
             let url = this.url + pageNumber + this.url_search + this.url_category + this.url_month;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.saleReportList = response.data.pagination.data;
+
                 this.currentPage = pageNumber;
                 this.perPage = response.data.pagination.per_page;
-                this.lastPage = response.data.pagination.last_page
+                this.lastPage = response.data.pagination.last_page;
+                this.totalData = response.data.pagination.total;
             }
         },
         async searchBtnClicked() {
