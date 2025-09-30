@@ -82,7 +82,7 @@ class InventoryAPIController extends Controller
     public function getInventoryLedgerList(Request $request)
     {
         $data = $this->inventoryRepo->getInventoryLedgerList($request);
-        return InventoryLedgerResource::collection($data);
+        ResponseData($data);
     }
 
     public function createInventoryItem(InventoryItemRequest $request)
@@ -95,5 +95,11 @@ class InventoryAPIController extends Controller
     {
         $inventoryItems = $this->inventoryRepo->getInventoryItemsByStaff($areaId);
         ResponseData($inventoryItems);
+    }
+
+    public function getInventoryClosingItems(Request $request)
+    {
+        $data = $this->inventoryRepo->getInventoryLedgerList($request);
+        return InventoryLedgerResource::collection($data);
     }
 }
