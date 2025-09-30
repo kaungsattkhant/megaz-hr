@@ -100,13 +100,16 @@ class InventoryRepository implements InventoryRepositoryInterface
                 }
                 foreach ($inventoryables as $inventoryable) {
                     if($inventoryable['inventoryable_type'] === "department"){
-                        $existingDepartment = Inventoryable::where('inventoryable_type', 'department')
-                        ->where('inventoryable_id', $inventoryable['inventoryable_id'])
-                        ->first();
-                        if ($existingDepartment) {
-                            DB::rollback();
-                            return ResponseMessage('This department already has a inventory association. Only one inventory per department is allowed.', 400);
+                        if(!isset($inventoryable['id']) || $inventoryable['id'] === null){
+                            $existingDepartment = Inventoryable::where('inventoryable_type', 'department')
+                            ->where('inventoryable_id', $inventoryable['inventoryable_id'])
+                            ->first();
+                            if ($existingDepartment) {
+                                DB::rollback();
+                                return ResponseMessage('This department already has a inventory association. Only one inventory per department is allowed.', 400);
+                            }
                         }
+                        
                         Inventoryable::updateOrCreate(
                             [
                                 'id' => $inventoryable['id'] ?? null,
@@ -239,8 +242,7 @@ class InventoryRepository implements InventoryRepositoryInterface
     //area equipment lists
     public function getInventoryItemsByStaff($areaId)
     {
-        $staffId = UserData()->id;
-        $inventoryId = $this->getInventory($staffId)->pluck('id')->first();
+        $inventoryId = UserData()->department->inventory->inventory_id;
         $inventoryItems = InventoryLedgerItem::with([
             'inventory_ledger',
             'inventory_ledger.inventory.inventoryable.inventoryable',
