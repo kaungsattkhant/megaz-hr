@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\HandOverDetailResource;
+use App\Http\Resources\StaffTimeShiftResource;
+use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 
 class StaffEquipmentHandoverController extends Controller
 {
@@ -12,6 +14,18 @@ class StaffEquipmentHandoverController extends Controller
     public function __construct(StaffEquipmentHandoverRepositoryInterface $staffEquipmentHandoverRepository)
     {
         $this->staffEquipmentHandoverRepository = $staffEquipmentHandoverRepository;
+    }
+
+    public function getHandoverStaffs()
+    {
+        $handoverStaffs = $this->staffEquipmentHandoverRepository->getHandoverStaffs();
+        ResponseData($handoverStaffs);
+    }
+
+    public function getStaffTimeshift($staffId)
+    {
+        $staffTimeshift = $this->staffEquipmentHandoverRepository->getStaffTimeshift($staffId);
+        ResponseData(StaffTimeShiftResource::collection($staffTimeshift));
     }
 
     public function createStaffEquipmentHandover(Request $request)
@@ -36,5 +50,17 @@ class StaffEquipmentHandoverController extends Controller
     {
         $staffEquipmentHandover = $this->staffEquipmentHandoverRepository->cancelHandover($id, $request->all());
         ResponseData($staffEquipmentHandover);
+    }
+
+    public function getStaffEquipmentHandoverById($id)
+    {
+        $staffEquipmentHandover = $this->staffEquipmentHandoverRepository->getStaffEquipmentHandoverById($id);
+        ResponseData(HandOverDetailResource::make($staffEquipmentHandover));
+    }
+
+    public function getLostItems()
+    {
+        $lostItems = $this->staffEquipmentHandoverRepository->getLostItems();
+        ResponseData($lostItems);
     }
 }

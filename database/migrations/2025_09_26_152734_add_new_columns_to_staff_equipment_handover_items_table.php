@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sops', function (Blueprint $table) {
-            $table->dropForeign('sops_job_description_id_foreign');
-            $table->dropColumn('job_description_id');
+        Schema::table('staff_equipment_handover_items', function (Blueprint $table) {
+            $table->enum('type', ['inventory_closing', 'area_equipment','personal_equipment']);
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sops', function (Blueprint $table) {
+        Schema::table('staff_equipment_handover_items', function (Blueprint $table) {
             //
         });
     }

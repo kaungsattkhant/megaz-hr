@@ -69,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
             'leave' => 'App\Models\Leave',
             'staff_equipment_handover' => 'App\Models\StaffEquipmentHandover',
             'staff_equipment_handover_item' => 'App\Models\StaffEquipmentHandoverItem',
+            'lost_item' => 'App\Models\LostItem',
         ]);
     }
 }

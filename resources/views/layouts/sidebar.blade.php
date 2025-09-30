@@ -464,6 +464,7 @@
                         </a>
                     </li>
                     @endif
+                    asdf
                     @if (checkFeaturePermission('equipment-assignment'))
                     <li>
                         <a href="/equipment_assignment"
