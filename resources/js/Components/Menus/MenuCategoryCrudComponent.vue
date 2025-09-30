@@ -47,6 +47,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -92,6 +97,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="categoryList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -282,8 +292,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             categoryList: [],
@@ -300,6 +314,7 @@ export default {
             lastPage: 0,
             totalData: 0,
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -315,6 +330,7 @@ export default {
         },
 
         async getMenuCategoryList(pageNumber) {
+            this.loading = true;
             let url = `/api/menu_categories?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/menu_categories?page=' + pageNumber + '&search=' + this.searchInput;
@@ -322,6 +338,7 @@ export default {
             const response = await getApiData({ url: url, token: this.getToken() });
             // const response = await getApiData({ url: `/api/menu_categories?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.categoryList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

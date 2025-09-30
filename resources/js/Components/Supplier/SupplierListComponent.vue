@@ -54,6 +54,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(supplier, supplierIndex) in supplierList" :key="supplierIndex">
@@ -93,6 +98,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="supplierList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <!-- pagination -->
@@ -176,8 +186,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             supplierList: [],
@@ -192,6 +206,7 @@ export default {
             selectedImportItem: null,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -199,12 +214,14 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getSupplierList(pageNumber) {
+            this.loading = true;
             let url = `/api/suppliers?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/suppliers?page=' + pageNumber + '&search=' + this.searchInput;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.supplierList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

@@ -114,7 +114,7 @@
                                         {{ ledger.base_balance }} {{ ledger.conversion_balance }}
                                     </td>
                                     <td>
-                                        {{ (ledger.total_value).toLocaleString() }}
+                                        {{ (ledger?.total_value)?.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <!-- <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
@@ -153,7 +153,7 @@
                                         <!-- {{ ledger.base_balance }} {{ ledger.conversion_balance }} -->
                                     </td>
                                     <td>
-                                        {{ (batch.total_value).toLocaleString() }}
+                                        {{ (batch?.total_value)?.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <button id="edit-btn" class="pr-1" @click="transferBtnClicked(batch, index-1, batchIndex)"

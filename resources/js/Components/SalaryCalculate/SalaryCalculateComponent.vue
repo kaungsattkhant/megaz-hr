@@ -42,7 +42,7 @@
                     </label>
                     <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="getSalaryList">
-                        Add New
+                        Calculate
                     </button>
                 </div>
                 
@@ -84,6 +84,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(salary, index) in salaryList" :key="index">
                                 <tr class="">
@@ -120,6 +125,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="salaryList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
@@ -231,10 +241,12 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -258,6 +270,7 @@ export default {
             test: [],
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -285,9 +298,11 @@ export default {
                 return 1;
             }
             else{
+                this.loading = true;
                 let url = '/api/hr/calculate_salary?salary_batch_id=' + this.selectedBatch.id + '&from_date=' + this.fromDate + '&to_date=' + this.toDate;
                 let response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
+                    this.loading = false;
                     this.unChangedSalaryList = response.data.data;
                     this.salaryList = response.data.data;
                     this.salaryList.forEach(sa => {

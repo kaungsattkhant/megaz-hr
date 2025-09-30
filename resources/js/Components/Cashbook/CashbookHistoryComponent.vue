@@ -42,6 +42,11 @@
                                 </th> -->
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in primaryList" :key="index">
@@ -60,6 +65,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -151,8 +161,12 @@
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import { getCurrentDate } from "../../utilities/datetime-helpers";
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
                 primaryList: [],
@@ -164,6 +178,7 @@
                 perPage: 0,
                 lastPage: 0,
                 totalData: 0,
+                loading: false,
             };
         },
 
@@ -171,10 +186,12 @@
             ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
             async getPrimaryList(pageNumber) {
+                this.loading = true;
                 // let url = this.url + this.url_search + this.url_department + this.url_role;
                 let url = this.url + '?is_pos=0' + '&page=' + pageNumber + this.url_date;
                 let response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
+                    this.loading = false;
                     if(response.data.data){
                         this.primaryList = response.data.data;
                         this.lastPage = response.data.last_page;

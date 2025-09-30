@@ -84,6 +84,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(prepaid, index) in prepaidList" :key="index">
                                 <tr class="">
@@ -134,6 +139,11 @@
                                 </tr>
 
                             </div>
+                            <tr class=" !text-center" v-if="prepaidList.length < 1 && !loading">
+                                <td class="" colspan="13">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -363,8 +373,12 @@
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
     import { getCurrentDate } from '../../utilities/datetime-helpers';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
 
@@ -403,6 +417,7 @@
                 totalData:0,
 
                 feature: this.getFeature(),
+                loading: false,
             };
         },
 
@@ -416,8 +431,10 @@
             },
 
             async getPrepaidList(pageNumber){
+                this.loading = true;
                 const response = await getApiData({ url: '/api/prepaid_lists?month=' + this.selectedNewMonth+'&page=' + pageNumber , token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.prepaidList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;

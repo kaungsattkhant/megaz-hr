@@ -1,5 +1,10 @@
 <template>
     <div class="card-shadow mt-4">
+        <div>
+            <p class=" text-lg font-semibold font-inter px-4 pt-3">
+                AP
+            </p>
+        </div>
         <div class="btn-container !border-0 !mb-1">
             <div class=" flex">
                 <label for="search" class="search-input">
@@ -38,6 +43,11 @@
                             </th>
                         </tr>
                     </thead>
+                    <TableSkeleton
+                    v-if="loading"
+                    :rows="20"
+                    :cols="6"
+                    />
                     <tbody>
                         <div class="contents" v-for="(ap, index) in apList" :key="index">
                             <tr class="">
@@ -68,6 +78,11 @@
                                 </td>
                             </tr>
                         </div>
+                        <tr class=" !text-center" v-if="apList.length < 1 && !loading">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -138,10 +153,12 @@
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
     import Multiselect from 'vue-multiselect';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
         components: {
-            Multiselect
+            Multiselect,
+            TableSkeleton
         },
         data() {
             return {
@@ -162,6 +179,7 @@
                 currentGroup: 0,
                 isFirstGroup: true,
                 isLastGroup: false,
+                loading: false,
             };
         },
 
@@ -185,6 +203,7 @@
             },
 
             async getAccountPayables(pageNumber){
+                this.loading = true;
                 if(pageNumber){
                     this.currentPage = pageNumber;
                 }
@@ -192,6 +211,7 @@
                 let url = `/api/account_payables?page=${this.currentPage}&per_page=${this.per_page}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
+                    this.loading = false;
                     this.apList = response.data;
                     this.apList.forEach((ap)=>{
                         ap.credit_amount = parseFloat(ap.credit_amount);
