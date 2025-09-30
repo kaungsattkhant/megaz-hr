@@ -53,6 +53,11 @@
 
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -106,9 +111,13 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="promotionPackageList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
 
 
-                            <!-- looping end -->
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -188,8 +197,12 @@
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             promotionPackageList: [],
@@ -202,6 +215,7 @@ export default {
             totalData:0,
 
             feature: this.getFeature(),
+            loading: false,
 
         };
     },
@@ -210,12 +224,14 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getPromotionPackageList(pageNumber) {
+            this.loading = true;
             let url = `/api/packages?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/packages?page=' + pageNumber + '&search=' + this.searchInput;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.promotionPackageList = response.data.data;
                 this.lastPage = response.data.last_page;
 

@@ -76,6 +76,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -160,7 +165,11 @@
                                     </td>
                                 </tr>
                             </div>
-                            <!-- looping end -->
+                            <tr class=" !text-center" v-if="transactionList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <!-- pagination -->
@@ -491,8 +500,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 
 import { getCurrentDate } from '../../utilities/datetime-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             transactionList: [],
@@ -534,6 +547,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -541,13 +555,14 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getTransactionList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/transactions?page=${pageNumber}&is_confirm=${this.searchCategory}`;
             if (this.fromDate && this.toDate) {
                 url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.transactionList = response.data.data;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;

@@ -45,6 +45,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(skill, index) in skillList" :key="index">
@@ -66,6 +71,11 @@
     
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="skillList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
     
@@ -242,8 +252,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             skillList: [],
@@ -264,7 +278,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
-
+            loading: false,
         };
     },
 
@@ -279,8 +293,10 @@ export default {
         },
 
         async getSkillList(pageNumber) {
+            this.loading = true;
             const response = await getApiData({ url: `/api/skills?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.skillList = response.data.data;
 
                 this.lastPage = response.data.last_page;
