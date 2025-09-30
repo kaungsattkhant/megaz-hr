@@ -208,7 +208,7 @@
                     checkFeaturePermission('brand') || checkFeaturePermission('service') ||
                     checkFeaturePermission('cooking-place'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             SET UP
                         </p>
                     </li>
@@ -303,7 +303,7 @@
                     @if (checkFeaturePermission('item') || checkFeaturePermission('uom-conversion') ||
                     checkFeaturePermission('accessory') || checkFeaturePermission('supplier'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             ITEM
                         </p>
                     </li>
@@ -360,7 +360,7 @@
                     checkFeaturePermission('exit-pass') || checkFeaturePermission('resignation') || 
                     checkFeaturePermission('shift-assignment') || checkFeaturePermission('equipment-assignment'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             HR
                         </p>
                     </li>
@@ -464,7 +464,6 @@
                         </a>
                     </li>
                     @endif
-                    asdf
                     @if (checkFeaturePermission('equipment-assignment'))
                     <li>
                         <a href="/equipment_assignment"
@@ -479,7 +478,7 @@
                     @if (checkFeaturePermission('salary-batch') || checkFeaturePermission('salary-calculate') ||
                     checkFeaturePermission('pay-slip'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             SALARY
                         </p>
                     </li>
@@ -522,7 +521,7 @@
                     checkFeaturePermission('skill') || checkFeaturePermission('handbook') ||
                     checkFeaturePermission('overtime-confirmation') || checkFeaturePermission('allowance'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             HR SETUP
                         </p>
                     </li>
@@ -708,7 +707,7 @@
                     checkFeaturePermission('menu-costing') || checkFeaturePermission('menu') ||
                     checkFeaturePermission('menu-area'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             MENU
                         </p>
                     </li>
@@ -776,7 +775,7 @@
                     checkFeaturePermission('customer-birthday') || checkFeaturePermission('customer-level-discount') ||
                     checkFeaturePermission('customer-birthday-promotion'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             PROMOTION & CRM
                         </p>
                     </li>
@@ -866,7 +865,7 @@
                     checkFeaturePermission('ar') || checkFeaturePermission('loan') || 
                     checkFeaturePermission('accrual'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             FINANCIAL
                         </p>
                     </li>
@@ -1088,7 +1087,7 @@
                     @if (checkFeaturePermission('menu') || checkFeaturePermission('ktv-product-tree') ||
                     checkFeaturePermission('menu-forecasting') || checkFeaturePermission('ktv-forecasting'))
                     <li>
-                        <p class="text-[#2a3547] text-xs font-semibold ml-1">
+                        <p class="text-[#2a3547] text-sm font-semibold ml-1">
                             MRP
                         </p>
                     </li>

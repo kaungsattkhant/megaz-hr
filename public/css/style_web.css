@@ -408,4 +408,7 @@ body {
 .capitalize .multiselect__option {
   text-transform: capitalize; }
 
+#sidebar_admin {
+  transition: all 0.3s ease; }
+
 /*# sourceMappingURL=style_web.css.map */

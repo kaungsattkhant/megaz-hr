@@ -61,10 +61,32 @@
 <script type="application/javascript">
     $(document).ready(function(){
             $('#toggleBtn').on('click', function() {
-                $('#sidebar_admin').toggleClass('!w-0');
+
+                let sidebar = $('#sidebar_admin');
+                let content = $('#content_collapse');
+
+                if (sidebar.width() === 0) {
+                    // expand
+                    sidebar.animate({ width: "256px" }, 400); // adjust px
+                    content.animate({ marginLeft: "256px" }, 300);
+                    // content.animate({ width: "calc(100% - 256px)" }, 300);
+                } else {
+                    // collapse
+                    sidebar.animate({ width: "0px" }, 300);
+                    content.animate({ marginLeft: "0px", width: "100%" }, 700);
+                    // content.animate({ width: "100%" }, 300);
+                }
+
+                // rotate the icon
                 $('#toggleBtn i').toggleClass('rotate-180');
-                console.log('testing sidenav');
-                $('#content_collapse').toggleClass('!ml-0 w-full');
+
+
+
+
+                // $('#sidebar_admin').toggleClass('!w-0');
+                // $('#toggleBtn i').toggleClass('rotate-180');
+                // console.log('testing sidenav');
+                // $('#content_collapse').toggleClass('!ml-0 w-full');
             });
         });
 </script>

@@ -67,6 +67,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <div class="contents" v-for="(accessories, index) in accessoriesList" :key="index">
@@ -114,6 +119,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="accessoriesList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -144,8 +154,12 @@
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             accessoriesCategoryList: [],
@@ -160,6 +174,7 @@ export default {
             lastPage: 0,
             totalData:0,
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -175,7 +190,7 @@ export default {
         },
 
         async getAccessoriesList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/accessories?page=${pageNumber}`;
             if (this.searchInput && this.searchCategory) {
                 url = `/api/accessories?search_input=${this.searchInput}&accessories_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -189,6 +204,7 @@ export default {
 
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.accessoriesList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

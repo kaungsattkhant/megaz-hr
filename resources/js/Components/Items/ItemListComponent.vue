@@ -87,6 +87,11 @@
                                 <!-- <th></th> -->
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
@@ -135,6 +140,11 @@
                                 </tr>
                             </div>
 
+                            <tr class=" !text-center" v-if="itemList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -670,10 +680,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { ref } from 'vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -733,6 +745,7 @@ export default {
             conversion: null,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -807,9 +820,11 @@ export default {
             }
         },
         async getItemList(pageNumber) {
+            this.loading = true;
             let url = `/api/items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.itemList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
