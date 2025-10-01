@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\HandoverStaffList;
 use App\Http\Resources\HandOverDetailResource;
 use App\Http\Resources\StaffTimeShiftResource;
 use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
@@ -19,7 +20,7 @@ class StaffEquipmentHandoverController extends Controller
     public function getHandoverStaffs()
     {
         $handoverStaffs = $this->staffEquipmentHandoverRepository->getHandoverStaffs();
-        ResponseData($handoverStaffs);
+        ResponseData(HandoverStaffList::collection($handoverStaffs));
     }
 
     public function getStaffTimeshift($staffId)
