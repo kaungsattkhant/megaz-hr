@@ -82,7 +82,8 @@ class InventoryAPIController extends Controller
     public function getInventoryLedgerList(Request $request)
     {
         $data = $this->inventoryRepo->getInventoryLedgerList($request);
-        return InventoryLedgerResource::collection($data);
+        ResponseData($data);
+        // return InventoryLedgerResource::collection($data);
     }
 
     public function createInventoryItem(InventoryItemRequest $request)
