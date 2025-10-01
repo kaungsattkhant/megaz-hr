@@ -78,7 +78,13 @@
                         :rows="20"
                         :cols="6"
                         />
-                        <tbody v-else>
+
+                        <tr class=" !text-center" v-else-if="staffList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else-if="!loading && staffList.length > 0">
                             <!-- looping start -->
                             <div class="contents" v-for="(staff, index) in staffList" :key="index">
                                 <tr class="">

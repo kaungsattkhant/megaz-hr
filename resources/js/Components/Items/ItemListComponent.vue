@@ -99,7 +99,7 @@
                             </td>
                         </tr>
 
-                        <tbody v-else>
+                        <tbody v-else-if="!loading && itemList.length > 0">
                             <!-- looping start -->
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                                 <tr class="">
@@ -964,6 +964,7 @@ export default {
         },
 
         async searchBtnClicked() {
+            this.loading = true;
             let url = `/api/items?page=1`;
             if(this.searchInput){
                 url = `${url}&search_input=${this.searchInput}`;
@@ -985,6 +986,7 @@ export default {
             // }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.itemList = response.data.data;
             }
         },
