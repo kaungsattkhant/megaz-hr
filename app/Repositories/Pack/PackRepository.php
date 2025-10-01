@@ -45,7 +45,10 @@ class PackRepository implements PackRepositoryInterface
         DB::beginTransaction();
         try {
             $data['created_by'] = UserData()->id;
-            $menu = Menu::find($data['menu_id']);
+            $menu = Menu::where('is_active',1)->find($data['menu_id']);
+            if(!$menu){
+                ResponseMessage('Menu is invalid',419);
+            }
             $menuId = $data['menu_id'];
             $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
                 ->whereHas('menuStep', function ($q) use ($menuId) {
