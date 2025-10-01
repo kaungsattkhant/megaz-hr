@@ -713,7 +713,7 @@ class OrderService
                     'batch_no' => $inventory_item->batch_no,
                     'date' => now(),
                     'ledgerable_id' => $orderItem->id,
-                    'ledgerable_type' => 'order_item',
+                    'ledgerable_type' => $morphMapName,
                     'inventory_id' => $inventoryId,
                     'action' => $action,//out
                 ]);
