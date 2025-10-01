@@ -271,7 +271,6 @@ class GetInventoryStockAction
             })
             ->filter(fn ($item) => $item['closing_balance'] > 0) // remove groups with closing_balance <= 0
             ->values();
-
         return $grouped;
     }
 

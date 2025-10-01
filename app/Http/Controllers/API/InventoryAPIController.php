@@ -69,7 +69,6 @@ class InventoryAPIController extends Controller
     public function getInventoryLedgers(Request $request, int $inventoryId)
     {
         $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId, $request);
-
         ResponseData($ledgers);
     }
 
@@ -100,6 +99,6 @@ class InventoryAPIController extends Controller
     public function getInventoryClosingItems(Request $request)
     {
         $data = $this->inventoryRepo->getInventoryLedgerList($request);
-        return InventoryLedgerResource::collection($data);
+        ResponseData( InventoryLedgerResource::collection($data));
     }
 }

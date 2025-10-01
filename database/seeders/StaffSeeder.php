@@ -77,7 +77,8 @@ class StaffSeeder extends Seeder
         // $staff->features()->sync($featureIds);
 
 
-        $departments = Department::with('roles')->get();
+        // $departments = Department::with('roles')->get();
+        $departments = Department::with('roles')->where('slug','hr')->get();
         $hr_features = config('common.hr_feature_slug');
         
             foreach ($departments as $i => $department) {
