@@ -49,7 +49,18 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="uomList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(uom, itemIndex) in uomList" :key="itemIndex">
                                 <tr class="">
@@ -196,8 +207,12 @@
 import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, putApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             uomList: [],
@@ -214,7 +229,9 @@ export default {
             baseUnitedit:null,
             conversionUnitedit:null,
             editUomId:null,
-            editUomName:null
+            editUomName:null,
+
+            loading: true,
         };
     },
 
@@ -222,10 +239,11 @@ export default {
         ...mapGetters(['getToken']),
 
         async getUomList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/uoms?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.uomList = response.data.uoms;
             }
         },

@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="mt-4 bg-white">
         <div class="card-shadow">
             <div>
@@ -24,7 +24,7 @@
                                 :key="itemIndex"> {{ item.name }} </option>
                         </select>
                     </div> -->
-                    
+
                 </div>
             </div>
         </div>
@@ -53,7 +53,19 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="leadTimeList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+
+                        <tbody v-else>
                             <tr v-if="leadTimeList.length < 1 && errorMessage">
                                 <td colspan="3">
                                     {{ errorMessage }}
@@ -101,8 +113,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             leadTimeList: [],
@@ -122,7 +138,9 @@ export default {
             searchInput:null,
 
             url:'/api/supplier_lead_time/',
-            url_supplier:''
+            url_supplier:'',
+
+            loading: true,
 
         };
     },
@@ -145,9 +163,12 @@ export default {
             }
         },
         async getSupplierList(){
+            this.loading = true;
             let url = '/api/suppliers';
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
+                console.log('loading top');
                 this.supplierList = response.data;
                 this.selectedSupplier = response.data[0]
                 this.getLeadTimeList();

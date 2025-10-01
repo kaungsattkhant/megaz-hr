@@ -27,7 +27,7 @@ class AccountTableSeeder extends Seeder
                     'sub_account_id' => $obj->sub_account_id,
                 ]);
             }
-            DB::commit();php
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

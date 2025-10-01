@@ -49,7 +49,14 @@
                             :rows="20"
                             :cols="6"
                             />
-                            <tbody>
+
+                            <tr class=" !text-center" v-else-if="sellingExtras.length < 1">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
+
+                            <tbody v-else>
                                 <div class="contents" v-for="(sellingExtra, index) in sellingExtras" :key="index">
                                     <tr class="">
                                         <td class="">
@@ -393,6 +400,7 @@ export default {
             editIndex: null,
 
             categoryName: null,
+
             loading: true,
         }
     },
