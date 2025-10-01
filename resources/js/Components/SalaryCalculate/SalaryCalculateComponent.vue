@@ -42,7 +42,7 @@
                     </label>
                     <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="getSalaryList">
-                        Add New
+                        Calculate
                     </button>
                 </div>
 
@@ -131,6 +131,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="salaryList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
@@ -242,7 +247,7 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
-import TableSkeleton from '../Common/TableSkeleton.vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
@@ -271,7 +276,6 @@ export default {
             test: [],
 
             feature: this.getFeature(),
-
             loading: false,
         };
     },

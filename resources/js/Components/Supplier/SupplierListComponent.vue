@@ -104,6 +104,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="supplierList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <!-- pagination -->
@@ -207,7 +212,6 @@ export default {
             selectedImportItem: null,
 
             feature: this.getFeature(),
-
             loading: true,
         };
     },
@@ -216,6 +220,7 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getSupplierList(pageNumber) {
+            this.loading = true;
             let url = `/api/suppliers?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/suppliers?page=' + pageNumber + '&search=' + this.searchInput;

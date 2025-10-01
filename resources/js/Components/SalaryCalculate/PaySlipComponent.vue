@@ -123,6 +123,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="paySlipList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -146,7 +151,7 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
-import TableSkeleton from '../Common/TableSkeleton.vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {

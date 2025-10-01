@@ -56,6 +56,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(menuForecasting, index) in menuForecastingTable" :key="index">
@@ -85,6 +90,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="menuForecastingTable.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -164,8 +174,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             menuForecastingList: [],
@@ -191,6 +205,7 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -198,6 +213,7 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getMenuForecastingList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url+this.url_type;
             // let url = `/api/objectives?page=${pageNumber}`;
@@ -213,6 +229,7 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.menuForecastingList = response.data;
                 this.menuForecastingList.forEach(forecasting => {
                     let total_amount = 0;

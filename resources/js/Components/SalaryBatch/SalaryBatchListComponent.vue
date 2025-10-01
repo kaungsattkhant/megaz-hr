@@ -73,6 +73,7 @@
                                 No Data Here
                             </td>
                         </tr>
+                        <TableSkeleton v-if="loading" :rows="20" :cols="6" />
                         <tbody>
                             <div class="contents" v-for="(batch, index) in salaryBatchList" :key="index">
                                 <tr class="">
@@ -100,6 +101,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="salaryBatchList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -182,12 +188,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
-import TableSkeleton from '../Common/TableSkeleton.vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
         Multiselect,
-        TableSkeleton,
+        TableSkeleton
     },
     data() {
         return {
