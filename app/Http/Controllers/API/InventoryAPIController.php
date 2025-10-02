@@ -98,7 +98,7 @@ class InventoryAPIController extends Controller
 
     public function getInventoryClosingItems(Request $request)
     {
-        $data = $this->inventoryRepo->getInventoryLedgerList($request);
+        $data = $this->inventoryRepo->getInventoryClosingItems($request);
         ResponseData(InventoryLedgerResource::collection($data));
     }
 }
