@@ -167,6 +167,9 @@ class TransferRepository implements TransferRepositoryInterface
         try {
             // if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
             $transfer = Transfer::find($request->id);
+            if($transfer->status==='complete'){
+                ResponseMessage('Transfer aleady confirmed',419);
+            }
             if ($transfer) {
                 // if ($transfer->confirmed_at != null && $transfer->confirmed_by != null) {
                 //     ResponseMessage('Already checked', 200);
