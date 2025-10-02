@@ -29,4 +29,6 @@ interface InventoryRepositoryInterface
     public function getallInventories($request);
 
     public function getInventoryItemsByStaff($areaId);
+
+    public function getInventoryClosingItems($request);
 }

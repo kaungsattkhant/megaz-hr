@@ -302,4 +302,21 @@ class InventoryRepository implements InventoryRepositoryInterface
         
     return $result;
     }
+
+    public function getInventoryClosingItems($request)
+    {
+        $inventoryId = null;
+        $userData = UserData();
+        if ($userData && isset($userData->department) && $userData->department && 
+        isset($userData->department->inventory) && $userData->department->inventory) {
+        $inventoryId = $userData->department->inventory->inventory_id;
+        }
+    
+        if ($inventoryId === null) {
+            ResponseMessage('Login User have no Inventory', 419);
+        }
+        
+        $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
+        return $ledgers;
+    }
 }
