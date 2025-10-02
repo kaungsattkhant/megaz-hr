@@ -249,7 +249,7 @@ class PackRepository implements PackRepositoryInterface
 
                         $remainingQuantity -= $quantityToTake;
 
-                        // ✅ Reduce in_stock_quantity in memory to avoid negative stock in next iterations
+                        // Reduce in_stock_quantity in memory to avoid negative stock in next iterations
                         $batch->in_stock_quantity -= $quantityToTake;
                     }
 
