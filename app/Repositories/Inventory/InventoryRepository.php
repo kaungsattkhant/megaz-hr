@@ -284,17 +284,18 @@ class InventoryRepository implements InventoryRepositoryInterface
             // $area = $areaInventoryable ? $areaInventoryable->inventoryable : null;
             
             return [
-                'id' => $firstItem->id,
+                // 'id' => $firstItem->id,
                 'item_id' => $itemId,
+                'item_code' => $item->code,
                 'item_name' => $item->name,
-                'base_quantity' =>  $baseQuantity,
-                'base_uom' => $baseUom,
+                // 'base_uom_quantity' =>  $baseQuantity,
+                'base_uom_name' => $baseUom,
                 'base_uom_id' => $item->base_uom_id,
-                'uom_quantity' => $uomQuantity,
-                'uom' => $uom,
+                // 'uom_quantity' => $uomQuantity,
                 'uom_id' => $item->uom_id,
                 'uom_name' => $item->item_uom,
-                'conversion' => $conversion,
+                'uom_conversion' => $conversion,
+                'current_quantity' => $currentQuantity,
             ];
         })
         ->values();
