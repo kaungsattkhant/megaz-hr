@@ -324,6 +324,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(InventoryAPIController::class)->group(function () {
         Route::get('inventory_ledger_list', 'getInventoryLedgerList');
         Route::post('inventory_item', 'createInventoryItem');
+        Route::get('inventory-closing-items', 'getInventoryClosingItems');
     });
 
     Route::get('/uoms', [UomAPIController::class, 'getUomData']);

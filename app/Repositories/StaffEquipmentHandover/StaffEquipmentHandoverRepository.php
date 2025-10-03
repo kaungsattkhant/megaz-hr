@@ -58,7 +58,7 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 'to_staff_id' => $data['to_staff_id'],
                 'staff_timeshift_id' => $data['staff_timeshift_id'] ?? null,
                 'handover_date' => $data['handover_date'] ?? now(),
-                'notes' => $data['notes'] ?? null,
+                'handover_note' => $data['handover_note'] ?? null,
                 'status' => 'pending',
                 'created_by' => UserData()->id,
             ]);
@@ -72,7 +72,6 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 
                 foreach ($handover_items as $handover_item) {
                     // if($handover_item['type'] === "personal_equipment"){
-                  
                     //     $currentItem = $this->getEquipmentAssignByItemAndStaff($handover_item['item_id'], $data['from_staff_id']);
                     //     $currentQty = (int) $currentItem->current_quantity ?? 0;
                     //     if ($handover_item['quantity'] > $currentQty) {
@@ -90,7 +89,6 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                         'uom_quantity' => $uom_quantity,
                         'quantity' => $handover_item['quantity'],
                         'uom_type' => $handover_item['uom_type'] ?? null,
-                        'notes' => $handover_item['notes'] ?? null,
                         'type' => $handover_item['type'] ?? null,
                     ]);
                 }
@@ -121,12 +119,12 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                                 'equipment_typeable_type' => 'lost_item',
                             ],[
                                 'equipment_typeable_id' => $lostItem->id,
-                            'equipment_typeable_type' => 'lost_item',
-                            'item_id'=>$lostItem->item_id,
-                            'uom_id'=>$lostItem->uom_id,
-                            'uom_quantity'=>$lostItem->uom_quantity,
-                            'quantity'=>$lostItem->quantity,
-                            'uom_type'=>$lostItem->uom_type,
+                                'equipment_typeable_type' => 'lost_item',
+                                'item_id'=>$lostItem->item_id,
+                                'uom_id'=>$lostItem->uom_id,
+                                'uom_quantity'=>$lostItem->uom_quantity,
+                                'quantity'=>$lostItem->quantity,
+                                'uom_type'=>$lostItem->uom_type,
                         ]);
                         $batchDeductions = $this->processInventoryBatchDeductions([
                             'item_id' => $lostItem->item_id,
@@ -175,10 +173,6 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
         DB::beginTransaction();
         try {
             $handover = StaffEquipmentHandover::with('staffEquipmentHandoverItems')->findOrFail($id);
-            $fromStaff = Staff::with('department.inventory')->findOrFail($handover->from_staff_id);
-            $toStaff = Staff::with('department.inventory')->findOrFail($handover->to_staff_id);
-            $source_inventory_id = $fromStaff->department->inventory->inventory_id;
-            $destination_inventory_id = $toStaff->department->inventory->inventory_id;
             if ($handover->status !== "pending") {
                 ResponseMessage('Only pending handovers can be confirmed.', 400);
                 return;
@@ -190,7 +184,6 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
             ]);
 
             $personalEquipmentHandoverItems = $handover->staffEquipmentHandoverItems->where('type', 'personal_equipment');
-            //$inventoryClosingHandoverItems = $handover->staffEquipmentHandoverItems->where('type', 'inventory_closing');
 
             if(isset($personalEquipmentHandoverItems)){
                 StaffEquipment::updateOrCreate([
@@ -213,18 +206,7 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
                 ]);
             }
         }
-        // if(isset($inventoryClosingHandoverItems)){
-        //     foreach ($inventoryClosingHandoverItems as $inventoryClosingHandoverItem) {
-        //         $batchDeductions = $this->processInventoryBatchDeductions([
-        //             'item_id' => $inventoryClosingHandoverItem->item_id,
-        //             'source_inventory_id' => $source_inventory_id,
-        //             'destination_inventory_id' => $destination_inventory_id,
-        //             'ledgerable_id' => $inventoryClosingHandoverItem->id,
-        //             'ledgerable_type' => 'staff_equipment_handover_item',
-        //             'uom_quantity' => $inventoryClosingHandoverItem->uom_quantity,
-        //         ]);
-        //     }
-        // }
+
             $data=[
                 'id' => $handover->id,
                 'status' => $handover->status

@@ -15,14 +15,15 @@ class InventoryLedgerResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "name" => $this->resource['name'] ?? null,
             "item_id" => $this->resource['item_id'] ?? null,
+            "item_name" => $this->resource['name'] ?? null,
+            "item_code" => $this->resource['item_code'] ?? null,
             'current_quantity' => $this->resource['closing_balance'] ?? null,
             'base_uom_id' => $this->resource['base_unit_id'] ?? null,
             'base_uom_name' => $this->resource['base_uom_name'] ?? null,
             'uom_id' => $this->resource['item_uom_id'] ?? null,
             'uom_name' => $this->resource['conversion_uom_name'] ?? null,
-            'conversion' => $this->resource['conversion'] ?? null,
+            'uom_conversion' => $this->resource['conversion'] ?? null,
         ];
     }
 }
