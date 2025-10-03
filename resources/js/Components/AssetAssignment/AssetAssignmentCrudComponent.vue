@@ -63,6 +63,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(ot, index) in primaryList" :key="index">
                                 <tr class="">
@@ -94,6 +99,11 @@
                                     </td> -->
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -264,10 +274,12 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -305,6 +317,8 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -312,10 +326,12 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
+            this.loading = true;
             // let url = this.url + this.url_search + this.url_department + this.url_role;
             let url = this.url + '?page=' + pageNumber
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if (response.data.data) {
                     this.primaryList = response.data.data;
                 }

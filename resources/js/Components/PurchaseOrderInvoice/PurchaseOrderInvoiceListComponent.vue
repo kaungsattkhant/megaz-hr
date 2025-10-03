@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(item, index) in items" :key="index">
                                 <tr>
@@ -129,6 +134,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="items.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -211,8 +221,12 @@
 import { Modal, Ripple, Select, initTE } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             items: [],
@@ -232,6 +246,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: false,
         }
     },
 
@@ -250,9 +265,11 @@ export default {
         },
 
         async getItems(page) {
+            this.loading = true;
             let url = `/api/invoices`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.items = response.data;
                 this.items.map(item => ({ ...item, showDatails: false}));
 
