@@ -9,4 +9,6 @@ interface PackRepositoryInterface
     public function createPack(array $data);
 
     public function listAllData(Request $request);
+
+    public function changePack($request);
 }
