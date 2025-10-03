@@ -284,21 +284,39 @@ class InventoryRepository implements InventoryRepositoryInterface
             // $area = $areaInventoryable ? $areaInventoryable->inventoryable : null;
             
             return [
-                'id' => $firstItem->id,
+                // 'id' => $firstItem->id,
                 'item_id' => $itemId,
+                'item_code' => $item->code,
                 'item_name' => $item->name,
-                'base_quantity' =>  $baseQuantity,
-                'base_uom' => $baseUom,
+                // 'base_uom_quantity' =>  $baseQuantity,
+                'base_uom_name' => $baseUom,
                 'base_uom_id' => $item->base_uom_id,
-                'uom_quantity' => $uomQuantity,
-                'uom' => $uom,
+                // 'uom_quantity' => $uomQuantity,
                 'uom_id' => $item->uom_id,
                 'uom_name' => $item->item_uom,
-                'conversion' => $conversion,
+                'uom_conversion' => $conversion,
+                'current_quantity' => $currentQuantity,
             ];
         })
         ->values();
         
     return $result;
+    }
+
+    public function getInventoryClosingItems($request)
+    {
+        $inventoryId = null;
+        $userData = UserData();
+        if ($userData && isset($userData->department) && $userData->department && 
+        isset($userData->department->inventory) && $userData->department->inventory) {
+        $inventoryId = $userData->department->inventory->inventory_id;
+        }
+    
+        if ($inventoryId === null) {
+            ResponseMessage('Login User have no Inventory', 419);
+        }
+        
+        $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
+        return $ledgers;
     }
 }

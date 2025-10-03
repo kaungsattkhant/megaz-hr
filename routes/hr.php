@@ -10,6 +10,7 @@ use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\MenuItemImportController;
 use App\Http\Controllers\API\StaffTimeShiftController;
 use App\Http\Controllers\API\StaffEquipmentHandoverController;
 use App\Http\Controllers\API\AssetItemEquipmentAssignController;
@@ -154,6 +155,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/handover-staffs', 'getHandoverStaffs');
     Route::get('/staff-equipment-handovers/{id}', 'getStaffEquipmentHandoverById');
     Route::get('/lost-items', 'getLostItems'); //admin panel
+  });
+  Route::controller(MenuItemImportController::class)->group(function () {
+    Route::post('/ready-to-sale-menu-item-import', 'readyToSaleMenuItemImport');
+    Route::post('/raw-item-import', 'rawItemImport');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
