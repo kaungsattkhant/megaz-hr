@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class StaffEquipmentHandoverItem extends Model
+class staffEquipmentHandoverItem extends Model
 {
     use HasFactory;
 
