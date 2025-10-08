@@ -66,7 +66,7 @@
                                     <td class="whitespace-nowrap" @click="toggleItems(index)">
                                         {{ item.invoice_no }}
                                     </td>
-                                    <td class="whitespace-nowrap" @click="toggleItems(index)">
+                                    <td class="whitespace-normal" @click="toggleItems(index)">
                                         {{ item.item_names }}
                                     </td>
                                     <td class="whitespace-nowrap">
@@ -266,7 +266,7 @@ export default {
 
         async getItems(page) {
             this.loading = true;
-            let url = `/api/invoices`;
+            let url = `/api/invoices?page=1`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
