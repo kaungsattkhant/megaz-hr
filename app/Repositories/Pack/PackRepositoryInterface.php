@@ -10,5 +10,5 @@ interface PackRepositoryInterface
 
     public function listAllData(Request $request);
 
-    public function changePack($request);
+    public function optimizePackCreate($request);
 }
