@@ -20,7 +20,7 @@
                 </div>
                 <div class="flex justify-end flex-col">
 
-                    <button type="button" v-if="feature.includes('room.create')"
+                    <button type="button" v-if="feature.includes('room.create')" @click="btnClickedCreateModal"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
                         Add New
@@ -333,6 +333,11 @@ export default {
         //     }
         // },
 
+        btnClickedCreateModal(){
+            this.name = null;
+            this.pricePerHour = null;
+            this.area_id = null;
+        },
         createBtnClicked() {
             this.createTableAndRoom();
         },
@@ -362,9 +367,9 @@ export default {
         },
 
         clearForm() {
-            this.name = null,
-            this.pricePerHour = null,
-            this.area_id = null,
+            this.name = null;
+            this.pricePerHour = null;
+            this.area_id = null;
             this.typeList = []
         },
 

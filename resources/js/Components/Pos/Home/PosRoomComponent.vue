@@ -495,12 +495,12 @@
                                     {{  (printInvoiceData.total ? printInvoiceData.total : 0).toLocaleString() }} MMKs
                                 </p>
                             </div>
-                            <div class="">
+                            <!-- <div class="">
                                 <button data-te-toggle="modal" data-te-target="#end_room_modal"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Print Invoice
                                 </button>
-                            </div>
+                            </div> -->
 
                             <!-- <div class=" text-right pr-3 mb-3">
                                 <p class="">
@@ -531,12 +531,12 @@
                                         MMKs
                                 </p>
                             </div> -->
-                            <!-- <div class="" >
+                            <div class="" >
                                 <button @click="btnClickedDoneSession()"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Done Session
                                 </button>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                     <!-- invoice right sidebar -->
