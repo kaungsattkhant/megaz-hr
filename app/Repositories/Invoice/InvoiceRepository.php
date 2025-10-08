@@ -270,7 +270,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
-                //broadcast on room opening to waiter 
+                //broadcast on room opening to waiter
                 //broadcast
                 if (!$data['is_waiter']) {
                     $waiterRole = Role::getRoleByName('Waiter');
@@ -1035,7 +1035,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'is_cashier_confirmed' => 0
                 ]);
             }
-            $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
+            // $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
+            $invoiceCost = $invoice->total - $withdrawalAmt; // included with deposit amount
             if ($depositBalance > 1 && (int) $paidAmount > $invoiceCost) {
                 ResponseMessage('Deposit balance is enough.Customer Deposit Balance is ' . $depositBalance . '.Paid Amount does not require.Invoice cost is ' . $invoiceCost, 419);
             }
@@ -1243,6 +1244,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
+        // dd($data);
         //payload
         //invoice_id: 36
         // discount_type: null
@@ -1405,6 +1407,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
+
+            $invoice->total_discount = $invoice->discount_value
+            + $invoice->order_discount_value
+            + $invoice->room_discount_value
+            + $invoice->birthday_discount
+            + $invoice->customer_level_discount;
+
+            $invoice->total = ($invoice->sub_total + $invoice->service_charge + $invoice->tax) - $invoice->total_discount;
+
+            $invoice->save();
 
             //update is active  to room_session
             // $this->invoiceService->updateIsActive($invoice->id, 0);
