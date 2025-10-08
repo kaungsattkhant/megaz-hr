@@ -411,6 +411,11 @@
                             </th>
                         </tr>
                     </thead>
+                    <TableSkeleton
+                        v-if="loading"
+                        :rows="4"
+                        :cols="6"
+                    />
                     <tbody v-if="menuLevel">
                         <tr v-if="menuLevel.item_menu.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item_menu"
                             :key="menuIndex">
@@ -427,6 +432,11 @@
                                 <button @click="removeMenuLevel(menuIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
+                            </td>
+                        </tr>
+                        <tr class=" !text-center" v-if="menuLevel.item_menu.length < 1 && !loading">
+                            <td class="" colspan="4">
+                                No Data Here
                             </td>
                         </tr>
                     </tbody>
@@ -466,6 +476,11 @@
                             </th>
                         </tr>
                     </thead>
+                    <TableSkeleton
+                        v-if="loading"
+                        :rows="4"
+                        :cols="6"
+                    />
                     <tbody>
                         <div class="contents" v-for="(level, levelIndex) in levelTable" :key="levelIndex">
                             <tr class="" @click="isShowToggle(level)">
@@ -510,6 +525,12 @@
                                 </button>
                             </td>
                         </tr>
+
+                        <tr class=" !text-center" v-if="levelTable.length < 1 && !loading">
+                            <td class="" colspan="4">
+                                No Data Here
+                            </td>
+                        </tr>
                     </tbody>
 
                 </table>
@@ -534,10 +555,12 @@ import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
 import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     props: ["mrpId"],
     data() {
@@ -624,6 +647,7 @@ export default {
             is_show:false,
             isReadyToSale:false,
 
+            loading: true,
         };
     },
 
@@ -634,8 +658,10 @@ export default {
             level.isShow = !level.isShow;
         },
         async getMrpDetail() {
+            this.loading = true;
             let response = await getApiData({ url: `/api/mrp/${this.mrpId}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.mrpDetail = response.data[0];
                 if(response.data[0]){
                     this.addDetail(response.data[0])
