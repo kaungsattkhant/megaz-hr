@@ -191,6 +191,18 @@
                                     </option>
                                 </select> -->
                             </div>
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Cooking Area'">
+                                <label for="" class="label-form mb-3">Type</label>
+                                <multiselect v-model="selectedCookingAreaType" :options="cookingAreaTypeList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Type"
+                                    label="name" track-by="value" :preselect-first="false"></multiselect>
+                                <!-- <select name="" id="" v-model="selectedCookingAreaType"
+                                    class="input-ui">
+                                    <option :value="type.value" v-for="(type, index) in cookingAreaTypeList" :key="index">
+                                        {{ type.name }}
+                                    </option>
+                                </select> -->
+                            </div>
 
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -235,6 +247,18 @@
                                     Area Name
                                 </label>
                                 <input type="text" placeholder="Area Name" v-model="editName" class="input-ui">
+                            </div>
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Cooking Area'">
+                                <label for="" class="label-form mb-3">Type</label>
+                                <multiselect v-model="selectedCookingAreaType" :options="cookingAreaTypeList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Type"
+                                    label="name" track-by="value" :preselect-first="false"></multiselect>
+                                <!-- <select name="" id="" v-model="selectedCookingAreaType"
+                                    class="input-ui">
+                                    <option :value="type.value" v-for="(type, index) in cookingAreaTypeList" :key="index">
+                                        {{ type.name }}
+                                    </option>
+                                </select> -->
                             </div>
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -327,12 +351,15 @@ export default {
             departmentList: [],
             areaList: [],
             typeList: [],
+            cookingAreaTypeList: [{ name: 'Bar', value: 'bar'},{ name: 'Restaurant', value: 'restaurant'}],
             categoryList: [],
             name: null,
             selectedType: null,
+            selectedCookingAreaType: null,
             selectedCategory: null,
             selectedDepartment: null,
 
+            editDetail: null,
             selectedId: null,
             editName: null,
             editSelectedType: null,
@@ -404,6 +431,7 @@ export default {
             this.selectedCategory = null;
             this.selectedDepartment = null;
             this.name = null;
+            this.selectedCookingAreaType = null;
         },
         createAreasBtnClicked() {
             if(!this.name){
@@ -415,6 +443,10 @@ export default {
                 return 1;
             }
             else if(this.selectedCategory.name === 'Selling Area' && !this.selectedType){
+                this.alertValidationMessage(`Area Type`);
+                return 1;
+            }
+            else if(this.selectedCategory.name === 'Cooking Area' && !this.selectedCookingAreaType){
                 this.alertValidationMessage(`Type`);
                 return 1;
             }
@@ -428,6 +460,9 @@ export default {
             formData.append('name', this.name);
             if(this.selectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.selectedType.id);
+            }
+            if(this.selectedCategory.name === 'Cooking Area'){
+                formData.append('type', this.selectedCookingAreaType.value);
             }
             formData.append('area_category_id', this.selectedCategory.id);
             // formData.append('department_id', this.selectedDepartment.id);
@@ -448,7 +483,7 @@ export default {
             }
             else {
                 this.$notify({
-                    text: `Menu create failed`,
+                    text: `Area create failed`,
                     type: "error"
                 });
             }
@@ -456,6 +491,7 @@ export default {
 
 
         editBtnClicked(item){
+            this.editDetail = item;
             this.selectedId = item.id;
             this.selectedType = null;
             // this.selectedCategory = null;
@@ -464,6 +500,10 @@ export default {
             if(this.editSelectedCategory.name === 'Selling Area'){
                 this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
             }
+
+            // if(item.area_category.name === 'Cooking Area'){
+            //     this.selectedCookingAreaType = this.cookingAreaTypeList.find(type => type === a)
+            // }
         },
         editAreasBtnClicked() {
             if(!this.editName){
