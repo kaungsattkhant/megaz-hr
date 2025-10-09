@@ -53,6 +53,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <tr v-if="leadTimeList.length < 1 && errorMessage">
                                 <td colspan="3">
@@ -74,6 +79,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="leadTimeList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -101,8 +111,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             leadTimeList: [],
@@ -122,7 +136,8 @@ export default {
             searchInput:null,
 
             url:'/api/supplier_lead_time/',
-            url_supplier:''
+            url_supplier:'',
+            loading: false,
 
         };
     },
@@ -130,10 +145,12 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         async getLeadTimeList(pageNumber) {
+            // this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url + this.selectedSupplier.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.leadTimeList = response.data;
                 this.totalAvgLeadTime = response.data.total_average_lead_time;
                 // this.lastPage = response.data.last_page;

@@ -56,7 +56,7 @@
                             :rows="20"
                             :cols="6"
                             />
-                        <tbody>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(role, index) in roleList" :key="index">
                                 <tr class="">
