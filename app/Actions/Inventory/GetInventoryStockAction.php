@@ -175,6 +175,7 @@ class GetInventoryStockAction
                 })
                 ->select(
                     'items.name',
+                    'items.code',
                     'inventory_ledger_items.item_id',
                     'items.uom_id as item_uom_id',
                     'inventory_ledgers.inventory_id',
@@ -215,6 +216,7 @@ class GetInventoryStockAction
                     'inventory_ledger_items.item_id',
                     'inventory_ledgers.batch_no',
                     'items.name',
+                    'items.code',
                     'items.uom_id',
                     'latest_prices.average_price',
                     'inventory_items.min_quantity',
@@ -253,6 +255,7 @@ class GetInventoryStockAction
                 return [
                     'name' => $items->first()->name,
                     'item_id' => $itemId,
+                    'item_code' => $items->first()->code,
                     'opening_balance' => $items->sum('opening_balance'),
                     'in_balance' => $items->sum('in_balance'),
                     'out_balance' => $items->sum('out_balance'),
@@ -271,9 +274,7 @@ class GetInventoryStockAction
             })
             ->filter(fn ($item) => $item['closing_balance'] > 0) // remove groups with closing_balance <= 0
             ->values();
-
         return $grouped;
-      
     }
 
     public function test($request)

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('sops', function (Blueprint $table) {
-            $table->dropForeign('sops_job_description_id_foreign');
-            $table->dropColumn('job_description_id');
+        Schema::table('staff_equipment_assigns', function (Blueprint $table) {
+            $table->unsignedBigInteger('equipment_typeable_id')->after('uom_type');
+            $table->string('equipment_typeable_type')->after('equipment_typeable_id');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('sops', function (Blueprint $table) {
+        Schema::table('staff_equipment_assigns', function (Blueprint $table) {
             //
         });
     }

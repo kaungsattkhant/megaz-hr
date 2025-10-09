@@ -19,7 +19,7 @@ class Pack extends Model
         return $this->belongsTo(Menu::class);
     }
 
-    public function packItems()
+    public function pack_items()
     {
         return $this->hasMany(PackItem::class);
     }

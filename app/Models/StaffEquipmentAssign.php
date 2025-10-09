@@ -11,7 +11,8 @@ class StaffEquipmentAssign extends Model
     use HasFactory;
 
     protected $fillable = [
-        'staff_equipment_id',
+        'equipment_typeable_id',
+        'equipment_typeable_type',
         'item_id',
         'uom_id',
         'uom_quantity',
@@ -19,15 +20,18 @@ class StaffEquipmentAssign extends Model
         'uom_type'
     ];
 
-    public function staffEquipment()
-    {
-        return $this->belongsTo(StaffEquipment::class, 'staff_equipment_id');
-    }
+    // public function staffEquipment()
+    // {
+    //     return $this->belongsTo(StaffEquipment::class, 'staff_equipment_id');
+    // }
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
-
+    public function equipmentTypeable()
+    {
+        return $this->morphTo();
+    }
     // public function baseUom()
     // {
     //     return $this->belongsTo(Uom::class, 'base_uom_id');

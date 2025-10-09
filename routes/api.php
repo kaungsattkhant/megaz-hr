@@ -283,8 +283,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases/bought', 'boughtFixedAsset');
     });
 
-    Route::post('/packs', [PackAPIController::class, 'createPack']);
-    Route::get('/packs', [PackAPIController::class, 'getPacksData']);
+   
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(SupplierController::class)->group(function () {
         Route::post('/create_supplier_account', 'createSupplierAccount');
@@ -324,6 +323,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(InventoryAPIController::class)->group(function () {
         Route::get('inventory_ledger_list', 'getInventoryLedgerList');
         Route::post('inventory_item', 'createInventoryItem');
+        Route::get('inventory-closing-items', 'getInventoryClosingItems');
     });
 
     Route::get('/uoms', [UomAPIController::class, 'getUomData']);

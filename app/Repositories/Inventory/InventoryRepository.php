@@ -100,13 +100,16 @@ class InventoryRepository implements InventoryRepositoryInterface
                 }
                 foreach ($inventoryables as $inventoryable) {
                     if($inventoryable['inventoryable_type'] === "department"){
-                        $existingDepartment = Inventoryable::where('inventoryable_type', 'department')
-                        ->where('inventoryable_id', $inventoryable['inventoryable_id'])
-                        ->first();
-                        if ($existingDepartment) {
-                            DB::rollback();
-                            return ResponseMessage('This department already has a inventory association. Only one inventory per department is allowed.', 400);
+                        if(!isset($inventoryable['id']) || $inventoryable['id'] === null){
+                            $existingDepartment = Inventoryable::where('inventoryable_type', 'department')
+                            ->where('inventoryable_id', $inventoryable['inventoryable_id'])
+                            ->first();
+                            if ($existingDepartment) {
+                                DB::rollback();
+                                return ResponseMessage('This department already has a inventory association. Only one inventory per department is allowed.', 400);
+                            }
                         }
+                        
                         Inventoryable::updateOrCreate(
                             [
                                 'id' => $inventoryable['id'] ?? null,
@@ -174,6 +177,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         return $ledgers;
     }
 
+    //inventory closing means current inventory stock
     public function getInventoryLedgerList($request)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
@@ -235,10 +239,10 @@ class InventoryRepository implements InventoryRepositoryInterface
         }
     }
 
+    //area equipment lists
     public function getInventoryItemsByStaff($areaId)
     {
-        $staffId = UserData()->id;
-        $inventoryId = $this->getInventory($staffId)->pluck('id')->first();
+        $inventoryId = UserData()->department->inventory->inventory_id;
         $inventoryItems = InventoryLedgerItem::with([
             'inventory_ledger',
             'inventory_ledger.inventory.inventoryable.inventoryable',
@@ -261,7 +265,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         ->map(function ($items, $itemId) {
             $firstItem = $items->first();
             $item = $firstItem->item;
-            $conversion =  max(1, $item->conversion); //to prevent division by zero;
+            $conversion =  max(1, $item->uom_conversion); //to prevent division by zero;
             $baseUom =  $item->base_uom_name;
             $uom =  $item->item_uom;
             $inQuantity = $items->filter(function ($item) {
@@ -280,17 +284,39 @@ class InventoryRepository implements InventoryRepositoryInterface
             // $area = $areaInventoryable ? $areaInventoryable->inventoryable : null;
             
             return [
-                'id' => $firstItem->id,
+                // 'id' => $firstItem->id,
                 'item_id' => $itemId,
+                'item_code' => $item->code,
                 'item_name' => $item->name,
-                'base_quantity' =>  $baseQuantity,
-                'base_uom' => $baseUom,
-                'uom_quantity' => $uomQuantity,
-                'uom' => $uom,
+                // 'base_uom_quantity' =>  $baseQuantity,
+                'base_uom_name' => $baseUom,
+                'base_uom_id' => $item->base_uom_id,
+                // 'uom_quantity' => $uomQuantity,
+                'uom_id' => $item->uom_id,
+                'uom_name' => $item->item_uom,
+                'uom_conversion' => $conversion,
+                'current_quantity' => $currentQuantity,
             ];
         })
         ->values();
         
     return $result;
+    }
+
+    public function getInventoryClosingItems($request)
+    {
+        $inventoryId = null;
+        $userData = UserData();
+        if ($userData && isset($userData->department) && $userData->department && 
+        isset($userData->department->inventory) && $userData->department->inventory) {
+        $inventoryId = $userData->department->inventory->inventory_id;
+        }
+    
+        if ($inventoryId === null) {
+            ResponseMessage('Login User have no Inventory', 419);
+        }
+        
+        $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
+        return $ledgers;
     }
 }

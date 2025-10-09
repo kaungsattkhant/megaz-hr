@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangePackRequest;
+use App\Http\Requests\PackCreateRequest;
 use App\Repositories\Pack\PackRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -21,9 +23,16 @@ class PackAPIController extends Controller
         ResponseData($packs);
     }
 
-    public function createPack(Request $request)
+    public function createPack(PackCreateRequest $request)
     {
         $pack = $this->packRepo->createPack($request->all());
+        ResponseData($pack);
+    }
+
+    public function changePack(ChangePackRequest $request)
+    {
+        dd('abc');
+        $pack = $this->packRepo->changePack($request);
         ResponseData($pack);
     }
 }

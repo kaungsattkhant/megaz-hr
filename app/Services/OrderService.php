@@ -4,14 +4,18 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\Menu;
+use App\Models\Pack;
 use App\Models\Order;
 use App\Models\Entity;
 use App\Models\Invoice;
 use App\Models\MenuArea;
+use App\Models\Inventory;
 use App\Models\OrderItem;
 use App\Models\RoomSession;
 use App\Models\MenuStepItem;
+use App\Models\SellingExtra;
 use GuzzleHttp\Psr7\Response;
+use App\Models\OrderItemExtra;
 use App\Models\InventoryLedger;
 use App\Models\InvoiceAccessory;
 use App\Models\MenuCategoryArea;
@@ -22,9 +26,6 @@ use App\Events\KitchenNotificationRequest;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
-use App\Models\Inventory;
-use App\Models\OrderItemExtra;
-use App\Models\SellingExtra;
 
 class OrderService
 {
@@ -117,6 +118,7 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
 
                 $insertData = [];
+                $this->checkPackEnough($data['menu_id'], $quantityCount);
                 $this->checkInventoryEnough($data['menu_id'], $inventoryId, $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
@@ -263,6 +265,7 @@ class OrderService
                 $cookingAreaId = $menuData['cooking_area_id'];
                 $inventoryId = $this->getInventoryIdByCookingArea($cookingAreaId);
                 $cookingAreaIds[] = $cookingAreaId;
+                $this->checkPackEnough($menuData['menu_id'], $menuData['quantity']);
                 $this->checkInventoryEnough($menuData['menu_id'], $inventoryId, $menuData['quantity']);
                 if (isset($menuData['selling_extra_id']) && !empty($menuData['selling_extra_id'])) {
                     foreach ($menuData['selling_extra_id'] as $sellingExtraId) {
@@ -524,7 +527,7 @@ class OrderService
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
-                    ->where('type', 'ready_to_sale');
+                    ->where('type','!=','ready_to_sale');
             })
             ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
@@ -583,6 +586,37 @@ class OrderService
 
     }
 
+    public function checkPackEnough($menuId, $quantity)
+    {
+        $totalPacks = Pack::where('menu_id', $menuId)
+            ->where('status', 'ready')
+            ->where('expired_at', '>', now())
+            ->count();
+
+        if ($totalPacks == 0) {
+            ResponseMessage('No packs found for this menu', 404);
+        }
+
+        if ($totalPacks < $quantity) {
+            ResponseMessage('Not enough packs to sell', 402);
+        }
+    }
+
+    public function actionPackMenu($menuId, $quantity)
+    {
+        $packs = Pack::where('menu_id', $menuId)
+            ->where('status', 'ready')
+            ->where('expired_at', '>', now())
+            ->orderBy('expired_at', 'asc')
+            ->limit($quantity)
+            ->get();
+        if ($packs->count() < $quantity) {
+            ResponseMessage('Not enough packs to sell', 402);
+        }
+        Pack::whereIn('id', $packs->pluck('id'))->update(['status' => 'sold']);
+        return true;
+    }
+
     public function actionInventoryItem($orderItem, $morphMapName, $action, $sellingExtraIds)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
@@ -591,7 +625,7 @@ class OrderService
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
-                    ->where('type', 'ready_to_sale');
+                    ->where('type', '!=', 'ready_to_sale');
             })
             ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
@@ -713,7 +747,7 @@ class OrderService
                     'batch_no' => $inventory_item->batch_no,
                     'date' => now(),
                     'ledgerable_id' => $orderItem->id,
-                    'ledgerable_type' => 'order_item',
+                    'ledgerable_type' => $morphMapName,
                     'inventory_id' => $inventoryId,
                     'action' => $action,//out
                 ]);
@@ -724,7 +758,6 @@ class OrderService
                     'inventory_ledger_id' => $inventoryLedger->id,
                 ]);
                 $remainingQuantity -= $quantityToTake;
-                $array[] = $quantityToTake;
             }
         }
 
