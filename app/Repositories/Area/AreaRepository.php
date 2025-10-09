@@ -39,7 +39,6 @@ class AreaRepository implements AreaRepositoryInterface
                 $data['id'] = null;
             }
             $area = Area::updateOrCreate(['id'=>$data['id']],$data);
-            dd($area);
             if (!isset($data['id'])) {
                 $sellingAreaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])
                     ->first();
