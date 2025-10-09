@@ -71,8 +71,9 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <td class="whitespace-nowrap capitalize ">
                                         {{ area.area_type ? area.area_type.name : '' }}
+                                        {{ area.type ? area.type : '' }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_category.name }}
@@ -248,7 +249,7 @@
                                 </label>
                                 <input type="text" placeholder="Area Name" v-model="editName" class="input-ui">
                             </div>
-                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Cooking Area'">
+                            <div class="mb-4" v-show="editDetail?.area_category?.name === 'Cooking Area'">
                                 <label for="" class="label-form mb-3">Type</label>
                                 <multiselect v-model="selectedCookingAreaType" :options="cookingAreaTypeList" :close-on-select="true"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Type"
@@ -501,9 +502,9 @@ export default {
                 this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
             }
 
-            // if(item.area_category.name === 'Cooking Area'){
-            //     this.selectedCookingAreaType = this.cookingAreaTypeList.find(type => type === a)
-            // }
+            if(item.area_category.name === 'Cooking Area'){
+                this.selectedCookingAreaType = this.cookingAreaTypeList.find(type => type.value === item.type)
+            }
         },
         editAreasBtnClicked() {
             if(!this.editName){
@@ -529,6 +530,9 @@ export default {
             formData.append('name', this.editName);
             if(this.editSelectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.editSelectedType.id);
+            }
+            if(this.editSelectedCategory.name === 'Cooking Area'){
+                formData.append('type', this.selectedCookingAreaType.value);
             }
             formData.append('area_category_id', this.editSelectedCategory.id);
             // formData.append('department_id', this.selectedDepartment.id);
