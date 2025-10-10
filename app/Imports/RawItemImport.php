@@ -74,6 +74,10 @@ class RawItemImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnE
                 'date' => $convertedDate,
                 'action' => 'in',
             ]);
+
+            $batchNo = now()->format('YmdHis') .'_'.$item->id .'_'. $inventoryLedger->id;
+            $inventoryLedger->batch_no = $batchNo;
+            $inventoryLedger->save();
             $inventoryLedger->inventory_ledger_items()->create([
                 'inventory_id' => $inventory->id,
                 'item_id' => $item->id,

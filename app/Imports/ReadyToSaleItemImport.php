@@ -60,6 +60,9 @@ class ReadyToSaleItemImport implements ToModel, WithHeadingRow, WithValidation, 
                 'date' => $convertedDate,
                 'action' => 'in',
             ]);
+            // $batchNo = now()->format('YmdHis') .'_'. $inventory->id .'_'. $inventoryLedger->id;
+            // $inventoryLedger->batch_no = $batchNo;
+            // $inventoryLedger->save();
 
             foreach ($menuStepItems as $menuStepItem) {
                 $inventoryLedger->inventory_ledger_items()->create([
