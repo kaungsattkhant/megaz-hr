@@ -210,6 +210,8 @@ use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningIn
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepositoryInterface;
+use App\Repositories\Report\ReportInterface;
+use App\Repositories\Report\ReportRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -316,5 +318,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
         $this->app->bind(DepositAndReceivableReportRepositoryInterface::class, DepositAndReceivableReportRepository::class);
         $this->app->bind(StaffEquipmentHandoverRepositoryInterface::class, StaffEquipmentHandoverRepository::class);
+        $this->app->bind(ReportInterface::class, ReportRepository::class);
+
     }
 }
