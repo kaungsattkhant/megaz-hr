@@ -437,6 +437,7 @@
                 typeList:[
                     {'name': 'KTV', 'value': 'ktv'},
                     {'name': 'Restaurant', 'value': 'restaurant'},
+                    {'name': 'Bar', 'value': 'bar'},
                     {'name': 'Event', 'value': 'event'},
                 ],
                 selectedType: null,
