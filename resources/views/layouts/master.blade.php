@@ -64,25 +64,34 @@
 
                 let sidebar = $('#sidebar_admin');
                 let content = $('#content_collapse');
+                let logout = $('#logout');
+                let sidebar_scroll_list = $('#sidebar_scroll_list');
+                let icon_sidebar = $('#icon_sidebar');
 
-                if (sidebar.width() === 0) {
-                    // expand
-                    sidebar.animate({ width: "256px" }, 400); // adjust px
-                    content.animate({ marginLeft: "256px" }, 300);
-                    // content.animate({ width: "calc(100% - 256px)" }, 300);
+                if (sidebar.width() > 100) {
+                     // collapse
+                    sidebar.animate({ width: "80px"}, 300);
+                    logout.animate({ width: "0", opacity: '0'  }, 500);
+                    sidebar_scroll_list.animate({ opacity: '0'  }, 500);
+                    content.animate({ marginLeft: "80px", width: "100%" }, 700);
+                    setTimeout(() => {
+                        $('#icon_sidebar').addClass('shadow-xl');
+                        $('#icon_sidebar').removeClass('border-r');
+                    }, 600);
                 } else {
-                    // collapse
-                    sidebar.animate({ width: "0px" }, 300);
-                    content.animate({ marginLeft: "0px", width: "100%" }, 700);
-                    // content.animate({ width: "100%" }, 300);
+                    // expand
+                    sidebar.animate({ width: "336px" }, 100);
+                    logout.animate({ width: "336px", opacity: '100'  }, 300);
+                    sidebar_scroll_list.animate({ opacity: '100'  }, 300);
+                    content.animate({ marginLeft: "336px" }, 300);
+                    setTimeout(() => {
+                        $('#icon_sidebar').removeClass('shadow-xl');
+                        $('#icon_sidebar').addClass('border-r');
+                    }, 0);
                 }
 
                 // rotate the icon
                 $('#toggleBtn i').toggleClass('rotate-180');
-
-
-
-
                 // $('#sidebar_admin').toggleClass('!w-0');
                 // $('#toggleBtn i').toggleClass('rotate-180');
                 // console.log('testing sidenav');
@@ -90,6 +99,62 @@
             });
         });
 </script>
+<script>
+    $(document).ready(function () {
+        // Show the first tab by default
+        $('.tab-content:first').show();
+        $('.tab-btn:first').addClass('!text-blue-500 border-blue-500');
+
+        // Tab click handler
+        $('.tab-btn').click(function () {
+            const $btn = $(this);
+            const targetId = $btn.data('tab');
+            const $target = $('#' + targetId);
+
+            // Change active button color
+            $('.tab-btn')
+            .removeClass('!text-blue-500 border-blue-500')
+            .addClass('text-gray-500 border-transparent');
+
+            $btn
+            .removeClass('text-gray-500 border-transparent')
+            .addClass('!text-blue-500 border-blue-500');
+
+            // Fade out the current tab and fade in the new one
+            const $visible = $('.tab-content:visible');
+            if ($visible.attr('id') === targetId) return; // skip if same tab
+
+            $visible.stop(true, true).animate({ opacity: 0 }, 100, function () {
+                $visible.hide();
+                $target.css({ opacity: 0, display: 'block' }).animate({ opacity: 1 }, 100);
+            });
+
+
+            let sidebar = $('#sidebar_admin');
+            let content = $('#content_collapse');
+            let logout = $('#logout');
+            let sidebar_scroll_list = $('#sidebar_scroll_list');
+            let icon_sidebar = $('#icon_sidebar');
+
+            if (sidebar.width() < 100) {
+                 // expand
+                sidebar.animate({ width: "336px" }, 100);
+                logout.animate({ width: "336px", opacity: '100'  }, 300);
+                sidebar_scroll_list.animate({ opacity: '100'  }, 300);
+                content.animate({ marginLeft: "336px" }, 300);
+                setTimeout(() => {
+                    $('#icon_sidebar').removeClass('shadow-xl');
+                    $('#icon_sidebar').addClass('border-r');
+                }, 0);
+                $('#toggleBtn i').toggleClass('rotate-180');
+            }
+
+
+
+        });
+    });
+
+  </script>
 <script type="application/javascript">
     $(document).ready(function () {
         function scrollToActiveLink() {
