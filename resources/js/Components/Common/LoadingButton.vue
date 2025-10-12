@@ -1,6 +1,6 @@
 <template>
   <button
-    :disabled="loading"
+    :disabled="loading || explicitDisable"
     @click="$emit('click')"
     class="add-btn focus:outline-none focus:ring-0
     flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -34,6 +34,7 @@
 export default {
   props: {
     loading: Boolean,
+    explicitDisable: {type: Boolean, default: false},
     text: { type: String, default: 'Submit' },
     loadingText: { type: String, default: 'Processing...' },
   },
