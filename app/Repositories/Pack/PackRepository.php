@@ -267,5 +267,12 @@ class PackRepository implements PackRepositoryInterface
             ResponseMessage($e->getMessage(), 500);
         }
 
+
     }
+
+    public function changePack($request)
+    {
+        dd($request->all());
+    }
+
 }

@@ -733,6 +733,7 @@ export default {
             // this.areaList = [];
 
             this.modalType = 'create';
+            this.selectedItem = [];
         },
 
         createBtnClicked() {

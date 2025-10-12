@@ -77,6 +77,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- <tr>
                                 {{ balanceFormat(2010, 1000, 'kg', 'g') }}
@@ -172,6 +177,11 @@
                                 </tr>
                             </div>
 
+                            <tr class=" !text-center" v-if="inventoryLegderList.length < 1 && !loading">
+                                <td class="" colspan="10">
+                                    No Data Here
+                                </td>
+                            </tr>
                             <!-- <div class="contents" > -->
                                 <!-- <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                     <td colspan="7" class=" px-6 py-4 font-medium ">
@@ -501,8 +511,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import 'tw-elements';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             inventoryLegderList: [],
@@ -554,7 +568,8 @@ export default {
             typeList: [
                 { name: 'Defect', value: 'defect'},
                 { name: 'Used', value: 'used'}
-            ]
+            ],
+            loading: true,
         };
     },
     // props: ['inventory_id'],
@@ -572,6 +587,7 @@ export default {
         },
 
         async getInventoryLegderList(pageNumber) {
+            this.loading = true;
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
@@ -584,6 +600,7 @@ export default {
             }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.totalValuation = 0;
                 this.inventoryLegderList = response.data;
                 this.inventoryLegderList.forEach(ledger => {

@@ -70,6 +70,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -119,6 +124,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="receivesList.length < 1 && !loading">
+                                <td class="" colspan="11">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -254,8 +264,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             receivesList: [],
@@ -267,6 +281,7 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+            loading: true,
         };
     },
 
@@ -274,6 +289,7 @@ export default {
         ...mapGetters(['getToken']),
 
         async getInventoryReceivesList(pageNumber) {
+            this.loading = true;
             if (pageNumber) {
                 this.currentPage = pageNumber;
             }
@@ -283,6 +299,7 @@ export default {
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.receivesList = response.data.data;
 
                 this.lastPage = response.data.last_page;

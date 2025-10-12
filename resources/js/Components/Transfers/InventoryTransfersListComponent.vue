@@ -69,6 +69,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -116,6 +121,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="transfersList.length < 1 && !loading">
+                                <td class="" colspan="11">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -151,8 +161,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             transfersList: [],
@@ -165,6 +179,7 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+            loading: true,
         };
     },
 
@@ -172,13 +187,14 @@ export default {
         ...mapGetters(['getToken']),
 
         async getInventoryTransfersList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/transfers?page=${pageNumber}`;
             if (this.fromDate && this.toDate) {
                 url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.transfersList = response.data.data;
 
                 this.lastPage = response.data.last_page;

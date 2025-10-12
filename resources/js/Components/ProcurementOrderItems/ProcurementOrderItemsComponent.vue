@@ -64,7 +64,7 @@
                         :rows="20"
                         :cols="6"
                         />
-                        <tbody>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in orderItems" :key="index">
                                 <tr class="" data-te-collapse-init :data-te-target="'#orderCollapse'+index"
@@ -574,7 +574,6 @@ export default {
             let url = this.url + '?page=' + pageNumber;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.loading = false;
                 this.orderItems = response.data.data;
                 this.orderItems.map(item => ({ ...item, showPurchaseOrders: false }));
 
@@ -582,6 +581,7 @@ export default {
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
+                this.loading = false;
             }
         },
 

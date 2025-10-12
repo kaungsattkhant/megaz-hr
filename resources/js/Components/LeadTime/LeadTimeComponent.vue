@@ -58,14 +58,7 @@
                         :rows="20"
                         :cols="6"
                         />
-
-                        <tr class=" !text-center" v-else-if="leadTimeList.length < 1">
-                            <td class="" colspan="5">
-                                No Data Here
-                            </td>
-                        </tr>
-
-                        <tbody v-else>
+                        <tbody>
                             <tr v-if="leadTimeList.length < 1 && errorMessage">
                                 <td colspan="3">
                                     {{ errorMessage }}
@@ -86,6 +79,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="leadTimeList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -139,8 +137,7 @@ export default {
 
             url:'/api/supplier_lead_time/',
             url_supplier:'',
-
-            loading: true,
+            loading: false,
 
         };
     },
@@ -148,10 +145,12 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         async getLeadTimeList(pageNumber) {
+            // this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url + this.selectedSupplier.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.leadTimeList = response.data;
                 this.totalAvgLeadTime = response.data.total_average_lead_time;
                 // this.lastPage = response.data.last_page;

@@ -275,6 +275,7 @@
                 this.selectedAreaId = areaId
                 this.areaType = areaType
                 this.selectedArea = area;
+                // this.$refs.posRoom.isShowSidebar = false;
             },
 
             // create customer
