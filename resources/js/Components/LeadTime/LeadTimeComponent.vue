@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="mt-4 bg-white">
         <div class="card-shadow">
             <div>
@@ -24,7 +24,7 @@
                                 :key="itemIndex"> {{ item.name }} </option>
                         </select>
                     </div> -->
-                    
+
                 </div>
             </div>
         </div>
@@ -162,9 +162,12 @@ export default {
             }
         },
         async getSupplierList(){
+            this.loading = true;
             let url = '/api/suppliers';
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
+                console.log('loading top');
                 this.supplierList = response.data;
                 this.selectedSupplier = response.data[0]
                 this.getLeadTimeList();

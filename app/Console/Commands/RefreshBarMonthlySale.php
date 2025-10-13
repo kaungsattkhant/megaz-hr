@@ -39,6 +39,7 @@ class RefreshBarMonthlySale extends Command
                 ->join('areas as selling_area', 'invoices.area_id', '=', 'selling_area.id')
                 ->join('areas as cooking_area', 'order_items.area_id', '=', 'cooking_area.id')
                 ->join('area_types', 'selling_area.area_type_id', '=', 'area_types.id')
+                
                 ->whereYear('order_items.date', $year)
                 ->whereMonth('order_items.date', $month)
                 ->selectRaw('
@@ -48,6 +49,7 @@ class RefreshBarMonthlySale extends Command
                 ')
                 ->groupBy('area_types.type', 'cooking_area.type')
                 ->get();
+                dd($records);
             if ($records->isEmpty()) {
                 $this->info("ℹ No bar data found for {$monthName}");
                 return Command::SUCCESS;

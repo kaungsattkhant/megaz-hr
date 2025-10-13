@@ -69,7 +69,13 @@
                         :rows="20"
                         :cols="6"
                         />
-                        <tbody>
+
+                        <tr class=" !text-center" v-else-if="uomConversionList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(uom, itemIndex) in uomConversionList" :key="itemIndex">
                                 <tr class="">
