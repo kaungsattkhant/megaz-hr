@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bar_monthly_sale', function (Blueprint $table) {
+        Schema::create('monthly_total_ktv_sessions', function (Blueprint $table) {
             $table->id();
             $table->integer('year');
             $table->string('month_name');
             $table->integer('month_number');
-            $table->decimal('total', 15, 2)->default(0);
-            $table->string('area_type');
-            $table->string('cooking_area_type');
+            $table->decimal('total_ktv_sessions', 15, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bar_monthly_sale');
+        //
     }
 };

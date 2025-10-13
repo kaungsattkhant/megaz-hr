@@ -95,7 +95,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
                 'item_id' => $itemData->item_id,
                 'uom_id' => $itemData->uom_id,
                 'quantity' => $quantity,
-                'weight' =>  $itemData->weight,
+                'weight' => $itemData->weight,
                 'uom_type' => $itemData->uom_type
               ]);
             }
@@ -116,7 +116,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menu->menuPlaces()->sync($cookingPlace);
         if (isset($validatedData['menu_category_id'])) {
           $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
-          foreach ($cookingPlace  as $place) {
+          foreach ($cookingPlace as $place) {
             $place = CookingPlace::findOrFail($place);
             $areaId = $place->area_id;
             $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
@@ -127,11 +127,11 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
               MenuArea::updateOrCreate(
                 [
                   'menu_category_area_id' => $menuCategoryArea->id,
-                  'cooking_area_id' =>  $areaId,
+                  'cooking_area_id' => $areaId,
                 ],
                 [
                   'menu_category_area_id' => $menuCategoryArea->id,
-                  'cooking_area_id' =>  $areaId,
+                  'cooking_area_id' => $areaId,
                   'is_default' => 1,
                 ]
               );
@@ -210,7 +210,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
               return ResponseMessage("The 'expired_at' field is required for  type 'ready_to_sale'.", 402);
             }
           }
-          $menuStep =  $menu->menuSteps()->updateOrCreate(
+          $menuStep = $menu->menuSteps()->updateOrCreate(
             [
               'id' => $step->id ?? null,
               'menu_id' => $menuId,
@@ -261,10 +261,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
               ->update(['is_default' => 0]);
             MenuArea::updateOrCreate([
               'menu_category_area_id' => $menuCategoryArea->id,
-              'cooking_area_id' =>  $areaId,
+              'cooking_area_id' => $areaId,
             ], [
               'menu_category_area_id' => $menuCategoryArea->id,
-              'cooking_area_id' =>  $areaId,
+              'cooking_area_id' => $areaId,
               'is_default' => 1,
             ]);
           }
@@ -286,7 +286,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
       return response()->json([
         'message' => 'Menu updated successfully!',
-        'data' =>   $menuDatas
+        'data' => $menuDatas
       ], 200);
     } catch (Exception $e) {
       ResponseMessage($e->getMessage(), 500);
@@ -361,7 +361,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       $menuCategoriesQuery->where('selling_area_id', $sellingAreaId);
     }
     if ($request->has('per_page') || $request->has('page')) {
-      return  $menuCategoriesQuery->paginate(config('common.list_count'));
+      return $menuCategoriesQuery->paginate(config('common.list_count'));
     }
     return $menuCategoriesQuery->get();
   }
@@ -438,7 +438,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
   public function saleReport($request)
   {
-    $areaId=isset($request->area_id) ? $request->area_id :null;
+    $areaId = isset($request->area_id) ? $request->area_id : null;
     $query = OrderItem::select(
       'menu_id',
       DB::raw('CAST(SUM(quantity) AS UNSIGNED) as total_quantity'),
@@ -449,9 +449,9 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
     if ($areaId) {
       $query
-      ->whereHas('order.invoice',function($q)use($areaId){
-        $q->where('area_id', $areaId);
-      });
+        ->whereHas('order.invoice', function ($q) use ($areaId) {
+          $q->where('area_id', $areaId);
+        });
     }
 
     if ($request->has('date')) {

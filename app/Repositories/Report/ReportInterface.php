@@ -1,7 +1,8 @@
 <?php
 namespace App\Repositories\Report;
- interface ReportInterface 
- {
+interface ReportInterface 
+{
+   public function getBarForSky($request);
 
-    public function getBarForSky($request);
- }
+   public function getTotalKTVCustomers($request);
+}
