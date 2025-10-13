@@ -185,7 +185,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         // $inventoryId = UserData()->department->inventory->inventory_id;
         $inventoryId = $request->inventory_id;
         $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
-        return $ledgers;
+        return paginateCollection($ledgers,config('common.list_count'));
     }
 
     public function inventoryList()

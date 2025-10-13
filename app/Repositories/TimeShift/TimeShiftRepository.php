@@ -136,8 +136,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     $from_date = $request->input('from_date');
     $to_date = $request->input('to_date');
     $staff_id = $request->input('staff_id');
-
-    $query = CheckIn::with(['staff', 'timeShift.shift'])->checkInFilter($from_date, $to_date, $staff_id);
+    $query = CheckIn::orderBy('id','desc')->with(['staff', 'timeShift.shift'])->checkInFilter($from_date, $to_date, $staff_id);
 
     $checkIns = $query->paginate(config('common.list_count'));
     return CheckInResource::collection($checkIns);
