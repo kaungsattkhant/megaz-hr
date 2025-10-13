@@ -17,4 +17,9 @@ class ReportController extends Controller
         $data=$this->reportRepo->getBarForSky($request);
         ResponseData($data);
     }
+
+    public function getTotalKTVCustomers(Request $request){
+        $data=$this->reportRepo->getTotalKTVCustomers($request);
+        ResponseData($data);
+    }
 }

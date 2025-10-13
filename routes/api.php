@@ -492,6 +492,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('report')->controller(ReportController::class)->group(function () {
         Route::get('get_bar_for_sky', 'getBarForSky');
+        Route::get('get_total_ktv_customers', 'getTotalKTVCustomers');
     });
 
 });
@@ -715,3 +716,6 @@ Route::controller(TagController::class)->group(function () {
     Route::get('/tags', 'getTags');
     Route::post('/tags', 'createTag');
 });
+
+Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
+
