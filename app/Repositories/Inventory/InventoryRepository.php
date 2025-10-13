@@ -328,82 +328,37 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $inventories = Inventory::whereIn('id', [8,9])->get(); //hot kitchen 555 and bar inventory
-            $items = Item::all();
-            $inventoryLedgersData = [];
-            $inventoryLedgerItemsData = [];
-            $today = Carbon::today();
-            $now = Carbon::now();
+            // $inventories = Inventory::whereIn('id', [8,9])->get(); //hot kitchen 555 and bar inventory
+            // $items = Item::all();
+            // $inventoryLedgersData = [];
+            // $inventoryLedgerItemsData = [];
+            // $today = Carbon::today();
+            // $now = Carbon::now();
 
-            foreach ($inventories as $inventory) {
-                foreach ($items as $item) {
-                    $conversionRate = UomConversion::where('item_id', $item->id)->latest()->first();
-                    if (!$conversionRate) {
-                        ResponseMessage('Uom conversion not found for ' . $item->name, 419);
-                    }
-                    $inventoryLedger = InventoryLedger::create([
-                        'inventory_id' => $inventory->id,
-                        'date' => Carbon::now(),
-                        'action' => 'in',
-                    ]);
-                    $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
-                    $inventoryLedger->batch_no = $batchNo;
-                    $inventoryLedger->save();
+            // foreach ($inventories as $inventory) {
+            //     foreach ($items as $item) {
+            //         $conversionRate = UomConversion::where('item_id', $item->id)->latest()->first();
+            //         if (!$conversionRate) {
+            //             ResponseMessage('Uom conversion not found for ' . $item->name, 419);
+            //         }
+            //         $inventoryLedger = InventoryLedger::create([
+            //             'inventory_id' => $inventory->id,
+            //             'date' => Carbon::now(),
+            //             'action' => 'in',
+            //         ]);
+            //         $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
+            //         $inventoryLedger->batch_no = $batchNo;
+            //         $inventoryLedger->save();
 
-                    $inventoryLedger->inventory_ledger_items()->create([
-                        'inventory_id' => $inventory->id,
-                        'item_id' => $item->id,
-                        'inventory_ledger_id' => $inventoryLedger->id,
-                        'quantity' => 500 * $conversionRate->conversion,
-                    ]);
-                    // $inventoryLedger = InventoryLedger::where('action', 'in')
-                    //     ->whereDate('date', $today) // ✅ matches only by date part
-                    //     ->first();
-
-                    // if (!$inventoryLedger) {
-                    //     $inventoryLedger = InventoryLedger::create([
-                    //         'inventory_id' => $inventory->id,
-                    //         'date' => now(), // keep full datetime for new insert
-                    //         'action' => 'in',
-                    //     ]);
-                    // }
-                    // $inventoryLedger = InventoryLedger::updateOrCreate(
-                    //     [
-                    //         'inventory_id' => $inventory->id,
-                    //         'date' => $today,
-                    //         'action' => 'in',
-                    //     ],
-                    //     [
-                    //         'updated_at' => $now,
-                    //     ]
-                    // );
-
-                    // if (!$inventoryLedger->batch_no) {
-                    //     $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
-                    //     $inventoryLedger->batch_no = $batchNo;
-                    //     $inventoryLedger->save();
-                    // }
-
-                    // $inventoryLedger->inventory_ledger_items()->updateOrCreate(
-                    //     [
-                    //         'inventory_ledger_id' => $inventoryLedger->id,
-                    //     ],
-                    //     [
-                    //         'item_id' => $item->id,
-
-                    //         'inventory_id' => $inventory->id,
-                    //         'quantity' => 500 * $conversionRate->conversion,
-                    //         'updated_at' => $now,
-                    //     ]
-                    // );
-                    // $inventoryLedger->inventory_ledger_items()->create([
-                    //     'inventory_id' => $inventory->id,
-                    //     'item_id' => $item->id,
-                    //     'inventory_ledger_id' => $inventoryLedger->id,
-                    //     'quantity' => 500 * $conversionRate->conversion,
-                    // ]);
-                }
-            }
+            //         $inventoryLedger->inventory_ledger_items()->create([
+            //             'inventory_id' => $inventory->id,
+            //             'item_id' => $item->id,
+            //             'inventory_ledger_id' => $inventoryLedger->id,
+            //             'quantity' => 500 * $conversionRate->conversion,
+            //         ]);
+                
+            //     }
+            // }
 
             DB::commit();
             ResponseMessage('Insert successfully', 200);
