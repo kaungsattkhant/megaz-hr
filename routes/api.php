@@ -716,3 +716,6 @@ Route::controller(TagController::class)->group(function () {
     Route::get('/tags', 'getTags');
     Route::post('/tags', 'createTag');
 });
+
+Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
+
