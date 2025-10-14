@@ -1,5 +1,5 @@
 <template>
-    <button class="w-full text-left pl-12" @click="logoutBtnClicked">
+    <button class="w-full text-center" @click="logoutBtnClicked">
         <i class="fal fa-sign-out pr-3"></i>Logout
     </button>
 </template>
