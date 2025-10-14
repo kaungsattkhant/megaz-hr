@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RefreshBarMonthlySale extends Command
 {
@@ -31,7 +32,6 @@ class RefreshBarMonthlySale extends Command
             $year = now()->year;
             $month = now()->month;
             $monthName = now()->format('M');
-            // dd($month);
             // Calculate total for current month
             $records = DB::table('order_items')
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -49,7 +49,12 @@ class RefreshBarMonthlySale extends Command
                 ')
                 ->groupBy('area_types.type', 'cooking_area.type')
                 ->get();
-                dd($records);
+
+                Log::info([
+                    "Bar monthly sale" => $records,
+                    "Month" => $monthName,
+                    "Year" => $year,
+                ]);
             if ($records->isEmpty()) {
                 $this->info("ℹ No bar data found for {$monthName}");
                 return Command::SUCCESS;
