@@ -13,4 +13,11 @@ class MenuPlace extends Model
         'menu_id',
         'cooking_place_id'
     ];
+
+    public function menu(){
+        return $this->belongsTo(Menu::class);
+    }
+     public function cooking_place(){
+        return $this->belongsTo(CookingPlace::class);
+    }
 }
