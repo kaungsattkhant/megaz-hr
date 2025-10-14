@@ -271,6 +271,7 @@ import LoanDetailsComponent from './Components/Loans/LoanDetailsComponent.vue';
 import SaleLedgerComponent from './Components/SaleLedgers/SaleLedgerComponent.vue';
 import SaleLedgerKtvComponent from './Components/SaleLedgers/SaleLedgerKtvComponent.vue';
 import SaleLedgerRestaurantComponent from './Components/SaleLedgers/SaleLedgerRestaurantComponent.vue';
+import SideBarComponent from './Components/Common/SideBarComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -520,6 +521,7 @@ app.component('LoanDetailsComponent', LoanDetailsComponent);
 app.component('SaleLedgerComponent',SaleLedgerComponent);
 app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
 app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
+app.component('SideBarComponent',SideBarComponent);
 
 const toastificationOptions = {};
 app.use(store);

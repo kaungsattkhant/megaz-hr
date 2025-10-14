@@ -57,7 +57,8 @@ body{
   display: flex;
   position: relative;
   font-size: 14px;
-  color: black;
+  // color: black;
+  color: rgb(107,114,128);
   font-family: Inter, sans-serif; 
 }
 
@@ -88,8 +89,8 @@ body{
 
 .main-content {
   margin-left: auto;
-  width: calc(100% - 256px);
-  margin-inline-start: 16rem;
+  width: calc(100% - 336px);
+  margin-inline-start: 336px;
   display: inline-block; }
 
 .inner-container {
@@ -459,4 +460,15 @@ body{
 }
 #sidebar_admin{
   transition: all 0.3s ease;
+}
+
+.tab-content {
+  display: none;
+  // opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.tab-content.show {
+  display: block;
+  // opacity: 1;
 }
