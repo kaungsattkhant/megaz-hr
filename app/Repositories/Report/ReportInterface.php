@@ -11,4 +11,6 @@ interface ReportInterface
    public function getTotalKTVRoomCharges($request);
 
    public function getTotalKTVSales($request);
+
+   public function getKTVTraining($request);
 }

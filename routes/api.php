@@ -496,6 +496,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('get-total-ktv-sessions', 'getTotalKTVSessions');
         Route::get('get-total-ktv-room-charges', 'getTotalKTVRoomCharges');
         Route::get('get-total-ktv-sales', 'getTotalKTVSales');
+
+        Route::get('ktv/trainings', 'getKTVTraining');
     });
 
 });

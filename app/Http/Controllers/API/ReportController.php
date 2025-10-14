@@ -37,4 +37,9 @@ class ReportController extends Controller
         $data=$this->reportRepo->getTotalKTVSales($request);
         ResponseData($data);
     }
+
+    public function getKTVTraining(Request $request){
+        $data=$this->reportRepo->getKTVTraining($request);
+        ResponseData($data);
+    }
 }

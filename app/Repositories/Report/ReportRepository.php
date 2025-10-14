@@ -53,4 +53,13 @@ class ReportRepository implements ReportInterface
         return $this->orderByMonthName($results)->get();
     }
 
+    public function getKTVTraining($request)
+    {
+        $results = DB::table('monthly_total_ktv_training')
+            ->select('month_name', 'total_ktv_training')
+            ->groupBy('month_name')
+            ->where('year', $request->year ?? now()->year);
+        return $this->orderByMonthName($results)->get();
+    }
+
 }
