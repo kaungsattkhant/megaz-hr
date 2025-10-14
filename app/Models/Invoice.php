@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Area;
 use App\Models\Order;
 use App\Models\Entity;
 use App\Models\Package;
+use App\Models\HeadCount;
 use App\Models\RoomSession;
 use App\Models\InvoiceService;
 use Illuminate\Support\Carbon;
@@ -126,5 +128,15 @@ class Invoice extends Model
     }
     public function invoiceSessions(){
         return $this->hasMany(InvoiceSession::class);
+    }
+
+    public function headCount()
+    {
+        return $this->belongsTo(HeadCount::class);
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
     }
 }

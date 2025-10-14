@@ -594,7 +594,8 @@ class OrderService
             ->count();
 
         if ($totalPacks == 0) {
-            ResponseMessage('No packs found for this menu', 404);
+            $menu=Menu::find($menuId);
+            ResponseMessage('No packs found for  '.$menu->name, 404);
         }
 
         if ($totalPacks < $quantity) {

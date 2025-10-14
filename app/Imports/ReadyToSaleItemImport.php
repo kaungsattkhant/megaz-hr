@@ -54,14 +54,15 @@ class ReadyToSaleItemImport implements ToModel, WithHeadingRow, WithValidation, 
             if ($menuStepItems->isEmpty()) {
                 ResponseMessage( $row['menu_code'].' - Ready to sale Item is invalid', 419);
             }
-
+            foreach ($menuStepItems as $menuStepItem) {
             $inventoryLedger = InventoryLedger::create([
                 'inventory_id' => $inventory->id,
                 'date' => $convertedDate,
                 'action' => 'in',
             ]);
-
-            foreach ($menuStepItems as $menuStepItem) {
+            $batchNo = now()->format('YmdHis') .'_'. $menuStepItem->id .'_'. $inventoryLedger->id;
+            $inventoryLedger->batch_no = $batchNo;
+            $inventoryLedger->save();
                 $inventoryLedger->inventory_ledger_items()->create([
                     'inventory_id' => $inventory->id,
                     'item_id' => $menuStepItem->item_id,
