@@ -1588,11 +1588,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     })
             //     ->values();
             // $orderItems = $order->orderItems->where('status','pos_confirmed');
+            $invoice = $order->invoice;
+            $areaId = $invoice->area_id;
             $orderItems = $order->orderItems->filter(fn($item) => $item->status === 'pos_confirmed');
-            $groupedOrderItems = $orderItems->groupBy(fn($item) => $item['menu_id'] . '-' . $item['area_id'])
+            $groupedOrderItems = $orderItems
+                ->groupBy('menu_id')
                 ->map(fn($items) => [
                     'menu_id' => $items->first()->menu_id,
-                    'area_id' => $items->first()->area_id,
                     'quantity' => $items->sum('quantity'),
                 ])
                 ->values();
@@ -1600,11 +1602,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $insertData = $groupedOrderItems->map(fn($orderItem) => [
                 'date_time' => CurrentTime(),
                 'invoice_id' => $invoiceId,
-                'area_id' => $orderItem['area_id'],
+                'area_id' => $areaId,
                 'menu_id' => $orderItem['menu_id'],
                 'quantity' => $orderItem['quantity'],
             ])->toArray();
-
             // Bulk insert for better performance
             TargetMenuResult::insert($insertData);
             // foreach ($groupedOrderItems as $orderItem) {
@@ -1617,6 +1618,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     ]);
             // }
         }
+
     }
     public function broadcastNotification($entityId)
     {
