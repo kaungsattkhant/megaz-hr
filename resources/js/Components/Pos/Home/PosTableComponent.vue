@@ -2605,6 +2605,7 @@
                 .then((response)=>{
                     this.menuOrderBtnLoading = false;
                     if(response.success){
+                        this.getPurchaseMenuList();
                         this.cartMenus = [];
                         this.cartMenusPriceTotal = 0;
                         this.foodOrderPanelShown = false;
