@@ -186,6 +186,7 @@ class InvoiceAPIController extends Controller
                 }
             }
             $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
+            // dd('fail safe');
             DB::commit();
             ResponseData($endRoom);
         } catch (\Exception $e) {
