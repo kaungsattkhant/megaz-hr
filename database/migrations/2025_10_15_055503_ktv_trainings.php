@@ -11,13 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //The table structure is designed to store one record per month per year for material view for total ktv sessions
-        Schema::create('monthly_total_ktv_sessions', function (Blueprint $table) {
+        Schema::create('monthly_total_ktv_trainings', function (Blueprint $table) {
             $table->id();
             $table->integer('year');
             $table->string('month_name');
             $table->integer('month_number');
-            $table->decimal('total_ktv_sessions', 15, 2)->default(0);
+            $table->string('training_topic');
+            $table->string('trainer');
+            $table->string('participant');
+            $table->string('training_date');
+            $table->string('training_time');
+
             $table->timestamps();
         });
     }
