@@ -22,4 +22,8 @@ class ReportController extends Controller
         $data=$this->reportRepo->getTotalKTVCustomers($request);
         ResponseData($data);
     }
+    public function getWaiterSale(Request $request){
+         $data=$this->reportRepo->getWaiterSale($request);
+        ResponseData($data);
+    }
 }

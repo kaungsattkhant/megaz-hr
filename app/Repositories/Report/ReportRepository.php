@@ -33,4 +33,9 @@ class ReportRepository implements ReportInterface
         return $results;
     }
 
+    public function getWaiterSale($request)
+    {
+        dd("hello");
+    }
+
 }
