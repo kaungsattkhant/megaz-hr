@@ -267,6 +267,13 @@
                                     </option>
                                 </select> -->
                             </div>
+
+                            <div class="mb-4" v-show="editDetail?.area_category?.name === 'Selling Area'">
+                                <label for="" class="label-form mb-3">Area Type</label>
+                                <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="false"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Menu Category"
+                                    :multiple="true" label="name" track-by="id" :preselect-first="false"></multiselect>
+                            </div>
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -463,6 +470,10 @@ export default {
             }
             else if(this.selectedCategory.name === 'Selling Area' && !this.selectedType){
                 this.alertValidationMessage(`Area Type`);
+                return 1;
+            }
+            else if(this.selectedCategory.name === 'Selling Area' && this.selectedMenuCategory.length < 1){
+                this.alertValidationMessage(`Menu Category`);
                 return 1;
             }
             else if(this.selectedCategory.name === 'Cooking Area' && !this.selectedCookingAreaType){
