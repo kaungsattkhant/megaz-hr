@@ -22,4 +22,27 @@ class ReportController extends Controller
         $data=$this->reportRepo->getTotalKTVCustomers($request);
         ResponseData($data);
     }
+    public function getWaiterSale(Request $request){
+         $data=$this->reportRepo->getWaiterSale($request);
+
+    }
+    public function getTotalKTVSessions(Request $request){
+        $data=$this->reportRepo->getTotalKTVSessions($request);
+        ResponseData($data);
+    }
+
+    public function getTotalKTVRoomCharges(Request $request){
+        $data=$this->reportRepo->getTotalKTVRoomCharges($request);
+        ResponseData($data);
+    }
+
+    public function getTotalKTVSales(Request $request){
+        $data=$this->reportRepo->getTotalKTVSales($request);
+        ResponseData($data);
+    }
+
+    public function getKTVTraining(Request $request){
+        $data=$this->reportRepo->getKTVTraining($request);
+        ResponseData($data);
+    }
 }

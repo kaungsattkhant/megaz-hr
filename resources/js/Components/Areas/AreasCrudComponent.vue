@@ -192,6 +192,12 @@
                                     </option>
                                 </select> -->
                             </div>
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Selling Area'">
+                                <label for="" class="label-form mb-3">Area Type</label>
+                                <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="false"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Menu Category"
+                                    :multiple="true" label="name" track-by="id" :preselect-first="false"></multiselect>
+                            </div>
                             <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Cooking Area'">
                                 <label for="" class="label-form mb-3">Type</label>
                                 <multiselect v-model="selectedCookingAreaType" :options="cookingAreaTypeList" :close-on-select="true"
@@ -352,6 +358,7 @@ export default {
             departmentList: [],
             areaList: [],
             typeList: [],
+            menuCategoryList: [],
             cookingAreaTypeList: [{ name: 'Bar', value: 'bar'},{ name: 'Restaurant', value: 'restaurant'}],
             categoryList: [],
             name: null,
@@ -359,6 +366,7 @@ export default {
             selectedCookingAreaType: null,
             selectedCategory: null,
             selectedDepartment: null,
+            selectedMenuCategory: [],
 
             editDetail: null,
             selectedId: null,
@@ -407,6 +415,15 @@ export default {
             }
         },
 
+        async getMenuCategoryList() {
+            let response = await getApiData({
+                url: `/api/menu_categories`,
+                token: this.getToken(),
+            });
+            if (response.data) {
+                this.menuCategoryList = response.data;
+            }
+        },
         async getDepartmentList() {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -433,6 +450,7 @@ export default {
             this.selectedDepartment = null;
             this.name = null;
             this.selectedCookingAreaType = null;
+            this.selectedMenuCategory = [];
         },
         createAreasBtnClicked() {
             if(!this.name){
@@ -457,10 +475,15 @@ export default {
         },
 
         async createArea() {
+            let menuCategoryIds = [];
+            this.selectedMenuCategory.forEach(menu => {
+                menuCategoryIds.push(menu.id);
+            });
             let formData = new FormData();
             formData.append('name', this.name);
             if(this.selectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.selectedType.id);
+                formData.append('menu_category_ids', JSON.stringify(menuCategoryIds));
             }
             if(this.selectedCategory.name === 'Cooking Area'){
                 formData.append('type', this.selectedCookingAreaType.value);
@@ -525,6 +548,7 @@ export default {
         },
 
         async editArea() {
+            
             let formData = new FormData();
             formData.append('id', this.selectedId);
             formData.append('name', this.editName);
@@ -604,6 +628,7 @@ export default {
         this.getAreasList(1);
         this.getDepartmentList();
         this.getTypeList();
+        this.getMenuCategoryList();
         initTE({ Modal, Select, Ripple });
     }
 }
