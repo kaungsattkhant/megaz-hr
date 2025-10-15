@@ -169,7 +169,7 @@
                                 <label for="" class="label-form mb-3">
                                     Price Per Hour
                                 </label>
-                                <input type="text" placeholder="Price Per Hour" v-model="pricePerHour" class="input-ui">
+                                <input type="number" placeholder="Price Per Hour" v-model="pricePerHour" class="input-ui">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
@@ -185,10 +185,12 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createBtnClicked"
-                                class="add-btn focus:outline-none focus:ring-0 ">
-                                Create
-                            </button>
+                            <LoadingButton
+                            :loading="buttonLoading"
+                            text="Create"
+                            loadingText="Creating..."
+                            @click="createBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -253,10 +255,12 @@ import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -281,6 +285,8 @@ export default {
             feature: this.getFeature(),
 
             loading: true,
+
+            buttonLoading: false,
         };
     },
 
@@ -343,6 +349,7 @@ export default {
         },
 
         async createTableAndRoom() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('price_per_hour', this.pricePerHour);
@@ -350,6 +357,7 @@ export default {
             formData.append('area_id', this.area_id);
             // formData.append('service_category_id', this.service_category_id);
             let response = await postApiData({ url: '/api/entities', form_data: formData, token: this.getToken() });
+            this.buttonLoading = false;
             if (response.success) {
                 this.getRoomList(1);
                 this.closeModal();
