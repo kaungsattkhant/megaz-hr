@@ -14,8 +14,20 @@ class ReportRepository implements ReportInterface
     {
         $results = DB::table('bar_monthly_sale')
             ->select('month_name', DB::raw('SUM(total) as amount'))
+// <<<<<<< HEAD
+//             ->groupBy('month_name')
+//             // <<<<<<< HEAD
+//             ->pluck('amount', 'month_name');
+//         return $months->map(fn($month) => [
+//             'month_name' => $month,
+//             'amount' => $sales[$month] ?? 0,
+//         ]);
+
+// =======
             ->groupBy('month_name');
         return $this->orderByMonthName($results)->get();
+// >>>>>>> origin/thhs/hr
+            
     }
 
     public function getTotalKTVCustomers($request)
@@ -60,6 +72,11 @@ class ReportRepository implements ReportInterface
             ->groupBy('month_name')
             ->where('year', $request->year ?? now()->year);
         return $this->orderByMonthName($results)->get();
+    }
+
+    public function getWaiterSale($request)
+    {
+        dd("hello");
     }
 
 }

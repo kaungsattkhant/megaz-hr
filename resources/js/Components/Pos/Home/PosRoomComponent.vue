@@ -2055,7 +2055,7 @@
                 }
             },
             btnClickAddPackageMenuModal(){
-                this.getMenuList();
+                // this.getMenuList();
                 this.selectedMenuForPackage = null;
                 this.menuQuantityForPackage = null;
             },
@@ -2740,12 +2740,12 @@
 
 
             // add menu
-            async getMenuList() {
-                const response = await getApiData({ url: '/api/menus?selling_area_id=' + this.area.id, token: this.getToken() });
-                if (response.data) {
-                    this.menuList = response.data;
-                }
-            },
+            // async getMenuList() {
+            //     const response = await getApiData({ url: '/api/menus?selling_area_id=' + this.area.id, token: this.getToken() });
+            //     if (response.data) {
+            //         this.menuList = response.data;
+            //     }
+            // },
             async selectedMenuChange() {
                 // const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
                 // if (response.data) {
@@ -3162,7 +3162,9 @@
                 this.menuList = [];
                 this.selectedMenuCategory = category;
                 this.menuLoading = true;
-                this.getMenuList();
+                if(this.entityDetails){
+                    this.getMenuList(this.entityDetails.area_id);
+                }
             },
 
             addToOrderBtnClicked(menu){
@@ -3211,6 +3213,7 @@
                 .then((response)=>{
                     this.menuOrderBtnLoading = false;
                     if(response.success){
+                        this.getPurchaseMenuList();
                         this.cartMenus = [];
                         this.cartMenusPriceTotal = 0;
                         this.foodOrderPanelShown = false;

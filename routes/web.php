@@ -97,7 +97,7 @@ Route::middleware(['departments:inventory'])->group(function () {
 Route::middleware(['departments:inventory-transfer'])->group(function () {
     Route::view('/inventory_transfers', 'transfers.index')->name('transfers.index');
     Route::view('/inventory_transfers_list', 'transfers.transfers_list')->name('transfers.transfers');
-    Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
+    // Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
 });
 
 Route::middleware(['departments:used-defected-item'])->group(function () {
@@ -346,7 +346,7 @@ Route::middleware(['departments:staff-balance'])->group(function () {
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 
 // Route::middleware(['departments:prepaid'])->group(function () {
-Route::view('prepaid', 'prepaid.index')->name('prepaid');
+Route::view('/prepaid', 'prepaid.index')->name('prepaid');
 // });
 
 Route::middleware(['departments:ar'])->group(function () {

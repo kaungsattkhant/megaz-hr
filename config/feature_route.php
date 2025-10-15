@@ -88,6 +88,12 @@ return [
     'js'=>'job_specifications.index',
     'sop'=>'SOP.index',
     'cv'=>'CV.index',
+    'shift-assignment'=>'shift_assignment.index',
+    'equipment-assignment'=>'equipment_assignment.index',
+    'asset-assignment'=>'asset_assignment.index',
+    'handbook'=>'handbooks.index',
+
+    
     
     
     //financial
@@ -103,6 +109,7 @@ return [
     'ar' => 'AR.index',
     'cashbook' => 'cashbook',
     'accrual'=>'accruals.index',
+    'loan'=>'loans.index',
     //end financial
 
     //pos
