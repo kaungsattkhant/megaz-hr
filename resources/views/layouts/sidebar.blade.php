@@ -1,4 +1,10 @@
-<nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh]">
+<div id="app">
+    <side-bar-component />
+</div>
+
+
+@if(1 > 3)
+<nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh] hidden">
     <div class="relative flex">
         <button type="button" id="toggleBtn"
             class="py-3 px-2 absolute -right-4 overflow-hidden top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 z-50 shadow-md">
@@ -1180,6 +1186,9 @@
                         @endif
                     </ul>
                 </div>
+
+
+
                 <div class="tab-content" id="tab-sample">
                     <ul>
                         @if (checkFeaturePermission('complaint'))
@@ -1207,6 +1216,8 @@
                         </li>
                     </ul>
                 </div>
+
+                
                 <div class="tab-content" id="tab-order">
                     <ul>
                         @if (
@@ -2951,3 +2962,4 @@
     });
 </script> -->
 
+@endif
