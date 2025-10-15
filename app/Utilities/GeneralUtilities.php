@@ -403,7 +403,7 @@ if (!function_exists('format_price')) {
      */
     function format_price($value)
     {
-        return number_format((float)$value, 2, '.', '');
+        return number_format((float) $value, 2, '.', '');
     }
 }
 
@@ -419,3 +419,21 @@ if (!function_exists('toggleColumn')) {
         return false;
     }
 }
+
+if (!function_exists('paginateCollection')) {
+    function paginateCollection($collection, $perPage = 15)
+    {
+        $page = request()->get('page', 1);
+        $path = request()->url();
+        $query = request()->query();
+
+        return new LengthAwarePaginator(
+            $collection->forPage($page, $perPage)->values(),
+            $collection->count(),
+            $perPage,
+            $page,
+            compact('path', 'query')
+        );
+    }
+}
+

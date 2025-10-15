@@ -52,7 +52,7 @@ body {
   display: flex;
   position: relative;
   font-size: 14px;
-  color: black;
+  color: #6b7280;
   font-family: Inter, sans-serif; }
 
 .side-bar ul li a.active-link {

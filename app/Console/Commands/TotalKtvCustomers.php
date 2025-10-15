@@ -32,7 +32,7 @@ class TotalKtvCustomers extends Command
             $month = now()->month;
             $monthName = now()->format('M');
             $totalKTVCustomers = HeadCount::whereHas('invoice.entity.area.areaType',function ($query){
-                $query->where('type','KTV');
+                $query->where('type','ktv');
             })
             ->whereHas('invoice.entity.area',function ($query){
                 $query->where('entity_type','room');

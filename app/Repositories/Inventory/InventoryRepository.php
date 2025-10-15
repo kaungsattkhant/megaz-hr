@@ -185,7 +185,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         // $inventoryId = UserData()->department->inventory->inventory_id;
         $inventoryId = $request->inventory_id;
         $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
-        return $ledgers;
+        return paginateCollection($ledgers,config('common.list_count'));
     }
 
     public function inventoryList()
@@ -328,7 +328,7 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $inventories = Inventory::whereIn('id', [8,9])->get(); //hot kitchen 555 and bar inventory
+            $inventories = Inventory::whereIn('id', [1,2])->get(); //hot kitchen 555 and bar inventory
             $items = Item::all();
             $inventoryLedgersData = [];
             $inventoryLedgerItemsData = [];
@@ -356,52 +356,7 @@ class InventoryRepository implements InventoryRepositoryInterface
                         'inventory_ledger_id' => $inventoryLedger->id,
                         'quantity' => 500 * $conversionRate->conversion,
                     ]);
-                    // $inventoryLedger = InventoryLedger::where('action', 'in')
-                    //     ->whereDate('date', $today) // ✅ matches only by date part
-                    //     ->first();
-
-                    // if (!$inventoryLedger) {
-                    //     $inventoryLedger = InventoryLedger::create([
-                    //         'inventory_id' => $inventory->id,
-                    //         'date' => now(), // keep full datetime for new insert
-                    //         'action' => 'in',
-                    //     ]);
-                    // }
-                    // $inventoryLedger = InventoryLedger::updateOrCreate(
-                    //     [
-                    //         'inventory_id' => $inventory->id,
-                    //         'date' => $today,
-                    //         'action' => 'in',
-                    //     ],
-                    //     [
-                    //         'updated_at' => $now,
-                    //     ]
-                    // );
-
-                    // if (!$inventoryLedger->batch_no) {
-                    //     $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
-                    //     $inventoryLedger->batch_no = $batchNo;
-                    //     $inventoryLedger->save();
-                    // }
-
-                    // $inventoryLedger->inventory_ledger_items()->updateOrCreate(
-                    //     [
-                    //         'inventory_ledger_id' => $inventoryLedger->id,
-                    //     ],
-                    //     [
-                    //         'item_id' => $item->id,
-
-                    //         'inventory_id' => $inventory->id,
-                    //         'quantity' => 500 * $conversionRate->conversion,
-                    //         'updated_at' => $now,
-                    //     ]
-                    // );
-                    // $inventoryLedger->inventory_ledger_items()->create([
-                    //     'inventory_id' => $inventory->id,
-                    //     'item_id' => $item->id,
-                    //     'inventory_ledger_id' => $inventoryLedger->id,
-                    //     'quantity' => 500 * $conversionRate->conversion,
-                    // ]);
+                
                 }
             }
 

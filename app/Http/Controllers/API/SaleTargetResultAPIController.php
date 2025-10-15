@@ -44,8 +44,8 @@ class SaleTargetResultAPIController extends Controller
             ->selectRaw('SUM(target_position_results.amount ) as total_result_amount,SUM(head_counts.total_head_count) as total_result_count')
             ->first();
 
-            $depts = Department::whereIn('name', ['Catering', 'Bar', 'Procurement'])->pluck('id')->toArray();
-            if (in_array(UserData()->department_id, $depts)) {
+        $depts = Department::whereIn('name', ['Catering', 'Bar', 'Procurement'])->pluck('id')->toArray();
+        // if (in_array(UserData()->department_id, $depts)) {
             $targetMenus = SaleTargetMenu::whereYear('month', $year)
                 ->whereMonth('month', $month)
                 ->with([
@@ -79,7 +79,6 @@ class SaleTargetResultAPIController extends Controller
                 ->with('menu') // optional: if you still want the related menu
                 ->get()
                 ->keyBy('menu_id');
-            // dd($soldMenus);
             $allMenus = $soldMenus->union($targetMenus)->map(function ($menu, $menuId) use ($targetMenus, $soldMenus) {
                 return [
                     'menu' => $soldMenus[$menuId]->menu ?? $targetMenus[$menuId]->menu,
@@ -87,9 +86,9 @@ class SaleTargetResultAPIController extends Controller
                     'sold_quantity' => $soldMenus[$menuId]->quantity ?? 0,
                 ];
             });
-        } else {
-            $allMenus = collect();
-        }
+        // } else {
+        //     $allMenus = collect();
+        // }
 
         $responseData = [
             'target_position_result' => [

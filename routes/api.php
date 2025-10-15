@@ -491,8 +491,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
 
     Route::prefix('report')->controller(ReportController::class)->group(function () {
-        Route::get('get_bar_for_sky', 'getBarForSky');
-        Route::get('get_total_ktv_customers', 'getTotalKTVCustomers');
+        Route::get('get-bar-for-sky', 'getBarForSky');
+        Route::get('get-total-ktv-customers', 'getTotalKTVCustomers');
+        Route::get('get-total-ktv-sessions', 'getTotalKTVSessions');
+        Route::get('get-total-ktv-room-charges', 'getTotalKTVRoomCharges');
+        Route::get('get-total-ktv-sales', 'getTotalKTVSales');
+
+        Route::get('ktv/trainings', 'getKTVTraining');
     });
 
 });
