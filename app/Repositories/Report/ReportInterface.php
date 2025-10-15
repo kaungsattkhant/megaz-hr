@@ -7,4 +7,11 @@ interface ReportInterface
    public function getTotalKTVCustomers($request);
 
    public function getWaiterSale($request);
+   public function getTotalKTVSessions($request);
+
+   public function getTotalKTVRoomCharges($request);
+
+   public function getTotalKTVSales($request);
+
+   public function getKTVTraining($request);
 }
