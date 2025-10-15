@@ -11,12 +11,16 @@ class Pack extends Model
     use HasFactory,SoftDeletes;
 
     protected $fillable = [
-        'menu_id','date','expired_at','created_by','status','pack_quantity',
+        'menu_id','date','expired_at','created_by','status','pack_quantity','inventory_id',
     ];
 
     public function menu()
     {
         return $this->belongsTo(Menu::class);
+    }
+    public function inventory()
+    {
+        return $this->belongsTo(Inventory::class,'inventory_id');
     }
 
     public function pack_items()
