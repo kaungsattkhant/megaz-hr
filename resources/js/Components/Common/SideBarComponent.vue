@@ -621,7 +621,7 @@
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('menu')">
-                                <a href="/MRP" class="flex items-center sidebar-gap-x">
+                                <a href="/mrp" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-salad"></i>
                                     MRP
                                 </a>
