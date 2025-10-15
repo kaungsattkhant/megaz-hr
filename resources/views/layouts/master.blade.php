@@ -30,6 +30,14 @@
 </head>
 
 <body>
+    <div id="global-loader">
+        <div class="spinner-wrapper">
+            <div class="spinner-ring"></div>
+            <img src="{{asset('img/logo.png')}}" alt="Loading..." width="100">
+        </div>
+    </div>
+    
+
      <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
@@ -102,8 +110,8 @@
 <script>
     $(document).ready(function () {
         // Show the first tab by default
-        $('.tab-content:first').show();
-        $('.tab-btn:first').addClass('!text-blue-500 border-blue-500');
+        // $('.tab-content:first').show();
+        // $('.tab-btn:first').addClass('!text-blue-500 border-blue-500');
 
         // Tab click handler
         $('.tab-btn').click(function () {
@@ -113,12 +121,12 @@
 
             // Change active button color
             $('.tab-btn')
-            .removeClass('!text-blue-500 border-blue-500')
+            .removeClass('!text-blue-500 border-blue-500 bg-blue-100')
             .addClass('text-gray-500 border-transparent');
 
             $btn
             .removeClass('text-gray-500 border-transparent')
-            .addClass('!text-blue-500 border-blue-500');
+            .addClass('!text-blue-500 border-blue-500 bg-blue-100');
 
             // Fade out the current tab and fade in the new one
             const $visible = $('.tab-content:visible');
@@ -148,9 +156,24 @@
                 }, 0);
                 $('#toggleBtn i').toggleClass('rotate-180');
             }
+        });
 
 
+        // for active tab and link in sidebar
+        const currentPath = window.location.pathname;
+        $("#sidebar_admin a").each(function () {
+            if ($(this).attr("href") === currentPath) {
 
+                $("#sidebar_admin a").removeClass("active-link"); // Remove 'active' from all links
+                $(this).addClass("active-link"); // Add 'active' to the matching link
+
+                $("#sidebar_admin .tab-content").removeClass("show"); // Remove 'active' from all links
+                $(this).closest(".tab-content").addClass("show");
+
+                const $tabContent = $(this).closest(".tab-content");
+                const tabId = $tabContent.attr("id"); // e.g. "tab-salary"
+                $(`.tab-btn[data-tab="${tabId}"]`).addClass("!text-blue-500 bg-blue-100");
+            }
         });
     });
 
@@ -160,19 +183,13 @@
         function scrollToActiveLink() {
             const $activeLink = $("#sidebar_admin a.active-link");
             if ($activeLink.length) {
-            $activeLink[0].scrollIntoView({
-                behavior: "smooth", // Smooth scrolling animation
-                block: "center",    // Center the active link in the view
-            });
+                $activeLink[0].scrollIntoView({
+                    behavior: "smooth", // Smooth scrolling animation
+                    block: "center",    // Center the active link in the view
+                });
             }
         }
-        const currentPath = window.location.pathname;
-            $("#sidebar_admin a").each(function () {
-                if ($(this).attr("href") === currentPath) {
-                    $("#sidebar_admin a").removeClass("active-link"); // Remove 'active' from all links
-                    $(this).addClass("active-link"); // Add 'active' to the matching link
-                }
-            });
+        
         // console.log(currentPath)
         $(window).on('load', function() {
             scrollToActiveLink();
@@ -182,5 +199,16 @@
 </script>
 <script>
         window.$ = window.jQuery;
-    </script>
+</script>
+
+<script>
+    // Wait until everything is ready
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('global-loader');
+        if (loader) {
+            loader.classList.add('hide');
+            setTimeout(() => loader.remove(), 0);
+        }
+    });
+</script>
 </html>
