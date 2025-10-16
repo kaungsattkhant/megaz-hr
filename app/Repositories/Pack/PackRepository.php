@@ -25,7 +25,7 @@ class PackRepository implements PackRepositoryInterface
     {
         $inventoryId = !isset($request->inventory_id) ? null : $request->inventory_id;
         $inventoryId = $request->inventory_id ?? null;
-
+        $this->matchInventoryWithPack();
         $query = Pack::with(['menu', 'pack_items'])
             ->when($request->menu_id, fn($q) => $q->where('menu_id', $request->menu_id))
             ->where('inventory_id', $inventoryId);
@@ -36,6 +36,25 @@ class PackRepository implements PackRepositoryInterface
     }
 
 
+    public function matchInventoryWithPack()
+    {
+        DB::beginTransaction();
+        try {
+            $packAll = Pack::with('inventory_ledgers')->get();
+            foreach ($packAll as $pack) {
+                if ($pack->inventory_ledgers->isNotEmpty()) {
+                    foreach ($pack->inventory_ledgers as $ledger) {
+                        $pack->inventory_id = $ledger->inventory_id;
+                        $pack->save();
+                    }
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseMessage($e->getMessage(), 402);
+        }
+    }
 
     public function createPack(array $data)
     {
