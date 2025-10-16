@@ -12,22 +12,15 @@ class ReportRepository implements ReportInterface
     }
     public function getBarForSky($request)
     {
+        $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
         $results = DB::table('bar_monthly_sale')
             ->select('month_name', DB::raw('SUM(total) as amount'))
-// <<<<<<< HEAD
-//             ->groupBy('month_name')
-//             // <<<<<<< HEAD
-//             ->pluck('amount', 'month_name');
-//         return $months->map(fn($month) => [
-//             'month_name' => $month,
-//             'amount' => $sales[$month] ?? 0,
-//         ]);
-
-// =======
-            ->groupBy('month_name');
-        return $this->orderByMonthName($results)->get();
-// >>>>>>> origin/thhs/hr
-            
+            ->groupBy('month_name')
+            ->pluck('amount', 'month_name');
+        return $months->map(fn($month) => [
+            'month_name' => $month,
+            'amount' => $results[$month] ?? 0,
+        ]);
     }
 
     public function getTotalKTVCustomers($request)

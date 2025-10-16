@@ -23,29 +23,38 @@ class PackRepository implements PackRepositoryInterface
     }
     public function listAllData(Request $request)
     {
-        if ($request->menu_id !== null) {
-            $query = Pack::with('menu', 'pack_items')->where('menu_id', $request->menu_id);
-        } else {
-            $query = Pack::with('menu', 'pack_items');
-        }
+        $inventoryId = !isset($request->inventory_id) ? null : $request->inventory_id;
+        $inventoryId = $request->inventory_id ?? null;
+        $this->matchInventoryWithPack();
+        $query = Pack::with(['menu', 'pack_items'])
+            ->when($request->menu_id, fn($q) => $q->where('menu_id', $request->menu_id))
+            ->where('inventory_id', $inventoryId);
 
-        if ($request->per_page || $request->page) {
-            // $totalCount = $query->count();
-            // $pageNumber = $request->page ?? 1;
-            // $perPage = $request->per_page ?? 20;
-            // $skip = ($pageNumber - 1) * $perPage;
-            // $packs = $query->skip($skip)->take($perPage)->get();
-            // $paginationData = MakePaginationData($request, $totalCount, 'packs');
-            // $paginationData['packs'] = $packs;
-
-            return $query->paginate(config('common.list_count'));
-        } else {
-            $packs = $query->get();
-            return $packs;
-        }
+        return ($request->per_page || $request->page)
+            ? $query->paginate(config('common.list_count'))
+            : $query->get();
     }
 
 
+    public function matchInventoryWithPack()
+    {
+        DB::beginTransaction();
+        try {
+            $packAll = Pack::with('inventory_ledgers')->get();
+            foreach ($packAll as $pack) {
+                if ($pack->inventory_ledgers->isNotEmpty()) {
+                    foreach ($pack->inventory_ledgers as $ledger) {
+                        $pack->inventory_id = $ledger->inventory_id;
+                        $pack->save();
+                    }
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseMessage($e->getMessage(), 402);
+        }
+    }
 
     public function createPack(array $data)
     {
@@ -204,6 +213,7 @@ class PackRepository implements PackRepositoryInterface
                     'expired_at' => $data['expired_at'],
                     'created_by' => $data['created_by'],
                     'status' => 'ready',
+                    'inventory_id' => $inventoryId,
                 ]);
 
                 foreach ($menuStepItemByMenu as $item) {

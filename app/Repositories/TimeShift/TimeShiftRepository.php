@@ -2,11 +2,13 @@
 
 namespace App\Repositories\TimeShift;
 
+use Carbon\Carbon;
 use App\Models\Gps;
 use App\Models\Shift;
 use App\Models\CheckIn;
 use App\Models\TimeShift;
 use Illuminate\Http\Request;
+use App\Models\StaffTimeshift;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CheckInResource;
 use Illuminate\Support\Facades\Storage;
@@ -46,7 +48,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   public function storeShifts($data)
   {
     return Shift::updateOrCreate(
-      ['id' => $data['id']  ?? null],
+      ['id' => $data['id'] ?? null],
       $data
     );
   }
@@ -136,7 +138,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     $from_date = $request->input('from_date');
     $to_date = $request->input('to_date');
     $staff_id = $request->input('staff_id');
-    $query = CheckIn::orderBy('id','desc')->with(['staff', 'timeShift.shift'])->checkInFilter($from_date, $to_date, $staff_id);
+    $query = CheckIn::orderBy('id', 'desc')->with(['staff', 'timeShift.shift'])->checkInFilter($from_date, $to_date, $staff_id);
 
     $checkIns = $query->paginate(config('common.list_count'));
     return CheckInResource::collection($checkIns);
@@ -202,20 +204,40 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     try {
       $staffId = $requestData['staff_id'];
+      $timeShiftId = $requestData['time_shift_id'];
+      $today = Carbon::today();
       $currentDate = now()->format('Y-m-d');
 
       $existingCheckIn = CheckIn::where('staff_id', $staffId)
         ->whereDate('check_in_date_time', $currentDate)
         ->where('is_current_checked_in', true)
         ->first();
+
+      $existShiftAssign = StaffTimeshift::where("staff_id", $staffId)
+        ->where('timeshift_id', $timeShiftId)
+        ->whereDate('date_time', $today)
+        ->first();
+      if (!$existShiftAssign) {
+        ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
+      }
+      if ($existShiftAssign) {
+        if ($existShiftAssign->status === 'pending') {
+          ResponseMessage('Check-in is invalid ,you have to accept  shift assignment', 419);
+        }
+        if ($existShiftAssign->status === 'cancelled') {
+          ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
+        }
+      }
       if ($existingCheckIn) {
-        return ResponseData($data = null, $status_code = 422, false, $extra_message = "You have already checked in today");
+        return ResponseData('You have already checked in today', 422);
       }
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
 
       $officeGps = Gps::where('name', 'GPS Point')->first();
-
+      if (!$officeGps) {
+        ResponseData('Office GPS coordinates not found.', 422);
+      }
       $officeLat = $officeGps->latitude;
       $officeLng = $officeGps->longitude;
 
