@@ -591,7 +591,7 @@ export default {
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            let url = `/api/inventory_ledger_list?`;
+            let url = `/api/inventory_ledger_list?page=` + pageNumber + `&`;
             if(this.fromDate && this.toDate){
                 url = `${url}from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
@@ -663,7 +663,7 @@ export default {
                     text: `Success`,
                     type: 'info'
                 });
-                this.getInventoryLegderList();
+                this.getInventoryLegderList(1);
                 document.getElementById('close_add_minimum_modal').click();
                 this.base_min_amount = 0;
                 this.min_amount = 0;
@@ -819,7 +819,7 @@ export default {
 
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
             if (response.success) {
-                // this.getInventoryLegderList(null);
+                // this.getInventoryLegderList(1);
                 this.closeModal();
                 this.clearForm();
                 this.$notify({
@@ -847,25 +847,25 @@ export default {
                     this.url_inventory = 'inventory_id=' + this.searchInventory.id
                 }
                 
-                this.getInventoryLegderList();
+                this.getInventoryLegderList(1);
             }
         },
         selectedInventoryChanged(){
             this.url_inventory = 'inventory_id=' + this.searchInventory.id
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryLegderList();
+            this.getInventoryLegderList(1);
         },
         searchBtnClicked(){
             this.searchInventory = null;
             this.url_inventory = '';
-            this.getInventoryLegderList();
+            this.getInventoryLegderList(1);
         },
 
         clearSearchBtnClicked(){
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryLegderList();
+            this.getInventoryLegderList(1);
             
         },
 
@@ -898,7 +898,7 @@ export default {
     },
 
     created() {
-        // this.getInventoryLegderList(null);
+        // this.getInventoryLegderList(1);
         this.getInventoryList();
         this.getUomList();
         this.getSearchInventoryList();

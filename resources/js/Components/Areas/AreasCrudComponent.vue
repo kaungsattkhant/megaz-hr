@@ -565,6 +565,7 @@ export default {
             formData.append('name', this.editName);
             if(this.editSelectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.editSelectedType.id);
+                formData.append('menu_category_ids', JSON.stringify(menuCategoryIds));
             }
             if(this.editSelectedCategory.name === 'Cooking Area'){
                 formData.append('type', this.selectedCookingAreaType.value);
