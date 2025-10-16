@@ -82,14 +82,15 @@
                         :rows="20"
                         :cols="6"
                         />
-                        <tbody>
+                        <tbody v-else>
                             <!-- <tr>
                                 {{ balanceFormat(2010, 1000, 'kg', 'g') }}
                             </tr> -->
                             <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
                                 <tr>
                                     <td>
-                                        {{ ++index }}
+                                        <!-- {{ ++index }} -->
+                                        {{ perPage ? (currentPage - 1) * perPage + index + 1 : index+1 }}
                                     </td>
                                     <td @click="isShowToggle(ledger)">
                                         {{ ledger.name }}
@@ -199,6 +200,23 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1" @click="getInventoryLegderList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                        lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getInventoryLegderList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -550,15 +568,20 @@ export default {
             base_min_amount:0,
             min_amount:0,
 
-            per_page: 20,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            // per_page: 20,
+            // pageNumbers: [],
+            // currentPage: 1,
+            // paginationGroupsCount: 1,
+            // per_group: 10,
+            // groupedPageNumbers: [],
+            // currentGroup: 0,
+            // isFirstGroup: true,
+            // isLastGroup: false,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
 
             searchInventoryList:[],
             searchInventory:null,
@@ -602,7 +625,7 @@ export default {
             if (response.data) {
                 this.loading = false;
                 this.totalValuation = 0;
-                this.inventoryLegderList = response.data;
+                this.inventoryLegderList = response.data.data;
                 this.inventoryLegderList.forEach(ledger => {
                     ledger.base_balance = Math.floor(ledger.closing_balance / ledger.conversion) + ' ' + ledger.base_uom_name;
                     ledger.conversion_balance = null;
@@ -618,6 +641,11 @@ export default {
                     ...item,
                     isShow: false
                 }));
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         isShowToggle(item) {
