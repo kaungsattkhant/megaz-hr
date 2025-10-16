@@ -40,7 +40,7 @@ class PackRepository implements PackRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $packAll = Pack::with('inventory_ledgers')->get();
+            $packAll = Pack::with('inventory_ledgers')->whereNull('inventory_id')->get();
             foreach ($packAll as $pack) {
                 if ($pack->inventory_ledgers->isNotEmpty()) {
                     foreach ($pack->inventory_ledgers as $ledger) {
