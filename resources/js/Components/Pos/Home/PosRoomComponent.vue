@@ -162,7 +162,14 @@
                                     @click="cancelMenuOrder()">
                                         Cancel
                                     </button>
-                                    <button type="button" class="add-btn mx-1 focus:shadow-none focus:outline-none"
+                                    <pos-loading-btn
+                                    text="Order"
+                                    loading-text="Ordering..."
+                                    :loading="menuOrderBtnLoading"
+                                    :explicitDisable="cartMenus.length < 1"
+                                    @click="confirmMenuOrder()"
+                                    />
+                                    <!-- <button type="button" class="add-btn mx-1 focus:shadow-none focus:outline-none"
                                     @click="confirmMenuOrder()"
                                     :disabled="menuOrderBtnLoading || cartMenus.length < 1">
                                         <svg
@@ -187,7 +194,7 @@
                                             />
                                             </svg>
                                             <span>{{ menuOrderBtnLoading ? "Ordering..." : "Order" }}</span>
-                                    </button>
+                                    </button> -->
                                 </div>
                             </div>
                         </div>
@@ -1703,8 +1710,8 @@
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
     import moment from "moment";
-    import flatpickr from "flatpickr";
     import "flatpickr/dist/flatpickr.min.css";
+    import PosLoadingBtn from "../Common/PosLoadingBtn.vue";
 
     export default {
         name:'PosRoomComponent',
@@ -1719,7 +1726,8 @@
             }
         },
         components:{
-            Multiselect
+            Multiselect,
+            PosLoadingBtn
         },
         // props: ['roomAreaId'],
         data() {

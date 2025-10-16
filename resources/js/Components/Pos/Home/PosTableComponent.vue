@@ -161,32 +161,13 @@
                                     @click="cancelMenuOrder()">
                                         Cancel
                                     </button>
-                                    <button type="button" class="add-btn mx-1 focus:shadow-none focus:outline-none"
+                                    <pos-loading-btn
+                                    text="Order 2"
+                                    loading-text="Ordering 2..."
+                                    :loading="menuOrderBtnLoading"
+                                    :explicitDisable="cartMenus.length < 1"
                                     @click="confirmMenuOrder()"
-                                    :disabled="menuOrderBtnLoading || cartMenus.length < 1">
-                                        <svg
-                                            v-if="menuOrderBtnLoading"
-                                            class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            >
-                                            <circle
-                                                class="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                stroke-width="4"
-                                            />
-                                            <path
-                                                class="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                            />
-                                            </svg>
-                                            <span>{{ menuOrderBtnLoading ? "Ordering..." : "Order" }}</span>
-                                    </button>
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -1368,10 +1349,12 @@
     import { mapGetters } from "vuex";
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
+    import PosLoadingBtn from "../Common/PosLoadingBtn.vue";
 
     export default {
-        components: {
-
+        components:{
+            Multiselect,
+            PosLoadingBtn,
         },
 
         name:'PosTableComponent',
@@ -1394,9 +1377,6 @@
             }
         },
         emits: ['callParent'],
-        components:{
-            Multiselect
-        },
         // props: ['tableAreaId'],
         data() {
             return {
