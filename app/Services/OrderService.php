@@ -609,7 +609,7 @@ class OrderService
         $packs = Pack::where('menu_id', $menuId)
             ->where('status', 'ready')
             ->where('expired_at', '>', now())
-            ->where('inventory_id',$invenoryId);
+            ->where('inventory_id',$inventoryId)
             ->orderBy('expired_at', 'asc')
             ->limit($quantity)
             ->get();
@@ -1019,7 +1019,7 @@ class OrderService
             });
         } else {
             $filterAccessory = $accessories;
-        }
+        }   
 
         $cancelledAccessory = array_filter($accessories, function ($accessory) {
             return isset($accessory['is_package']) && in_array($accessory['is_package'], [-1]);
