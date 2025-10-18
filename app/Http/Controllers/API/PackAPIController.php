@@ -31,7 +31,6 @@ class PackAPIController extends Controller
 
     public function changePack(ChangePackRequest $request)
     {
-        dd('abc');
         $pack = $this->packRepo->changePack($request);
         ResponseData($pack);
     }

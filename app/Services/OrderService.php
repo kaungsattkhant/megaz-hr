@@ -586,7 +586,7 @@ class OrderService
 
     }
 
-    public function checkPackEnough($menuId, $quantity,$invenoryId)
+    public function checkPackEnough($menuId, $quantity,$inventoryId)
     {
         $totalPacks = Pack::where('menu_id', $menuId)
             ->where('status', 'ready')

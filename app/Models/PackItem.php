@@ -17,4 +17,8 @@ class PackItem extends Model
     {
         return $this->belongsTo(Pack::class);
     }
+     public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 }
