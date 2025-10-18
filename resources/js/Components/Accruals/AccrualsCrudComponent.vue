@@ -57,7 +57,12 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
@@ -304,10 +309,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     props: ["accrualsId"],
     data() {
@@ -346,12 +353,15 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
         async getPrimaryList() {
+
+            this.loading = true;
             let url = this.url + '/' + this.accrualsId
             let response = await getApiData({ url: url, token: this.getToken() })
 
@@ -361,6 +371,7 @@ export default {
             //     this.primaryList = response.data ? response.data : response;
             // }
             if (response.data) {
+                this.loading = false;
                 this.primaryList = response.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = response.pageNumber;
