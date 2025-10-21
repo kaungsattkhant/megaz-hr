@@ -42,14 +42,12 @@ class MonthlyKtvRoomCharges extends Command
                     $query->whereYear('invoice_date', $year)
                         ->whereMonth('invoice_date', $month);
                 })->sum('total_session_price');
-            // Log the results
             Log::info([
                 "Monthly KTV room charges" => $monthlyTotalKtvRoomCharges,
                 "Month" => $monthName,
                 "Year" => $year,
             ]);
 
-            
             if ($monthlyTotalKtvRoomCharges == 0) {
                 $this->info("No total ktv room charges data found for {$monthName}");
                 return Command::SUCCESS;
