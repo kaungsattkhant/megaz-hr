@@ -10,7 +10,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 
 	<title> Mega Z ERP | @yield('page_title')</title>
-    @vite('resources/js/app.js')
+        @vite('resources/js/app.js')
 
     <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
     <link rel="stylesheet" href="{{asset('fontawesome/css/all.css')}}">
@@ -26,7 +26,11 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-  <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
+        <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
