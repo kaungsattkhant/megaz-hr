@@ -23,8 +23,8 @@ class ReportController extends Controller
         ResponseData($data);
     }
     public function getWaiterSale(Request $request){
-         $data=$this->reportRepo->getWaiterSale($request);
-
+        $data=$this->reportRepo->getWaiterSale($request);
+        ResponseData($data);
     }
     public function getTotalKTVSessions(Request $request){
         $data=$this->reportRepo->getTotalKTVSessions($request);
@@ -43,6 +43,11 @@ class ReportController extends Controller
 
     public function getKTVTraining(Request $request){
         $data=$this->reportRepo->getKTVTraining($request);
+        ResponseData($data);
+    }
+
+    public function getBarTotalExpense(Request $request){
+        $data=$this->reportRepo->getBarTotalExpense($request);
         ResponseData($data);
     }
 }
