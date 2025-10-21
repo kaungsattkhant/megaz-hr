@@ -11,17 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('monthly_total_ktv_trainings', function (Blueprint $table) {
+        Schema::create('bar_department_expenses', function (Blueprint $table) {
             $table->id();
             $table->integer('year');
             $table->string('month_name');
             $table->integer('month_number');
-            $table->string('training_topic');
-            $table->string('trainer');
-            $table->string('participant');
-            $table->string('training_date');
-            $table->string('training_time');
-
+            $table->decimal('bar_total_expense', 15, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('bar_department_expenses');
     }
 };
