@@ -15,7 +15,7 @@ class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-        $areasQuery = Area::with(['areaType', 'areaCategory'])->orderBy('created_at', 'desc');
+        $areasQuery = Area::with(['areaType', 'areaCategory','menuCategories'])->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
             $areas = $areasQuery->where('department_id', $request->department_id)->get();

@@ -140,7 +140,7 @@ class OrderRepository implements OrderRepositoryInterface
                     elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                         $orderItem->progressed_at = now();
                         $orderItem->progressed_by = UserData()->id;
-                        $this->orderService->actionPackMenu($orderItem->menu_id,$orderItem->quantity);
+                        $this->orderService->actionPackMenu($orderItem->menu_id,$orderItem->quantity,$orderItem->inventory_id);
                         $sellingExtraIds=$orderItem->extras->pluck('selling_extra_id')->toArray();
                         $this->orderService->actionInventoryItem($orderItem, 'order_item', 'out',$sellingExtraIds);
                     } elseif ($data['status'] == 'cancelled') {

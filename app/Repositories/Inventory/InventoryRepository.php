@@ -185,8 +185,8 @@ class InventoryRepository implements InventoryRepositoryInterface
         // $inventoryId = UserData()->department->inventory->inventory_id;
         $inventoryId = $request->inventory_id;
         $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
-        return $ledgers; //no pagination
-        // return paginateCollection($ledgers,config('common.list_count'));
+        // return $ledgers; //no pagination
+        return paginateCollection($ledgers,config('common.list_count'));
     }
 
     public function inventoryList()
@@ -329,6 +329,9 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            if($request->ip()!=="127.0.0.1"){
+                ResponseMessage('Push data is invalid',422);
+            }
             $inventories = Inventory::whereIn('id', [1,2])->get(); //hot kitchen 555 and bar inventory
             $items = Item::all();
             $inventoryLedgersData = [];
