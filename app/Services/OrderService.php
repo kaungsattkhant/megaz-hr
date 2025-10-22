@@ -118,7 +118,7 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
 
                 $insertData = [];
-                $this->checkPackEnough($data['menu_id'], $quantityCount,$invenrotyId);
+                $this->checkPackEnough($data['menu_id'], $quantityCount,$inventoryId);
                 $this->checkInventoryEnough($data['menu_id'], $inventoryId, $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
