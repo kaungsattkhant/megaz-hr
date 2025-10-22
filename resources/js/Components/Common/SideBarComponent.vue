@@ -1079,6 +1079,10 @@
                     </div>
                 </div>
             </div>
+            <div id="logout"
+                class="absolute bottom-0 left-0 w-[336px] h-14 bg-[#fdfdfd] border-t border-[#0002] flex items-center justify-center overflow-hidden">
+                <logout-component />
+            </div>
         </div>
     </nav>
     

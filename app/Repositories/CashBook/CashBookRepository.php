@@ -169,6 +169,8 @@ class CashBookRepository implements CashBookInterface
     {
         $isPos = $request->is_pos;
         $date = isset($request->date) || $request->date != null ? Carbon::parse($request->date) : today();
+        $month = $date->month;
+        $year = $date->year;
         $is_closing_column = null;
         $closing_date_column = null;
         if ($isPos) {
@@ -183,6 +185,16 @@ class CashBookRepository implements CashBookInterface
             ResponseMessage('Something went wrong in cashbook', 419);
         }
         $account_codes = $request->is_pos ? Config::get('common.pos_cash_account_code') : Config::get('common.cash_account_code');
+
+        $closingCashbook = CashbookBalance::with(['account'])
+            ->whereHas('account', function ($query) use ($account_codes) {
+                $query->whereIn('account_code', $account_codes);
+            })
+            ->where('month', $month)
+            ->where('year', $year)
+            ->get();
+        return $closingCashbook;
+
         // $closingCashbook=Ledger::with(['account','transaction:id,closing_date,is_closing,pos_closing_date,is_pos_closing'])->whereHas('account',function($query)use($account_codes){
         //     $query->whereIn('account_code',$account_codes);
         // })
@@ -190,13 +202,6 @@ class CashBookRepository implements CashBookInterface
         //     $q->where($is_closing_column,1)
         // ->whereDate($closing_date_column,$date);
         // })->paginate(20);
-        $closingCashbook = CashbookBalance::with(['account'])
-            ->whereHas('account', function ($query) use ($account_codes) {
-                $query->whereIn('account_code', $account_codes);
-            })
-            ->whereDate('created_at', $date)
-            ->get();
-        return $closingCashbook;
     }
 
 

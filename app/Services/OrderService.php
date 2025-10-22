@@ -118,7 +118,7 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
 
                 $insertData = [];
-                $this->checkPackEnough($data['menu_id'], $quantityCount);
+                $this->checkPackEnough($data['menu_id'], $quantityCount,$inventoryId);
                 $this->checkInventoryEnough($data['menu_id'], $inventoryId, $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
@@ -265,7 +265,7 @@ class OrderService
                 $cookingAreaId = $menuData['cooking_area_id'];
                 $inventoryId = $this->getInventoryIdByCookingArea($cookingAreaId);
                 $cookingAreaIds[] = $cookingAreaId;
-                $this->checkPackEnough($menuData['menu_id'], $menuData['quantity']);
+                $this->checkPackEnough($menuData['menu_id'], $menuData['quantity'],$inventoryId);
                 $this->checkInventoryEnough($menuData['menu_id'], $inventoryId, $menuData['quantity']);
                 if (isset($menuData['selling_extra_id']) && !empty($menuData['selling_extra_id'])) {
                     foreach ($menuData['selling_extra_id'] as $sellingExtraId) {
@@ -586,16 +586,18 @@ class OrderService
 
     }
 
-    public function checkPackEnough($menuId, $quantity)
+    public function checkPackEnough($menuId, $quantity,$inventoryId)
     {
         $totalPacks = Pack::where('menu_id', $menuId)
             ->where('status', 'ready')
+            ->where('inventory_id',$inventoryId)
             ->where('expired_at', '>', now())
             ->count();
 
         if ($totalPacks == 0) {
             $menu=Menu::find($menuId);
-            ResponseMessage('No packs found for  '.$menu->name, 404);
+            $msg='No packs found for  '.$menu->name.'. Inventoy Id is '.$inventoryId.'. Total pack is '.$totalPacks;
+            ResponseMessage($msg, 404);
         }
 
         if ($totalPacks < $quantity) {
@@ -603,11 +605,12 @@ class OrderService
         }
     }
 
-    public function actionPackMenu($menuId, $quantity)
+    public function actionPackMenu($menuId, $quantity,$inventoryId)
     {
         $packs = Pack::where('menu_id', $menuId)
             ->where('status', 'ready')
             ->where('expired_at', '>', now())
+            ->where('inventory_id',$inventoryId)
             ->orderBy('expired_at', 'asc')
             ->limit($quantity)
             ->get();
@@ -1017,7 +1020,7 @@ class OrderService
             });
         } else {
             $filterAccessory = $accessories;
-        }
+        }   
 
         $cancelledAccessory = array_filter($accessories, function ($accessory) {
             return isset($accessory['is_package']) && in_array($accessory['is_package'], [-1]);
