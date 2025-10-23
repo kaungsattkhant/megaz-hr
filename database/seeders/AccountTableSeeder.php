@@ -18,6 +18,9 @@ class AccountTableSeeder extends Seeder
         //
         $json = File::get(base_path('app/Console/Commands/data/accountlist.json'));
         $data = json_decode($json);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('accounts')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         DB::beginTransaction();
         try {
             foreach ($data as $obj) {
