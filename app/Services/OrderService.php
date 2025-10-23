@@ -118,7 +118,7 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
 
                 $insertData = [];
-                $this->checkPackEnough($data['menu_id'], $quantityCount,$invenrotyId);
+                $this->checkPackEnough($data['menu_id'], $quantityCount,$inventoryId);
                 $this->checkInventoryEnough($data['menu_id'], $inventoryId, $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
@@ -596,7 +596,8 @@ class OrderService
 
         if ($totalPacks == 0) {
             $menu=Menu::find($menuId);
-            ResponseMessage('No packs found for  '.$menu->name, 404);
+            $msg='No packs found for  '.$menu->name.'. Inventoy Id is '.$inventoryId.'. Total pack is '.$totalPacks;
+            ResponseMessage($msg, 404);
         }
 
         if ($totalPacks < $quantity) {

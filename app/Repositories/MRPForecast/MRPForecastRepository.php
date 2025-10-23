@@ -116,9 +116,15 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       $item = $menuStepItem->item;
 
       $averagePrice = $this->averagePriceCalculator->getAveragePriceForItem($item->id);
-      $weight = $menuStepItem->weight ?? 0;
-
-      $totalWeightedPrice += $averagePrice * $weight;
+      $weight = $menuStepItem->quantity ?? 0;
+      if($menuStepItem->uom_type=='uom'){
+        $unitPrice=$averagePrice/$item->conversion;
+      }else if($menuStepItem->uom_type=='base_uom'){
+        $unitPrice=$averagePrice;
+      }else{
+        ResponseMessage('Unit Price is missing for '.$item->name,422);
+      }
+      $totalWeightedPrice += $unitPrice * $weight;
       $totalWeight += $weight;
     }
 
