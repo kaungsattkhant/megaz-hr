@@ -26,6 +26,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:total-ktv-customers')->monthly();
         $schedule->command('app:monthly-total-k-t-v-sales')->monthly();
         $schedule->command('app:ktv-training')->monthly();
+        $schedule->command('app:refresh-target-actual-monthly-menu-sale')->dailyAt('00:10');
+        $schedule->command('app:record-daily-area-sales-volume-by-staff')->dailyAt('23:59');
     }
 
     /**
