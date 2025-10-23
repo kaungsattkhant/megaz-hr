@@ -526,6 +526,7 @@ export default {
 
 
         editBtnClicked(item){
+            this.selectedMenuCategory = [];
             this.editDetail = item;
             this.selectedId = item.id;
             this.selectedType = null;
@@ -533,7 +534,8 @@ export default {
             this.editName = item.name;
             this.editSelectedCategory = this.categoryList.find(cat => cat.id === item.area_category_id);
             if(this.editSelectedCategory.name === 'Selling Area'){
-                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
+                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id);
+                this.selectedMenuCategory = item.menu_categories
             }
 
             if(item.area_category.name === 'Cooking Area'){
@@ -559,12 +561,16 @@ export default {
         },
 
         async editArea() {
-            
+            let menuCategoryIds = [];
+            this.selectedMenuCategory.forEach(menu => {
+                menuCategoryIds.push(menu.id);
+            });
             let formData = new FormData();
             formData.append('id', this.selectedId);
             formData.append('name', this.editName);
             if(this.editSelectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.editSelectedType.id);
+                formData.append('menu_category_ids', JSON.stringify(menuCategoryIds));
             }
             if(this.editSelectedCategory.name === 'Cooking Area'){
                 formData.append('type', this.selectedCookingAreaType.value);
