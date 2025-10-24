@@ -21,3 +21,9 @@ interface ReportInterface
 
    public function getDailyAreaSalesVolumeByStaff($request);
 }
+   public function getKitchenForSktyAndKtv($request);
+
+   public function getKitchenTotalExpense($request);
+
+   public function getMonthlyKitchenMenuTotal($request);
+}
