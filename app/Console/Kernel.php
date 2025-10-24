@@ -25,8 +25,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:refresh-bar-monthly-sale')->monthly();
         $schedule->command('app:total-ktv-customers')->monthly();
         $schedule->command('app:monthly-total-k-t-v-sales')->monthly();
-        $schedule->command('app:ktv-training')->monthly();
+        $schedule->command('app:kitchen-monthly-sale')->monthly();
+        $schedule->command('app:bar-total-expense')->monthly();
+        $schedule->command('app:kitchen-expense')->monthly();
+        $schedule->command('app:kitchen-menu-total')->monthly();
     }
+
 
     /**
      * Register the commands for the application.

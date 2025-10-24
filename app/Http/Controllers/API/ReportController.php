@@ -50,4 +50,22 @@ class ReportController extends Controller
         $data=$this->reportRepo->getBarTotalExpense($request);
         ResponseData($data);
     }
+
+    public function getKitchenForSktyAndKtv(Request $request)
+    {
+        $data=$this->reportRepo->getKitchenForSktyAndKtv($request);
+        ResponseData($data);
+    }
+
+    public function getKitchenTotalExpense(Request $request)
+    {
+        $data=$this->reportRepo->getKitchenTotalExpense($request);
+        ResponseData($data);
+    }
+
+    public function getMonthlyKitchenMenuTotal(Request $request)
+    {
+        $data=$this->reportRepo->getMonthlyKitchenMenuTotal($request);
+        ResponseData($data);
+    }
 }

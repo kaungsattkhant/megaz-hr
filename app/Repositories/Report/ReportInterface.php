@@ -16,4 +16,10 @@ interface ReportInterface
    public function getKTVTraining($request);
 
    public function getBarTotalExpense($request);
+
+   public function getKitchenForSktyAndKtv($request);
+
+   public function getKitchenTotalExpense($request);
+
+   public function getMonthlyKitchenMenuTotal($request);
 }
