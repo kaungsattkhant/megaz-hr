@@ -141,7 +141,7 @@
                                 id="create_modalLabel">
                                 Create Role
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_create_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -173,10 +173,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createRolesBtnClicked"
+                            <!-- <button type="button" @click="createRolesBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @onClick="createRolesBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -195,7 +201,7 @@
                                 id="edit_modalLabel">
                                 Update Role
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_edit_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -227,10 +233,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="editRole"
+                            <!-- <button type="button" @click="editRole"
                                 class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Edit"
+                                loadingText="Editing..."
+                                @onClick="editRole"
+                            />
                         </div>
                     </div>
                 </div>
@@ -300,10 +312,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -330,6 +344,7 @@ export default {
             feature: this.getFeature(),
 
             loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -371,6 +386,7 @@ export default {
         },
 
         async createRole() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('department_id', this.selectedDepartment);
@@ -383,8 +399,13 @@ export default {
                     this.getRolesList(1);
                 }
                 console.log("success")
+                document.getElementById('close_create_modal').click();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                     text: message,
                     type: "error"
@@ -399,6 +420,7 @@ export default {
         },
 
         async editRole() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.nameEdit);
             formData.append('department_id', this.selectedDepartmentEdit);
@@ -411,9 +433,17 @@ export default {
                     this.getRolesList(1);
                 }
                 console.log("success")
+                document.getElementById('close_edit_modal').click();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
