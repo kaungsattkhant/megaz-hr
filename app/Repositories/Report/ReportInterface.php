@@ -20,7 +20,7 @@ interface ReportInterface
    public function getTargetActualMenuSales($request);
 
    public function getDailyAreaSalesVolumeByStaff($request);
-}
+
    public function getKitchenForSktyAndKtv($request);
 
    public function getKitchenTotalExpense($request);

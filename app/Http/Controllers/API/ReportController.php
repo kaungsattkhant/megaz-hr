@@ -68,4 +68,16 @@ class ReportController extends Controller
         $data=$this->reportRepo->getMonthlyKitchenMenuTotal($request);
         ResponseData($data);
     }
+
+    public function getDailyAreaSalesVolume(Request $request)
+    {
+        $data = $this->reportRepo->getDailyAreaSalesVolumeByStaff($request);
+        ResponseData($data);
+    }
+
+    public function getMenuSales(Request $request)
+    {
+        $data = $this->reportRepo->getTargetActualMenuSales($request);
+        ResponseData($data);
+    }
 }

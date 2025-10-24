@@ -214,7 +214,7 @@ class ReportRepository implements ReportInterface
 
         return $results;
     }
-}
+
     public function getKitchenForSktyAndKtv($request)
     {
         $year = $request->year ?? now()->year;
@@ -309,5 +309,4 @@ class ReportRepository implements ReportInterface
 
             return $result;
     }
-
 }

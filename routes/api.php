@@ -504,6 +504,9 @@ Route::middleware('auth:api')->group(function () {
         Route::get('kitchen-for-sky-and-ktv', 'getKitchenForSktyAndKtv');
         Route::get('kitchen/total-expenses', 'getKitchenTotalExpense');
         Route::get('monthly-kitchen-menu-total', 'getMonthlyKitchenMenuTotal');//lists
+
+        Route::get('catering/target_actual_menu_sales', 'getMenuSales');
+        Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
     });
 
 });
