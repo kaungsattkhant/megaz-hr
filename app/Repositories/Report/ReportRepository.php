@@ -195,7 +195,7 @@ class ReportRepository implements ReportInterface
             ar.name AS area_name,
             COALESCE(SUM(dasvs.total_amount), 0) AS total_amount,
             COALESCE(SUM(dasvs.total_pax), 0) AS total_pax,
-            COALESCE(SUM(dasvs.per_pax), 0) AS total_par_pex
+            COALESCE(SUM(dasvs.per_pax), 0) AS total_per_pax
         ')
         ->groupByRaw('
             dasvs.work_date,
