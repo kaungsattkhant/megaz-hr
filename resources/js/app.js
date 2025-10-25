@@ -273,7 +273,8 @@ import SaleLedgerKtvComponent from './Components/SaleLedgers/SaleLedgerKtvCompon
 import SaleLedgerRestaurantComponent from './Components/SaleLedgers/SaleLedgerRestaurantComponent.vue';
 import SideBarComponent from './Components/Common/SideBarComponent.vue';
 import KtvReportComponent from './Components/KtvReport/KtvReportComponent.vue';
-
+import DailyAreaSalesByStaffReport from './Components/CateringReport/DailyAreaSalesByStaffReport.vue';
+import TargetActualMenuSalesReport from './Components/CateringReport/TargetActualMenuSalesReport.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -524,6 +525,8 @@ app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
 app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
 app.component('SideBarComponent',SideBarComponent);
 app.component('KtvReportComponent',KtvReportComponent);
+app.component('DailyAreaSalesByStaffReport',DailyAreaSalesByStaffReport);
+app.component('TargetActualMenuSalesReport',TargetActualMenuSalesReport);
 
 const toastificationOptions = {};
 app.use(store);

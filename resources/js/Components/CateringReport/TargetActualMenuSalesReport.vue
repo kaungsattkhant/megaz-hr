@@ -3,28 +3,21 @@
         <!-- Date Pickers -->
         <div class="flex flex-col gap-4 mb-6">
             <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Start Month -->
                 <div class="flex flex-col w-40">
-                    <label for="startDate" class="text-sm font-medium text-gray-600 mb-1">Start Date</label>
-                    <input type="date" id="startDate"
-                    v-model="startDate"
-                    class="border border-gray-300 rounded-md p-2 focus:ring focus:ring-indigo-200 focus:border-indigo-400" />
-                </div>
-                <div class="flex flex-col w-40">
-                    <label for="endDate" class="text-sm font-medium text-gray-600 mb-1">End Date</label>
-                    <input type="date" id="endDate"
-                    v-model="endDate"
-                    class="border border-gray-300 rounded-md p-2 focus:ring focus:ring-indigo-200 focus:border-indigo-400" />
-                </div>
-                <!-- Select Box Example -->
-                <div class="flex flex-col w-40">
-                    <label for="reportType" class="text-sm font-medium text-gray-600 mb-1">Area</label>
-                    <multiselect v-model="selectedArea" :options="areas"
-                    :clear-on-select="false"
-                    :preserve-search="true" placeholder="Area" label="name" track-by="id"
-                    :preselect-first="false"></multiselect>
+                    <label for="startMonth" class="text-sm font-medium text-gray-600 mb-1">
+                    Month
+                    </label>
+                    <input
+                    type="month"
+                    id="startMonth"
+                    v-model="month"
+                    class="border border-gray-300 rounded-md p-2 w-full focus:ring focus:ring-indigo-200 focus:border-indigo-400"
+                    />
                 </div>
 
-                <div class="p-2 mt-5">
+                <!-- Filter Button -->
+                <div class="flex items-end">
                     <loading-button
                     text="Get Report"
                     loadingText="Loading..."
@@ -42,11 +35,12 @@
                 <thead class="">
                     <tr>
                         <th class="py-3 px-4 text-left">#</th>
-                        <th class="py-3 px-4 text-left">Date</th>
-                        <th class="py-3 px-4 text-left">Name</th>
-                        <th class="py-3 px-4 text-left">Total Pax</th>
-                        <th class="py-3 px-4 text-left">Total Amount</th>
-                        <th class="py-3 px-4 text-left">Per Pax</th>
+                        <th class="py-3 px-4 text-left">Menu</th>
+                        <th class="py-3 px-4 text-left">Target Qty</th>
+                        <th class="py-3 px-4 text-left">Target Sales</th>
+                        <th class="py-3 px-4 text-left">Actual Qty</th>
+                        <th class="py-3 px-4 text-left">Actual Sales</th>
+                        <th class="py-3 px-4 text-left">Acheived Percentage</th>
                     </tr>
                 </thead>
                 <TableSkeleton
@@ -55,11 +49,12 @@
                     <!-- Rows dynamically generated -->
                      <tr v-for="(row, index) in reportRows" :key="index">
                         <td> {{ index + 1 }} </td>
-                        <td> {{ startDate }} to {{ endDate }} </td>
-                        <td> {{ row.staff_name }} </td>
-                        <td> {{ row.total_pax }} </td>
-                        <td> {{ row.total_amount.toLocaleString() }} </td>
-                        <td> {{ row.total_per_pax.toLocaleString() }} </td>
+                        <td> {{ row.menu_name }} </td>
+                        <td> {{ row.target_qty }} </td>
+                        <td> {{ row.target_amount.toLocaleString() }} </td>
+                        <td> {{ row.actual_qty }} </td>
+                        <td> {{ row.actual_amount.toLocaleString() }} </td>
+                        <td> {{ row.percentage_hit }} %</td>
                      </tr>
                      <tr class=" !text-center" v-if="reportRows.length < 1 && !tableLoading">
                         <td class="" colspan="4">
@@ -79,6 +74,7 @@
     import { mapGetters } from "vuex";
     import TableSkeleton from "../Common/TableSkeleton.vue";
     import Multiselect from 'vue-multiselect';
+import { dropRightWhile } from 'lodash';
 
     export default {
         components: {
@@ -92,8 +88,7 @@
                 buttonLoading: false,
                 tableLoading: false,
 
-                startDate: null,
-                endDate: null,
+                month: null,
                 areas: [],
                 selectedArea: null,
 
@@ -104,21 +99,18 @@
             ...mapGetters(['getToken', 'getFeature']),
 
             getReport(){
-                if(!this.startDate){
-                    this.showToastMessage("Start date must be provided");
-                    return;
-                }
-                if(!this.endDate){
-                    this.showToastMessage("End date must be provided");
+                if(!this.month){
+                    this.showToastMessage("Month must be provided");
                     return;
                 }
 
+                console.log(this.month);
+                const [year, month] = this.month.split("-");
+                // return;
+
                 this.buttonLoading = true;
                 this.tableLoading = true;
-                let url = `/api/report/catering/daily_area_sales_by_staff?start_date=${this.startDate}&end_date=${this.endDate}`;
-                if(this.selectedArea) {
-                    url += `&area_id=${this.selectedArea.id}`;
-                }
+                let url = `/api/report/catering/target_actual_menu_sales?year=${year}&month=${month}`;
                 getApiData({
                     url: url,
                     token: this.getToken()
@@ -158,7 +150,7 @@
         },
 
         mounted() {
-            this.getAreas();
+            // this.getAreas();
         },
     }
 </script>

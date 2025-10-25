@@ -767,6 +767,8 @@ Route::view('/sale_ledger', 'sale_ledgers.index')->name('sale_ledgers.index');
 Route::view('/sale_ledger_ktv', 'sale_ledgers.sale_ledger_ktv')->name('sale_ledgers.sale_ledger_ktv');
 Route::view('/sale_ledger_restaurant', 'sale_ledgers.sale_ledger_restaurant')->name('sale_ledgers.sale_ledger_restaurant');
 Route::view('/ktv_report', 'ktv_reports.index');
+Route::view('/report/catering/daily_area_sales', 'catering_reports.daily_area_sales_by_staff');
+Route::view('/report/catering/target_actual_menu_sales', 'catering_reports.target_actual_menu_sales');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');
