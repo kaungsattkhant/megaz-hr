@@ -51,7 +51,9 @@
     .group-first tr p{
         @apply opacity-0
     }
-
+    .sidebar-tab-title{
+        @apply text-[#2a3547] text-sm font-semibold ml-1 pl-3 pb-1.5
+    }
     }
 
 
