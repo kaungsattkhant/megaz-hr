@@ -98,8 +98,13 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         $q->where('from_time', '<=', now()->format('H:i'))
           ->orWhere('from_time', '>=', now()->format('H:i'));
       })
+      ->where('is_active',1)
       ->where('to_time', '>=', now()->format('H:i'))
       ->first();
+    // $currentTimeShift = TimeShift::with('shift')
+    //   ->where('from_time', '<=', now()->format('H:i'))
+    //   ->where('to_time', '>=', now()->format('H:i'))
+    //   ->first();
 
     $response = [
       'gps' => $gps,
