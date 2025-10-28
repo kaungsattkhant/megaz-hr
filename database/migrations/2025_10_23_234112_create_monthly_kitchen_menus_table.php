@@ -11,17 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('monthly_total_ktv_trainings', function (Blueprint $table) {
+        Schema::create('monthly_kitchen_menus', function (Blueprint $table) {
             $table->id();
-            $table->integer('year');
+            $table->string('year');
             $table->string('month_name');
-            $table->integer('month_number');
-            $table->string('training_topic');
-            $table->string('trainer');
-            $table->string('participant');
-            $table->string('training_date');
-            $table->string('training_time');
-
+            $table->string('month_number');
+            $table->string('menu_name');
+            $table->string('area_type');
+            $table->string('cooking_area_type');
+            $table->decimal('total_menu_sale', 10, 2);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('monthly_kitchen_menus');
     }
 };
