@@ -4,7 +4,7 @@
 @section('ktv_report', 'active-link')
 @section('content')
     <div id="app">
-        <ktv-report-component/>
+        <ktv-report-chart-component/>
     </div>
 
 @endsection

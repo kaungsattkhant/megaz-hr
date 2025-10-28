@@ -766,7 +766,11 @@ Route::view('/loans/{id}/details', 'loans.details')->name('loans.details');
 Route::view('/sale_ledger', 'sale_ledgers.index')->name('sale_ledgers.index');
 Route::view('/sale_ledger_ktv', 'sale_ledgers.sale_ledger_ktv')->name('sale_ledgers.sale_ledger_ktv');
 Route::view('/sale_ledger_restaurant', 'sale_ledgers.sale_ledger_restaurant')->name('sale_ledgers.sale_ledger_restaurant');
-Route::view('/ktv_report', 'ktv_reports.index');
+Route::view('/ktv_report', 'ktv_reports.chart');
+Route::view('/bar_report', 'bar_reports.chart');
+Route::view('/kitchen_report', 'kitchen_reports.chart');
+Route::view('/ktv_menu_sale', 'kitchen_menu_sale.ktv_menu_sale');
+Route::view('/sky_menu_sale', 'kitchen_menu_sale.sky_menu_sale');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');

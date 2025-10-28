@@ -778,15 +778,16 @@
                                                 KTV Project Cash Book
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="/cashbook_history"
-                                                class="flex items-center ">
-                                                <i class="fal fa-tasks  pr-3"></i>
-                                                Cash Book History
-                                            </a>
-                                        </li>
+                                        
                                     </ul>
                                 </div>
+                            </li>
+                            <li>
+                                <a href="/cashbook_history"
+                                    class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-tasks"></i>
+                                    Cash Book History
+                                </a>
                             </li>
                             <li v-show="checkFeaturePermission('journal')">
                                 <a href="/journals" class="flex items-center  sidebar-gap-x">

@@ -166,10 +166,16 @@
         // for active tab and link in sidebar
         const currentPath = window.location.pathname;
         $("#sidebar_admin a").each(function () {
-            if ($(this).attr("href") === currentPath) {
+
+            console.log('outter' + currentPath)
+            const href = $(this).attr("href");
+
+            // if current path starts with the link's href (e.g., '/staff' matches '/staff/4/edit')
+            if (currentPath === href || currentPath.startsWith(href + '/')) {
 
                 $("#sidebar_admin a").removeClass("active-link"); // Remove 'active' from all links
                 $(this).addClass("active-link"); // Add 'active' to the matching link
+                console.log($(this))
 
                 $("#sidebar_admin .tab-content").removeClass("show"); // Remove 'active' from all links
                 $(this).closest(".tab-content").addClass("show");
