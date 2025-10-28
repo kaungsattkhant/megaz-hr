@@ -192,10 +192,16 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="confirmCreateBtnClicked"
+                        <!-- <button type="button" @click="confirmCreateBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
-                        </button>
+                        </button> -->
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Create"
+                            loadingText="Creating..."
+                            @click="confirmCreateBtnClicked"
+                        />
                     </div>
                 </div>
             </div>
@@ -305,10 +311,16 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="confirmEditBtnClicked"
+                        <!-- <button type="button" @click="confirmEditBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
-                        </button>
+                        </button> -->
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Edit"
+                            loadingText="Editing..."
+                            @click="confirmEditBtnClicked"
+                        />
                     </div>
                 </div>
             </div>
@@ -326,10 +338,37 @@
                         Create Department
                     </p>
                     <div>
-                        <button type="button" class="add-btn focus:shadow-none focus:outline-none"
+                        <button type="button" class="add-btn focus:shadow-none focus:outline-none flex"
                             @click="btnClickedDone">
-                            Done
+                            <svg
+                                v-show="buttonLoading"
+                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                />
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                />
+                            </svg>
+                            <span>{{ buttonLoading ? 'Processing...' : 'done' }}</span>
                         </button>
+                        <!-- <LoadingButton
+                            :loading="buttonLoading"
+                            text="Done"
+                            loadingText="Done..."
+                            @click="btnClickedDone"
+                        /> -->
                     </div>
                 </div>
                 <div>
@@ -357,10 +396,41 @@
                     </div>
                 </div>
                 <div class="flex justify-end">
-                    <button type="button" class="add-btn focus:shadow-none focus:outline-none"
+                    <button type="button" class="add-btn focus:shadow-none focus:outline-none flex"
+                        @click="btnClickedDone">
+                        <svg
+                            v-show="buttonLoading"
+                            class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            />
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
+                        </svg>
+                        <span>{{ buttonLoading ? 'Processing...' : 'done' }}</span>
+                    </button>
+                    <!-- <button type="button" class="add-btn focus:shadow-none focus:outline-none"
                         @click="btnClickedDone">
                         Done
                     </button>
+                    <LoadingButton
+                            :loading="buttonLoading"
+                            text="Done"
+                            loadingText="Done..."
+                            @click="btnClickedDone"
+                        /> -->
                 </div>
             </div>
         </div>
@@ -374,11 +444,13 @@
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
     import TableSkeleton from "../Common/TableSkeleton.vue";
+    import LoadingButton from "../Common/LoadingButton.vue";
 
     export default {
         components: {
             Multiselect,
-            TableSkeleton
+            TableSkeleton,
+            LoadingButton
         },
         data() {
             return {
@@ -406,6 +478,7 @@
 
                 isShow:false,
                 loading: true,
+                buttonLoading: false,
             };
         },
 
@@ -509,6 +582,8 @@
                 //         featureIds.push(selectedFeature.id);
                 //     });
                 // }
+
+                this.buttonLoading = true;
                 let formData = new FormData();
                 // formData.append('name', this.editName);
                 formData.append('name', this.name);
@@ -519,6 +594,7 @@
                 let url = `/api/departments/${this.editId}`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
+                    this.buttonLoading = false;
                     this.getDepartmentList(1);
                     this.name = null;
                     this.editId = null;
@@ -553,6 +629,7 @@
 
             async createDepartment()
             {
+                this.buttonLoading = true;
                 let featureIds = [];
                 this.selectedFeatures.forEach((selectedFeature)=>{
                     featureIds.push(selectedFeature.id);
@@ -563,6 +640,7 @@
 
                 let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
+                    this.buttonLoading = false;
                     this.getDepartmentList(1);
                     this.selectedFeatures = [];
                     this.btnClickedChangeFeature();

@@ -436,7 +436,7 @@
     import { mapGetters } from "vuex";
 
     export default {
-        props: ["cashAccountId", "cashAccountName"],
+        props: ["cashAccountId", "cashAccountName", "cashAccountCode"],
         data() {
             return {
                 openingBalance: 0,
@@ -563,6 +563,7 @@
                 formData.append('account_id', this.selectedAccount.id);
                 formData.append('value', this.amount);
                 formData.append('cash_account_id', this.cashAccountId);
+                formData.append('cash_account_code', '2-' + this.cashAccountCode);
                 formData.append('action', this.action);
                 formData.append('is_confirmed', 1);
 
