@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Transaction;
 
+use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
@@ -58,6 +59,13 @@ class TransactionRepository implements TransactionInterface
                 $data['id'] = null;
                 $ledger1Id=null;
                 $ledger2Id=null;
+            }
+            if(isset($request->cash_account_code)){
+                $account=Account::getByAccountCode($request->cash_account_code);
+                if(!$account){
+                    ResponseMessage('Cash Account does not exist',419);
+                }
+                $data['cash_account_id']=$account->id;
             }
             $data['created_by']=UserData()->id;
             $transaction=(new StoreTransactionLedger())->createTransaction($data);
