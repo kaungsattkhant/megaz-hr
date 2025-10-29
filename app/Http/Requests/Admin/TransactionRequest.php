@@ -13,7 +13,7 @@ class TransactionRequest extends APIRequest
             'account_id'=>'required',
             'value'=>'required|integer',
             'action' => 'required|in:debit,credit',
-            'cash_account_id'=>'required|exists:accounts,id'
+            'cash_account_id'=>'required'
         ];
     }
     public function authorize()
