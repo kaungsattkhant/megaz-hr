@@ -93,13 +93,53 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   public function getCurrentTimeShift($request)
   {
     $gps = Gps::first();
-    $currentTimeShift = TimeShift::with(['shift'])
-      ->where(function ($q) {
-        $q->where('from_time', '<=', now()->format('H:i'))
-          ->orWhere('from_time', '>=', now()->format('H:i'));
+    if (!isset($request->staff_id) || $request->staff_id == null) {
+      ResponseMessage('Staff ID is required', 419);
+    }
+    $staffId = $request->input('staff_id');
+
+    $today = Carbon::today();
+
+    $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
+      $now = now();
+      $graceMinutes = 30; // allow 30 mins early check-in
+      $nowTime = $now->format('H:i');
+      $graceTime = $now->copy()->addMinutes($graceMinutes)->format('H:i');
+      $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+        ->where(function ($q) use ($nowTime, $graceTime) {
+          $q->where(function ($q1) use ($nowTime, $graceTime) {
+            $q1->where('time_shifts.from_time', '<=', $graceTime)
+              ->where('time_shifts.to_time', '>=', $nowTime);
+          })
+            ->orWhere(function ($q1) use ($nowTime) {
+              $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
+                ->where(function ($q2) use ($nowTime) {
+                  $q2->where('time_shifts.from_time', '<=', $nowTime)
+                    ->orWhere('time_shifts.to_time', '>=', $nowTime);
+                });
+            });
+        })
+        ->where('time_shifts.is_active', 1);
+    })
+      ->where("staff_id", $staffId)
+      ->whereHas('timeshift', function ($q) {
+        $q->where('is_active', 1);
       })
-      ->where('to_time', '>=', now()->format('H:i'))
+      ->whereDate('date_time', $today)
       ->first();
+
+    if (!$existShiftAssign) {
+      ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
+    }
+    if ($existShiftAssign) {
+      if ($existShiftAssign->status === 'pending') {
+        ResponseMessage('Check-in is invalid ,you have to accept  shift assignment', 419);
+      }
+      if ($existShiftAssign->status === 'cancelled') {
+        ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
+      }
+    }
+    $currentTimeShift = $existShiftAssign->timeshift;
 
     $response = [
       'gps' => $gps,
