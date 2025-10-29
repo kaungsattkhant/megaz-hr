@@ -236,7 +236,7 @@
                             'brand', 'service', 'cooking-place'
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     SET UP
                                 </p>
                             </li>
@@ -304,7 +304,7 @@
                             'item', 'uom-conversion', 'accessory', 'supplier', 
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     ITEM
                                 </p>
                             </li>
@@ -349,7 +349,7 @@
                             'shift-assignment', 'equipment-assignment'
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     HR
                                 </p>
                             </li>
@@ -435,7 +435,7 @@
                             'salary-batch', 'salary-calculate', 'pay-slip'
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     SALARY
                                 </p>
                             </li>
@@ -467,7 +467,7 @@
                             'overtime-confirmation','allowance'
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     HR SETUP
                                 </p>
                             </li>
@@ -595,7 +595,7 @@
                             'menu-category','menu-sale-report','menu-costing','menu','menu-area'
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     MENU
                                 </p>
                             </li>
@@ -641,7 +641,7 @@
                             'customer-birthday','customer-level-discount','customer-birthday-promotion'
                           ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     PROMOTION & CRM
                                 </p>
                             </li>
@@ -718,7 +718,7 @@
                             'ap-balance','ar','loan','accrual'
                             ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     FINANCIAL
                                 </p>
                             </li>
@@ -778,15 +778,16 @@
                                                 KTV Project Cash Book
                                             </a>
                                         </li>
-                                        <li>
-                                            <a href="/cashbook_history"
-                                                class="flex items-center ">
-                                                <i class="fal fa-tasks  pr-3"></i>
-                                                Cash Book History
-                                            </a>
-                                        </li>
+                                        
                                     </ul>
                                 </div>
+                            </li>
+                            <li>
+                                <a href="/cashbook_history"
+                                    class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-tasks"></i>
+                                    Cash Book History
+                                </a>
                             </li>
                             <li v-show="checkFeaturePermission('journal')">
                                 <a href="/journals" class="flex items-center  sidebar-gap-x">
@@ -909,7 +910,7 @@
                             'menu','ktv-product-tree','menu-forecasting','ktv-forecasting'
                             ])">
                             <li>
-                                <p class="text-[#2a3547] text-sm font-semibold ml-1">
+                                <p class="sidebar-tab-title">
                                     MRP
                                 </p>
                             </li>
@@ -946,7 +947,7 @@
                             'po-order','arrival-item','po-order-invoice'
                             ])">
                             <li>
-                                <p class="sidebar-title">
+                                <p class="sidebar-tab-title">
                                     ORDER
                                 </p>
                             </li>
@@ -1006,7 +1007,7 @@
                             'inventory-stock','inventory-transfer-history','inventory-transfer-receive','inventory-transfer','used-defected-item'
                             ])">
                             <li>
-                                <p class="sidebar-title">
+                                <p class="sidebar-tab-title">
                                     INVENTORY
                                 </p>
                             </li>
@@ -1053,7 +1054,7 @@
                             'okr-dashboard','event','asset-assignment'
                             ])">
                             <li>
-                                <p class="sidebar-title">
+                                <p class="sidebar-tab-title">
                                     OKR
                                 </p>
                             </li>
@@ -1078,6 +1079,10 @@
                         </ul>
                     </div>
                 </div>
+            </div>
+            <div id="logout"
+                class="absolute bottom-0 left-0 w-[336px] h-14 bg-[#fdfdfd] border-t border-[#0002] flex items-center justify-center overflow-hidden">
+                <logout-component />
             </div>
         </div>
     </nav>

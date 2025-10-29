@@ -23,8 +23,8 @@ class ReportController extends Controller
         ResponseData($data);
     }
     public function getWaiterSale(Request $request){
-         $data=$this->reportRepo->getWaiterSale($request);
-
+        $data=$this->reportRepo->getWaiterSale($request);
+        ResponseData($data);
     }
     public function getTotalKTVSessions(Request $request){
         $data=$this->reportRepo->getTotalKTVSessions($request);
@@ -43,6 +43,41 @@ class ReportController extends Controller
 
     public function getKTVTraining(Request $request){
         $data=$this->reportRepo->getKTVTraining($request);
+        ResponseData($data);
+    }
+
+    public function getBarTotalExpense(Request $request){
+        $data=$this->reportRepo->getBarTotalExpense($request);
+        ResponseData($data);
+    }
+
+    public function getKitchenForSktyAndKtv(Request $request)
+    {
+        $data=$this->reportRepo->getKitchenForSktyAndKtv($request);
+        ResponseData($data);
+    }
+
+    public function getKitchenTotalExpense(Request $request)
+    {
+        $data=$this->reportRepo->getKitchenTotalExpense($request);
+        ResponseData($data);
+    }
+
+    public function getMonthlyKitchenMenuTotal(Request $request)
+    {
+        $data=$this->reportRepo->getMonthlyKitchenMenuTotal($request);
+        ResponseData($data);
+    }
+
+    public function getDailyAreaSalesVolume(Request $request)
+    {
+        $data = $this->reportRepo->getDailyAreaSalesVolumeByStaff($request);
+        ResponseData($data);
+    }
+
+    public function getMenuSales(Request $request)
+    {
+        $data = $this->reportRepo->getTargetActualMenuSales($request);
         ResponseData($data);
     }
 }

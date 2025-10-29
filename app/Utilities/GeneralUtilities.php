@@ -82,6 +82,14 @@ if (!function_exists('MonthStartEndDates')) {
     }
 }
 
+if (!function_exists('IsValidDateString')){
+    function IsValidDateString(string $date): bool
+    {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
+    }
+}
+
 if (!function_exists('UploadFileToServer')) {
     function UploadFileToServer(Request $request, string $file_name, string $path): array
     {

@@ -492,14 +492,21 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('report')->controller(ReportController::class)->group(function () {
 
-        Route::get('get-bar-for-sky', 'getBarForSky');
+        Route::get('get_bar_for_sky', 'getBarForSky');
         Route::get('get-total-ktv-customers', 'getTotalKTVCustomers');
         Route::get('get-total-ktv-sessions', 'getTotalKTVSessions');
         Route::get('get-total-ktv-room-charges', 'getTotalKTVRoomCharges');
         Route::get('get-total-ktv-sales', 'getTotalKTVSales');
         Route::get('get_waiter_sale', 'getWaiterSale');
 
-        Route::get('ktv/trainings', 'getKTVTraining');
+        // Route::get('ktv/trainings', 'getKTVTraining');
+        Route::get('bar/total-expenses', 'getBarTotalExpense');
+        Route::get('kitchen-for-sky-and-ktv', 'getKitchenForSktyAndKtv');
+        Route::get('kitchen/total-expenses', 'getKitchenTotalExpense');
+        Route::get('monthly-kitchen-menu-total', 'getMonthlyKitchenMenuTotal');//lists
+
+        Route::get('catering/target_actual_menu_sales', 'getMenuSales');
+        Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
     });
 
 });

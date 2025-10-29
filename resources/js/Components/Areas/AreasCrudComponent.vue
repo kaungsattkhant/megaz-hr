@@ -193,7 +193,7 @@
                                 </select> -->
                             </div>
                             <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Selling Area'">
-                                <label for="" class="label-form mb-3">Area Type</label>
+                                <label for="" class="label-form mb-3">Menu Category</label>
                                 <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="false"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Menu Category"
                                     :multiple="true" label="name" track-by="id" :preselect-first="false"></multiselect>
@@ -217,10 +217,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createAreasBtnClicked"
+                            <!-- <button type="button" @click="createAreasBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @click="createAreasBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -267,16 +273,29 @@
                                     </option>
                                 </select> -->
                             </div>
+
+                            <div class="mb-4" v-show="editDetail?.area_category?.name === 'Selling Area'">
+                                <label for="" class="label-form mb-3">Area Type</label>
+                                <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="false"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Menu Category"
+                                    :multiple="true" label="name" track-by="id" :preselect-first="false"></multiselect>
+                            </div>
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="editAreasBtnClicked"
+                            <!-- <button type="button" @click="editAreasBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Edit
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Edit"
+                                loadingText="Editing..."
+                                @click="editAreasBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -346,11 +365,13 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
         Multiselect,
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -386,6 +407,7 @@ export default {
             feature: this.getFeature(),
 
             loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -465,6 +487,10 @@ export default {
                 this.alertValidationMessage(`Area Type`);
                 return 1;
             }
+            else if(this.selectedCategory.name === 'Selling Area' && this.selectedMenuCategory.length < 1){
+                this.alertValidationMessage(`Menu Category`);
+                return 1;
+            }
             else if(this.selectedCategory.name === 'Cooking Area' && !this.selectedCookingAreaType){
                 this.alertValidationMessage(`Type`);
                 return 1;
@@ -475,6 +501,7 @@ export default {
         },
 
         async createArea() {
+            this.buttonLoading = true;
             let menuCategoryIds = [];
             this.selectedMenuCategory.forEach(menu => {
                 menuCategoryIds.push(menu.id);
@@ -504,17 +531,23 @@ export default {
                 this.selectedDepartment = null;
                 this.name = null;
                 document.getElementById('close_create_modal').click();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500);
             }
             else {
                 this.$notify({
                     text: `Area create failed`,
                     type: "error"
                 });
+
+                this.buttonLoading = false;
             }
         },
 
 
         editBtnClicked(item){
+            this.selectedMenuCategory = [];
             this.editDetail = item;
             this.selectedId = item.id;
             this.selectedType = null;
@@ -522,7 +555,8 @@ export default {
             this.editName = item.name;
             this.editSelectedCategory = this.categoryList.find(cat => cat.id === item.area_category_id);
             if(this.editSelectedCategory.name === 'Selling Area'){
-                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
+                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id);
+                this.selectedMenuCategory = item.menu_categories
             }
 
             if(item.area_category.name === 'Cooking Area'){
@@ -548,12 +582,17 @@ export default {
         },
 
         async editArea() {
-            
+            this.LoadingButton = true;
+            let menuCategoryIds = [];
+            this.selectedMenuCategory.forEach(menu => {
+                menuCategoryIds.push(menu.id);
+            });
             let formData = new FormData();
             formData.append('id', this.selectedId);
             formData.append('name', this.editName);
             if(this.editSelectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.editSelectedType.id);
+                formData.append('menu_category_ids', JSON.stringify(menuCategoryIds));
             }
             if(this.editSelectedCategory.name === 'Cooking Area'){
                 formData.append('type', this.selectedCookingAreaType.value);
@@ -573,8 +612,13 @@ export default {
                 this.editSelectedCategory = null;
                 this.editName = null;
                 document.getElementById('close_edit_modal').click();
+
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500);
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                     text: response.message,
                     type: "error"

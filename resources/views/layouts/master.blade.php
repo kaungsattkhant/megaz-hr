@@ -10,7 +10,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 
 	<title> Mega Z ERP | @yield('page_title')</title>
-    @vite('resources/js/app.js')
+        @vite('resources/js/app.js')
 
     <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
     <link rel="stylesheet" href="{{asset('fontawesome/css/all.css')}}">
@@ -26,7 +26,11 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-  <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
+        <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -162,10 +166,16 @@
         // for active tab and link in sidebar
         const currentPath = window.location.pathname;
         $("#sidebar_admin a").each(function () {
-            if ($(this).attr("href") === currentPath) {
+
+            console.log('outter' + currentPath)
+            const href = $(this).attr("href");
+
+            // if current path starts with the link's href (e.g., '/staff' matches '/staff/4/edit')
+            if (currentPath === href || currentPath.startsWith(href + '/')) {
 
                 $("#sidebar_admin a").removeClass("active-link"); // Remove 'active' from all links
                 $(this).addClass("active-link"); // Add 'active' to the matching link
+                console.log($(this))
 
                 $("#sidebar_admin .tab-content").removeClass("show"); // Remove 'active' from all links
                 $(this).closest(".tab-content").addClass("show");

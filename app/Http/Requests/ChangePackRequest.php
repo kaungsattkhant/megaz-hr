@@ -11,7 +11,7 @@ class ChangePackRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,6 +23,10 @@ class ChangePackRequest extends FormRequest
     {
         return [
             //
+            "menu_id" => 'required|integer|exists:menus,id',
+            "quantity" => 'required|integer',
+            'pack_ids' => 'required|array',
+            'pack_ids.*' => 'integer|exists:packs,id',
         ];
     }
 }
