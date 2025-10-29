@@ -272,6 +272,14 @@ import SaleLedgerComponent from './Components/SaleLedgers/SaleLedgerComponent.vu
 import SaleLedgerKtvComponent from './Components/SaleLedgers/SaleLedgerKtvComponent.vue';
 import SaleLedgerRestaurantComponent from './Components/SaleLedgers/SaleLedgerRestaurantComponent.vue';
 import SideBarComponent from './Components/Common/SideBarComponent.vue';
+import KtvReportComponent from './Components/KtvReport/KtvReportComponent.vue';
+import DailyAreaSalesByStaffReport from './Components/CateringReport/DailyAreaSalesByStaffReport.vue';
+import TargetActualMenuSalesReport from './Components/CateringReport/TargetActualMenuSalesReport.vue';
+import KtvReportChartComponent from './Components/KtvReport/KtvReportChartComponent.vue';
+import BarReportChartComponent from './Components/BarReport/BarReportChartComponent.vue';
+import KitchenReportChartComponent from './Components/KitchenReport/KitchenReportChartComponent.vue';
+import KtvMenuSaleComponent from './Components/KitchenMenuSale/KtvMenuSaleComponent.vue';
+import SkyMenuSaleComponent from './Components/KitchenMenuSale/SkyMenuSaleComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -522,6 +530,14 @@ app.component('SaleLedgerComponent',SaleLedgerComponent);
 app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
 app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
 app.component('SideBarComponent',SideBarComponent);
+app.component('KtvReportComponent',KtvReportComponent);
+app.component('DailyAreaSalesByStaffReport',DailyAreaSalesByStaffReport);
+app.component('TargetActualMenuSalesReport',TargetActualMenuSalesReport);
+app.component('KtvReportChartComponent',KtvReportChartComponent);
+app.component('BarReportChartComponent',BarReportChartComponent);
+app.component('KitchenReportChartComponent',KitchenReportChartComponent);
+app.component('KtvMenuSaleComponent',KtvMenuSaleComponent);
+app.component('SkyMenuSaleComponent',SkyMenuSaleComponent);
 
 const toastificationOptions = {};
 app.use(store);

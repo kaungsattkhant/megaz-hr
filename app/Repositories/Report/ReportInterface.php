@@ -1,6 +1,6 @@
 <?php
 namespace App\Repositories\Report;
-interface ReportInterface 
+interface ReportInterface
 {
    public function getBarForSky($request);
 
@@ -14,4 +14,16 @@ interface ReportInterface
    public function getTotalKTVSales($request);
 
    public function getKTVTraining($request);
+
+   public function getBarTotalExpense($request);
+
+   public function getTargetActualMenuSales($request);
+
+   public function getDailyAreaSalesVolumeByStaff($request);
+
+   public function getKitchenForSktyAndKtv($request);
+
+   public function getKitchenTotalExpense($request);
+
+   public function getMonthlyKitchenMenuTotal($request);
 }

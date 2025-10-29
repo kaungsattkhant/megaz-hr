@@ -188,10 +188,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createBtnClicked"
+                            <!-- <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @click="createBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -259,10 +265,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-            TableSkeleton
+            TableSkeleton,
+            LoadingButton
     },
     data() {
         return {
@@ -287,6 +295,7 @@ export default {
 
             feature: this.getFeature(),
             loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -340,10 +349,29 @@ export default {
         // },
 
         createBtnClicked() {
-            this.createTableAndRoom();
+            if(!this.name){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(this.pricePerHour < 1){
+                this.alertValidationMessage(`Price Per Hour`);
+                return 1;
+            }
+            else if(!this.entityType){
+                this.alertValidationMessage(`Entity Type`);
+                return 1;
+            }
+            else if(!this.area_id){
+                this.alertValidationMessage(`Area Id`);
+                return 1;
+            }
+            else{
+                this.createTableAndRoom();
+            }
         },
 
         async createTableAndRoom() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('price_per_hour', this.pricePerHour);
@@ -356,9 +384,16 @@ export default {
                 console.log("success")
                 this.closeModal();
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
@@ -413,6 +448,13 @@ export default {
             this.searchInput = null;
             this.getTableList(1);
         },
+        alertValidationMessage(field) {
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: 'warn'
+                });
+            },
     },
 
     created() {

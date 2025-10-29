@@ -2,6 +2,7 @@
 
 namespace App\Repositories\StaffTimeShift;
 
+use App\Models\Staff;
 use App\Models\StaffTimeshift;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
@@ -20,6 +21,7 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 
   public function createStaffTimeShift(array $data)
   {
+    // dd($data);
     DB::beginTransaction();
     try {
       if (isset($data['staff_time_shifts'])) {
@@ -27,7 +29,17 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for staff_time_shifts.', 400);
         }
-        foreach ($staff_time_shifts as   $staff_time_shift) {
+        foreach ($staff_time_shifts as $staff_time_shift) {
+          $exists = StaffTimeshift::where('date_time', $staff_time_shift['date_time'])
+            ->where('staff_id', $staff_time_shift['staff_id'])
+            ->where('timeshift_id', $staff_time_shift['timeshift_id'])
+            ->exists();
+
+          if ($exists) {
+            // Return error or handle as needed
+            $staff=Staff::find($staff_time_shift['staff_id']);
+            ResponseMessage('Shift already assigned for '.$staff->name.' at this date and timeshift.',422);
+          }
           $staffTimeshift = StaffTimeshift::updateOrCreate(
             [
               'date_time' => $staff_time_shift['date_time'],
@@ -69,14 +81,14 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
           'confirmed_by' => UserData()->id,
           'confirmed_at' => now(),
         ]);
-        $this->sendShiftStatusNotificationToAdmin($staffTimeshift , $data['status']);
+        $this->sendShiftStatusNotificationToAdmin($staffTimeshift, $data['status']);
       }
       if ($data['status'] === "cancelled") {
         $staffTimeshift->update([
           'cancelled_by' => UserData()->id,
           'cancelled_at' => now(),
         ]);
-        $this->sendShiftStatusNotificationToAdmin($staffTimeshift , $data['status']);
+        $this->sendShiftStatusNotificationToAdmin($staffTimeshift, $data['status']);
       }
       DB::commit();
       ResponseData($staffTimeshift, 201);
