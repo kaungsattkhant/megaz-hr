@@ -1,8 +1,12 @@
 <template>
     <div class="mt-4 bg-white">
-        <div class=" grid grid-cols-2 gap-x-12 gap-y-8">
+        <div class=" grid grid-cols-2 gap-x-8 gap-y-4">
             <div class="card-shadow p-8">
+                <p class=" text-black mb-2 font-semibold">
+                    Total No of Pax KTV Compare
+                </p>
                 <p v-if="loading">Loading chart...</p>
+
                 <canvas v-show="!loading" ref="customer"></canvas>
 
                 <div class="box-container-table !shadow-none">
@@ -12,7 +16,7 @@
                                 <thead v-html="cusTable"></thead>
                                 <tbody>
                                     <div class="contents" v-for="(cus, index) in customerData" :key="index">
-                                        <tr class="">
+                                        <tr class="" v-show="index < 4">
                                             <td class=" font-medium ">
                                                 {{cus.month_name}}
                                             </td>
@@ -27,7 +31,10 @@
                     </div>
                 </div>
             </div>
-            <div class="card-shadow">
+            <div class="card-shadow p-8">
+                <p class=" text-black mb-2 font-semibold">
+                    Total No of Section KTV Compare
+                </p>
                 <p v-if="loading">Loading chart...</p>
                 <canvas v-show="!loading" ref="session"></canvas>
                 <div class="box-container-table !shadow-none">
@@ -37,7 +44,7 @@
                                 <thead v-html="sessionTable"></thead>
                                 <tbody>
                                     <div class="contents" v-for="(ses, index) in sessionData" :key="index">
-                                        <tr class="">
+                                        <tr class="" v-show="index < 4">
                                             <td class=" font-medium ">
                                                 {{ses.month_name}}
                                             </td>
@@ -52,7 +59,10 @@
                     </div>
                 </div>
             </div>
-            <div class="card-shadow">
+            <div class="card-shadow p-8">
+                <p class=" text-black mb-2 font-semibold">
+                    Total No of Room Charges KTV Compare
+                </p>
                 <p v-if="loading">Loading chart...</p>
                 <canvas v-show="!loading" ref="room"></canvas>
                 <div class="box-container-table !shadow-none">
@@ -62,7 +72,7 @@
                                 <thead v-html="roomTable"></thead>
                                 <tbody>
                                     <div class="contents" v-for="(room, index) in roomData" :key="index">
-                                        <tr class="">
+                                        <tr class="" v-show="index < 4">
                                             <td class=" font-medium ">
                                                 {{room.month_name}}
                                             </td>
@@ -77,7 +87,10 @@
                     </div>
                 </div>
             </div>
-            <div class="card-shadow">
+            <div class="card-shadow p-8">
+                <p class=" text-black mb-2 font-semibold">
+                    Total No of Sale KTV Compare
+                </p>
                 <p v-if="loading">Loading chart...</p>
                 <canvas v-show="!loading" ref="sale"></canvas>
                 <div class="box-container-table !shadow-none">
@@ -87,7 +100,7 @@
                                 <thead v-html="saleTable"></thead>
                                 <tbody>
                                     <div class="contents" v-for="(sale, index) in saleData" :key="index">
-                                        <tr class="">
+                                        <tr class="" v-show="index < 4">
                                             <td class=" font-medium ">
                                                 {{sale.month_name}}
                                             </td>
@@ -168,13 +181,14 @@ methods: {
                             labels,
                             datasets: [
                                 {
-                                label: 'Total Pax',
-                                data: values,
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.3)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                fill: true,
+                                    label: 'Total Pax',
+                                    data: values,
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                    fill: true,
+                                    pointRadius: 0, // hides points,
                                 },
                             ],
                         },
@@ -182,6 +196,16 @@ methods: {
                         responsive: true,
                         animation: false,
                         scales: {
+                            x: {
+                                grid: {
+                                    drawBorder: false, // hides the axis line itself
+                                    drawOnChartArea: false, // optional: hide grid lines
+                                    drawTicks: false, // optional: hide tick marks
+                                },
+                                ticks: {
+                                    color: '#666', // keep labels if you want
+                                },
+                            },
                             y: {
                                 beginAtZero: true,
                             },
@@ -223,11 +247,12 @@ methods: {
                                 {
                                     label: 'KTV Sessions',
                                     data: values,
-                                    borderColor: 'rgba(54, 162, 235, 1)',
-                                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                                    borderColor: 'rgba(22, 163, 74, 1)',
+                                    backgroundColor: 'rgba(22, 163, 74, 0.6)',
                                     borderWidth: 2,
                                     tension: 0.3,
                                     fill: true,
+                                    pointRadius: 0, // hides points,
                                 },
                             ],
                         },
@@ -235,6 +260,16 @@ methods: {
                         responsive: true,
                         animation: false,
                         scales: {
+                            x: {
+                                grid: {
+                                    drawBorder: false, // hides the axis line itself
+                                    drawOnChartArea: false, // optional: hide grid lines
+                                    drawTicks: false, // optional: hide tick marks
+                                },
+                                ticks: {
+                                    color: '#666', // keep labels if you want
+                                },
+                            },
                             y: {
                                 beginAtZero: true,
                             },
@@ -274,13 +309,14 @@ methods: {
                             labels,
                             datasets: [
                                 {
-                                label: 'Room Charges',
-                                data: values,
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.3)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                fill: true,
+                                    label: 'Room Charges',
+                                    data: values,
+                                    borderColor: 'rgba(126, 34, 206, 1)',
+                                    backgroundColor: 'rgba(126, 34, 206, 0.7)',
+                                    borderWidth: 2,
+                                    tension: 0.3,
+                                    fill: true,
+                                    pointRadius: 0, // hides points,
                                 },
                             ],
                         },
@@ -288,6 +324,16 @@ methods: {
                         responsive: true,
                         animation: false,
                         scales: {
+                            x: {
+                                grid: {
+                                    drawBorder: false, // hides the axis line itself
+                                    drawOnChartArea: false, // optional: hide grid lines
+                                    drawTicks: false, // optional: hide tick marks
+                                },
+                                ticks: {
+                                    color: '#666', // keep labels if you want
+                                },
+                            },
                             y: {
                                 beginAtZero: true,
                             },
@@ -308,57 +354,70 @@ methods: {
       }
     },
     async getSaleChartData() {
-      try {
-        const response = await getApiData({url: `/api/report/get-total-ktv-sales`,token: this.getToken()});
-        if (response.data) {
-            this.saleData = response.data;
-            const labels = response.data.map(item => item.month_name);
-            const values = response.data.map(item => item.total_ktv_sales);
-            this.$nextTick(() => {
-                if (!this.saleChart) {
-                    const ctx = this.$refs.sale?.getContext('2d');
-                    if (!ctx) {
-                        console.error('Canvas not found!');
-                        return;
-                    }
-                    this.saleChart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels,
-                            datasets: [
-                                {
-                                label: 'KTV Sales',
-                                data: values,
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.3)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                fill: true,
-                                },
-                            ],
-                        },
-                        options: {
-                        responsive: true,
-                        animation: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
+        try {
+            const response = await getApiData({url: `/api/report/get-total-ktv-sales`,token: this.getToken()});
+            if (response.data) {
+                this.saleData = response.data;
+                const labels = response.data.map(item => item.month_name);
+                const values = response.data.map(item => item.total_ktv_sales);
+                this.$nextTick(() => {
+                    if (!this.saleChart) {
+                        const ctx = this.$refs.sale?.getContext('2d');
+                        if (!ctx) {
+                            console.error('Canvas not found!');
+                            return;
+                        }
+                        this.saleChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels,
+                                datasets: [
+                                    {
+                                        label: 'KTV Sales',
+                                        data: values,
+                                        borderColor: 'rgba(249, 115, 22, 1)',
+                                        backgroundColor: 'rgba(249, 115, 22, 0.6)',
+                                        borderWidth: 2,
+                                        tension: 0.3,
+                                        fill: true,
+                                        pointRadius: 0, // hides points,
+                                    },
+                                ],
                             },
-                        },
-                    },
+                            options: {
+                                responsive: true,
+                                animation: false,
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            drawBorder: false, // hides the axis line itself
+                                            drawOnChartArea: false, // optional: hide grid lines
+                                        },
+                                        ticks: {
+                                            color: '#666', // keep labels if you want
+                                        },
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                    },
+                                },
+                            },
+                        });
+                    } 
+                    else {
+                        this.saleChart.data.labels = labels;
+                        this.saleChart.data.datasets[0].data = values;
+                        this.saleChart.update();
+                    }
                 });
-            } else {
-              this.saleChart.data.labels = labels;
-              this.saleChart.data.datasets[0].data = values;
-              this.saleChart.update();
             }
-          });
+        } 
+        catch (error) {
+            console.error('Error fetching Sale chart data:', error);
+        } 
+        finally {
+            this.loading = false;
         }
-      } catch (error) {
-        console.error('Error fetching Sale chart data:', error);
-      } finally {
-        this.loading = false;
-      }
     },
 
     async getRoomList(){
