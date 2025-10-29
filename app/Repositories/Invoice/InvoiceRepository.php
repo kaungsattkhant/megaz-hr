@@ -143,8 +143,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
+
         DB::beginTransaction();
         try {
+            $sessionStartedTime = Carbon::parse($data['start_time'])->format('H:i');
             $roomDiscountId = isset($data['room_discount_id']) ? $data['room_discount_id'] : null;
             $roomDiscount = null;
             if ($roomDiscountId) {
@@ -159,7 +161,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $entitySession = null;
                 if (isset($data['entity_id']) && $data['entity_id'] != null && $data['is_waiter']) {
                     $entity = Entity::find($data['entity_id']);
-                    $currentTime = Carbon::parse(now())->format('H:i');
+                    // $currentTime = Carbon::parse(now())->format('H:i');
+                    $currentTime = Carbon::parse($data['start_time'])->format('H:i');
                     $entitySession = $entity->currentEntitySession($currentTime)->first();
                     if (!$entitySession) {
                         ResponseMessage('Entity is invalid', 422);
@@ -167,7 +170,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $data['entity_session_id'] = $entitySession->id;
                     $entity = $entitySession->entity;
                 } else if (isset($data['entity_session_id']) && !$data['is_waiter']) {
-                    $currentTime = Carbon::parse(now())->format('H:i');
+                    // $currentTime = Carbon::parse(now())->format('H:i');
+                    $currentTime = Carbon::parse($data['start_time'])->format('H:i');
                     $entitySession = EntitySession::where('id', $data['entity_session_id'])
                         ->where(function ($query) use ($currentTime) {
                             $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
@@ -184,7 +188,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     //     ->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
                     //     ->first();
                     if (!$entitySession) {
-                        ResponseMessage('Session can open at this time', 419);
+                        ResponseMessage('Start Time and Session does not  match at this time', 419);
                     }
                     $entity = Entity::find($entitySession->entity_id);
                 }
@@ -1409,10 +1413,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice->update($data);
 
             $invoice->total_discount = $invoice->discount_value
-            + $invoice->order_discount_value
-            + $invoice->room_discount_value
-            + $invoice->birthday_discount
-            + $invoice->customer_level_discount;
+                + $invoice->order_discount_value
+                + $invoice->room_discount_value
+                + $invoice->birthday_discount
+                + $invoice->customer_level_discount;
 
             $invoice->total = ($invoice->sub_total + $invoice->service_charge + $invoice->tax) - $invoice->total_discount;
 
