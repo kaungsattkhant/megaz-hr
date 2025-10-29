@@ -32,7 +32,7 @@ class EntityRepository implements EntityRepositoryInterface
         $type = $request->type;
         if ($request->per_page || $request->page) {
             return Entity::orderByDesc('id')
-                ->with('service_category')
+                ->with(['service_category','area'])
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })

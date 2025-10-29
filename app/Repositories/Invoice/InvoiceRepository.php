@@ -146,7 +146,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         DB::beginTransaction();
         try {
-            $sessionStartedTime = Carbon::parse($data['start_time'])->format('H:i');
+            // $sessionStartedTime = Carbon::parse($data['start_time'])->format('H:i');
             $roomDiscountId = isset($data['room_discount_id']) ? $data['room_discount_id'] : null;
             $roomDiscount = null;
             if ($roomDiscountId) {
