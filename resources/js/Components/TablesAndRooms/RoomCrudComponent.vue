@@ -41,9 +41,9 @@
                                 <th scope="col" class="  ">
                                     Room
                                 </th>
-                                <!-- <th scope="col" class="">
-                                    Category
-                                </th> -->
+                                <th scope="col" class="  ">
+                                    Area
+                                </th>
                                 <th scope="col" class="">
                                     Price Per Hour
                                 </th>
@@ -67,6 +67,9 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ room.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ room.area.name }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap  ">
                                         <div v-if="room.service_category"> {{ room.service_category.name }} </div>
@@ -313,7 +316,7 @@ export default {
         },
 
         async getAreaList() {
-            const response = await getApiData({ url: '/api/areas', token: this.getToken() });
+            const response = await getApiData({ url: '/api/areas?area_type_id=2', token: this.getToken() });
             if (response.data) {
                 // this.areaList = response.data;
                 response.data.forEach(area => {
