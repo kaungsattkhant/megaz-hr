@@ -47,7 +47,8 @@ Route::middleware(['departments:staff.edit'])->group(function () {
 });
 
 Route::middleware(['departments:uom-conversion'])->group(function () {
-    Route::view('/uoms', 'item_uoms.index')->name('uoms');
+    Route::view('/uoms', 'item_uoms.uom_list')->name('uoms');
+    Route::view('/uom_conversions', 'item_uoms.index')->name('uom_conversions');
 });
 
 // item

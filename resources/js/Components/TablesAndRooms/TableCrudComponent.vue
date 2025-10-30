@@ -40,6 +40,9 @@
                                 <th scope="col" class="  ">
                                     Table
                                 </th>
+                                <th scope="col" class="  ">
+                                    Area
+                                </th>
                                 <!-- <th scope="col" class="">
                                     Category
                                 </th> -->
@@ -66,6 +69,9 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ room.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ room.area.name }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap  ">
                                         <div v-if="room.service_category"> {{ room.service_category.name }} </div>
@@ -321,7 +327,7 @@ export default {
         },
 
         async getAreaList() {
-            const response = await getApiData({ url: '/api/areas', token: this.getToken() });
+            const response = await getApiData({ url: '/api/areas?area_type_id=1', token: this.getToken() });
             if (response.data) {
                 // this.areaList = response.data;
                 // console.log(this.areaList)
@@ -353,21 +359,19 @@ export default {
                 this.alertValidationMessage(`Name`);
                 return 1;
             }
-            else if(this.pricePerHour < 1){
-                this.alertValidationMessage(`Price Per Hour`);
+            if(this.pricePerHour < 0){
+                this.alertValidationMessage(`Price Per Hour cannot be negative numbers`);
                 return 1;
             }
-            else if(!this.entityType){
+            if(!this.entityType){
                 this.alertValidationMessage(`Entity Type`);
                 return 1;
             }
-            else if(!this.area_id){
+            if(!this.area_id){
                 this.alertValidationMessage(`Area Id`);
                 return 1;
             }
-            else{
-                this.createTableAndRoom();
-            }
+            this.createTableAndRoom();
         },
 
         async createTableAndRoom() {
