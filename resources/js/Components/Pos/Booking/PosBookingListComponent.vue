@@ -66,7 +66,38 @@
                                         </div>
                                         
                                     </td>
-                                </tr>                                
+                                </tr>
+                                <!-- <tr class="">
+                                    <td class="whitespace-nowrap px-6 py-4 font-medium">
+                                        one
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        two
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        three
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        four            
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        five
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        sive
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <button>
+                                            <i class="fal fa-play-circle text-sm mr-2"></i>
+                                        </button>
+                                        <button>
+                                            <i class="fal fa-check text-sm mr-2"></i>
+                                        </button>
+                                        <button>
+                                            <i class="fal fa-times text-sm"></i>
+                                        </button>
+                                    </td>
+                                </tr> -->
                             </tbody>
                         </table>
                     </div>

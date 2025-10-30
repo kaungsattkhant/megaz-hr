@@ -2,12 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MenuAPIController;
+use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\AccessoryController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
+use App\Http\Controllers\API\SellingExtraAPIController;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(EntityAPIController::class)->group(function () {
@@ -56,4 +58,15 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('pos')->controller(RoomDiscountAPIController::class)->group(function () {
         Route::get('/get_room_discount_list', 'getRoomDiscountList');
     });
+    Route::prefix('pos')->controller(SellingExtraAPIController::class)->group(function () {
+        Route::get('/selling_extra_categories', 'getSellingExtraCategories');
+        Route::get('/selling_extras', 'getSellingExtrasFromPos');
+    });
+    Route::controller(PackAPIController::class)->group(function () {
+        Route::get('/packs', 'getPacksData');
+        Route::post('/packs', 'createPack');
+        Route::post('change_pack','changePack');
+    });
+  
 });
+

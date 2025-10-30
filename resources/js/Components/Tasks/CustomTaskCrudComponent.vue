@@ -1,24 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Custom Tasks
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Custom Tasks
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button type="button" v-show="feature.includes('custom-task.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -57,7 +60,6 @@
                             </tr>
                         </thead>
                         <tbody>
-
                             <!-- looping start -->
                             <div class="contents" v-for="(task, index) in tasksList" :key="index">
                                 <tr class="">
@@ -88,8 +90,12 @@
                                         {{ task.kpi }}
                                     </td>
 
-                                    <td class="  " @click="editTask(task.id)">
-                                        <i class="fas fa-pen" data-te-toggle="modal" data-te-target="#update_task"></i>
+                                    <td class="  " v-show="getFeature().includes('custom-task.edit')">
+                                        <button type="button" class="pr-3" 
+                                            data-te-toggle="modal" data-te-target="#update_task" @click="editTask(task.id)">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <!-- <i class="fas fa-pen" data-te-toggle="modal" data-te-target="#update_task"></i> -->
                                     </td>
 
                                 </tr>
@@ -415,11 +421,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async doubleChecked(id) {
             let url = `/api/tasks/${id}/double_checked`;

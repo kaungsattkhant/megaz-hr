@@ -1,30 +1,32 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            UOM
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <!-- <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button> -->
-
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    UOM
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <div class="flex gap-3">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+
+                    <!-- <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button> -->
+
+                </div>
+                <div class="flex justify-end flex-col">
+                    <div class="flex gap-3">
 
 
-                    <button type="button"
-                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                        data-te-toggle="modal" data-te-target="#uom">
-                        Create Uom
-                    </button>
+                        <button type="button"
+                            class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                            data-te-toggle="modal" data-te-target="#uom">
+                            Create Uom
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,7 +49,18 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="uomList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(uom, itemIndex) in uomList" :key="itemIndex">
                                 <tr class="">
@@ -194,8 +207,12 @@
 import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, putApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             uomList: [],
@@ -212,7 +229,9 @@ export default {
             baseUnitedit:null,
             conversionUnitedit:null,
             editUomId:null,
-            editUomName:null
+            editUomName:null,
+
+            loading: true,
         };
     },
 
@@ -220,10 +239,11 @@ export default {
         ...mapGetters(['getToken']),
 
         async getUomList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/uoms?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.uomList = response.data.uoms;
             }
         },

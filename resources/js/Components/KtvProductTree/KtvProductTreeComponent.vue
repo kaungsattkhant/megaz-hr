@@ -1,34 +1,37 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Product Tree
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Room" v-model="selectedRoom" @change="roomchange(1)"
-                    data-te-select-filter="true" class="input-ui w-full">
-                        <option value="">All</option>
-                        <option v-for="(room,index) in roomList" :key="index" :value="room"> {{ room.name }} </option>
-                    </select>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Product Tree
+                </p>
             </div>
+            <div class="btn-container">
+                <notifications position="top center" />
+
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Room" v-model="selectedRoom" @change="roomchange(1)"
+                        data-te-select-filter="true" class="input-ui w-full">
+                            <option value="">All</option>
+                            <option v-for="(room,index) in roomList" :key="index" :value="room"> {{ room.name }} </option>
+                        </select>
+                    </div>
+                </div>
 
 
-            <div class="flex pr-0 gap-x-4">
-                
-                <a href="/ktv_product_tree/create"
-                    class="add-btn whitespace-nowrap h-8 focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
+                <div class="flex pr-0 gap-x-4">
+                    
+                    <a href="/ktv_product_tree/create" v-if="feature.includes('ktv-product-tree.create')"
+                        class="add-btn whitespace-nowrap h-8 focus:outline-none focus:ring-0 ">
+                        Add New
+                    </a>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -48,6 +51,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(productTree, index) in productTreeList" :key="index">
@@ -60,14 +68,19 @@
                                         <!-- {{ roomList.find(room=>room.id = productTree.entity_id)?.name }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/ktv_product_tree/' + productTree.id + '/edit'">
+                                        <a :href="'/ktv_product_tree/' + productTree.id + '/edit'" v-if="feature.includes('ktv-product-tree.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <i class="far fa-trash-alt cursor-pointer"
+                                        <i class="far fa-trash-alt cursor-pointer" v-if="feature.includes('ktv-product-tree.delete')"
                                             @click="deleteqkr(qkr.id)"></i>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="productTreeList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -97,8 +110,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             productTreeList: [],
@@ -118,11 +135,14 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature', 'getFeature']),
 
         async getRoomList(){
             let response = await getApiData({url: `/api/ktv/entity_room`, token: this.getToken()});
@@ -132,9 +152,11 @@ export default {
         },
 
         async getProductTree(pageNumber) {
+            this.loading = true;
             let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.productTreeList = response.data.data;
 
                 this.lastPage = response.data.last_page;

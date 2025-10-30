@@ -17,9 +17,9 @@ class MenuRepository implements MenuRepositoryInterface
     {
         $validateDate = $request->date ?? CurrentDate();
         $sellingAreaId = isset($request->selling_area_id) ? $request->selling_area_id : null;
-        if ($request->per_page || $request->page) {
+        if ($request->per_page || $request->page || !$sellingAreaId) {
             $menu_category_id = $request->menu_category_id;
-            return Menu::with([
+            $menuQuery = Menu::with([
                 'menu_category',
                 'prices',
                 'items',
@@ -32,8 +32,12 @@ class MenuRepository implements MenuRepositoryInterface
                 })
                 ->when($menu_category_id, function ($query) use ($menu_category_id) {
                     $query->where('menu_category_id', $menu_category_id);
-                })
-                ->paginate(config('common.list_count'));
+                });
+            if (isset($request->page)) {
+                return $menuQuery->paginate(config('common.list_count'));
+            }
+            return $menuQuery->where('is_active',1)->get();
+
         } else {
             // $menus = Menu::with(['menu_category', 'prices', 'items', 'menuServiceDiscounts' => function ($query) use ($validateDate) {
             //     $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
@@ -77,12 +81,15 @@ class MenuRepository implements MenuRepositoryInterface
                 ->where('menu_category_areas.selling_area_id', $sellingAreaId)
                 ->where('menu_areas.is_default', 1)
                 ->where('menus.is_active', 1)
+                ->where('menus.menu_category_id', $id)
                 ->select('menus.*', 'menu_areas.cooking_area_id')
                 ->get();
 
             return $menus;
         } else {
-            return Menu::where('menu_category_id', $id)->with('prices', 'menuServiceDiscounts')->get();
+            return Menu::where('menu_category_id', $id)->with('prices', 'menuServiceDiscounts')
+            ->where('is_active',1)
+            ->get();
         }
     }
 
@@ -281,8 +288,8 @@ class MenuRepository implements MenuRepositoryInterface
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('MONTH(order_items.created_at) as month'),
                 DB::raw('YEAR(order_items.created_at) as year')
-            )
-            ->where('order_items.status', 'done');
+            );
+            // ->where('order_items.status', 'done');
 
         // Apply filters
         if (!empty($searchTerm)) {
@@ -373,8 +380,8 @@ class MenuRepository implements MenuRepositoryInterface
             ->join('menus', 'order_items.menu_id', '=', 'menus.id')
             ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id')
             ->join('menu_prices', 'menus.id', '=', 'menu_prices.menu_id')
-            ->join('item_menu', 'menus.id', '=', 'item_menu.menu_id')
-            ->join('items', 'item_menu.item_id', '=', 'items.id')
+            // ->join('item_menu', 'menus.id', '=', 'item_menu.menu_id')
+            // ->join('items', 'item_menu.item_id', '=', 'items.id')
             ->select(
                 'order_items.menu_id',
                 'menus.code as menu_code',
@@ -382,7 +389,7 @@ class MenuRepository implements MenuRepositoryInterface
                 'menu_categories.name as menu_category',
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('SUM(order_items.quantity * menu_prices.price) as total_price'),
-                DB::raw('SUM(item_menu.price * order_items.quantity) as items_total_price')
+                DB::raw('SUM(order_items.sub_total_price) as items_total_price')
             );
 
         // Apply filters

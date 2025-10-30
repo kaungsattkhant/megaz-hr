@@ -1,18 +1,20 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Arrival Items
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class="flex pr-0 gap-x-4">
-                <button type="button" hidden disabled
-                class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#check_modal">
-                    Add New
-                </button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Arrival Items
+                </p>
+            </div>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class="flex pr-0 gap-x-4">
+                    <button type="button" hidden disabled
+                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    data-te-toggle="modal" data-te-target="#check_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -41,6 +43,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in items" :key="index">
@@ -96,12 +103,17 @@
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                        @click="checkBtnClicked(arrival)">
+                                        @click="checkBtnClicked(arrival)" v-show="feature.includes('arrival-item.confirm')">
                                             <i class="fal fa-check"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="items.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -151,7 +163,7 @@
                             placeholder="Base UOM Qty"
                             v-model="baseUomQty"
                             min="0"
-                            class="input-ui"
+                            class="input-ui !w-20"
                             @change="baseUomQtyChanged">
                         </div>
                         <div>
@@ -167,7 +179,7 @@
                             v-model="uomQty"
                             min="0"
                             :max="uomUpperLimit"
-                            class="input-ui"
+                            class="input-ui !w-20"
                             @change="uomQtyChanged">
                         </div>
                         <div>
@@ -210,6 +222,19 @@
                             for="checkboxDefault">
                             Later Arrival
                         </label>
+                    </div>
+                    <div class="mb-4">
+                        <label for="invoice" class="text-sm">Quality (%)</label>
+                        <input type="number" placeholder="Quality" v-model="selectedQuality" class="input-ui" min="0" max="100">
+                        <!-- <select id="invoice" v-model="selectedQuality" @change="invoiceSelectChanged()"
+                            class="text-sm border border-gray-300 input-ui w-12
+                            bg-transparent rounded-lg focus:ring-0">
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="E">E</option>
+                        </select> -->
                     </div>
                     <div class="mb-4">
                         <label for="invoice" class="text-sm">Invoice</label>
@@ -283,8 +308,12 @@
 import { Modal, Ripple, Select, initTE } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             items: [],
@@ -317,11 +346,16 @@ export default {
             totalPrice: 0,
             uomUpperLimit: 0,
             isLoading:true,
+
+            feature: this.getFeature(),
+
+            selectedQuality: null,
+            loading: false,
         }
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         showInput() {
             this.isShowInput = true;
@@ -335,9 +369,11 @@ export default {
         },
 
         async getItems(page) {
+            this.loading = true;
             let url = `/api/po_arrival_list?page=${page}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.items = response.data.data;
                 this.items.map(item => ({ ...item, showDatails: false, arrival_details: [] }));
                 this.items.forEach(item => {
@@ -444,6 +480,10 @@ export default {
                 this.alertValidationMessage(`new invoice number`);
                 return;
             }
+            if(!this.selectedQuality){
+                this.alertValidationMessage(`Quality`);
+                return;
+            }
             if(!this.isCreateNewInvoice && !this.selectedInvoice){
                 this.alertValidationMessage(`existing invoice number`);
                 return;
@@ -459,6 +499,7 @@ export default {
             formData.append('quantity', this.confirmArrivalTotalQty);
             formData.append('amount', this.totalPrice);
             formData.append('item_id', this.confirmArrivalItem.item_id);
+            formData.append('quality', this.selectedQuality);
 
 
             formData.append('purchase_order_id', this.confirmArrivalItem.purchase_order_id);

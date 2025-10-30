@@ -1,12 +1,12 @@
 <template>
-    <div class="px-0">
+    <div class=" container-card px-0">
         <div class="mb-4">
-            <p class="text-lg font-semibold font-inter">
+            <p class="page-title px-6">
                 Create Meeting
             </p>
         </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white px-6 rounded-md">
             <div class="mb-4 col-span-9 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Title
@@ -150,7 +150,7 @@
 
 
 
-            <div class="mb-4 col-span-6 pb-6 rounded-md">
+            <div class="mb-4 col-span-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Description
                 </label>
@@ -159,7 +159,7 @@
                     rows="6"></textarea>
             </div>
         </div>
-        <div class="flex gap-x-4">
+        <div class="flex gap-x-4 mx-6 mb-6">
             <a href="/meeting" class="cancel-btn focus:shadow-none focus:outline-none ">
                 Cancel
             </a>

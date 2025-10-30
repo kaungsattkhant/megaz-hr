@@ -27,4 +27,6 @@ interface PurchaseOrderRepositoryInterface
     public function confirmPurchaseOrderItem($request);
 
     public function getAvgPriceByBrand($itemId, $brandId);
+
+    public function checkLimitation($request);
 }

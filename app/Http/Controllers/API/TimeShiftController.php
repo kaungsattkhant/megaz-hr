@@ -79,6 +79,12 @@ class TimeShiftController extends Controller
         ResponseData($data);
     }
 
+    public function toggleTimeShift($timeShiftId)
+    {
+        $data = $this->TimeShiftRepository->toggleTimeShift($timeShiftId);
+        ResponseData($data);
+    }
+
     public function deleteTimeShiftById($timeShiftId)
     {
         $data = $this->TimeShiftRepository->deleteTimeShiftById($timeShiftId);
@@ -105,7 +111,7 @@ class TimeShiftController extends Controller
     public function getAllCheckIns(Request $request)
     {
         $data =  $this->TimeShiftRepository->getAllCheckIns($request);
-        ResponseData($data);
+        return $data;
     }
 
     public function getTotalHoursCheckIns(Request $request)

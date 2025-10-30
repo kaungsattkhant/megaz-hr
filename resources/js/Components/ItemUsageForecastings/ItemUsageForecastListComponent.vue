@@ -1,22 +1,25 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Item Usage Forecast
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Item Usage Forecast
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/create_item_usage_forecasts" class="add-btn ">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/create_item_usage_forecasts" class="add-btn ">
+                        Add New
+                    </a>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">

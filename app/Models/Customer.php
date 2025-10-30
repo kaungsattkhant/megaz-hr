@@ -38,7 +38,8 @@ class Customer extends Authenticatable
         'account_id',
         'credit_limit',
         'credit_opening_date',
-        'credit_opening_amount'
+        'credit_opening_amount',
+        'account_receivable_id',
     ];
 
     public function setPasswordAttribute($value)

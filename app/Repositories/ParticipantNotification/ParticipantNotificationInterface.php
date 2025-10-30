@@ -37,4 +37,8 @@ interface ParticipantNotificationInterface
 
   //mobile
   public function getallNoties($request, $staffId);
+  public function getMeetingsByStaffId($staffId,$request);
+  public function getTrainingsByStaffId($staffId,$request);
+  public function getShiftsByStaffId($staffId,$request);
+  public function getConfirmedShiftsByStaffIdTimeShiftId($staffId,$staffTimeshiftId);
 }

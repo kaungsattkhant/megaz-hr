@@ -43,7 +43,18 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Menu
                     </label>
-                    <div class="mb-0 w-full text-sm inline-block h-max select-ui"
+                    <multiselect v-model="selectedMenu"
+                    :options="menuList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Select Menu"
+                    track-by="id"
+                    label="name"
+                    :preselect-first="false">
+                    </multiselect>
+                    <!-- <div class="mb-0 w-full text-sm inline-block h-max select-ui"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
                          
@@ -51,7 +62,7 @@
                             <option :value="menu" v-for="(menu, menuIndex) in menuList"
                                 :key="menuIndex"> {{ menu.name }} </option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -411,7 +422,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-x-4">
+                        <!-- <div class="grid grid-cols-3 gap-x-4">
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
                                     Qty
@@ -431,7 +442,7 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
@@ -728,11 +739,14 @@ export default {
             }
         },
         btnClickPoModal(raw){
+            this.po_base_quantity = 0;
+            this.po_brand = null;
             this.selectedItem = raw;
             this.itemBrands = raw.brands;
             this.itemSelectChanged();
             this.po_base_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.base_uom_id)
-            this.po_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.uom_id)
+            this.po_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.uom_id);
+            this.getPoList();
         },
         async selectedBrandChange(){
             console.log('brand change')
@@ -744,7 +758,7 @@ export default {
         },
         btnClickedCreatePo(){
 
-            if(this.po_base_quantity < 1 && this.po_quantity < 1){
+            if(this.po_base_quantity < 1){
                 this.alertValidationMessage('Quantiy');
                 return 1;
             }
@@ -829,7 +843,7 @@ export default {
         donePoModal() {
             document.getElementById("close_po").click();
             this.po_uom = null;
-            this.po_quantity = null;
+            this.po_quantity = 0;
             this.selectedPo = null;
         },
         alertValidationMessage(field) {

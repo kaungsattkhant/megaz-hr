@@ -1,26 +1,29 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Department
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+
+    <div class="mt-4 bg-white" v-show="!isShow">
+        <div class="card-shadow">
+            <div>
+                <p class="page-title">
+                    Department
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <button type="button" v-if="feature.includes('department.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        @click="btnClickedAddDepartment">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="block mx-4 mt-4 pb-4">
+        <div class="box-container-table">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
                 <div class="table-container">
@@ -36,9 +39,14 @@
                                 <th scope="col" class="">
                                     Features
                                 </th>
-                                <th></th>
+                                <th v-show="feature.includes('department.edit')"></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(department, index) in departmentList" :key="index">
                                 <tr class="">
@@ -60,30 +68,31 @@
                                     </td> -->
                                     <td>
                                         <div class="relative inline-block">
-                                            <span class="" v-for="(item, itemIndex) in getVisibleItems(department.features, index)" :key="itemIndex">
-                                                {{ item.name }}<span v-if="itemIndex < getVisibleItems(department.features, index).length - 1">, </span>
+                                            <span class=""
+                                                v-for="(item, itemIndex) in getVisibleItems(department.features, index)"
+                                                :key="itemIndex">
+                                                {{ item.name }}<span
+                                                    v-if="itemIndex < getVisibleItems(department.features, index).length - 1">,
+                                                </span>
                                             </span>
-                                            <div v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)" class="absolute bottom-0 left-0 right-0 h-5 blur-box" style="background-image: linear-gradient(to right,#fff0, #fffa);"></div>
+                                            <div v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)"
+                                                class="absolute bottom-0 left-0 right-0 h-5 blur-box"
+                                                style="background-image: linear-gradient(to right,#fff0, #fffa);"></div>
                                         </div>
                                         <button
-                                          v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)"
-                                          @click="expandRow(index)"
-                                          class="see-more-button pt-2"
-                                        >
-                                          ... See More
+                                            v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)"
+                                            @click="expandRow(index)" class="see-more-button pt-2 font-semibold text-gray-700">
+                                            ... See More
                                         </button>
                                         <!-- "See Less" button for expanded rows -->
-                                        <button
-                                          v-if="expandedRows.includes(index)"
-                                          @click="collapseRow(index)"
-                                          class="see-less-button pt-2"
-                                        >
-                                          See Less
+                                        <button v-if="expandedRows.includes(index)" @click="collapseRow(index)"
+                                            class="see-less-button pt-2 font-semibold pl-2 text-gray-700">
+                                            See Less
                                         </button>
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        <button @click="editBtnClicked(department.id)" data-te-toggle="modal"
-                                            data-te-target="#editModal" id="edit-btn" class="pr-1">
+                                    <td class="whitespace-nowrap" v-show="feature.includes('department.edit')">
+                                        <button v-if="feature.includes('department.edit')"
+                                            @click="editBtnClicked(department)" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </button>
 
@@ -93,16 +102,20 @@
                                         <i class="fas fa-trash-alt"></i>
                                     </button> -->
                                     </td>
-                                    
+
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="departmentList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
 
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-4 py-3">
-                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === 1"
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
                                 @click="getDepartmentList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
@@ -112,13 +125,17 @@
                             </button>
 
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage"
-                                @click="getDepartmentList(currentPage + 1)"> »</button>
+                                :disabled="currentPage === lastPage" @click="getDepartmentList(currentPage + 1)">
+                                »</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
+
         <!-- Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -156,13 +173,13 @@
                         <div class="mb-4">
                             <div>
                                 <label class="block text-sm text-black mb-3">Department Features</label>
-                                <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
-                                <template #selection="{ values, search, isOpen }">
-                                    <span class="multiselect__single"
-                                        v-if="values.length"
-                                        v-show="!isOpen">{{ values.length }} features selected</span>
-                                </template>
+                                <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true"
+                                    :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+                                    placeholder="Select features" label="name" track-by="id" :preselect-first="true">
+                                    <template #selection="{ values, search, isOpen }">
+                                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{
+                                            values.length }} features selected</span>
+                                    </template>
                                 </multiselect>
                                 <!-- <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre> -->
                             </div>
@@ -175,10 +192,16 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="confirmCreateBtnClicked"
+                        <!-- <button type="button" @click="confirmCreateBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
-                        </button>
+                        </button> -->
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Create"
+                            loadingText="Creating..."
+                            @click="confirmCreateBtnClicked"
+                        />
                     </div>
                 </div>
             </div>
@@ -269,13 +292,13 @@
                         <div class="mb-4">
                             <div>
                                 <label class="block text-sm text-black mb-3">Department Features</label>
-                                <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
-                                <template #selection="{ values, search, isOpen }">
-                                    <span class="multiselect__single"
-                                        v-if="values.length"
-                                        v-show="!isOpen">{{ values.length }} features selected</span>
-                                </template>
+                                <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true"
+                                    :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+                                    placeholder="Select features" label="name" track-by="id" :preselect-first="true">
+                                    <template #selection="{ values, search, isOpen }">
+                                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{
+                                            values.length }} features selected</span>
+                                    </template>
                                 </multiselect>
                                 <!-- <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre> -->
                             </div>
@@ -288,15 +311,131 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="confirmEditBtnClicked"
+                        <!-- <button type="button" @click="confirmEditBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
-                        </button>
+                        </button> -->
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Edit"
+                            loadingText="Editing..."
+                            @click="confirmEditBtnClicked"
+                        />
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <transition enter-active-class="fade-out duration-[200ms]" enter-from-class="opacity-0" enter-to-class="opacity-100"
+        leave-active-class="fade-in duration-[300ms]" leave-from-class="opacity-100" leave-to-class="opacity-0">
+        <div v-show="isShow" 
+            class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008]"
+            @click="btnClickedChangeFeature">
+            <div class="container-card pb-4 px-8 m-16 z-50 overflow-hidden" @click.stop>
+                <div class="mb-6 flex justify-between">
+                    <p class="text-lg font-semibold font-inter">
+                        Create Department
+                    </p>
+                    <div>
+                        <button type="button" class="add-btn focus:shadow-none focus:outline-none flex"
+                            @click="btnClickedDone">
+                            <svg
+                                v-show="buttonLoading"
+                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                />
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                />
+                            </svg>
+                            <span>{{ buttonLoading ? 'Processing...' : 'done' }}</span>
+                        </button>
+                        <!-- <LoadingButton
+                            :loading="buttonLoading"
+                            text="Done"
+                            loadingText="Done..."
+                            @click="btnClickedDone"
+                        /> -->
+                    </div>
+                </div>
+                <div>
+                    <div class="pb-8 mb-4 border-b border-gray-200">
+                        <label for="" class="label-form mb-3 font-semibold">
+                            Department Name
+                        </label>
+                        <input type="text" placeholder="Department Name" v-model="name" class="input-ui !w-1/3">
+                    </div>
+                    <div v-for="(module, index) in featureList" class="mb-4 pb-6 px-2 border-b border-gray-200 flex">
+                        <p class=" capitalize mb-4 font-semibold w-[20%]">
+                            {{ module.module }}
+                        </p>
+                        <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                            <div v-for="feature in module.features" class="">
+
+                                <label class="block items-center space-x-2 cursor-pointer">
+                                    <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
+                                    <input type="checkbox" :value="feature.id" v-model="selectedFeatures"
+                                        class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer" />
+
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="add-btn focus:shadow-none focus:outline-none flex"
+                        @click="btnClickedDone">
+                        <svg
+                            v-show="buttonLoading"
+                            class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            />
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
+                        </svg>
+                        <span>{{ buttonLoading ? 'Processing...' : 'done' }}</span>
+                    </button>
+                    <!-- <button type="button" class="add-btn focus:shadow-none focus:outline-none"
+                        @click="btnClickedDone">
+                        Done
+                    </button>
+                    <LoadingButton
+                            :loading="buttonLoading"
+                            text="Done"
+                            loadingText="Done..."
+                            @click="btnClickedDone"
+                        /> -->
+                </div>
+            </div>
+        </div>
+    </transition>
+
 </template>
 
 <script>
@@ -304,10 +443,14 @@
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
+    import LoadingButton from "../Common/LoadingButton.vue";
 
     export default {
         components: {
-            Multiselect
+            Multiselect,
+            TableSkeleton,
+            LoadingButton
         },
         data() {
             return {
@@ -330,27 +473,52 @@
 
                 defaultVisibleCount: 3, // Number of items to show by default
                 expandedRows: [], // Tracks which rows are expanded
+
+                feature: this.getFeature(),
+
+                isShow:false,
+                loading: true,
+                buttonLoading: false,
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getDepartmentList(pageNumber){
+                this.loading = true;
+                console.log('loading');
                 const response = await getApiData({ url: '/api/departments?page=${pageNumber}', token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.departmentList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;
                     this.perPage = response.data.per_page;
                     this.totalData = response.data.total;
+                    console.log('loading done');
                 }
             },
 
             async getFeatureList(){
-                let response = await getApiData({ url: `/api/features`, token: this.getToken() });
+                // let response = await getApiData({ url: `/api/features`, token: this.getToken() });
+                let response = await getApiData({ url: `/api/feature_by_module`, token: this.getToken() });
                 if(response.data){
                     this.featureList = response.data;
+                    // const grouped = {};
+                    // response.data.forEach(feature => {
+                    //     const mod = feature.module;
+
+                    //     if (!grouped[mod]) {
+                    //         grouped[mod] = {
+                    //             module: mod,
+                    //             features: []
+                    //         };
+                    //     }
+
+                    //     grouped[mod].features.push(feature);
+                    // });
+                    // this.featureList = Object.values(grouped);
                 }
             },
 
@@ -362,36 +530,75 @@
                 });
             },
 
-            editBtnClicked(id){
-                this.selectedFeatures = [];
-                this.editId = id;
-                let index = this.departmentList.findIndex(department => department.id == this.editId);
-                if(index != -1){
-                    this.editName = this.departmentList[index].name;
-                    this.selectedFeatures = this.departmentList[index].features;
+            btnClickedChangeFeature(){
+                if(this.isShow){
+                    this.isShow = false;
+                }
+                else{
+                    this.isShow = true;
                 }
             },
-
+            btnClickedDone(){
+                if(this.editId){
+                    this.confirmEditBtnClicked();
+                }
+                else{
+                    this.confirmCreateBtnClicked();
+                }
+            },
+            editBtnClicked(detail){
+                let featureIds = [];
+                detail.features.forEach(item => {
+                    featureIds.push(
+                        item.id
+                    )
+                })
+                this.selectedFeatures = featureIds;
+                this.name = detail.name;
+                this.editId = detail.id;
+                // let index = this.departmentList.findIndex(department => department.id == this.editId);
+                // if(index != -1){
+                //     this.editName = this.departmentList[index].name;
+                //     this.selectedFeatures = this.departmentList[index].features;
+                // }
+                this.btnClickedChangeFeature();
+            },
             async confirmEditBtnClicked(){
-                if(!this.editName){
+                if(!this.name){
                     this.alertValidationMessage('name');
                     return 1;
                 }
-                let featureIds = [];
-                if(this.selectedFeatures.length > 0){
-                    this.selectedFeatures.forEach((selectedFeature)=>{
-                        featureIds.push(selectedFeature.id);
-                    });
+                if(this.selectedFeatures.length < 1){
+                    this.alertValidationMessage('department features');
+                    return 1;
                 }
+                // if(!this.editName){
+                //     this.alertValidationMessage('name');
+                //     return 1;
+                // }
+                // let featureIds = [];
+                // if(this.selectedFeatures.length > 0){
+                //     this.selectedFeatures.forEach((selectedFeature)=>{
+                //         featureIds.push(selectedFeature.id);
+                //     });
+                // }
+
+                this.buttonLoading = true;
                 let formData = new FormData();
-                formData.append('name', this.editName);
-                if(featureIds.length > 0){
-                    formData.append('featureIds', JSON.stringify(featureIds));
-                }
+                // formData.append('name', this.editName);
+                formData.append('name', this.name);
+                // if(featureIds.length > 0){
+                //     formData.append('featureIds', JSON.stringify(this.selectedFeatures));
+                // }
+                formData.append('featureIds', JSON.stringify(this.selectedFeatures));
                 let url = `/api/departments/${this.editId}`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
+                    this.buttonLoading = false;
                     this.getDepartmentList(1);
+                    this.name = null;
+                    this.editId = null;
+                    this.btnClickedChangeFeature();
                 }
 
                 this.selectedFeatures = [];
@@ -399,8 +606,12 @@
                 this.editName = null;
             },
 
-            addBtnClicked(){
+            
+            btnClickedAddDepartment(){
+                this.name = null;
                 this.selectedFeatures = [];
+                this.editId = null;
+                this.btnClickedChangeFeature();
             },
 
             confirmCreateBtnClicked(){
@@ -418,18 +629,21 @@
 
             async createDepartment()
             {
+                this.buttonLoading = true;
                 let featureIds = [];
                 this.selectedFeatures.forEach((selectedFeature)=>{
                     featureIds.push(selectedFeature.id);
                 });
                 let formData = new FormData();
                 formData.append('name', this.name);
-                formData.append('featureIds', JSON.stringify(featureIds));
+                formData.append('featureIds', JSON.stringify(this.selectedFeatures));
 
                 let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
+                    this.buttonLoading = false;
                     this.getDepartmentList(1);
                     this.selectedFeatures = [];
+                    this.btnClickedChangeFeature();
                 }
                 else{
                     this.$notify({

@@ -1,32 +1,35 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Menu Forecasting
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Menu Forecasting
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
-                            :key="typeIndex"> {{ type.name }} </option>
-                    </select>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <a href="/menu_forecasting/create"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-                </a>
+                <div class="flex pr-0 gap-x-4">
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                            <option :value="type.value" v-for="(type, typeIndex) in typeList"
+                                :key="typeIndex"> {{ type.name }} </option>
+                        </select>
+                    </div>
+                    <a href="/menu_forecasting/create" v-if="feature.includes('menu-forecasting.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -53,6 +56,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(menuForecasting, index) in menuForecastingTable" :key="index">
@@ -72,16 +80,21 @@
                                     </td>
 
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/menu_forecasting/' + menuForecasting.id + '/edit'">
+                                        <a :href="'/menu_forecasting/' + menuForecasting.id + '/edit'"  v-if="feature.includes('menu-forecasting.edit')">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(menuForecasting.id)"
+                                        <button @click="deleteBtnClicked(menuForecasting.id)"  v-show="feature.includes('menu-forecasting.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="menuForecastingTable.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -161,8 +174,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             menuForecastingList: [],
@@ -186,13 +203,17 @@ export default {
             url_role:'',
             url_type:'',
             deleteId:null,
+
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getMenuForecastingList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url+this.url_type;
             // let url = `/api/objectives?page=${pageNumber}`;
@@ -208,6 +229,7 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.menuForecastingList = response.data;
                 this.menuForecastingList.forEach(forecasting => {
                     let total_amount = 0;

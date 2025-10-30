@@ -98,25 +98,7 @@ class RoleSeeder extends Seeder
             ]);
         }
 
-        // Role::create([
-        //     'department_id' => $hrDept->id,
-        //     'name' => 'Staff'
-        // ]);
-
-        // Role::create([
-        //     'department_id' => $managementDept->id,
-        //     'name' => 'Manager'
-        // ]);
-
-        // Role::create([
-        //     'department_id' => $financeDept->id,
-        //     'name' => 'Financial'
-        // ]);
-
-        // Role::create([
-        //     'department_id' => $managementDept->id,
-        //     'name' => 'MD'
-        // ]);
+        
 
     }
 }

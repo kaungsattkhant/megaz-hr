@@ -1,38 +1,42 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Day Off
-        </p>
-    </div>
+
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Day Off
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
-                            :key="typeIndex"> {{ type.name }} </option>
-                    </select>
-                </div> -->
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_holiday_modal" @click="addHolidayModalBtnClicked">
-                    Add Holiday
-                </button>
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
-                    Add Off Day
-                </button>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                            <option :value="type.value" v-for="(type, typeIndex) in typeList"
+                                :key="typeIndex"> {{ type.name }} </option>
+                        </select>
+                    </div> -->
+                    <button type="button" v-show="feature.includes('off-day.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_holiday_modal"
+                        @click="addHolidayModalBtnClicked">
+                        Add Holiday
+                    </button>
+                    <button type="button" v-show="feature.includes('off-day.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
+                        Add Off Day
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -53,17 +57,23 @@
                                 <th scope="col" class="">
                                     Repetition
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class=""
+                                    v-show="['off-day.edit', 'off-day.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(offDay, index) in offDayList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
-                                        {{ index+1 }}
+                                        {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ offDay.day }}
@@ -74,20 +84,28 @@
                                         </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ offDay.off_day.repetition }}
+                                        {{ offDay.day === 'Public-holiday' ? offDay.date : offDay.off_day.repetition }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap"
+                                        v-show="['off-day.edit', 'off-day.delete'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(offDay, index)">
+                                            class="pr-3" @click="editBtnClicked(offDay, index)"
+                                            v-show="feature.includes('off-day.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <button @click="deleteBtnClicked(offDay.id)" data-te-toggle="modal"
-                                            data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                            v-show="feature.includes('off-day.delete')" data-te-target="#deleteModal"
+                                            id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="offDayList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -99,7 +117,7 @@
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
                                     class="text-gray-400">{{
-                                    lastPage }}</span>
+                                        lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
                                 :disabled="currentPage === lastPage" @click="getOffDayList(currentPage + 1)">
@@ -194,15 +212,21 @@
                                     :key="index"> {{ day.name }} </option>
                             </select>
                         </div> -->
-                        <multiselect v-model="selectedDay" :options="dayList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                        :preserve-search="true" placeholder="Select Day" label="name" track-by="name" :preselect-first="false">
-                            <template #selection="{ values, search, isOpen }">
+                        <multiselect v-model="selectedDay" :options="dayList" :multiple="true" :close-on-select="false"
+                            :clear-on-select="false" :preserve-search="true" placeholder="Select Day" label="name"
+                            track-by="name" :preselect-first="false" :taggable="true" @tag="addTag" id="tagging">
+                            <!-- <template #selection="{ values, search, isOpen }">
                                 <span class="multiselect__single"
                                     v-if="values.length"
                                     v-show="!isOpen">{{ values.length }} Day selected</span>
-                            </template>
+                            </template> -->
                         </multiselect>
                     </div>
+                    <!-- <div><label class="typo__label">Tagging</label>
+                        <multiselect id="tagging" v-model="selectedDay" tag-placeholder="Add this as new tag" placeholder="Search or add a tag" label="name"
+                                     track-by="value" :options="dayList" :multiple="true" :taggable="true" @tag="addTag"></multiselect>
+                        <pre class="language-json"><code>{{ value }}</code></pre>
+                      </div> -->
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Repetition
@@ -210,9 +234,10 @@
                         <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                             data-te-select-wrapper-ref>
                             <select data-te-select-init data-te-select-placeholder="Select Repetition"
-                                data-te-select-filter="true" name="" id="" v-model="selectedRepetition" class="input-ui !text-black text-sm">
-                                <option :value="rep" v-for="(rep, index) in repetitionList"
-                                    :key="index"> {{ rep.name }} </option>
+                                data-te-select-filter="true" name="" id="" v-model="selectedRepetition"
+                                class="input-ui !text-black text-sm">
+                                <option :value="rep" v-for="(rep, index) in repetitionList" :key="index"> {{ rep.name }}
+                                </option>
                                 <!-- <option value="Default"> Default </option>
                                 <option value="Weekly"> Weekly </option>
                                 <option value="Bi-weekly"> Bi-weekly </option>
@@ -235,14 +260,18 @@
                         </label>
                         <div class="bg-white mb-0 w-full inline-block h-[34px] !text-black !text-sm"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Type"
-                                data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
-                                <option value="department"> Department </option>
-                                <option value="staff"> Staff </option>
+                            <select data-te-select-init data-te-select-placeholder="Select Type" @change="typeChange"
+                                data-te-select-filter="true" name="" id="" v-model="selectedType"
+                                class="input-ui !text-black text-sm">
+                                <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                                    {{ type.name }}
+                                </option>
+                                <!-- <option value="department"> Department </option>
+                                <option value="staff"> Staff </option> -->
                             </select>
-                        </div> 
+                        </div>
                     </div>
-                    <div class="mb-4" v-show="selectedType == 'department'">
+                    <div class="mb-4" v-show="selectedType && selectedType.value === 'department'">
                         <label for="" class="label-form mb-3">
                             Department
                         </label>
@@ -255,16 +284,16 @@
                             </select>
                         </div> -->
 
-                        <multiselect v-model="selectedDepartment" :options="departmentList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                        :preserve-search="true" placeholder="Select Department" label="name" track-by="id" :preselect-first="true">
+                        <multiselect v-model="selectedDepartment" :options="departmentList" :multiple="true"
+                            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+                            placeholder="Select Department" label="name" track-by="id" :preselect-first="true">
                             <template #selection="{ values, search, isOpen }">
-                                <span class="multiselect__single"
-                                    v-if="values.length"
-                                    v-show="!isOpen">{{ values.length }} Department selected</span>
+                                <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length
+                                    }} Department selected</span>
                             </template>
                         </multiselect>
                     </div>
-                    <div class="mb-4" v-show="selectedType == 'staff'">
+                    <div class="mb-4" v-show="selectedType && selectedType.value === 'staff'">
                         <label for="" class="label-form mb-3">
                             Staff
                         </label>
@@ -276,12 +305,12 @@
                                     :key="index"> {{ staff.name }} </option>
                             </select>
                         </div> -->
-                        <multiselect v-model="selectedStaff" :options="staffList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                        :preserve-search="true" placeholder="Select Staff" label="name" track-by="id" :preselect-first="true">
+                        <multiselect v-model="selectedStaff" :options="staffList" :multiple="true"
+                            :close-on-select="false" :clear-on-select="false" :preserve-search="true"
+                            placeholder="Select Staff" label="name" track-by="id" :preselect-first="true">
                             <template #selection="{ values, search, isOpen }">
-                                <span class="multiselect__single"
-                                    v-if="values.length"
-                                    v-show="!isOpen">{{ values.length }} Staff selected</span>
+                                <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length
+                                    }} Staff selected</span>
                             </template>
                         </multiselect>
                     </div>
@@ -292,8 +321,7 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" @click="btnCreateOffDay()"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                    <button type="button" @click="btnCreateOffDay()" class="add-btn focus:outline-none focus:ring-0 ">
                         Create
                     </button>
                 </div>
@@ -334,9 +362,10 @@
                         <label for="" class="label-form mb-3">
                             Day
                         </label>
-                        <input type="text" id="daterange" v-model="selectedDateRange" class="form-control input-ui" />
+                        <input type="text" id="daterange" v-model="selectedDateRange" readonly class="form-control input-ui" />
+                        <!-- <p>{{ selectedDate }}</p> -->
                     </div>
-                    
+
                 </div>
 
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -344,8 +373,7 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" @click="btnCreateHoliday()"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                    <button type="button" @click="btnCreateHoliday()" class="add-btn focus:outline-none focus:ring-0 ">
                         Create
                     </button>
                 </div>
@@ -368,46 +396,48 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
             offDayList: [],
-            repetitionList:[
+            repetitionList: [
                 // {value: 'Default', name: 'Default'},
-                {value: 'Weekly', name: 'Weekly'},
-                {value: 'Bi-weekly', name: 'Bi weekly'},
-                {value: 'Monthly', name: 'Monthly'},
+                { value: 'Weekly', name: 'Weekly' },
+                { value: 'Bi-weekly', name: 'Bi weekly' },
+                { value: 'Monthly', name: 'Monthly' },
             ],
-            dayList:[
-                {value: 'Monday', name: 'Monday'},
-                {value: 'Tuesday', name: 'Tuesday'},
-                {value: 'Wednesday', name: 'Wednesday'},
-                {value: 'Thursday', name: 'Thursday'},
-                {value: 'Friday', name: 'Friday'},
-                {value: 'Saturday', name: 'Saturday'},
-                {value: 'Sunday', name: 'Sunday'},
-                {value: 'Sabbath-day', name: 'Sabbath day'},
+            dayList: [
+                { value: 'Monday', name: 'Monday' },
+                { value: 'Tuesday', name: 'Tuesday' },
+                { value: 'Wednesday', name: 'Wednesday' },
+                { value: 'Thursday', name: 'Thursday' },
+                { value: 'Friday', name: 'Friday' },
+                { value: 'Saturday', name: 'Saturday' },
+                { value: 'Sunday', name: 'Sunday' },
+                { value: 'Sabbath-day', name: 'Sabbath day' },
             ],
-            typeList:[
-                {value: 'staff', name: 'Staff'},
-                {value: 'department', name: 'Department'},
+            typeList: [
+                { value: 'staff', name: 'Staff' },
+                { value: 'department', name: 'Department' },
             ],
-            departmentList:[],
-            staffList:[],
+            departmentList: [],
+            staffList: [],
 
-            selectedDay:[],
-            selectedRepetition:null,
-            selectedType:null,
-            selectedDepartment:[],
-            selectedStaff:[],
+            selectedDay: [],
+            selectedRepetition: null,
+            selectedType: null,
+            selectedDepartment: [],
+            selectedStaff: [],
 
             name: null,
             selectedDate: [],
-            
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -415,57 +445,65 @@ export default {
 
             searchInput: null,
 
-            
 
-            url:'/api/hr/off_days?off_day',
-            url_search:'',
-            url_department:'',
-            url_role:'',
-            deleteId:null,
+
+            url: '/api/hr/off_days?off_day',
+            url_search: '',
+            url_department: '',
+            url_role: '',
+            deleteId: null,
 
             selectedDateRange: null,
 
-            
+
+            feature: this.getFeature(),
+            loading: false,
+
+            test: null,
 
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
-        async getDepartmentList(){
+        ...mapGetters(['getToken', 'getFeature']),
+        async getDepartmentList() {
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
             }
         },
-        async getStaffList(){
+        async getStaffList() {
             let response = await getApiData({ url: '/api/staffs', token: this.getToken() });
             if (response.data) {
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
-        btnCreateOffDay(){
-            if(this.selectedDay.length < 1){
+        typeChange() {
+            this.selectedStaff = [];
+            this.selectedDepartment = [];
+        },
+        btnCreateOffDay() {
+            if (this.selectedDay.length < 1) {
                 this.alertValidationMessage(`Day`);
                 return 1;
             }
-            else if(this.selectedRepetition.length < 1){
+            else if (this.selectedRepetition.length < 1) {
                 this.alertValidationMessage(`Repetition`);
                 return 1;
             }
-            else if(this.selectedType == 'department' && this.selectedDepartment.length < 1){
+            else if (this.selectedType.value == 'department' && this.selectedDepartment.length < 1) {
                 this.alertValidationMessage(`Department`);
                 return 1;
             }
-            else if(this.selectedType == 'staff' && this.selectedStaff.length < 1){
+            else if (this.selectedType.value == 'staff' && this.selectedStaff.length < 1) {
                 this.alertValidationMessage(`Staff`);
                 return 1;
             }
-            else{
+            else {
                 this.createOffDay();
             }
         },
-        async createOffDay(){
+        async createOffDay() {
 
             let selectedDayList = [];
             this.selectedDay.forEach((day) => {
@@ -475,40 +513,47 @@ export default {
             let formData = new FormData();
             formData.append('repetition', this.selectedRepetition.value);
             formData.append('days', JSON.stringify(selectedDayList));
-            formData.append('offdayable_type',this.selectedType);
-            
-            if(this.selectedType == 'department'){
+            formData.append('offdayable_type', this.selectedType.value);
+
+            if (this.selectedType == 'department') {
                 let offdayable_id = [];
                 this.selectedDepartment.forEach((department) => {
                     offdayable_id.push(String(department.id))
                 })
                 formData.append('offdayable_id', JSON.stringify(offdayable_id));
             }
-            if(this.selectedType == 'staff'){
+            if (this.selectedType.value === 'staff') {
                 let offdayable_id = [];
                 this.selectedStaff.forEach((staff) => {
                     offdayable_id.push(String(staff.id))
                 })
                 formData.append('offdayable_id', JSON.stringify(offdayable_id));
             }
-            let response = await postApiData({url:`/api/hr/off_days`, form_data:formData, token:this.getToken()})
-            if(response.success){
+            let response = await postApiData({ url: `/api/hr/off_days`, form_data: formData, token: this.getToken() })
+            if (response.success) {
                 this.getOffDayList();
                 document.getElementById("close_create_modal").click();
+            } else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
-        
+
 
         async getOffDayList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.offDayList = response.data.data;
             }
         },
-        addBtnClicked(){
+        addBtnClicked() {
             this.selectedDay = [];
             this.selectedRepetition = [];
             this.selectedType = null;
@@ -516,32 +561,37 @@ export default {
             this.selectedStaff = []
         },
 
-        addHolidayModalBtnClicked(){
+        addHolidayModalBtnClicked() {
             this.name = null;
             this.selectedDate = [];
         },
-        btnCreateHoliday(){
-            if(!this.name){
+        btnCreateHoliday() {
+            if (!this.name) {
                 this.alertValidationMessage(`Name`);
                 return 1;
             }
-            else if(this.selectedDate.length < 1){
+            else if (this.selectedDate.length < 1) {
                 this.alertValidationMessage(`Date`);
                 return 1;
             }
-            else{
+            else {
                 this.createHoliday();
             }
         },
-        async createHoliday(){
+        async createHoliday() {
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('date', JSON.stringify(this.selectedDate));
-            
-            let response = await postApiData({url:`/api/hr/public_holidays`, form_data:formData, token:this.getToken()})
-            if(response.success){
+
+            let response = await postApiData({ url: `/api/hr/public_holidays`, form_data: formData, token: this.getToken() })
+            if (response.success) {
                 this.getOffDayList();
                 document.getElementById("close_create_holiday_modal").click();
+            } else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
         // async searchBtnClicked() {
@@ -573,46 +623,89 @@ export default {
             }
         },
 
+        addTag(newTag) {
+            const tag = {
+                name: newTag,
+                code: newTag.substring(0, 2) + Math.floor((Math.random() * 10000000))
+            }
+            this.dayList.push(tag)
+            this.selectedDay.push(tag)
+        },
 
 
         alertValidationMessage(field) {
-                this.$notify({
-                    title: 'Input validation',
-                    text: `You forgot to provide ${field}, please try again`,
-                    type: 'warn'
-                });
-            },
+            this.$notify({
+                title: 'Input validation',
+                text: `You forgot to provide ${field}, please try again`,
+                type: 'warn'
+            });
+        },
+
+        addHolidayModalBtnClicked() {
+            this.selectedDateRange = [] // Reset input
+            this.selectedDate = [] // Reset array
+
+            this.$nextTick(() => {
+                this.initDateRangePicker()
+            })
+        },
+        initDateRangePicker() {
+            const vm = this;
+            if (window.$ && window.moment && window.$.fn.daterangepicker) {
+                $('#daterange').daterangepicker(
+                    {
+                        opens: 'left',
+                        locale: { format: 'YYYY-MM-DD' }
+                    },
+                    function (start, end) {
+                        const allDates = []
+                        let currentDate = start.clone()
+
+                        while (currentDate.isSameOrBefore(end)) {
+                            allDates.push(currentDate.format('YYYY-MM-DD'))
+                            currentDate.add(1, 'day')
+                        }
+
+                        vm.selectedDate = allDates
+                        vm.selectedDateRange = `${start.format(
+                            'YYYY-MM-DD'
+                        )} - ${end.format('YYYY-MM-DD')}` // Keep v-model in sync
+                    }
+                )
+            }
+        },
+
+
+
 
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
-        const vm = this; // Save Vue instance reference
-        const waitForLibraries = () => {
-            if (window.$ && window.moment && window.$.fn.daterangepicker) {
-                $('#daterange').daterangepicker({
-                    opens: 'left',
-                    locale: { format: 'YYYY-MM-DD' }
-                }, 
-                function(start, end) {
-                    const allDates = [];
-                    let currentDate = start.clone();
+        // const vm = this;
+        // const waitForLibraries = () => {
+        //     if (window.$ && window.moment && window.$.fn.daterangepicker) {
+        //         $('#daterange').daterangepicker({
+        //             opens: 'left',
+        //             locale: { format: 'YYYY-MM-DD' }
+        //         },
+        //             function (start, end) {
+        //                 const allDates = [];
+        //                 let currentDate = start.clone();
 
-                    while (currentDate.isSameOrBefore(end)) {
-                        allDates.push(currentDate.format('YYYY-MM-DD'));
-                        currentDate.add(1, 'day');
-                    }
+        //                 while (currentDate.isSameOrBefore(end)) {
+        //                     allDates.push(currentDate.format('YYYY-MM-DD'));
+        //                     currentDate.add(1, 'day');
+        //                 }
 
-                    console.log('📆 All Dates:', allDates);
+        //                 console.log('📆 All Dates:', allDates);
+        //                 vm.selectedDate = allDates;
+        //             });
+        //     } else {
+        //         setTimeout(waitForLibraries, 100);
+        //     }
+        // };
 
-                    // Update Vue data
-                    vm.selectedDate = allDates;
-            });
-            } else {
-                setTimeout(waitForLibraries, 100);
-            }
-        };
-
-        waitForLibraries();
+        // waitForLibraries();
     },
     created() {
         this.getDepartmentList();

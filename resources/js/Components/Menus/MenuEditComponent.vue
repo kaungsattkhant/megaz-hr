@@ -69,12 +69,12 @@
                     </template>
                 </multiselect>
             </div>
-            <div class="mb-4 col-span-3 rounded-md">
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Code
                 </label>
                 <div class="">
-                    <input type='text' v-model='code' class="input-ui w-full !p-1 text-xs" placeholder="Code" />
+                    <input type='text' v-model='code' class="input-ui w-full text-xs" placeholder="Code" />
                 </div>
 
             </div>
@@ -510,7 +510,7 @@ export default {
                 return 1;
             }
 
-            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}&item_id=${this.selectedItem.id}`;
             let response = await getApiData({url: url, token: this.getToken()});
             let uomConversion = null;
             let amount = 0;

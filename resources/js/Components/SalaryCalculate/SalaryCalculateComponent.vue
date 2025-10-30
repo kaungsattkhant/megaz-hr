@@ -1,14 +1,16 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Calculate Salary
-        </p>
-    </div>
+
     <div class="mt-4 bg-white ">
-        <div class="border-b py-3 px-8 mb-8">
+
+        <div class="card-shadow" v-if="feature.includes('salary-calculate.create')">
             <notifications position="top center" />
-            <div class="grid grid-cols-4 pr-0 gap-x-4">
-                
+            <div>
+                <p class=" page-title">
+                    Calculate Salary
+                </p>
+            </div>
+            <div class="grid grid-cols-4 pr-0 gap-x-4 px-4 pt-2">
+
                 <div class="mb-4">
                     <label for="" class="label-form mb-3">
                         From
@@ -27,7 +29,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                        <select data-te-select-init data-te-select-placeholder="Select Batch"
                             data-te-select-filter="true" name="" id="" v-model="selectedBatch" class="input-ui !text-black text-sm">
                             <option :value="batch" v-for="(batch, index) in batchList"
                                 :key="index"> {{ batch.name }} </option>
@@ -40,12 +42,13 @@
                     </label>
                     <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="getSalaryList">
-                        Add New
+                        Calculate
                     </button>
                 </div>
-                
+
             </div>
         </div>
+        <div v-else class="py-1.5"></div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class="table-container">
@@ -77,11 +80,22 @@
                                     Net Salary
                                 </th>
                                 <th scope="col" class="">
-                                    
+
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="salaryList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <div class="contents" v-for="(salary, index) in salaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
@@ -117,10 +131,15 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="salaryList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
-                        class="pr-3 opacity-0 w-0 h-0">
+                        class=" opacity-0 w-0 h-0 mx-4">
                     </button>
 
                     <!-- pagination -->
@@ -138,9 +157,9 @@
                                 »</button>
                         </div>
                     </div> -->
-                
-                    <button type="button"
-                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnCreateSalaryCalculate">
+
+                    <button type="button" v-if="feature.includes('salary-calculate.publish')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 mt-4" @click="btnCreateSalaryCalculate">
                         Publish
                     </button>
                 </div>
@@ -150,7 +169,7 @@
 
 
         <!-- add allowance modal -->
-        
+
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="add_allowance_modal" tabindex="-1" aria-labelledby="add_allowanceLabel" aria-hidden="true">
@@ -218,7 +237,7 @@
     </div>
 
 
-    
+
 
 
 </template>
@@ -228,10 +247,12 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -243,7 +264,7 @@ export default {
             fromDate:null,
             toDate: null,
             selectedBatch: null,
-            
+
             allowanceList: [],
             selectedType: null,
             selectedAllowance: null,
@@ -253,16 +274,19 @@ export default {
 
             pay_slip:[],
             test: [],
+
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getBatchList() {
             let url = '/api/hr/salary_batches';
             let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
+            if (response.success) {
                 this.batchList = response.data.data;
             }
         },
@@ -280,9 +304,11 @@ export default {
                 return 1;
             }
             else{
+                this.loading = true;
                 let url = '/api/hr/calculate_salary?salary_batch_id=' + this.selectedBatch.id + '&from_date=' + this.fromDate + '&to_date=' + this.toDate;
                 let response = await getApiData({ url: url, token: this.getToken() });
-                if (response.data) {
+                if (response.success) {
+                    this.loading = false;
                     this.unChangedSalaryList = response.data.data;
                     this.salaryList = response.data.data;
                     this.salaryList.forEach(sa => {
@@ -296,7 +322,7 @@ export default {
                     });
                 }
             }
-            
+
         },
         btnClickedAddAllowanceAndDeduction(salary,index){
             this.salaryDetail = salary
@@ -350,7 +376,7 @@ export default {
                 document.getElementById('close_add_allowance').click();
             }
         },
-        
+
         btnCreateSalaryCalculate(){
             // if(!this.selectedRole){
             //     this.alertValidationMessage(`Role `);
@@ -412,7 +438,7 @@ export default {
         },
         async createSalaryCalculate(){
             let pay_slip = [];
-            this.salaryList.forEach(item => 
+            this.salaryList.forEach(item =>
                 pay_slip.push({
                     staff_id: item.staff_id,
                     salary_batch_id: item.salary_batch_id,
@@ -478,7 +504,7 @@ export default {
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
-        
+
     },
     created() {
         this.getBatchList();

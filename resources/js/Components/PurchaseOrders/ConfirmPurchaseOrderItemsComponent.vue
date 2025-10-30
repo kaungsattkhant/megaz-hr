@@ -176,7 +176,13 @@ export default {
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
-            }
+            }else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
         },
 
         checkPurchaseOrderItemBtnClicked(id) {
@@ -193,9 +199,14 @@ export default {
                         type: 'info'
                     });
                     this.getItemList(1);
+                }else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
                 }
             }
-
             this.checkId = null;
         }
     },

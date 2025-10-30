@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Invoice;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class HeadCount extends Model
 {
@@ -15,4 +16,9 @@ class HeadCount extends Model
         'child',
         'female'
     ];
+    
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
 }

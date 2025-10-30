@@ -24,6 +24,7 @@ return new class extends Migration
             $table->double('rentation')->default(0);
             $table->string('otp');
             $table->unsignedInteger('account_id')->nullable();
+            $table->unsignedInteger('account_receivable_id')->nullable();
             $table->integer('credit_limit');
             $table->dateTime('credit_opening_date');
             $table->double('credit_opening_amount');

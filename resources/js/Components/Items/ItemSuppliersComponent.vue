@@ -1,11 +1,14 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Item Suppliers
-        </p>
-    </div>
+
     <div class="mt-4 bg-white">
-        <div class="btn-container"></div>
+        <div class="card-shadow">
+            <div>
+                <p class="page-title mb-4">
+                    Item Suppliers
+                </p>
+            </div>
+            <!-- <div class="btn-container"></div> -->
+        </div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class="table-container">
@@ -14,12 +17,24 @@
                             <tr>
                                 <th>#</th>
                                 <th>Supplier</th>
-                                <!-- <th>Brand</th> -->
+                                <th>Item</th>
                                 <!-- <th>Price</th>
                                 <th></th> -->
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="3"
+                        />
+
+                        <tr class=" !text-center" v-else-if="itemSuppliers.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(itemSupplier, index) in itemSuppliers" :key="index">
                                 <tr class="">
@@ -28,11 +43,12 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ itemSupplier.supplier.name }}
-                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline" > [Detail] </a>
+                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline"
+                                        v-show="feature.includes('item-supplier.detail')"> [Detail] </a>
                                     </td>
-                                    <!-- <td class="whitespace-nowrap">
-                                        {{ itemSupplier.brand.name }}
-                                    </td> -->
+                                    <td class="whitespace-nowrap">
+                                        {{ itemSupplier.item_name }}
+                                    </td>
                                     <!-- <td class="whitespace-nowrap">
                                         <span v-if="itemSupplier.item_price">
                                             {{ (itemSupplier.item_price.price).toLocaleString() }}
@@ -181,9 +197,13 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDateTime } from "../../utilities/datetime-helpers";
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     props: ["itemId"],
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             item: null,
@@ -192,11 +212,17 @@ export default {
             price: null,
             supplierItemId: null,
             baseUomId: null,
+
+            feature: this.getFeature(),
+
+            loading: true,
+            timeoutReached: false,
+            noData: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({
@@ -207,14 +233,18 @@ export default {
         },
 
         async getItemSuppliers(pageNumber){
+            this.loading = true;
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
             let url = `/api/supplier_by_item/${this.itemId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.success){
+                this.loading = false;
                 this.itemSuppliers = response.data;
-                this.baseUomId = this.itemSuppliers[0].item.base_uom_id;
+                if(response.data.length > 0){
+                    this.baseUomId = this.itemSuppliers[0].item.base_uom_id;
+                }
             }
         },
 
@@ -244,7 +274,7 @@ export default {
                 this.supplierItemId = null;
                 this.getItemSuppliers();
             }
-        }
+        },
     },
 
     created() {

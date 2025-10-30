@@ -9,6 +9,7 @@ use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\Objective\ObjectiveRequest;
 use App\Repositories\Objective\ObjectiveInterface;
 use App\Http\Requests\Objective\KtvProductTreeRequest;
+use App\Http\Resources\CompleteObjectivesResource;
 
 class ObjectiveController extends Controller
 {
@@ -37,7 +38,7 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function store(ObjectiveRequest $request)
+    public function store(Request $request)
     {
 
         $data = $this->objectiveRepository->store($request->all());
@@ -51,20 +52,16 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function update(Request $request, int $objId)
-    {
-        $data = $this->objectiveRepository->update($request->all(), $objId);
-        ResponseData($data);
-    }
-
-
+    // public function update(Request $request, int $objId)
+    // {
+    //     $data = $this->objectiveRepository->update($request->all(), $objId);
+    //     ResponseData($data);
+    // }
     public function deleteObjective(int $objId)
     {
         $data = $this->objectiveRepository->deleteObjective($objId);
         ResponseData($data);
     }
-
-
 
     // assign duties 
 
@@ -100,19 +97,28 @@ class ObjectiveController extends Controller
     }
 
 
-    public function storeAssignDutiesByObjectiveKeys(AssignRequest $request)
+    public function storeAssignDutiesByObjectives(Request $request)
     {
-        $data = $this->objectiveRepository->storeAssignDutiesByObjectiveKeys($request->all());
+        $data = $this->objectiveRepository->storeAssignDutiesByObjectives($request->all());
         ResponseData($data);
     }
 
-
-    public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $assignDutyId)
+    public function getOkrAssigns(Request $request)
     {
-        $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $assignDutyId);
+        $data = $this->objectiveRepository->getOkrAssigns($request);
         ResponseData($data);
     }
 
+    public function getOkrAssignById(int $okrAssignId)
+    {
+        $data = $this->objectiveRepository->getOkrAssignById($okrAssignId);
+        ResponseData($data);
+    }
+    public function deleteOkrAssignById(int $okrAssignId)
+    {
+        $data = $this->objectiveRepository->deleteOkrAssignById($okrAssignId);
+        ResponseData($data);
+    }
 
     //for mobile
 
@@ -151,7 +157,6 @@ class ObjectiveController extends Controller
 
     public function updateDailyObjective(Request $request, $objKeyStaffId)
     {
-
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
         ResponseData($data);
     }
@@ -169,6 +174,12 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
+    {
+        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
+        ResponseData(new CompleteObjectivesResource($data));
+    }
+
     //ktvProductTree
 
     public function getKtvRoom(Request $request)
@@ -176,8 +187,6 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getKtvRoom($request);
         ResponseData($data);
     }
-
-
 
     public function  getKtvObjectiveTree(Request $request)
     {

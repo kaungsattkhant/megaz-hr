@@ -1,12 +1,12 @@
 <template>
-    <div class="px-0">
+    <div class="containe-card px-0">
         <div class="mb-4">
-            <p class="text-lg font-semibold font-inter">
+            <p class="page-title px-6">
                 Create Meeting 
             </p>
         </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white px-6 rounded-md">
             <div class="mb-4 col-span-9 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Title
@@ -94,7 +94,6 @@
                         Role selected</span>
                     </template>
                 </multiselect>
-
                 <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole" class="input-ui !text-black"
                     data-te-select-filter="true" @change="roleChange()" >
@@ -159,7 +158,7 @@
                     rows="6"></textarea>
             </div>
         </div>
-        <div class="flex gap-x-4">
+        <div class="flex gap-x-4 mx-6 mb-6">
             <a href="/meeting" class="cancel-btn focus:shadow-none focus:outline-none ">
                 Cancel
             </a>
@@ -250,56 +249,66 @@ export default {
                 this.selectedDepartment = departments;
             }
             if(detail.meeting_type === 'role_type'){
-                let roles = []
+                // let roles = []
+                // detail.participants.forEach(participant => {
+                //     this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.role.department.id));
+                //     roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                //     this.previous_role_id.push(participant.role_id)
+                // });
+                // this.selectedRole = roles;
+                let role_ids = [];
                 detail.participants.forEach(participant => {
-                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.role.department.id));
-                    roles.push(this.allRoleList.find(role => role.id == participant.role_id))
-                    this.previous_role_id.push(participant.role_id)
+                    role_ids.push(participant.role_id)
                 });
-                this.selectedRole = roles;
+                const allRoles = this.roleList.flatMap(dep => dep.roles);
+                const selectedRoles = allRoles.filter(role => role_ids.includes(role.id));
+                this.selectedRole = selectedRoles;
+                this.getStaffList();
             }
             if(detail.meeting_type === 'staff_type'){
                 detail.participants.forEach(participant => {
-                    this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.staff.department_id));
-                    this.roleList = [];
-                    this.selectedDepartment.forEach(department => {
-                        this.roleList.push({
-                            title: department.name,
-                            roles:department.roles,
-                        })
-                    });
-                    this.selectedRole.push(this.allRoleList.find(role => role.id == participant.staff.roles[0].id));
+                    this.selectedStaff.push(this.staffList.find(staff => staff.id == participant.staff_id)) 
+                    this.previous_staff_id.push(participant.staff_id)
+                    // this.selectedDepartment.push(this.allDepartmentList.find(department => department.id == participant.staff.department_id));
+                    // this.roleList = [];
+                    // this.selectedDepartment.forEach(department => {
+                    //     this.roleList.push({
+                    //         title: department.name,
+                    //         roles:department.roles,
+                    //     })
+                    // });
+                    // this.selectedRole.push(this.allRoleList.find(role => role.id == participant.staff.roles[0].id));
                 });
-                let url_department = '';
-                if(this.selectedDepartment.length > 0){
-                    this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
-                    url_department = url_department.slice(0, -1);
-                    console.log(url_department);
-                }
-                let url_role = '';
-                if(this.selectedRole.length > 0){
-                    this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
-                    url_role = url_role.slice(0, -1); 
-                    console.log(url_role);
-                }
-                let url_joint = '';
-                if(url_role){
-                    url_joint = '&'
-                }
-                else{
-                    url_joint = ''
-                }
-                let url = '/api/staffs?' + url_department + url_joint + url_role;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.staffList = response.data.data;
-                    let staffs = [];
-                    detail.participants.forEach(participant => {
-                        staffs.push(this.staffList.find(staff => staff.id == participant.staff_id)) 
-                        this.previous_staff_id.push(participant.staff_id)
-                    });
-                    this.selectedStaff = staffs;
-                }
+                // let url_department = '';
+                // if(this.selectedDepartment.length > 0){
+                //     this.selectedDepartment.forEach(department => url_department += 'department_id[]=' + department.id + '&');
+                //     url_department = url_department.slice(0, -1);
+                //     console.log(url_department);
+                // }
+                // let url_role = '';
+                // if(this.selectedRole.length > 0){
+                //     this.selectedRole.forEach(role => url_role += 'role_id[]=' + role.id + '&');
+                //     url_role = url_role.slice(0, -1); 
+                //     console.log(url_role);
+                // }
+                // let url_joint = '';
+                // if(url_role){
+                //     url_joint = '&'
+                // }
+                // else{
+                //     url_joint = ''
+                // }
+                // let url = '/api/staffs?' + url_department + url_joint + url_role;
+                // let response = await getApiData({url: url, token: this.getToken()});
+                // if(response.data){
+                //     this.staffList = response.data;
+                //     let staffs = [];
+                //     detail.participants.forEach(participant => {
+                //         staffs.push(this.staffList.find(staff => staff.id == participant.staff_id)) 
+                //         this.previous_staff_id.push(participant.staff_id)
+                //     });
+                //     this.selectedStaff = staffs;
+                // }
             }
         },
 
@@ -377,7 +386,7 @@ export default {
             // let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.staffList = response.data.data;
+                this.staffList = response.data;
             }
         },
         async getChairedByList(){
@@ -527,6 +536,7 @@ export default {
     },
     
     created(){
+        this.getStaffList();
         this.getChairedByList();
         this.getDepartmentList();
         // this.getRoleList();

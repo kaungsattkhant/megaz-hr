@@ -1,26 +1,29 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Menu Categories
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Menu Categories
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                    <button type="button" v-if="feature.includes('menu-category.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -39,11 +42,16 @@
                                 <th scope="col" class="">
                                     Image
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['menu-category.update', 'menu-category.toggle', 'menu-category.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -64,16 +72,16 @@
                                                 :src="category.image_url" alt="Menu image">
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <!-- <button @click="deleteBtnClicked(category.id)"
+                                    <td class="whitespace-nowrap "  v-show="['menu-category.update', 'menu-category.toggle', 'menu-category.delete'].some(f => feature.includes(f))">
+                                        <!-- <button @click="deleteBtnClicked(category.id)" v-if="feature.includes('menu-category.delete')"
                                         data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <button @click="editBtnClicked(category.id)" data-te-toggle="modal"
+                                        <button @click="editBtnClicked(category.id)" data-te-toggle="modal"  v-if="feature.includes('menu-category.update')"
                                             data-te-target="#edit_modal" id="edit-btn" class="pr-2">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <input :checked="category.is_active == 1" @change="isActiveToggled(category.id)"
+                                        <input :checked="category.is_active == 1" @change="isActiveToggled(category.id)"  v-if="feature.includes('menu-category.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                             before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                             after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -89,6 +97,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="categoryList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -279,8 +292,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             categoryList: [],
@@ -296,11 +313,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({
@@ -311,6 +330,7 @@ export default {
         },
 
         async getMenuCategoryList(pageNumber) {
+            this.loading = true;
             let url = `/api/menu_categories?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/menu_categories?page=' + pageNumber + '&search=' + this.searchInput;
@@ -318,6 +338,7 @@ export default {
             const response = await getApiData({ url: url, token: this.getToken() });
             // const response = await getApiData({ url: `/api/menu_categories?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.categoryList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

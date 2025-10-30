@@ -1,11 +1,13 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Supplier Brands Pricing
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container"></div>
+        <div class="card-shadow">
+            <div>
+                <p class="page-title mb-4">
+                    Supplier Brands Pricing
+                </p>
+            </div>
+            <!-- <div class="btn-container"></div> -->
+        </div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class="table-container">
@@ -13,18 +15,36 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Supplier</th>
+                                <th>Item</th>
                                 <th>Brand</th>
                                 <th>Price</th>
                                 <th>UOM</th>
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="3"
+                        />
+                        <tr class=" !text-center" v-else-if="brandsList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(brand, index) in brandsList" :key="index">
                                 <tr class="">
                                     <td class="">
                                         {{ index + 1 }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ brand.supplier.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ brand.item.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ brand.brand.name }}
@@ -36,7 +56,7 @@
                                         <span v-if="brand.item_price"> {{ brand.item_price.uom.name }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
+                                        <button id="price-edit-btn" class="pr-2" data-te-toggle="modal" v-if="feature.includes('item-price.update')"
                                         data-te-target="#priceUpdateModal" @click="brandBtnClicked(brand)" >
                                             <i class="fas fa-tag"></i>
                                         </button>
@@ -188,10 +208,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { convertToFriendlyDateTime } from "../../utilities/datetime-helpers";
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     props: ["supplierId","itemId"],
     data() {
@@ -203,11 +225,15 @@ export default {
             baseUomId: null,
             price: null,
             supplierItemId: null,
+
+            feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken' ,'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({
@@ -218,12 +244,14 @@ export default {
         },
 
         async getSupplierBrands(pageNumber){
+            this.loading = true;
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
             let url = `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.supplierId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.success){
+                this.loading = false;
                 this.brandsList = response.data;
             }
         },

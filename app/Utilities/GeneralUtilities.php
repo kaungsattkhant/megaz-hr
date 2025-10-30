@@ -24,6 +24,25 @@ if (!function_exists('CurrentDate')) {
     }
 }
 
+if (!function_exists('MonthStartAndEndDatesFromDateString')) {
+    function MonthStartAndEndDatesFromDateString(string $dateString): array
+    {
+        // Convert the date string to a timestamp
+        $timestamp = strtotime($dateString);
+
+        // Get the first day of the month
+        $startDate = date('Y-m-01', $timestamp);
+
+        // Get the last day of the month
+        $endDate = date('Y-m-t', $timestamp);
+
+        return [
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ];
+    }
+}
+
 if (!function_exists('DayStartEndTimestamps')) {
     function DayStartEndTimestamps(DateTime $date): Collection
     {
@@ -60,6 +79,14 @@ if (!function_exists('MonthStartEndDates')) {
         $month_end_date = $date->format('Y-m') . $month_end_dates[$date->format('m')];
 
         return collect(['start_date' => $month_start_date, 'end_date' => $month_end_date]);
+    }
+}
+
+if (!function_exists('IsValidDateString')){
+    function IsValidDateString(string $date): bool
+    {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
     }
 }
 
@@ -265,7 +292,7 @@ if (!function_exists('JsonDecode')) {
     function JsonDecode($raw_data)
     {
         $input_items = stripslashes(str_replace(array('\"', '&quot;', '\n'), '', $raw_data));
-        $json_data = json_decode($input_items);
+        $json_data = json_decode($input_items, true);
         if ($json_data == null) {
             ResponseMessage('input data is not corrected', 402);
         }
@@ -343,6 +370,18 @@ if (!function_exists('checkFeaturePermission')) {
         return false;
     }
 }
+if (!function_exists('checkMultipleFeaturePermission')) {
+    function checkMultipleFeaturePermission($names)
+    {
+        $features = UserData()->features;
+        foreach ($names as $name) {
+            if ($features->contains('slug', $name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 
 if (!function_exists('InventoryIds')) {
     function InventoryIds()
@@ -352,11 +391,11 @@ if (!function_exists('InventoryIds')) {
 }
 
 if (!function_exists('existOrderItemByStatus')) {
-    function existOrderItemByStatus($orderItems,$status)
+    function existOrderItemByStatus($orderItems, $status)
     {
         // return UserData()->inventories->pluck('id')->toArray();
-        $existOrderItems=$orderItems->whereIn('status',$status);
-        if($existOrderItems->isEmpty()){
+        $existOrderItems = $orderItems->whereIn('status', $status);
+        if ($existOrderItems->isEmpty()) {
             return false;
         }
         return true;
@@ -372,7 +411,7 @@ if (!function_exists('format_price')) {
      */
     function format_price($value)
     {
-        return number_format((float)$value, 2, '.', '');
+        return number_format((float) $value, 2, '.', '');
     }
 }
 
@@ -388,3 +427,21 @@ if (!function_exists('toggleColumn')) {
         return false;
     }
 }
+
+if (!function_exists('paginateCollection')) {
+    function paginateCollection($collection, $perPage = 15)
+    {
+        $page = request()->get('page', 1);
+        $path = request()->url();
+        $query = request()->query();
+
+        return new LengthAwarePaginator(
+            $collection->forPage($page, $perPage)->values(),
+            $collection->count(),
+            $perPage,
+            $page,
+            compact('path', 'query')
+        );
+    }
+}
+

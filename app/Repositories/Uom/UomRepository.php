@@ -28,22 +28,22 @@ class UomRepository implements UomRepositoryInterface
             $data['name'] = $data['name'];
             $data['uom_code'] = $data['uom_code'];
             $uom = Uom::firstOrCreate(['name' => $data['name'], 'uom_code' => $data['uom_code']], $data);
-            if ($uom) {
-                UomConversion::firstOrCreate(
-                    [
-                        'base_unit_id' => $uom->id,
-                        'conversion_unit_id' => $uom->id,
-                        'conversion' => 1,
-                    ],
-                    [
-                        'base_unit_id' => $uom->id,
-                        'conversion_unit_id' => $uom->id,
-                        'conversion' => 1,
-                        'created_by' => UserData()->id,
-                        'is_show' => 0
-                    ]
-                );
-            }
+            // if ($uom) {
+            //     UomConversion::firstOrCreate(
+            //         [
+            //             'base_unit_id' => $uom->id,
+            //             'conversion_unit_id' => $uom->id,
+            //             'conversion' => 1,
+            //         ],
+            //         [
+            //             'base_unit_id' => $uom->id,
+            //             'conversion_unit_id' => $uom->id,
+            //             'conversion' => 1,
+            //             'created_by' => UserData()->id,
+            //             'is_show' => 0
+            //         ]
+            //     );
+            // }
             DB::commit();
             return $uom;
         } catch (\Exception $e) {

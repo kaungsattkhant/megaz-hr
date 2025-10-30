@@ -1,29 +1,32 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Inventory Receives
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded">
-                </div>
-
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
-                    <input type="date" v-model="toDate" class="search-input rounded">
-                </div>
-                <div class="ml-2 px-2">
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter"
-                        @click="clearSearchBtnClicked">Clear</button>
-                </div>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Inventory Receives
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <div>
+                        <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+                        <input type="date" v-model="fromDate" class="search-input rounded">
+                    </div>
 
+                    <div>
+                        <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                        <input type="date" v-model="toDate" class="search-input rounded">
+                    </div>
+                    <div class="ml-2 px-2">
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                        <button class="mx-1 add-btn h-8 text-[13px] font-inter"
+                            @click="clearSearchBtnClicked">Clear</button>
+                    </div>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -67,6 +70,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -116,6 +124,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="receivesList.length < 1 && !loading">
+                                <td class="" colspan="11">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -251,8 +264,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             receivesList: [],
@@ -264,6 +281,7 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+            loading: true,
         };
     },
 
@@ -271,6 +289,7 @@ export default {
         ...mapGetters(['getToken']),
 
         async getInventoryReceivesList(pageNumber) {
+            this.loading = true;
             if (pageNumber) {
                 this.currentPage = pageNumber;
             }
@@ -280,6 +299,7 @@ export default {
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.receivesList = response.data.data;
 
                 this.lastPage = response.data.last_page;

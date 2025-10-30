@@ -12,4 +12,32 @@ class FeatureRepository implements FeatureRepositoryInterface
         $feature = Feature::all();
         return $feature;
     }
+    public function gtFeatureByDepartment($departmentId){
+        $features = Feature::whereHas('departments', function($q) use ($departmentId) {
+            $q->where('id', $departmentId);
+        })->get()
+          ->groupBy('module')  // group by module
+          ->map(function ($features, $module) {
+              return [
+                  'module' => $module,
+                  'features' => $features->values(), // reset index
+              ];
+          })
+          ->values(); 
+        return $features;
+    }
+
+    public function getFeatureByModule(){
+        $features = Feature::orderBy('id','asc')->get()
+          ->groupBy('module')  // group by module
+          ->map(function ($features, $module) {
+              return [
+                  'module' => $module,
+                  'features' => $features->values(), // reset index
+              ];
+          })
+          ->values(); 
+        return $features;
+    }
+
 }

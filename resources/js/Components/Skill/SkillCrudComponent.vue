@@ -1,25 +1,28 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Skill
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-    
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Skill
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-    
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="[skill = null, selectedRole = null, selectedDepartment = null]">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <notifications position="top center" />
+        
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+        
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " v-show="feature.includes('skill.create')"
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="[skill = null, selectedRole = null, selectedDepartment = null]">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -38,10 +41,15 @@
                                     Role
                                 </th>
     
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['skill.edit', 'skill.delete'].some(f => feature.includes(f))">
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(skill, index) in skillList" :key="index">
@@ -55,18 +63,19 @@
                                     <td class="whitespace-nowrap">
                                         {{ skill.role.name }}
                                     </td>
-    
-                                    <td class="whitespace-nowrap">
-                                    </td>
-    
-                                    <td class="whitespace-nowrap flex justify-center gap-3">
-                                        <i class="fal fa-pen cursor-pointer" data-te-toggle="modal"
+                                    <td class="whitespace-nowrap flex justify-center gap-3" v-show="['skill.edit', 'skill.delete'].some(f => feature.includes(f))">
+                                        <i class="fal fa-pen cursor-pointer" data-te-toggle="modal" v-if="feature.includes('skill.edit')"
                                             data-te-target="#update_modal" @click="getSkillDetail(skill.id)"></i>
-                                        <i class="far fa-trash-alt cursor-pointer" @click="deleteSkill(skill.id)"></i>
+                                        <i class="far fa-trash-alt cursor-pointer" @click="deleteSkill(skill.id)"  v-if="feature.includes('skill.delete')"></i>
                                     </td>
     
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="skillList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
     
@@ -243,8 +252,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             skillList: [],
@@ -264,11 +277,13 @@ export default {
             lastPage: 0,
             totalData: 0,
 
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getRoleByDepartment(id) {
             const response = await getApiData({ url: `/api/role_by_department/` + id, token: this.getToken() });
@@ -278,8 +293,10 @@ export default {
         },
 
         async getSkillList(pageNumber) {
+            this.loading = true;
             const response = await getApiData({ url: `/api/skills?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.skillList = response.data.data;
 
                 this.lastPage = response.data.last_page;
@@ -315,8 +332,18 @@ export default {
         },
 
         async getSkillDetail(id) {
+            // let skillDetailData = await getApiData({ url: `/api/skills/${id}`, token: this.getToken() });
+            // this.edit_skill = skillDetailData.data.skill
             let skillDetailData = await getApiData({ url: `/api/skills/${id}`, token: this.getToken() });
-            this.edit_skill = skillDetailData.data.skill
+            if(skillDetailData.success){
+                this.edit_skill = skillDetailData.data.skill;
+            }else {
+                this.$notify({
+                    title: `Input validation`,
+                    text: skillDetailData.message,
+                    type: "warn"
+                });
+            }
             this.selectedDepartment = skillDetailData.data.role.department_id
             this.getRoleByDepartment(skillDetailData.data.role.department_id);
             this.edit_role = skillDetailData.data.role.id

@@ -1,36 +1,39 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Accessories list
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
 
-                <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter by category" class="text-xs"
-                        data-te-select-filter="true" v-model="searchCategory">
-                        <option :value="category" v-for="category in accessoriesCategoryList" :key="category.id">
-                            {{ category.name }}
-                        </option>
-                    </select>
+    <div class="mt-4 bg-white">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Accessories list
+                </p>
+            </div>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+
+                    <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter by category" class="text-xs"
+                            data-te-select-filter="true" v-model="searchCategory">
+                            <option :value="category" v-for="category in accessoriesCategoryList" :key="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <button class="add-btn " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
                 </div>
 
-                <button class="add-btn " @click="searchBtnClicked">Search</button>
-                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
-            </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/accessories/create" class="add-btn " v-if="feature.includes('accessory.store')">
+                        Add New
+                    </a>
 
-            <div class="flex justify-end flex-col">
-                <a href="/accessories/create" class="add-btn ">
-                    Add New
-                </a>
-
+                </div>
             </div>
         </div>
         <!-- {{ accessoriesList }} -->
@@ -59,12 +62,23 @@
                                 <!-- <th scope="col" class="  ">
                                     Is featured?
                                 </th> -->
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-if="feature.includes('accessory.show')">
 
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="accessoriesList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
 
                             <div class="contents" v-for="(accessories, index) in accessoriesList" :key="index">
                                 <tr class="">
@@ -92,7 +106,7 @@
                                     <!-- <td class="  ">
                                         {{ (accessories.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td> -->
-                                    <td class="whitespace-nowrap align-middle">
+                                    <td class="whitespace-nowrap align-middle" v-if="feature.includes('accessory.show')">
                                         <a :href="`/accessories/${accessories.id}/edit`" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </a>
@@ -111,6 +125,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="accessoriesList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -141,8 +160,12 @@
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             accessoriesCategoryList: [],
@@ -156,11 +179,14 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+            feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getAccessoriesCategoryList() {
             let url = `/api/get_accessory_category`;
@@ -171,7 +197,7 @@ export default {
         },
 
         async getAccessoriesList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/accessories?page=${pageNumber}`;
             if (this.searchInput && this.searchCategory) {
                 url = `/api/accessories?search_input=${this.searchInput}&accessories_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -185,6 +211,7 @@ export default {
 
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.accessoriesList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

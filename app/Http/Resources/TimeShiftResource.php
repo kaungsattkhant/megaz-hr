@@ -15,17 +15,17 @@ class TimeShiftResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'shift_id' => $this->shift_id,
-            'from_time' => $this->from_time,
-            'to_time' => $this->to_time,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'id' => $this->id ?? null,
+            'shift_id' => $this->shift_id ?? null,
+            'from_time' => $this->from_time ?? null,
+            'to_time' => $this->to_time ?? null,
             'shift' => [
-                'id' => $this->shift->id,
-                'name' => $this->shift->name,
-                'created_at' => $this->shift->created_at,
-                'updated_at' => $this->shift->updated_at,
+                'id' => $this->shift->id ?? null,
+                'name' => $this->shift->name ?? null,
+            ],
+            'area' => [
+                'id' => $this->area->id ?? null,
+                'name' => $this->area->name ?? null,
             ],
         ];
     }

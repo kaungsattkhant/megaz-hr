@@ -13,25 +13,33 @@ class LeaveService
     $leaveCategoryId = $data['leave_category_id'];
     $staffId = $data['staff_id'];
     $staff = Staff::findOrFail($staffId);
-    $roles = $staff->roles;
-    if ($roles->isEmpty()) {
-      ResponseMessage('Staff does not have any roles assigned.', 422);
-    }
-    $allowance = 0;
 
-    foreach ($roles as $role) {
-      $allowanceForRole = LeaveAllowance::where('role_id', $role->id)
-        ->where('leave_category_id', $leaveCategoryId)
-        ->value('day');
-      if ($allowanceForRole === null) {
-        ResponseMessage('Leave allowance not found for this role and leave category.', 422);
+    // First, check for a leave allowance specific to the staff member
+    $allowance = LeaveAllowance::where('allowanceable_type', 'staff')
+      ->where('allowanceable_id', $staff->id)
+      ->where('leave_category_id', $leaveCategoryId)
+      ->value('day');
+
+    // If no staff-specific allowance is found, check for role-based allowances
+    if ($allowance === null) {
+      $roles = $staff->roles;
+      if ($roles->isEmpty()) {
+        ResponseMessage('Staff does not have any roles assigned and no specific leave allowance.', 422);
       }
 
-      $allowance = max($allowance, $allowanceForRole);
+      $roleAllowances = LeaveAllowance::where('allowanceable_type', 'role')
+        ->whereIn('allowanceable_id', $roles->pluck('id'))
+        ->where('leave_category_id', $leaveCategoryId)
+        ->pluck('day');
+
+      if ($roleAllowances->isEmpty()) {
+        ResponseMessage('Leave allowance not found for the staff\'s roles and leave category.', 422);
+      }
+      $allowance = $roleAllowances->max();
     }
+
     $totalTaken = Leave::where('staff_id', $staffId)
       ->where('leave_category_id', $leaveCategoryId)
-      // ->where('status', 'confirmed')
       ->sum('day');
 
     $totalLeaveTakenByCategory = $totalTaken + $day;

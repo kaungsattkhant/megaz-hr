@@ -12,7 +12,7 @@ class AdsRepository implements AdsRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $ads = Ads::paginate(config('common.list_count'));
+        $ads = Ads::orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($ads);
     }
 
@@ -92,6 +92,18 @@ class AdsRepository implements AdsRepositoryInterface
             $adsQuery->where('type',$request->type);
         }
         $ads = $adsQuery->get();
+        ResponseData($ads);
+    }
+
+    public function adsDetail(int $id)
+    {
+        $ads = Ads::findOrFail($id);
+        ResponseData($ads);
+    }
+
+    public function latestAds()
+    {
+        $ads = Ads::select('id','name','image_path','image_url')->orderBy('created_at','desc')->limit(3)->get();
         ResponseData($ads);
     }
 }

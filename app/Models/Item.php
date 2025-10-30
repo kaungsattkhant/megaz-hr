@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Models\SupplierItem;
 use App\Models\UomConversion;
 use App\Models\MrpRawMaterial;
 use Illuminate\Support\Facades\DB;
@@ -23,11 +24,19 @@ class Item extends BaseModel
         'category_id',
         'item_type_id',
         'base_uom_id',
+        'tag_id',
         'uom_id',
         'is_active',
-        'min_holding_base_uom_quantity',
+        'min_holding_quantity',
+        'min_uom_id',
         'min_holding_uom_quantity',
         'minimum_holding_amount',
+        'limitation_type',
+        'amount',
+        'max_limit_quantity',
+        'max_uom_id',
+        'max_limit_uom_quantity',
+        'conversion'
     ];
 
 
@@ -46,19 +55,31 @@ class Item extends BaseModel
     {
         return $this->belongsTo(Category::class);
     }
+    public function tag()
+    {
+        return $this->belongsTo(Tag::class);
+    }
     public function item_type()
     {
         return $this->belongsTo(ItemType::class);
-    }
+    }   
 
     public function PurchaseOrderItem()
     {
         return $this->hasMany(PurchaseOrderItem::class);
     }
 
-    public function uoms()
+    // public function uoms()
+    // {
+    //     return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
+    // }
+    public function uom()
     {
-        return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
+        return $this->belongsTo(Uom::class, 'uom_id', '');
+    }
+    public function base_uom()
+    {
+        return $this->belongsTo(Uom::class, 'base_uom_id');
     }
 
     public function baseUoms()
@@ -89,6 +110,10 @@ class Item extends BaseModel
     public function suppliers()
     {
         return $this->belongsToMany(Supplier::class, 'supplier_items');
+    }
+    public function supplier_item()
+    {
+        return $this->hasMany(SupplierItem::class);
     }
     public function uomConversion()
     {
@@ -133,9 +158,6 @@ class Item extends BaseModel
                                         ')
             );
     }
-
-
-
 
     public function getItemPriceWithConversionAttribute()
     {
@@ -222,7 +244,7 @@ class Item extends BaseModel
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) -
-                     SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
+                    SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
             )
             ->groupBy('inventory_ledger_items.item_id');
     }

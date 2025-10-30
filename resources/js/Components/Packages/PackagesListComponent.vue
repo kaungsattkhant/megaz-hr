@@ -1,24 +1,28 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Packages
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Packages
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/packages/create" class="add-btn text-[13px] font-inter">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/packages/create" class="add-btn text-[13px] font-inter"
+                        v-show="feature.includes('package.create')">
+                        Add New
+                    </a>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -49,6 +53,11 @@
 
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -102,9 +111,13 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="promotionPackageList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
 
 
-                            <!-- looping end -->
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -184,8 +197,12 @@
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             promotionPackageList: [],
@@ -195,21 +212,26 @@ export default {
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
-            totalData:0
+            totalData:0,
+
+            feature: this.getFeature(),
+            loading: false,
 
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getPromotionPackageList(pageNumber) {
+            this.loading = true;
             let url = `/api/packages?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/packages?page=' + pageNumber + '&search=' + this.searchInput;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.promotionPackageList = response.data.data;
                 this.lastPage = response.data.last_page;
 

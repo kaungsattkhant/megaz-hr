@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AreaEquipmentResource;
+use App\Http\Resources\InventoryLedgerResource;
 use App\Http\Requests\Inventory\InventoryItemRequest;
 use App\Http\Requests\Inventory\InventoryCreateRequest;
 use App\Http\Requests\Inventory\InventoryUpdateRequest;
@@ -67,7 +69,6 @@ class InventoryAPIController extends Controller
     public function getInventoryLedgers(Request $request, int $inventoryId)
     {
         $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId, $request);
-
         ResponseData($ledgers);
     }
 
@@ -87,5 +88,21 @@ class InventoryAPIController extends Controller
     {
         $inventory = $this->inventoryRepo->createInventoryItem($request->validated());
         ResponseData($inventory);
+    }
+
+    public function getInventoryItemsByStaff($areaId)
+    {
+        $inventoryItems = $this->inventoryRepo->getInventoryItemsByStaff($areaId);
+        ResponseData($inventoryItems);
+    }
+
+    public function getInventoryClosingItems(Request $request)
+    {
+        $data = $this->inventoryRepo->getInventoryClosingItems($request);
+        ResponseData(InventoryLedgerResource::collection($data));
+    }
+
+    public function pushDataInventory(Request $request){
+        $data = $this->inventoryRepo->pushDataInventory($request);
     }
 }

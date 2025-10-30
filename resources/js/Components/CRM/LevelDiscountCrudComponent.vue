@@ -15,7 +15,7 @@
             </div>
             <div class="flex justify-end flex-col">
 
-                <button type="button"
+                <button type="button" v-show="feature.includes('customer-level-discount.create')"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -63,17 +63,18 @@
                                         {{ discount.promotion_value }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <button class="pr-2 " @click="editBtnClicked(discount.id)"
+                                        <button class="pr-2 " @click="editBtnClicked(discount.id)" v-show="feature.includes('customer-level-discount.edit')"
                                         data-te-toggle="modal" data-te-target="#edit_modal">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button class="pr-2 " @click="deleteBtnClicked(discount.id)"
+                                        <button class="pr-2 " @click="deleteBtnClicked(discount.id)" v-show="feature.includes('customer-level-discount.delete')"
                                         data-te-toggle="modal" data-te-target="#deleteModal">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            
 
                             <!-- looping end -->
                         </tbody>
@@ -342,11 +343,13 @@ export default {
             per_group: 10,
             groupedPageNumbers: [],
             currentGroup: 0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         alertValiationMessage(field) {
             this.$notify({

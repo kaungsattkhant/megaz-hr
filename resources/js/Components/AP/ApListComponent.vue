@@ -1,75 +1,88 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-                <i class="fal fa-search"></i>
-            </label>
-            <button hidden class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
-                <i class="fal fa-plus"></i>
-            </button>
+    <div class="card-shadow mt-4">
+        <div>
+            <p class=" text-lg font-semibold font-inter px-4 pt-3">
+                AP
+            </p>
+        </div>
+        <div class="btn-container !border-0 !mb-1">
+            <div class=" flex">
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search">
+                    <i class="fal fa-search"></i>
+                </label>
+                <button hidden class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
+                    <i class="fal fa-plus"></i>
+                </button>
+            </div>
         </div>
     </div>
-    <div class="block rounded-xl">
+    <div class="box-container-table">
         <div class="overflow-x-auto">
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
+            <div class="table-container">
+                <table class="primary-table">
                     <thead class="border-b font-medium ">
                         <tr>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 #
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 Supplier Name
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 Total Credit
                             </th>
-                            <!-- <th scope="col" class=" px-6 py-4 ">
+                            <!-- <th scope="col" class="">
                                 Total Debit
                             </th> -->
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 Outstanding Debt
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 &nbsp;
                             </th>
                         </tr>
                     </thead>
+                    <TableSkeleton
+                    v-if="loading"
+                    :rows="20"
+                    :cols="6"
+                    />
                     <tbody>
                         <div class="contents" v-for="(ap, index) in apList" :key="index">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
+                            <tr class="">
+                                <td class="font-medium ">
                                     {{ ++index }}
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
+                                <td class="whitespace-nowrap">
                                     {{ ap.supplier_name }}
                                     <a :href="`/account_payables/suppliers/${ap.supplier_id}/transactions`" class="text-blue-600 hover:underline" > Detail </a>
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
+                                <td class="whitespace-nowrap">
                                     {{ (ap.credit_amount).toLocaleString() }}
                                 </td>
 
-                                <!-- <td class=" px-6 py-4 ">
+                                <!-- <td class="">
                                     {{ (ap.debit_amount).toLocaleString() }}
                                 </td> -->
 
-                                <td class=" px-6 py-4 ">
+                                <td class="">
                                     {{ (ap.total_credit_amount).toLocaleString() }}
                                 </td>
 
-                                <td class=" px-6 py-4 ">
+                                <td class="">
                                     <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal"
                                     @click="payCreditBtnClicked(ap)">
                                         <i class="fal fa-plus"></i>
                                     </button>
                                 </td>
                             </tr>
-
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
                         </div>
+                        <tr class=" !text-center" v-if="apList.length < 1 && !loading">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -140,10 +153,12 @@
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
     import Multiselect from 'vue-multiselect';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
         components: {
-            Multiselect
+            Multiselect,
+            TableSkeleton
         },
         data() {
             return {
@@ -164,6 +179,7 @@
                 currentGroup: 0,
                 isFirstGroup: true,
                 isLastGroup: false,
+                loading: false,
             };
         },
 
@@ -187,6 +203,7 @@
             },
 
             async getAccountPayables(pageNumber){
+                this.loading = true;
                 if(pageNumber){
                     this.currentPage = pageNumber;
                 }
@@ -194,6 +211,7 @@
                 let url = `/api/account_payables?page=${this.currentPage}&per_page=${this.per_page}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
+                    this.loading = false;
                     this.apList = response.data;
                     this.apList.forEach((ap)=>{
                         ap.credit_amount = parseFloat(ap.credit_amount);
@@ -222,6 +240,7 @@
                 formData.append('value', this.payAmount);
                 formData.append('cash_account_id', this.selectedCashAccount.id);
                 formData.append('account_id', this.selectedAP.account_id);
+                formData.append('creditor_account_id', this.selectedAP.creditor_account_id);
                 let url = `/api/create_payable_transaction`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){

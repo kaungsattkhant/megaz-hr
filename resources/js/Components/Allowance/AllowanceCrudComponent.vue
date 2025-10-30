@@ -1,40 +1,43 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Salary Management
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Allowance Management
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
-                        <option :value="department.value" v-for="(department, departmentIndex) in searchDepartmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
-                        <option :value="role.value" v-for="(role, roleIndex) in searchRoleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
+                <div class="flex pr-0 gap-x-4">
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in searchDepartmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in searchRoleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                    <button type="button" v-show="feature.includes('allowance.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
+                        Add New
+                    </button>
                 </div>
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
-                    Add New
-                </button>
             </div>
         </div>
         <div class="box-container-table">
@@ -63,6 +66,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(ot, index) in allowanceList" :key="index">
                                 <tr class="">
@@ -97,6 +105,11 @@
                                     </td> -->
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="allowanceList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -268,10 +281,12 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -309,16 +324,21 @@ export default {
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getAllowanceList(pageNumber) {
+            this.loading = true;
             let url = this.url + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.allowanceList = response.data.data;
             }
         },
@@ -326,7 +346,19 @@ export default {
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
+                this.searchDepartmentList = response.data;
             }
+        },
+        searchDepartmentChange(){
+            this.searchRoleList = this.selectedSearchDepartment.roles;
+            this.selectedSearchRole = null;
+            this.url_role = '';
+            // this.url_department = '?department_id=' + this.selectedSearchDepartment.id;
+            // this.getAllowanceList();
+        },
+        searchRoleChange(){
+            this.url_role = '?role_id=' + this.selectedSearchRole.id;
+            this.getAllowanceList();
         },
         selectedDepartmentChange(){
             console.log('dep change')

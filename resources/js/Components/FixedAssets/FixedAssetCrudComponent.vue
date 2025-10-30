@@ -1,24 +1,27 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Fixed Assets
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" text-lg font-semibold font-inter p-4">
+                    Fixed Assets
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -76,6 +79,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(fixedAsset, fixedAssetIndex) in fixedAssetPurchases"
                                 :key="fixedAssetIndex">
@@ -137,9 +145,12 @@
                                         </button>
                                     </td>
                                 </tr>
-    
-                                
                             </div>
+                            <tr class=" !text-center" v-if="fixedAssetPurchases.length < 1 && !loading">
+                                <td class="" colspan="12">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
     
@@ -365,9 +376,12 @@ import { Modal, initTE } from "tw-elements";
 import { mapGetters } from 'vuex';
 import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
-
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             fixedAssetPurchases: [],
@@ -396,6 +410,7 @@ export default {
             buyFixedAssetId: null,
             cashAccountList: [],
             selectedCashAccount: null,
+            loading: false,
 
         };
     },
@@ -412,6 +427,7 @@ export default {
         },
 
         async getFixedAssetPurchases(pageNumber) {
+            this.loading = true;
             let url = `/api/fixed_asset_purchases?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/fixed_asset_purchases?page=' + pageNumber + '&search=' + this.searchInput;
@@ -419,6 +435,7 @@ export default {
             let response = await getApiData({ url: url, token: this.getToken() });
             // let response = await getApiData({ url: `/api/fixed_asset_purchases?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.fixedAssetPurchases = response.data.data;
 
                 this.lastPage = response.data.last_page;

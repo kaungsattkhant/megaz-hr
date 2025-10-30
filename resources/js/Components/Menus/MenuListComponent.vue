@@ -1,36 +1,39 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Selling Menus
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Selling Menus
+                </p>
+            </div>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
 
-                <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter by category"
-                        data-te-select-filter="true" v-model="searchCategory">
-                        <option :value="category" v-for="category in menuCategoryList" :key="category.id">
-                            {{ category.name }}
-                        </option>
-                    </select>
+                    <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter by category"
+                            data-te-select-filter="true" v-model="searchCategory">
+                            <option :value="category" v-for="category in menuCategoryList" :key="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <button class="add-btn " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
                 </div>
 
-                <button class="add-btn " @click="searchBtnClicked">Search</button>
-                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
-            </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/menus/create" class="add-btn " v-if="feature.includes('menu.create')">
+                        Add New
+                    </a>
 
-            <div class="flex justify-end flex-col">
-                <a href="/menus/create" class="add-btn ">
-                    Add New
-                </a>
-
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -58,7 +61,7 @@
                                 <th scope="col" class="  ">
                                     Is featured?
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['menu.toggle', 'menu.edit'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
@@ -91,11 +94,11 @@
                                     <td class="  ">
                                         {{ (menu.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1">
+                                    <td class="whitespace-nowrap " v-show="['menu.toggle', 'menu.edit'].some(f => feature.includes(f))">
+                                        <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1"  v-if="feature.includes('menu.edit')">
                                             <i class="fas fa-pen"></i>
                                         </a>
-                                        <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
+                                        <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"  v-if="feature.includes('menu.toggle')"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -155,11 +158,13 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+
+            feature: this.getFeature(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getMenuCategoryList() {
             let url = `/api/menu_categories`;

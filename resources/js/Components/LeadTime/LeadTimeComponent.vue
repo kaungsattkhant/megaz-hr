@@ -1,31 +1,34 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Lead Time
-        </p>
-    </div>
+    
     <div class="mt-4 bg-white">
-        <div class="btn-container !border-0 !mb-1">
-            <notifications position="top center" />
-            <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Supplier" @change="getLeadTimeList"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSupplier" class="input-ui">
-                        <option :value="supplier" v-for="(supplier, supplierIndex) in supplierList"
-                            :key="supplierIndex"> {{ supplier.name }} </option>
-                    </select>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Lead Time
+                </p>
+            </div>
+            <div class="btn-container !border-0 !mb-1">
+                <notifications position="top center" />
+                <div class="flex pr-0 gap-x-4">
+                    <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Supplier" @change="getLeadTimeList"
+                            data-te-select-filter="true" name="" id="" v-model="selectedSupplier" class="input-ui">
+                            <option :value="supplier" v-for="(supplier, supplierIndex) in supplierList"
+                                :key="supplierIndex"> {{ supplier.name }} </option>
+                        </select>
+                    </div>
+                    <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Item"
+                            data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui">
+                            <option :value="item.value" v-for="(item, itemIndex) in itemList"
+                                :key="itemIndex"> {{ item.name }} </option>
+                        </select>
+                    </div> -->
+                    
                 </div>
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Item"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui">
-                        <option :value="item.value" v-for="(item, itemIndex) in itemList"
-                            :key="itemIndex"> {{ item.name }} </option>
-                    </select>
-                </div> -->
-                
             </div>
         </div>
-        <div class="flex justify-between mb-4 px-6 font-semibold">
+        <div class="flex justify-between mb-4 px-3 pt-3 font-semibold">
             <p v-if="selectedSupplier">
                 Supplier : {{ selectedSupplier.name }}
             </p>
@@ -50,6 +53,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <tr v-if="leadTimeList.length < 1 && errorMessage">
                                 <td colspan="3">
@@ -71,6 +79,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="leadTimeList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -98,8 +111,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             leadTimeList: [],
@@ -119,7 +136,8 @@ export default {
             searchInput:null,
 
             url:'/api/supplier_lead_time/',
-            url_supplier:''
+            url_supplier:'',
+            loading: false,
 
         };
     },
@@ -127,10 +145,12 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         async getLeadTimeList(pageNumber) {
+            // this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url + this.selectedSupplier.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.leadTimeList = response.data;
                 this.totalAvgLeadTime = response.data.total_average_lead_time;
                 // this.lastPage = response.data.last_page;

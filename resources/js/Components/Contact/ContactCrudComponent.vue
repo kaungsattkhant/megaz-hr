@@ -1,33 +1,35 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Contacts Management
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Contacts Management
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
-                            :key="typeIndex"> {{ type.name }} </option>
-                    </select>
-                </div> -->
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
-                    Add New
-                </button>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex pr-0 gap-x-4">
+                    <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                            <option :value="type.value" v-for="(type, typeIndex) in typeList"
+                                :key="typeIndex"> {{ type.name }} </option>
+                        </select>
+                    </div> -->
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked"  v-show="feature.includes('contact.create')">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -42,11 +44,16 @@
                                 <th scope="col" class="">
                                     Phone Number
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['contact.delete', 'contact.edit'].some(f => feature.includes(f))">
                                     
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(contact, index) in contactList" :key="index">
@@ -58,18 +65,23 @@
                                     <td class="whitespace-nowrap">
                                         {{ contact.phone_number }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="['contact.delete', 'contact.edit'].some(f => feature.includes(f))">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(contact, index)">
+                                            @click="editBtnClicked(contact, index)" v-show="feature.includes('contact.edit')">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(contact.id)"
+                                        <button @click="deleteBtnClicked(contact.id)" v-show="feature.includes('contact.delete')"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="contactList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -163,7 +175,7 @@
                         <label for="" class="label-form mb-3">
                             Phone Number
                         </label>
-                        <input type="text" placeholder="Phone Number" v-model="ph_number" class="input-ui">
+                        <input type="number" placeholder="Phone Number" v-model="ph_number" class="input-ui no-arrow">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -206,7 +218,7 @@
                         <label for="" class="label-form mb-3">
                             Phone Number
                         </label>
-                        <input type="text" placeholder="Phone Number" v-model="ph_number_edit" class="input-ui">
+                        <input type="number" placeholder="Phone Number" v-model="ph_number_edit" class="input-ui no-arrow">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -214,9 +226,9 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                     </button>
-                    <button type="button" @click="btnClickedEditGps()"
+                    <button type="button" @click="btnClickedEditContact()"
                             class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
+                            Edit
                     </button>
                 </div>
             </div>
@@ -236,8 +248,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             contactList: [],
@@ -257,15 +273,19 @@ export default {
             url_search:'',
             deleteId:null,
 
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
         async getContactList(pageNumber) {
+            this.loading = true;
             let url = this.url;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.contactList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
@@ -299,16 +319,16 @@ export default {
             }
             
         },
-        btnClickedEditGps(){
+        btnClickedEditContact(){
             if(!this.ph_number_edit){
                 this.alertValidationMessage(`Phone Number`);
                 return 1;
             }
             else{
-                this.editGps();
+                this.editContact();
             }
         },
-        async editGps(){
+        async editContact(){
             let formData = new FormData();
             formData.append('phone_number',this.ph_number_edit);
             formData.append('id',this.editDetail.id);

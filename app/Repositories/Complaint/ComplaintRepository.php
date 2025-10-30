@@ -68,17 +68,22 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             $data['posted_by'] = UserData()->id;
             $complaint = Complaint::create($data);
             if ($complaint) {
-                $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
-                $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
-                if (!empty($complaintCarbonCopies)) {
+                if (isset($data['complaintResponsibles']) && !empty($data['complaintResponsibles'])) {
+                    $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
+                }
+                if (isset($data['complaintCarbonCopies']) && !empty($data['complaintCarbonCopies'])) {
+                    $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
+                }
+                if (!empty($complaintResponsibles)) {
 
                     foreach ($complaintResponsibles as $responsible) {
                         $complaint->complaintResponsibles()->create([
                             'staff_id' => $responsible,
                             'complaint_id' => $complaint->id
                         ]);
-                        $msg = 'You are responsible. Please Check';
-                        broadcast(new ComplaintNotificationRequest($complaint, $msg, $responsible));
+                        // $msg = 'You are responsible. Please Check';
+                        // broadcast(new ComplaintNotificationRequest($complaint, $msg, $responsible));
+                        $this->complaintNotification($complaint, $responsible);
                     }
                     $staffs = Staff::whereIn('id', $complaintResponsibles)->get();
                     $notificationsArray = $staffs->map(function($staff) {
@@ -108,9 +113,11 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                             'complaint_id' => $complaint->id
                         ]);
 
-                    $msg = 'You need to check.';
-                    broadcast(new ComplaintNotificationRequest($complaint, $msg, $carbonCopy));
+                    // $msg = 'You need to check.';
+                    // broadcast(new ComplaintNotificationRequest($complaint, $msg, $carbonCopy));
+                    $this->complaintNotification($complaint, $carbonCopy);
                     }
+                    
                     $staffs = Staff::whereIn('id', $complaintCarbonCopies)->get();
                     $notificationsCarbonCopy = $staffs->map(function($staff) {
                         return [
@@ -139,10 +146,13 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                     foreach ($data['complaintImages'] as $image) {
                         $extension = $image->getClientOriginalExtension();
                         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                        $data['image_path'] = $image->storeAs('images/complaint_images', $hashedName, 'public');
-                        $data['image_url'] = Storage::url($data['image_path']);
-                        $data['complaint_id'] = $complaint->id;
-                        ComplaintImage::create($data);
+                        $imagePath = $image->storeAs('images/complaint_images', $hashedName, 'public');
+                        $imageUrl = Storage::url($imagePath);
+                        ComplaintImage::create([
+                            'complaint_id' => $complaint->id,
+                            'image_path' => $imagePath,
+                            'image_url' => $imageUrl
+                        ]);
                     }
                 }
             }
@@ -224,9 +234,9 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             $data['posted_by'] = UserData()->id;
             if($oldComplaint != $data['status'])
             {
-                $msg = `You need to check`;
-                broadcast(new ComplaintNotificationRequest($complaint, $msg, UserData()->id));
-
+                // $msg = `You need to check`;
+                // broadcast(new ComplaintNotificationRequest($complaint, $msg, UserData()->id));
+                $this->complaintNotification($complaint, UserData()->id);
                 $staffs = Staff::where('id', UserData()->id)->get();
                 $notificationUser = $staffs->map(function($staff) use ($data,$complaint) {
                     return [

@@ -1,30 +1,33 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Prepaid
-        </p>
-    </div>
     <notifications position="top center" />
 
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <!-- <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label> -->
-                <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Prepaid
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <!-- <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label> -->
+                    <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-show="feature.includes('prepaid.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
+
 
         <!-- <p class="test">
             test
@@ -76,8 +79,16 @@
                                 <th scope="col" class="">
                                     Payment
                                 </th>
+                                <th scope="col" class="" v-show="feature.includes('prepaid-payment.create')">
+
+                                </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(prepaid, index) in prepaidList" :key="index">
                                 <tr class="">
@@ -117,7 +128,7 @@
                                     <td class="align-middle">
                                         {{ prepaid.prepaid.payment || 0 }}
                                     </td>
-                                    <td class=" align-middle">
+                                    <td class=" align-middle" v-show="feature.includes('prepaid-payment.create')">
                                         <button
                                         data-te-toggle="modal" data-te-target="#create_payment_modal" @click="btnClickedPaymentModal(prepaid)">
                                             <i class="fal fa-plus" ></i>
@@ -128,6 +139,11 @@
                                 </tr>
 
                             </div>
+                            <tr class=" !text-center" v-if="prepaidList.length < 1 && !loading">
+                                <td class="" colspan="13">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -357,8 +373,12 @@
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
     import { getCurrentDate } from '../../utilities/datetime-helpers';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
 
@@ -396,11 +416,13 @@
                 lastPage: 0,
                 totalData:0,
 
+                feature: this.getFeature(),
+                loading: false,
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             monthChange(){
                 this.selectedNewMonth = this.selectedMonth.slice(5,7);
@@ -409,8 +431,10 @@
             },
 
             async getPrepaidList(pageNumber){
+                this.loading = true;
                 const response = await getApiData({ url: '/api/prepaid_lists?month=' + this.selectedNewMonth+'&page=' + pageNumber , token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.prepaidList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;

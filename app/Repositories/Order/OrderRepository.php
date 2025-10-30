@@ -14,12 +14,14 @@ use App\Models\MenuArea;
 use App\Models\OrderItem;
 use App\Models\Department;
 use App\Models\RoomSession;
+use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
 use App\Traits\CheckMenuPack;
 use App\Models\InvoiceSession;
 use App\Services\OrderService;
 use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
+use App\Models\InventoryLedgerItem;
 use Illuminate\Support\Facades\Hash;
 use App\Services\InvoiceModelService;
 use App\Events\WaiterNotificationRequest;
@@ -45,337 +47,19 @@ class OrderRepository implements OrderRepositoryInterface
     public function createOrder(array $data)
     {
         return $this->orderService->createOrder($data);
-
-        DB::beginTransaction();
-        try {
-            //check and remove pack is enought for menu;
-            // $this->removePackForMenu($data['menu_id'], $data['quantity']);
-            $price = $data['original_price'] * $data['quantity'];
-            // $data['invoice'] must be unsigned integer format , not 000023
-            if (!isset($data['selling_area_id']) || $data['selling_area_id'] == null) {
-                ResponseMessage('Selling Area is required', 419);
-            }
-            $sellingAreaId = $data['selling_area_id'];
-            $order = Order::where('invoice_id', $data['invoice_id'])->first();
-            $invoice = Invoice::find($data['invoice_id']);
-            if (!$invoice) {
-                ResponseMessage('Invoice Not found', 419);
-            }
-            $menu = Menu::find($data['menu_id']);
-            $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
-                ->where('selling_area_id', $sellingAreaId)
-                ->first();
-            if (!$menuCategoryArea) {
-                ResponseMessage('Menu Category Area not found', 404);
-            }
-            $menuArea = MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
-                ->where('is_default', 1)
-                ->first();
-            if (!$menuArea) {
-                ResponseMessage('Menu Area not found', 404);
-            }
-            $cookingAreaId = $menuArea->cooking_area_id;
-
-            if (!$menu) {
-                ResponseMessage('Menu not found', 404);
-            }
-            $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
-                ->whereDate('from_date', '<=', CurrentDate())
-                ->whereDate('to_date', '>=', CurrentDate())
-                ->orderBy('created_at', 'desc')
-                ->where('type', 'menu')
-                ->first();
-            $quantityCount = (int) $data['quantity'];
-            $defaultQuantity = 1;
-            $discountAmount = 0;
-            $defaultDiscountAmont = 0;
-            if ($latestMenuServiceDiscount) {
-                $discountAmount = $latestMenuServiceDiscount->discount_price * $data['quantity'];
-                $data['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
-                $data['discount_value'] = $latestMenuServiceDiscount->discount_price * $defaultQuantity; //discount value for one quantity
-                $defaultDiscountAmont = $latestMenuServiceDiscount->discount_price * $defaultQuantity;
-            }
-            if ($order) {
-                //add menu for existing order
-                $order = $this->orderService->updateOrderItemAmountToOrder('add', $order, $data['original_price'], $data['quantity'], $discountAmount);
-                $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
-                // $data['date'] = currentTime();
-                // $data['order_id'] = $order->id;
-                // $data['price'] = $data['original_price'] * $data['quantity'];
-                // $data['sub_total_price'] =($data['original_price'] * $data['quantity'])-$discountAmount;
-                // $order_items = OrderItem::create($data);
-                $data['date'] = currentTime();
-                $data['order_id'] = $order->id;
-                $data['price'] = $data['original_price'] * $defaultQuantity;
-                $data['sub_total_price'] = ($data['original_price'] * $defaultQuantity) - $defaultDiscountAmont;
-                $orderItemData['order_id'] = $order->id;
-                $orderItemData['menu_id'] = $data['menu_id'];
-                $orderItemData['date'] = now();
-                $orderItemData['quantity'] = $defaultQuantity;
-                $orderItemData['remark'] = $data['remark'];
-                $orderItemData['status'] = 'pos_confirmed'; //default
-                $orderItemData['area_id'] = $cookingAreaId;
-                $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
-                $orderItemData['original_price'] = $data['original_price'];
-                $orderItemData['discount_value'] = $defaultDiscountAmont;
-                $orderItemData['sub_total_price'] = ($data['original_price']) - $defaultDiscountAmont; //after  
-                $orderItemData['price'] = $data['original_price']; //after  
-
-                $insertData = [];
-                for ($i = 0; $i < (int) $quantityCount; $i++) {
-                    // $insertData[] = $orderItemData;
-                    $createdOrderItem = OrderItem::create($orderItemData);
-                    $createdOrderItem->order = $createdOrderItem->order;
-                    $createdOrderItem->menu = $createdOrderItem->menu;
-                    $insertData[] = $createdOrderItem;
-                }
-                // OrderItem::insert($insertData);
-                broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
-                DB::commit();
-                return $order;
-                // $order->total_quantity += $data['quantity'];
-                // $order->total_discount_price += $discountAmount;
-                // $order->total += $data['original_price'] * $data['quantity'];
-                // $order->order_sub_total +=($data['original_price'] * $data['quantity'])-$discountAmount;
-                // $order->save();
-                // $invoice->total +=$data['original_price'] * $data['quantity'];
-                // $invoice->sub_total += ($data['original_price'] * $data['quantity'])-$discountAmount;
-                // $invoice->order_discount_value += $discountAmount;
-                // $invoice->total_discount+=$discountAmount;
-            } else {
-                //new order
-                $data['date'] = currentTime();
-                $data['total'] = $data['original_price'] * $data['quantity'];
-                $data['order_sub_total'] = ($data['original_price'] * $data['quantity']) - $discountAmount;
-                $data['total_quantity'] = $data['quantity'];
-                $data['total_discount_price'] = $discountAmount;
-                $order = Order::create($data);
-                $order->update(['order_id' => sprintf('%05d', $order->id)]);
-                //close for order item create default 1
-                // $data['order_id'] = $order->id;
-                // $data['sub_total_price'] = ($data['original_price'] * $data['quantity']) - $discountAmount; //after  
-                // $data['price'] = ($data['original_price'] * $data['quantity']); //after  
-                // $order_items = OrderItem::create($data);
-                //end
-
-
-                //update order amount to invoice   
-                $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
-                // change order item creat depend on quantity , like quantity=2 , create order two time, quantity=3 ,creat 3 time
-
-                $orderItemData['order_id'] = $order->id;
-                $orderItemData['menu_id'] = $data['menu_id'];
-                $orderItemData['date'] = now();
-                $orderItemData['quantity'] = $defaultQuantity;
-                $orderItemData['remark'] = $data['remark'];
-                $orderItemData['area_id'] = $cookingAreaId;
-                $orderItemData['status'] = 'pos_confirmed'; //defulat
-                $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
-                $orderItemData['original_price'] = $data['original_price'];
-                $orderItemData['discount_value'] = $defaultDiscountAmont;
-                $orderItemData['sub_total_price'] = ($data['original_price']) - $defaultDiscountAmont; //after  
-                $orderItemData['price'] = $data['original_price']; //after  
-                $insertData = [];
-                for ($i = 0; $i < (int) $quantityCount; $i++) {
-                    // $insertData[] = $orderItemData;
-                    $createdOrderItem = OrderItem::create($orderItemData);
-                    $createdOrderItem->order = $createdOrderItem->order;
-                    $createdOrderItem->menu = $createdOrderItem->menu;
-                    $insertData[] = $createdOrderItem;
-                    // dd($createdOrderItem);
-                }
-                // $orderItems=OrderItem::insert($insertData);
-                // dd($orderItems);
-                // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
-                broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
-                DB::commit();
-                return $order;
-            }
-        } catch (\Exception $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
     }
 
     public function createMultipleOrder(array $data)
     {
         return $this->orderService->createMultipleOrder($data);
-
-        DB::beginTransaction();
-        try {
-            $invoiceId = $data['invoice_id'];
-            $order = Order::where('invoice_id', $invoiceId)->first();
-            $sellingAreaId = $data['selling_area_id'];
-            $categorySums = [];
-            $totalDiscount = 0;
-            $invoice = Invoice::find($data['invoice_id']);
-            if ($invoice->entity_id != null) {
-                $entity = $invoice->entity;
-            } else {
-                $activeInvoiceSession = $invoice->activeInvoiceSession;
-                if (!$activeInvoiceSession) {
-                    ResponseMessage('Active Entity Session not found', 419);
-                }
-                $entity = $activeInvoiceSession->entity;
-            }
-
-            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-
-            $orderItemsArray = [];
-            $focTotal = 0;
-            foreach ($data['menuArray'] as $menuData) {
-
-                $menuData['invoice_id'] = $invoiceId;
-                $menu = Menu::find($menuData['menu_id']);
-                $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
-                    ->where('selling_area_id', $sellingAreaId)
-                    ->first();
-                if (!$menuCategoryArea) {
-                    ResponseMessage('Menu Category Area not found', 404);
-                }
-                $menuArea = MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
-                    ->where('is_default', 1)
-                    ->first();
-                if (!$menuArea) {
-                    ResponseMessage('Menu Area not found', 404);
-                }
-                $cookingAreaId = $menuArea->cooking_area_id;
-                $quantityCount = (int) $menuData['quantity'];
-                $defaultQuantity = 1;
-
-                if (!isset($menuData['discount_value'])) {
-                    $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
-                        ->whereDate('from_date', '<=', CurrentDate())
-                        ->whereDate('to_date', '>=', CurrentDate())
-                        ->orderBy('created_at', 'desc')
-                        ->where('type', 'menu')
-                        ->first();
-                    $discountAmount = 0;
-                    $defaultDiscountAmont = 0;
-                    if ($latestMenuServiceDiscount != null) {
-                        $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
-                        $totalDiscount += $discountAmount;
-                        $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
-                        $menuData['discount_value'] = $discountAmount; // Store the calculated discount value
-                        $defaultDiscountAmont = $latestMenuServiceDiscount->discount_price * $defaultQuantity;
-                    }
-                    // dd($defaultDiscountAmont);
-                    //  else {
-                    //     $discountAmount = ($menuData['discount_value'] ?? 0) * $menuData['quantity'];
-                    // }
-                    // dd('abc');
-                } else {
-                    $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
-                    $totalDiscount += $discountAmount;
-                }
-                // dd($order);
-                if ($order) {
-                    // $order->total_quantity += $menuData['quantity'];
-                    // $order->total_discount_price += $discountAmount; // update total discount only for this order
-                    // $order->total += $menuData['original_price'] * $menuData['quantity'];
-                    // $order->order_sub_total += $menuData['original_price'] * $menuData['quantity'];
-                    // $order->update($menuData);
-                    $order = $this->orderService->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-                    $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-                    $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
-                        ->where('order_id', $order->id)
-                        ->first();
-                    $menuData['date'] = CurrentTime();
-                    $menuData['order_id'] = $order->id;
-                    $menuData['price'] = $menuData['original_price'];
-                    $menuData['status'] = 'pos_confirmed';
-                    $menuData['area_id'] = $cookingAreaId;
-                    $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
-                    $menuData['discount_value'] = $defaultDiscountAmont;
-                    // $order_items = OrderItem::create($menuData);
-                    // $orderItems = OrderItem::find($order_items->id);
-                    // $orderItems->menu = $orderItems->menu;
-                    // $orderItemsArray[] = $orderItems;
-                } else {
-                    $orderData['invoice_id'] = $invoiceId;
-                    $orderData['date'] = CurrentTime();
-                    $orderData['total'] = $menuData['original_price'] * $menuData['quantity'];
-                    $orderData['order_sub_total'] = ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
-                    $orderData['total_quantity'] = $menuData['quantity'];
-                    $orderData['total_discount_price'] = $discountAmount; // update total discount only for this order
-                    $order = Order::create($orderData);
-                    $order->update(['order_id' => sprintf('%05d', $order->id)]);
-                    $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-
-                    $menuData['order_id'] = $order->id;
-                    $menuData['date'] = now();
-                    $menuData['quantity'] = $defaultQuantity;
-                    $menuData['status'] = 'pos_confirmed';
-                    // $menuData['remark'] = $menuData['remark'];
-                    // $menuData['original_price'] = $data['original_price'];
-                    // $menuData['menu_id'] = $data['menu_id'];
-                    $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
-                    $menuData['discount_value'] = $defaultDiscountAmont;
-                    $menuData['area_id'] = $cookingAreaId;
-                    $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
-                    $menuData['price'] = $menuData['original_price']; //after  
-
-                    // $menuData['order_id'] = $order->id;
-                    // $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
-
-                    // $order_items = OrderItem::create($menuData);
-                    // $orderItems = OrderItem::find($order_items->id);
-                    // $orderItems->menu = $orderItems->menu;
-                    // $orderItemsArray[] = $orderItems;
-                }
-                $insertData = [];
-                for ($i = 0; $i < (int) $quantityCount; $i++) {
-                    // $insertData[] = $orderItemData;
-                    $order_item = OrderItem::create($menuData);
-                    $insertData[] = $order_item;
-                    if ($order_item->is_foc == 1) {
-                        $focTotal += $order_item->price;
-                    }
-                    $order_item->menu = $order_item->menu;
-                    $order_item->order = $order_item->order;
-                    array_push($orderItemsArray, $order_item);
-                }
-                // dd($insertData);
-                // dd($menuData);
-                // $order_item = OrderItem::create($menuData);
-                // dd($order_item);
-
-            }
-            broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
-            $order->foc_total += $focTotal;
-            $order->save();
-            //doesn't need to do waiter
-            // if (isset($data['is_waiter'])) {
-            //     if ($data['is_waiter'] == 1) {
-            //         broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
-            //     }
-            // }
-            //end waiter
-
-            //current close because ,i got an error
-            // broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
-            DB::commit();
-            $data['order'] = $order;
-            $data['orderItems'] = $orderItemsArray;
-            return $data;
-        } catch (\Exception $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
     }
 
     public function orderItemStatusChange(array $data)
     {
         DB::beginTransaction();
         try {
-            $orderItems = OrderItem::where('group_order_id',  $data['group_order_id'])->get();
-            if (!$orderItems) {
-                ResponseMessage('Order Item not found', 404);
-            }
-            foreach ($orderItems as $orderItem) {
+            if ($data['status'] == 'placed' || $data['status'] == 'cancelled') {
+                $orderItem = OrderItem::where('id', $data['id'])->first();
                 if ($data['status'] == 'cancelled') {
                     if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
                         ResponseMessage("Permission doesn't allow", 422);
@@ -389,53 +73,90 @@ class OrderRepository implements OrderRepositoryInterface
                         ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
                     }
                 }
-            }
-            foreach ($orderItems as $orderItem) {
-                $invoice = Invoice::find($orderItem->order->invoice_id);
-                //must be check entity or room
-                if ($invoice->entity_id != null) {
-                    $entity = $invoice->entity;
-                } else {
-                    $activeInvoiceSession = $invoice->activeInvoiceSession;
-                    if (!$activeInvoiceSession) {
-                        ResponseMessage('Active Invioce Session not found', 419);
-                    }
-                    $entity = $activeInvoiceSession->entity;
+                if (!$orderItem) {
+                    ResponseMessage("Order Item Not Found", 422);
                 }
-                // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-                // $entity = $latestRoomSession->entitySession->entity;
-                // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-                if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
-                    $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
-                    if (count($packs) < $orderItem->quantity) {
-                        ResponseMessage('Not enough packs to sell', 402);
-                    }
-                    foreach ($packs as $pack) {
-                        if ($pack->status == 'ready') {
-                            $pack->status = 'sold';
-                            $pack->save();
-                        }
-                    }
-                    $orderItem->completed_at = now();
-                    $orderItem->completed_by = UserData()->id;
-                }
-                //tem command 
-                elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
-                    $orderItem->progressed_at = now();
-                    $orderItem->progressed_by = UserData()->id;
-                } elseif ($data['status'] == 'cancelled') {
-                    $orderItem->cancelled_at = now();
-                    $orderItem->cancelled_by = UserData()->id;
-                } elseif ($data['status'] == 'placed' && $orderItem->status == 'done') {
-                    $orderItem->placed_at = now();
-                    $orderItem->placed_by = UserData()->id;
-                } else {
+                if ($orderItem->status !== 'done') {
                     ResponseMessage("Order can't place at this moment ", 422);
                 }
                 $orderItem->status = $data['status'];
+                $orderItem->placed_at = now();
+                $orderItem->placed_by = UserData()->id;
                 $orderItem->update();
                 $orderItem->menu = $orderItem->menu;
-                broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
+                // broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
+            } else {
+                $orderItems = OrderItem::where('group_order_id', $data['group_order_id'])->get();
+                if (!$orderItems) {
+                    ResponseMessage('Order Item not found', 404);
+                }
+                foreach ($orderItems as $orderItem) {
+                    if ($data['status'] == 'cancelled') {
+                        if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
+                            ResponseMessage("Permission doesn't allow", 422);
+                        }
+                        $nonCancellableStatuses = [
+                            'in progress' => "Order item can't be canceled because it is already in progress.",
+                            'done' => "Order item can't be canceled because it is already done.",
+                            'pos_confirmed' => "Order item can't be canceled because it is already confirmed.",
+                        ];
+                        if (isset($nonCancellableStatuses[$orderItem->status])) {
+                            ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
+                        }
+                    }
+                }
+                foreach ($orderItems as $orderItem) {
+                    $invoice = Invoice::find($orderItem->order->invoice_id);
+                    //must be check entity or room
+                    if ($invoice->entity_id != null) {
+                        $entity = $invoice->entity;
+                    } else {
+                        $activeInvoiceSession = $invoice->activeInvoiceSession;
+                        if (!$activeInvoiceSession) {
+                            ResponseMessage('Active Invioce Session not found', 419);
+                        }
+                        $entity = $activeInvoiceSession->entity;
+                    }
+                    // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                    // $entity = $latestRoomSession->entitySession->entity;
+                    // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+                    if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
+                        // $packs = Pack::where(column: 'menu_id', $orderItem->menu_id)->where('status', 'ready')
+                        //     ->where('expired_at', '>', CurrentTime())
+                        //     ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                        // if (count($packs) < $orderItem->quantity) {
+                        //     ResponseMessage('Not enough packs to sell', 402);
+                        // }
+                        // foreach ($packs as $pack) {
+                        //     if ($pack->status == 'ready') {
+                        //         $pack->status = 'sold';
+                        //         $pack->save();
+                        //     }
+                        // }
+                        $orderItem->completed_at = now();
+                        $orderItem->completed_by = UserData()->id;
+                    }
+                    //tem command 
+                    elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
+                        $orderItem->progressed_at = now();
+                        $orderItem->progressed_by = UserData()->id;
+                        $this->orderService->actionPackMenu($orderItem->menu_id,$orderItem->quantity,$orderItem->inventory_id);
+                        $sellingExtraIds=$orderItem->extras->pluck('selling_extra_id')->toArray();
+                        $this->orderService->actionInventoryItem($orderItem, 'order_item', 'out',$sellingExtraIds);
+                    } elseif ($data['status'] == 'cancelled') {
+                        $orderItem->cancelled_at = now();
+                        $orderItem->cancelled_by = UserData()->id;
+                    } elseif ($data['status'] == 'placed' && $orderItem->status == 'done') {
+                        $orderItem->placed_at = now();
+                        $orderItem->placed_by = UserData()->id;
+                    } else {
+                        ResponseMessage("Order can't place at this moment ", 422);
+                    }
+                    $orderItem->status = $data['status'];
+                    $orderItem->update();
+                    $orderItem->menu = $orderItem->menu;
+                    broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
+                }
             }
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
@@ -444,6 +165,35 @@ class OrderRepository implements OrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function actionInventoryItem($orderItem, $morphMapName, $action)
+    {
+        $inventoryId = UserData()->department->inventory->inventory_id;
+        $menuId = $orderItem->menu_id;
+        $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
+            ->whereHas('menuStep', function ($q) use ($menuId) {
+                $q->where('menu_id', $menuId)
+                    ->where('type','!=','ready_to_sale');
+            })
+            ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
+            ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
+            ->get();
+        foreach ($menuStepItemByMenu as $item) {
+            $itemInventory = InventoryLedgerItem::where('item_id', $item->item_id)
+                ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                ->selectRaw("
+                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) as in_quantity,
+                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as out_quantity,
+                SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) - 
+                SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END) as in_stock_quantity
+            ")
+                ->where('inventory_ledgers.inventory_id', $inventoryId)
+                ->first();
+            // dd($itemInventory);
+            // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
+        }
+
     }
 
     public function getOrderItemData(Request $request)
@@ -558,7 +308,7 @@ class OrderRepository implements OrderRepositoryInterface
                 ->where('invoice_id', $invoice->id)
                 ->with('entity') // Eager load entity
                 ->first()
-                ?->entity; // Use null safe operator to avoid errors
+                    ?->entity; // Use null safe operator to avoid errors
 
             if (!$entity) {
                 return ResponseMessage('Entity not found', 404);
@@ -654,8 +404,45 @@ class OrderRepository implements OrderRepositoryInterface
     }
     public function getOrderItemGroupList($request)
     {
+        // $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
+        //     ->join('menus', 'order_items.menu_id', 'menus.id')
+        //     ->join('orders', 'order_items.order_id', 'orders.id')
+        //     ->join('areas', 'order_items.area_id', 'areas.id')
+        //     ->join('invoices', 'orders.invoice_id', 'invoices.id')
+        //     ->join('entities', 'invoices.entity_id', 'entities.id')
+        //     ->select(
+        //         'menus.id as menu_id',
+        //         'menus.name as menu_name',
+        //         DB::raw('MIN(order_items.date) as date'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
+        //         DB::raw('SUM(order_items.quantity) as total_quantity'),
+        //         // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
+        //         DB::raw('JSON_ARRAYAGG(
+        //             JSON_OBJECT(
+        //                 "order_item_id", order_items.id,
+        //                 "order_id", order_items.order_id,
+        //                 "date", order_items.date,
+        //                 "menu_id", order_items.menu_id,
+        //                 "menu_name", menus.name,
+        //                 "quantity", order_items.quantity,
+        //                 "area_id", order_items.area_id,
+        //                 "area_name", areas.name,
+        //                 "room_id", entities.id,
+        //                 "room_name", entities.name,
+        //                 "status", order_items.status,
+        //                 "remark", IFNULL(order_items.remark, ""),
+        //                 "group_order_id", order_items.group_order_id
+        //             )
+        //         ) as order_items_details')
+        //     )
+        //     ->whereNotIn('order_items.status', ['placed'])
+        //     ->groupBy('menus.id', 'menus.name', 'group_order_id');
         $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
             ->join('menus', 'order_items.menu_id', 'menus.id')
+            // ->join('remarks', 'order_items.remark_id', 'remarks.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
             ->join('invoices', 'orders.invoice_id', 'invoices.id')
@@ -666,28 +453,38 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('MIN(order_items.date) as date'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
+
+                // 👇 Add extra_item_names via subquery
                 DB::raw('JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        "order_item_id", order_items.id,
-                        "order_id", order_items.order_id,
-                        "date", order_items.date,
-                        "menu_id", order_items.menu_id,
-                        "menu_name", menus.name,
-                        "quantity", order_items.quantity,
-                        "area_id", order_items.area_id,
-                        "area_name", areas.name,
-                        "room_id", entities.id,
-                        "room_name", entities.name,
-                        "status", order_items.status,
-                        "remark", IFNULL(order_items.remark, ""),
-                        "group_order_id", order_items.group_order_id
-                    )
-                ) as order_items_details')
-            )->groupBy('menus.id', 'menus.name', 'group_order_id');
+            JSON_OBJECT(
+                "order_item_id", order_items.id,
+                "order_id", order_items.order_id,
+                "date", order_items.date,
+                "menu_id", order_items.menu_id,
+                "menu_name", menus.name,
+                "quantity", order_items.quantity,
+                "area_id", order_items.area_id,
+                "area_name", areas.name,
+                "room_id", entities.id,
+                "room_name", entities.name,
+                "status", order_items.status,
+                "remark", IFNULL(order_items.remark, ""),
+                "group_order_id", order_items.group_order_id,
+                "extra_item_names", (
+                    SELECT GROUP_CONCAT(items.name SEPARATOR ", ")
+                    FROM order_item_extras
+                    JOIN selling_extras ON selling_extras.id = order_item_extras.selling_extra_id
+                    JOIN items ON items.id = selling_extras.item_id
+                    WHERE order_item_extras.order_item_id = order_items.id
+                )
+            )
+        ) as order_items_details')
+            )
+            ->whereNotIn('order_items.status', ['placed'])
+            ->groupBy('menus.id', 'menus.name', 'group_order_id');
         if ($request->has('area_id') && $request->area_id) {
             $groupedOrderItem->where('order_items.area_id', $request->area_id);
         }
@@ -702,6 +499,39 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getOrderItemsGroupByMenu($request)
     {
+        // $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
+        //     ->join('orders', 'order_items.order_id', 'orders.id')
+        //     ->join('areas', 'order_items.area_id', 'areas.id')
+        //     ->join('invoices', 'orders.invoice_id', 'invoices.id')
+        //     ->join('entities', 'invoices.entity_id', 'entities.id')
+
+        //     ->select(
+        //         'menus.id as menu_id',
+        //         'menus.name as menu_name',
+        //         DB::raw('MIN(order_items.date) as date'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
+        //         DB::raw('SUM(order_items.quantity) as total_quantity'),
+        //         // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
+        //         // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
+        //         DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
+        //         DB::raw('JSON_ARRAYAGG( JSON_OBJECT(
+        //         "order_item_id", order_items.id,
+        //         "order_id", order_items.order_id,
+        //         "date", order_items.date,
+        //         "menu_id", order_items.menu_id,
+        //         "menu_name", menus.name,
+        //         "quantity", order_items.quantity,
+        //         "area_id", order_items.area_id,
+        //         "area_name", areas.name,
+        //         "room_id", entities.id,
+        //         "room_name", entities.name,
+        //         "status", order_items.status,
+        //         "remark", IFNULL(order_items.remark, "")
+        //     )) as order_items_details')
+        //     )
+        //     ->whereNull('order_items.group_order_id')
+        //     ->groupBy('menus.id', 'menus.name')
+        //     ->paginate(config('common.list_count'));
         $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
@@ -714,24 +544,34 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('MIN(order_items.date) as date'),
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
-                // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
-                DB::raw('JSON_ARRAYAGG( JSON_OBJECT(
-                "order_item_id", order_items.id,
-                "order_id", order_items.order_id,
-                "date", order_items.date,
-                "menu_id", order_items.menu_id,
-                "menu_name", menus.name,
-                "quantity", order_items.quantity,
-                "area_id", order_items.area_id,
-                "area_name", areas.name,
-                "room_id", entities.id,
-                "room_name", entities.name,
-                "status", order_items.status,
-                "remark", IFNULL(order_items.remark, "")
-            )) as order_items_details')
+
+                // 👇 JSON object for order items including extra item names
+                DB::raw('JSON_ARRAYAGG(JSON_OBJECT(
+            "order_item_id", order_items.id,
+            "order_id", order_items.order_id,
+            "date", order_items.date,
+            "menu_id", order_items.menu_id,
+            "menu_name", menus.name,
+            "quantity", order_items.quantity,
+            "area_id", order_items.area_id,
+            "area_name", areas.name,
+            "room_id", entities.id,
+            "room_name", entities.name,
+            "status", order_items.status,
+            "remark", IFNULL(order_items.remark, ""),
+            "extra_item_names", (
+                SELECT GROUP_CONCAT(items.name SEPARATOR ", ")
+                FROM order_item_extras
+                JOIN selling_extras ON selling_extras.id = order_item_extras.selling_extra_id
+                JOIN items ON items.id = selling_extras.item_id
+                WHERE order_item_extras.order_item_id = order_items.id
             )
+        )) as order_items_details')
+            )
+            ->when(isset($request->area_id) && $request->area_id,function($q)use($request){
+                $q->where('order_items.area_id',$request->area_id);
+            })
             ->whereNull('order_items.group_order_id')
             ->groupBy('menus.id', 'menus.name')
             ->paginate(config('common.list_count'));

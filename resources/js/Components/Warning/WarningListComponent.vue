@@ -1,25 +1,26 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Warnings
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-
-        <div class="btn-container">
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Warnings
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/warning/create" class="add-btn ">
-                    Add New
-                </a>
+            <div class="btn-container">
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/warning/create" class="add-btn " v-if="feature.includes('warning.create')">
+                        Add New
+                    </a>
 
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -46,11 +47,16 @@
                                 <th scope="col" class=" ">
                                     Staff
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['warning.edit', 'warning.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(warning, warningIndex) in warningList" :key="warningIndex">
@@ -80,19 +86,24 @@
                                             {{ staff.staff ? staff.staff.name : ''}} 
                                         </span>
                                     </td>
-                                    <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/warning/' + warning.id + '/edit'">
+                                    <td class="whitespace-nowrap " v-show="['warning.edit', 'warning.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/warning/' + warning.id + '/edit'" v-if="feature.includes('warning.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(warning.id)"
+                                            @click="deleteBtnClicked(warning.id)" v-show="feature.includes('warning.delete')"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="warningList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -173,8 +184,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             warningList: [],
@@ -187,16 +202,21 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
+            loading: true,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getWarningList(pageNumber) {
+            this.loading = true;
             let url = `/api/warnings`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.warningList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

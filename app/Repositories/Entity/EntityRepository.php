@@ -32,7 +32,7 @@ class EntityRepository implements EntityRepositoryInterface
         $type = $request->type;
         if ($request->per_page || $request->page) {
             return Entity::orderByDesc('id')
-                ->with('service_category')
+                ->with(['service_category','area'])
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
@@ -484,8 +484,8 @@ class EntityRepository implements EntityRepositoryInterface
         //     if (!$roomSession) {
         //         ResponseMessage('Invoice Room Session is invalid', 419);
         //     }
-        $customer = $invoice->customer;
-        $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
+        $customer = $invoice->customer ?? null;
+        $customerDepositBalance =$customer ? $this->getCustomerDepositBalance($customer->id) : 0;
         //end deposit
         // $invoice = $roomSession->invoiceSession->invoice;
         $invoice->package;
@@ -531,43 +531,47 @@ class EntityRepository implements EntityRepositoryInterface
 
             //customer level , birthday discount
             $today = Carbon::today();
-            $customer = Customer::find($invoice->customer_id);
             $customerTotal = 0;
-            if ($customer->invoices) {
-                foreach ($customer->invoices as $customerInvoice) {
-                    $customerTotal += $customerInvoice->total;
+            if($invoice->customer_id){
+                $customer = Customer::find($invoice->customer_id);
+                if ($customer->invoices) {
+                    foreach ($customer->invoices as $customerInvoice) {
+                        $customerTotal += $customerInvoice->total;
+                    }
                 }
-            }
-
-            $levels = CustomerLevelDiscount::all();
-            $customerLevel = null;
-            foreach ($levels as $level) {
-                if ($customerTotal >= $level->amount) {
-                    $customerLevel = $level;
+    
+                $levels = CustomerLevelDiscount::all();
+                $customerLevel = null;
+                foreach ($levels as $level) {
+                    if ($customerTotal >= $level->amount) {
+                        $customerLevel = $level;
+                    } else {
+                        break;
+                    }
+                }
+                if ($customerLevel !== null) {
+                    // $roomDoneResponse['customer_level'] = $customerLevel->name;
+                    // $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+                    $entity->customer_level = $customerLevel->name;
+                    $entity->customer_level_discount_value = $customerLevel->promotion_value;
                 } else {
-                    break;
+                    // $roomDoneResponse['customer_level'] = 'no customer level';
+                    $entity->customer_level = 'no customer level';
                 }
+                if ($customer) {
+                    $birthdate = Carbon::parse($customer->birthdate);
+                    // $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+                    $entity->is_birthday = $birthdate->isBirthday($today);
+    
+                } else {
+                    $entity->is_birthday = false;
+                    // $roomDoneResponse['is_birthday'] = false;
+                }
+    
             }
-            if ($customerLevel !== null) {
-                // $roomDoneResponse['customer_level'] = $customerLevel->name;
-                // $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
-                $entity->customer_level = $customerLevel->name;
-                $entity->customer_level_discount_value = $customerLevel->promotion_value;
-            } else {
-                // $roomDoneResponse['customer_level'] = 'no customer level';
-                $entity->customer_level = 'no customer level';
-            }
-
+           
             // $roomDoneResponse['customer_total'] = $customerTotal;
-            if ($customer) {
-                $birthdate = Carbon::parse($customer->birthdate);
-                // $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
-                $entity->is_birthday = $birthdate->isBirthday($today);
-
-            } else {
-                $entity->is_birthday = false;
-                // $roomDoneResponse['is_birthday'] = false;
-            }
+            
 
             //end 
 
@@ -639,8 +643,8 @@ class EntityRepository implements EntityRepositoryInterface
         $entity->invoice_total = $invoice->total + $total_service_value;
         $entity->total_order_value = $total_order_value;
         $entity->deposit_balance = $customerDepositBalance;
-        $entity->customer_id = $customer->id;
-        $entity->account_id = $customer->account_id;
+        $entity->customer_id = $invoice->customer_id ? $customer->id : null;
+        $entity->account_id =  $invoice->customer_id ? $customer->account_id :null;
         $entity->total_session_price = $invoice->total_session_price;
         $entity->invoice = $invoice;
         // dd($invoiec)

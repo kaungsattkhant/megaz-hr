@@ -17,6 +17,31 @@ class MrpStoreRequest extends APIRequest
         return parent::authorize();
     }
 
+    protected function prepareForValidation()
+    {
+        // Convert JSON strings to arrays for validation
+        if ($this->has('menu_steps') && is_string($this->menu_steps)) {
+            $menuSteps = json_decode($this->menu_steps, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $this->merge(['menu_steps_array' => $menuSteps]);
+            }
+        }
+
+        if ($this->has('cooking_place_id') && is_string($this->cooking_place_id)) {
+            $cookingPlaces = json_decode($this->cooking_place_id, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $this->merge(['cooking_places_array' => $cookingPlaces]);
+            }
+        }
+
+        if ($this->has('sub_menu_id') && is_string($this->sub_menu_id)) {
+            $subMenus = json_decode($this->sub_menu_id, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $this->merge(['sub_menus_array' => $subMenus]);
+            }
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -28,46 +53,13 @@ class MrpStoreRequest extends APIRequest
             'name' => 'required',
             'menu_category_id' => 'required|exists:menu_categories,id',
             'code' => 'required',
-            // 'image' => 'nullable|mimes:jpeg,png,jpg|max:10240',
-            'description' => 'required|string',
-            'cooking_place_id' => "required|exists:cooking_places,id",
+            'image' => 'nullable|mimes:jpeg,png,jpg,webp|max:10240',
+            'description' => 'nullable|string',
+            'cooking_place_id' => 'required|json',
             'price' => 'nullable',
-            'sub_menu_id' => 'nullable',
-            'menu_type' => 'required|string|in:menu,custom',
-            'menu_steps' => 'nullable|array',
-            // 'menu_steps.*.menu_id' => 'required|exists:menus,id',
-            'menu_steps.*.staff_id' => 'nullable|exists:staff,id',
-            'menu_steps.*.staff_quantity' => 'nullable|integer',
-            'menu_steps.*.level' => 'nullable|string',
-            'menu_steps.*.type' => 'nullable|string|in:portion,ready_to_sale,cooking,plating,hardcook',
-            'menu_steps.*.duration' => 'nullable|integer',
-            'menu_steps.*.order_time' => 'nullable|integer',
-            'menu_steps.*.expected_quantity' => 'nullable|integer',
-            'menu_steps.*.item_menu' => 'nullable|array',
-            // 'menu_steps.*.item_menu.*.menu_step_id' => 'required|exists:menu_steps,id',
-            'menu_steps.*.item_menu.*.item_id' => 'nullable|exists:items,id',
-            'menu_steps.*.item_menu.*.uom_id' => 'nullable|exists:uoms,id',
-            'menu_steps.*.item_menu.*.weight' => 'nullable|integer'
+            'sub_menu_id' => 'required_if:menu_type,menu|nullable|json',
+            'menu_steps' => 'nullable|json',
         ];
-        foreach ($this->input('menu_steps', []) as $index => $menuStep) {
-            if (
-                isset($menuStep['level'], $menuStep['type']) &&
-                $menuStep['level'] === 'level_4' &&
-                $menuStep['type'] === 'portion'
-            ) {
-                $rules["menu_steps.$index.duration"] = 'required|integer';
-                $rules["menu_steps.$index.order_time"] = 'required|integer';
-            }
-        }
-
-        if ($this->input('menu_type') === 'menu') {
-            $rules['menu_steps'] = 'nullable|array';
-            $rules['menu_steps.*.item_menu'] = 'nullable|array';
-        } else {
-            $rules['menu_steps'] = 'required|array';
-            $rules['menu_steps.*.item_menu'] = 'required|array';
-        }
-
         return $rules;
     }
 

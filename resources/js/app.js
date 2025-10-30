@@ -12,6 +12,8 @@ import { store } from './Store';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/messaging';
 import Notifications from '@kyvg/vue3-notification';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
@@ -57,7 +59,10 @@ import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/Conf
 import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/PurchaseOrderWithLeftItemsComponent.vue';
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
 import BrandCrudComponent from './Components/Brands/BrandCrudComponent.vue';
-import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
+import ItemListComponent from './Components/Items/ItemListComponent.vue';
+import ItemCreateComponent from './Components/Items/ItemCreateComponent.vue';
+import ItemEditComponent from './Components/Items/ItemEditComponent.vue';
+import SellingExtraListComponent from './Components/SellingExtras/SellingExtraListComponent.vue';
 import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
 import SupplierBrandsComponent from './Components/Items/SupplierBrandsComponent.vue';
 import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
@@ -123,6 +128,8 @@ import ArrivalItemsComponent from './Components/ArrivalItems/ArrivalItemsCompone
 import PurchaseOrderInvoiceListComponent from './Components/PurchaseOrderInvoice/PurchaseOrderInvoiceListComponent.vue';
 import PurchaseOrderInvoiceDetailComponent from './Components/PurchaseOrderInvoice/PurchaseOrderInvoiceDetailComponent.vue';
 import WorkingCapitalComponent from './Components/WorkingCapital/WorkingCapitalComponent.vue';
+import ProfitAndLossComponent from './Components/ProfitAndLoss/ProfitAndLossComponent.vue';
+import TrialBalanceComponent from './Components/TrialBalance/TrialBalanceComponent.vue';
 import ApBalancesComponent from './Components/ApBalances/ApBalancesComponent.vue';
 import CreditorBalancesComponent from './Components/CreditorBalances/CreditorBalancesComponent.vue';
 
@@ -172,6 +179,7 @@ import DutyComponent from './Components/Duty/DutyComponent.vue';
 import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
 import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
 import AssetDepreciationBalanceList from './Components/AssetDepreciationBalance/AssetDepreciationBalanceList.vue';
+import FixedAssetDepreciationList from './Components/AssetDepreciationBalance/FixedAssetDepreciationList.vue';
 import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue';
 import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue';
 import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue';
@@ -217,10 +225,62 @@ import SalaryCalculateComponent from './Components/SalaryCalculate/SalaryCalcula
 import PaySlipComponent from './Components/SalaryCalculate/PaySlipComponent.vue';
 import ResignationCategoriesCrudComponent from './Components/ResignationCategories/ResignationCategoriesCrudComponent.vue';
 import ResignationCrudComponent from './Components/Resignations/ResignationCrudComponent.vue';
+import EventCrudComponent from './Components/Events/EventCrudComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
+import PosSaleReportComponent from './Components/Pos/SaleReports/PosSaleReportComponent.vue';
+import PosOrderComponent from './Components/Pos/Home/PosOrderComponent.vue';
+
+
+import CvFormComponent from './Components/CV/CvFormComponent.vue';
+import CvListComponent from './Components/CV/CvListComponent.vue';
+import CvDetailComponent from './Components/CV/CvDetailComponent.vue';
+import ExamListComponent from './Components/Exams/ExamListComponent.vue';
+import ExamCreateComponent from './Components/Exams/ExamCreateComponent.vue';
+import ExamEditComponent from './Components/Exams/ExamEditComponent.vue';
+import InterviewListComponent from './Components/Interviews/InterviewListComponent.vue';
+import InterviewCreateComponent from './Components/Interviews/InterviewCreateComponent.vue';
+import InterviewResultComponent from './Components/Interviews/InterviewResultComponent.vue';
+import LocationListComponent from './Components/Locations/LocationListComponent.vue';
+import LocationDetailComponent from './Components/Locations/LocationDetailComponent.vue';
+import JdCrudComponent from './Components/JobDescription/JdCrudComponent.vue';
+import JsListComponent from './Components/JobSpecification/JsListComponent.vue';
+import JsCreateComponent from './Components/JobSpecification/JsCreateComponent.vue';
+import JsEditComponent from './Components/JobSpecification/JsEditComponent.vue';
+import SopListComponent from './Components/SOP/SopListComponent.vue';
+import SopCreateComponent from './Components/SOP/SopCreateComponent.vue';
+import OkrAssignComponent from './Components/OkrAssign/OkrAssignComponent.vue';
+import OkrAssignCreateComponent from './Components/OkrAssign/OkrAssignCreateComponent.vue';
+import OkrAssignEditComponent from './Components/OkrAssign/OkrAssignEditComponent.vue';
+import HandbooksListComponent from './Components/Handbooks/HandbooksListComponent.vue';
+import HandbooksCreateComponent from './Components/Handbooks/HandbooksCreateComponent.vue';
+import ShiftAssignmentListComponent from './Components/ShiftAssignment/ShiftAssignmentListComponent.vue';
+import ShiftAssignmentCreateComponent from './Components/ShiftAssignment/ShiftAssignmentCreateComponent.vue';
+import AssetAssignmentCrudComponent from './Components/AssetAssignment/AssetAssignmentCrudComponent.vue';
+import EquipmentAssignmentListComponent from './Components/EquipmentAssignment/EquipmentAssignmentListComponent.vue';
+import EquipmentAssignmentCreateComponent from './Components/EquipmentAssignment/EquipmentAssignmentCreateComponent.vue';
+import ShiftCrudComponent from './Components/Shift/ShiftCrudComponent.vue';
+import PosCashbookHistoryComponent from './Components/Pos/Cashbook/PosCashbookHistoryComponent.vue';
+import CashbookHistoryComponent from './Components/Cashbook/CashbookHistoryComponent.vue';
+import AccrualsCrudComponent from './Components/Accruals/AccrualsCrudComponent.vue';
+import AccrualsListComponent from './Components/Accruals/AccrualsListComponent.vue';
+import LoansListComponent from './Components/Loans/LoansListComponent.vue';
+import LoanDetailsComponent from './Components/Loans/LoanDetailsComponent.vue';
+import SaleLedgerComponent from './Components/SaleLedgers/SaleLedgerComponent.vue';
+import SaleLedgerKtvComponent from './Components/SaleLedgers/SaleLedgerKtvComponent.vue';
+import SaleLedgerRestaurantComponent from './Components/SaleLedgers/SaleLedgerRestaurantComponent.vue';
+import SideBarComponent from './Components/Common/SideBarComponent.vue';
+// import KtvReportComponent from './Components/KtvReport/KtvReportComponent.vue';
+import DailyAreaSalesByStaffReport from './Components/CateringReport/DailyAreaSalesByStaffReport.vue';
+import TargetActualMenuSalesReport from './Components/CateringReport/TargetActualMenuSalesReport.vue';
+import KtvReportChartComponent from './Components/KtvReport/KtvReportChartComponent.vue';
+import BarReportChartComponent from './Components/BarReport/BarReportChartComponent.vue';
+import KitchenReportChartComponent from './Components/KitchenReport/KitchenReportChartComponent.vue';
+import KtvMenuSaleComponent from './Components/KitchenMenuSale/KtvMenuSaleComponent.vue';
+import SkyMenuSaleComponent from './Components/KitchenMenuSale/SkyMenuSaleComponent.vue';
+
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -293,6 +353,8 @@ app.component('ArrivalItemsComponent', ArrivalItemsComponent);
 app.component('PurchaseOrderInvoiceListComponent', PurchaseOrderInvoiceListComponent);
 app.component('PurchaseOrderInvoiceDetailComponent', PurchaseOrderInvoiceDetailComponent);
 app.component('WorkingCapitalComponent', WorkingCapitalComponent);
+app.component('ProfitAndLossComponent', ProfitAndLossComponent);
+app.component('TrialBalanceComponent', TrialBalanceComponent);
 app.component('ApBalancesComponent', ApBalancesComponent);
 app.component('CreditorBalancesComponent', CreditorBalancesComponent);
 
@@ -305,7 +367,10 @@ app.component('ConfirmPurchaseOrderItemsComponent', ConfirmPurchaseOrderItemsCom
 app.component('PurchaseOrderWithLeftItemsComponent', PurchaseOrderWithLeftItemsComponent);
 app.component('LeftItemListComponent', LeftItemListComponent);
 app.component('BrandCrudComponent', BrandCrudComponent);
-app.component('ItemCrudComponent', ItemCrudComponent);
+app.component('ItemListComponent', ItemListComponent);
+app.component('ItemCreateComponent', ItemCreateComponent);
+app.component('ItemEditComponent', ItemEditComponent);
+app.component('SellingExtraListComponent', SellingExtraListComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
 app.component('ItemSuppliersComponent', ItemSuppliersComponent);
 app.component('SupplierBrandsComponent', SupplierBrandsComponent);
@@ -375,6 +440,7 @@ app.component('ItemUsageForecastListMonth',ItemUsageForecastListMonth);
 app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthWithDepartment);
 app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
 app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
+app.component('FixedAssetDepreciationList',FixedAssetDepreciationList);
 app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
 app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
 app.component('SaleTargetPositionEditComponent',SaleTargetPositionEditComponent);
@@ -417,13 +483,68 @@ app.component('SalaryCalculateComponent',SalaryCalculateComponent);
 app.component('PaySlipComponent',PaySlipComponent);
 app.component('ResignationCategoriesCrudComponent',ResignationCategoriesCrudComponent);
 app.component('ResignationCrudComponent',ResignationCrudComponent);
+app.component('EventCrudComponent',EventCrudComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
+app.component('PosSaleReportComponent',PosSaleReportComponent);
+app.component('PosOrderComponent',PosOrderComponent);
 
+
+app.component('CvFormComponent',CvFormComponent);
+app.component('CvListComponent',CvListComponent);
+app.component('CvDetailComponent',CvDetailComponent);
+app.component('ExamListComponent',ExamListComponent);
+app.component('ExamCreateComponent',ExamCreateComponent);
+app.component('ExamEditComponent',ExamEditComponent);
+app.component('InterviewListComponent',InterviewListComponent);
+app.component('InterviewCreateComponent',InterviewCreateComponent);
+app.component('InterviewResultComponent',InterviewResultComponent);
+app.component('LocationListComponent',LocationListComponent);
+app.component('LocationDetailComponent',LocationDetailComponent);
+app.component('JdCrudComponent',JdCrudComponent);
+app.component('JsListComponent',JsListComponent);
+app.component('JsCreateComponent',JsCreateComponent);
+app.component('JsEditComponent',JsEditComponent);
+app.component('SopListComponent',SopListComponent);
+app.component('SopCreateComponent',SopCreateComponent);
+app.component('OkrAssignComponent',OkrAssignComponent);
+app.component('OkrAssignCreateComponent',OkrAssignCreateComponent);
+app.component('OkrAssignEditComponent',OkrAssignEditComponent);
+app.component('HandbooksListComponent',HandbooksListComponent);
+app.component('HandbooksCreateComponent',HandbooksCreateComponent);
+app.component('ShiftAssignmentListComponent',ShiftAssignmentListComponent);
+app.component('ShiftAssignmentCreateComponent',ShiftAssignmentCreateComponent);
+app.component('AssetAssignmentCrudComponent',AssetAssignmentCrudComponent);
+app.component('EquipmentAssignmentListComponent',EquipmentAssignmentListComponent);
+app.component('EquipmentAssignmentCreateComponent',EquipmentAssignmentCreateComponent);
+app.component('ShiftCrudComponent',ShiftCrudComponent);
+app.component('PosCashbookHistoryComponent',PosCashbookHistoryComponent);
+app.component('CashbookHistoryComponent',CashbookHistoryComponent);
+app.component('AccrualsCrudComponent',AccrualsCrudComponent);
+app.component('AccrualsListComponent',AccrualsListComponent);
+app.component('LoansListComponent',LoansListComponent);
+app.component('LoanDetailsComponent', LoanDetailsComponent);
+app.component('SaleLedgerComponent',SaleLedgerComponent);
+app.component('SaleLedgerKtvComponent',SaleLedgerKtvComponent);
+app.component('SaleLedgerRestaurantComponent',SaleLedgerRestaurantComponent);
+app.component('SideBarComponent',SideBarComponent);
+// app.component('KtvReportComponent',KtvReportComponent);
+app.component('DailyAreaSalesByStaffReport',DailyAreaSalesByStaffReport);
+app.component('TargetActualMenuSalesReport',TargetActualMenuSalesReport);
+app.component('KtvReportChartComponent',KtvReportChartComponent);
+app.component('BarReportChartComponent',BarReportChartComponent);
+app.component('KitchenReportChartComponent',KitchenReportChartComponent);
+app.component('KtvMenuSaleComponent',KtvMenuSaleComponent);
+app.component('SkyMenuSaleComponent',SkyMenuSaleComponent);
+
+const toastificationOptions = {};
 app.use(store);
 app.use(Notifications);
+app.use(Toast, toastificationOptions);
 app.mount('#app');
+
+
 
 

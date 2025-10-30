@@ -1,28 +1,30 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Tables
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-
-                    <i class="fal fa-search"></i>
-                </label>
-
-                <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-                <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Tables
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
 
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="[name = null,pricePerHour = 0]">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label>
+
+                    <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+                    <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-show="feature.includes('table.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="[name = null,pricePerHour = 0]">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -49,6 +51,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -66,7 +73,7 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ room.price_per_hour }}
                                     </td>
-                                    <td class="whitespace-nowrap ">
+                                    <td class="whitespace-nowrap " v-show="feature.includes('table.toggle')">
                                         <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(room.id)"
                                     data-te-toggle="modal" data-te-target="#deleteModal">
                                         <i class="fas fa-trash-alt"></i>
@@ -86,6 +93,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="tableList.length < 1">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -164,7 +176,7 @@
                                 </label>
                                 <select name="" id="" v-model="area_id" class="input-ui ">
                                     <option :value="area.id" v-for="(area, index) in areaList" :key="index">{{ area.name
-                                        }}</option>
+                                        }}  ( {{area.area_type.name}} )</option>
                                 </select>
                             </div>
 
@@ -176,10 +188,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createBtnClicked"
+                            <!-- <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @click="createBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -246,8 +264,14 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
+    components: {
+            TableSkeleton,
+            LoadingButton
+    },
     data() {
         return {
             tableList: [],
@@ -268,19 +292,26 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            feature: this.getFeature(),
+            loading: true,
+            buttonLoading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken', 'getFeature']),
 
         async getTableList(pageNumber) {
+                this.loading = true;
+                console.log('loading');
             let url=`/api/entities?type=table&page=${pageNumber}`;
             if (this.searchInput) {
                 url = `/api/entities?type=table&search_input=${this.searchInput}&page=${pageNumber}`;
             }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.tableList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
@@ -318,10 +349,29 @@ export default {
         // },
 
         createBtnClicked() {
-            this.createTableAndRoom();
+            if(!this.name){
+                this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            else if(this.pricePerHour < 1){
+                this.alertValidationMessage(`Price Per Hour`);
+                return 1;
+            }
+            else if(!this.entityType){
+                this.alertValidationMessage(`Entity Type`);
+                return 1;
+            }
+            else if(!this.area_id){
+                this.alertValidationMessage(`Area Id`);
+                return 1;
+            }
+            else{
+                this.createTableAndRoom();
+            }
         },
 
         async createTableAndRoom() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('price_per_hour', this.pricePerHour);
@@ -334,9 +384,16 @@ export default {
                 console.log("success")
                 this.closeModal();
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
@@ -391,6 +448,13 @@ export default {
             this.searchInput = null;
             this.getTableList(1);
         },
+        alertValidationMessage(field) {
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: 'warn'
+                });
+            },
     },
 
     created() {

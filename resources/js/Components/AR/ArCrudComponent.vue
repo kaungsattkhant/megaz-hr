@@ -1,26 +1,28 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            AR
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    AR
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <notifications position="top center" />
 
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal" v-show="feature.includes('ar.create')">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -39,11 +41,16 @@
                                     Receivable Amount
                                 </th>
 
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="feature.includes('ar-payment.create')">
 
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(ar,index) in arList" :key="index">
@@ -57,7 +64,7 @@
                                     <td class="whitespace-nowrap">
                                         {{ ar.ar_balance }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap" v-show="feature.includes('ar-payment.create')">
                                         <button id="edit-btn" class="pr-3 transition duration-150 ease-in-out"
                                         @click="btnClickedPaidModal(ar)"
                                         data-te-toggle="modal" data-te-target="#paid_modal">
@@ -66,6 +73,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="arList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -228,8 +240,12 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
                 arList:[],
@@ -251,15 +267,19 @@
                 lastPage: 0,
                 totalData:0,
 
+                feature: this.getFeature(),
+                loading: false,
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getFeature']),
 
             async getArList(pageNumber){
+                this.loading = true;
                 const response = await getApiData({ url: '/api/account_receivable_lists?page='+pageNumber, token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.arList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;

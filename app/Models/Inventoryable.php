@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Inventory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Inventoryable extends Model
 {
@@ -20,8 +21,11 @@ class Inventoryable extends Model
 
     public function inventory()
     {
-        return $this->belongsTo(\App\Models\Inventory::class);
+        return $this->belongsTo(Inventory::class);
     }
 
-
+    // public function department()
+    // {
+    //     return $this->belongsTo(Department::class);
+    // }
 }

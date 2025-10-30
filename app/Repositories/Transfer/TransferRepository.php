@@ -2,13 +2,14 @@
 
 namespace App\Repositories\Transfer;
 
-use App\Http\Action\Common\Conversion;
-use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
-use App\Http\Action\Inventory\InventoryLedger;
-use App\Http\Action\Inventory\StoreInventory;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
+use App\Models\InventoryLedger;
+use App\Http\Action\Inventory\InventoryLedger as InventoryLedgerAction;
 use Illuminate\Support\Facades\DB;
+use App\Http\Action\Common\Conversion;
+use App\Http\Action\Inventory\StoreInventory;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class TransferRepository implements TransferRepositoryInterface
 {
@@ -110,8 +111,7 @@ class TransferRepository implements TransferRepositoryInterface
             // $uom_conversion = (new Conversion($request->uom_id, $request->base_uom_id))->run();
             #check is enough transfer quantity
             $quantity=$data['type']=='base_uom' ? $data['uom_conversion'] * $request->quantity : $request->quantity;
-            (new InventoryLedger($request->source_inventory_id))->isEnoughQuantityByItem($request->item_id, $quantity);
-
+            (new InventoryLedgerAction($request->source_inventory_id))->isEnoughQuantityByItem($data['item_id'], $quantity);
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'transfer_id', $count);
             $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['transfer_id'] = $transfer_id;
@@ -140,23 +140,25 @@ class TransferRepository implements TransferRepositoryInterface
         $from_date = convertDateFormat($request->from_date);
         $to_date = convertDateFormat($request->to_date);
         $inventory_ids = InventoryIds();
-        return Transfer::with(['item', 'uom','created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+        $transfer= Transfer::with(['item', 'uom','created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
             ->when($request->status, function ($q) use ($request) {
                 $q->where('status', $request->status);
             })
             ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date) {
-                $q->whereBetween(DB::raw('DATE(transfers.confirmed_by)'), [$from_date, $to_date]);
+                $q->whereBetween(DB::raw('DATE(transfers.date)'), [$from_date, $to_date]);
             })
             ->when(($request->from_date && $request->to_date == null), function ($q) use ($from_date) {
-                $q->whereDate('transfers.confirmed_by', '>=', $from_date);
+                $q->whereDate('transfers.date', '>=', $from_date);
             })
             ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date) {
-                $q->whereBetween('transfers.confirmed_by', [now(), $to_date]);
+                $q->whereBetween('transfers.date', [now(), $to_date]);
             })
-            ->when(checkDepartmentAndRoles('Inventory', ['Staff']), function ($q) use ($inventory_ids) {
-                $q->whereIn('destination_inventory_id', $inventory_ids);
-            })
+            // ->when(checkDepartmentAndRoles('Inventory', ['Staff']), function ($q) use ($inventory_ids) {
+                ->whereIn('destination_inventory_id', $inventory_ids)
+            // })
+            ->orderBy('id','desc')
             ->paginate(config('common.list_count'));
+            return $transfer;
     }
 
     public function confirmTransferItem($request)
@@ -165,6 +167,9 @@ class TransferRepository implements TransferRepositoryInterface
         try {
             // if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
             $transfer = Transfer::find($request->id);
+            if($transfer->status==='complete'){
+                ResponseMessage('Transfer aleady confirmed',419);
+            }
             if ($transfer) {
                 // if ($transfer->confirmed_at != null && $transfer->confirmed_by != null) {
                 //     ResponseMessage('Already checked', 200);
@@ -177,12 +182,28 @@ class TransferRepository implements TransferRepositoryInterface
 
                 #out
                 $inventoryId = $transfer->source_inventory_id;
-                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
-                (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+                $sourceLedger=InventoryLedger::create([
+                    'date'=>now(),
+                    'ledgerable_id'=>$transfer->id,
+                    'ledgerable_type'=>'transfer',
+                    'inventory_id'=>$inventoryId,
+                    'action'=>'out',
+                    'batch_no'=>$transfer->batch_no,
+                ]);
+                // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
+                (new StoreInventory($inventoryId))->storeItemToInventory($sourceLedger, $transfer);
                 #in
                 $inventoryId = $transfer->destination_inventory_id;
-                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
-                (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+                $destinationLedger=InventoryLedger::create([
+                    'date'=>now(),
+                    'ledgerable_id'=>$transfer->id,
+                    'ledgerable_type'=>'transfer',
+                    'inventory_id'=>$inventoryId,
+                    'action'=>'in',
+                    'batch_no'=>$transfer->batch_no,
+                ]);
+                // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
+                (new StoreInventory($inventoryId))->storeItemToInventory($destinationLedger, $transfer);
                 #store inventory
                 DB::commit();
                 ResponseMessage('Update Successfully', 200);

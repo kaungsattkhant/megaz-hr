@@ -1,39 +1,41 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Salary Setup
-        </p>
-    </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+        <div class="card-shadow">
+            <div>
+                <p class=" page-title">
+                    Salary Setup
+                </p>
             </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                        <option :value="department.value" v-for="(department, departmentIndex) in departmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+            <div class="btn-container">
+                <notifications position="top center" />
+                <div class=" flex gap-x-4">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                        <i class="fal fa-search"></i>
+                    </label>
+                    <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                        <option :value="role.value" v-for="(role, roleIndex) in roleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
+                <div class="flex pr-0 gap-x-4">
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                                :key="departmentIndex"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="changeRole"
+                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                    <a href="/salary_setup/create" v-if="feature.includes('salary-setup.create')"
+                        class="add-btn  h-8 whitespace-nowrap">
+                        Add New
+                    </a>
                 </div>
-                <a href="/salary_setup/create"
-                    class="add-btn  h-8 whitespace-nowrap">
-                    Add New
-                </a>
             </div>
         </div>
         <div class="box-container-table">
@@ -60,11 +62,16 @@
                                 <th scope="col" class="">
                                     Net Salary
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class="" v-show="['salary-setup.edit', 'salary-setup.delete'].some(f => feature.includes(f))">
 
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(salary, index) in salaryList" :key="index">
                                 <tr class="">
@@ -88,17 +95,22 @@
                                         {{ salary.net_salary }}
                                     </td>
                                     
-                                    <td class="whitespace-nowrap">
-                                        <a :href="'/salary_setup/'+salary.id+'/edit'" class="pr-3">
+                                    <td class="whitespace-nowrap" v-show="['salary-setup.edit', 'salary-setup.delete'].some(f => feature.includes(f))">
+                                        <a :href="'/salary_setup/'+salary.id+'/edit'" class="pr-3" v-if="feature.includes('salary-setup.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(salary.id)" data-te-toggle="modal"
+                                        <button @click="deleteBtnClicked(salary.id)" data-te-toggle="modal" v-show="feature.includes('salary-setup.delete')"
                                             data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="salaryList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -134,10 +146,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -164,16 +178,20 @@ export default {
             url_role:'',
             deleteId:null,
 
+            feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
-        ...mapGetters(['getUser', 'getDepartment','getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getSalaryList(pageNumber) {
+            this.loading = true;
             let url = this.url + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.salaryList = response.data.data;
             }
         },
@@ -183,7 +201,17 @@ export default {
                 this.departmentList = response.data;
             }
         },
-
+        changeDepartment(){
+            this.roleList = this.selectedDepartment.roles;
+            this.selectedRole = null;
+            this.url_role = '';
+            this.url_department = '?department_id=' + this.selectedDepartment.id;
+            this.getSalaryList();
+        },
+        changeRole(){
+            this.url_role = '&role_id=' + this.selectedRole.id;
+            this.getSalaryList();
+        },
 
         
         // async searchBtnClicked() {
@@ -231,6 +259,7 @@ export default {
     },
     created() {
         this.getSalaryList();
+        this.getDepartmentList();
     }
 }
 </script>
