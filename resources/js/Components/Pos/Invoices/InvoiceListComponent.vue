@@ -28,6 +28,7 @@
                                     <th scope="col" class="px-6 py-4">Room Charges</th>
                                     <th scope="col" class="px-6 py-4">Food</th>
                                     <!-- <th scope="col" class="px-6 py-4">Services</th> -->
+                                     <!-- <th scope="col" class="px-6 py-4">Discount</th> -->
                                     <th scope="col" class="px-6 py-4">Amount</th>
                                     <th scope="col" class="px-6 py-4">Status</th>
                                     <th scope="col" class="px-6 py-4">Action</th>
@@ -39,7 +40,7 @@
                                         {{ invoice.invoice_id }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.invoice_date }}
+                                        {{ friendlyDateTime(invoice.invoice_date) }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ invoice.customer ? invoice.customer.name : 'Default' }}
@@ -48,16 +49,19 @@
                                         <span v-if="invoice.entity">{{ invoice.entity.name }}</span>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.total_session_price}}
+                                        {{ invoice.total_session_price.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.sub_total - invoice.total_session_price }}
+                                        {{ (invoice.total - invoice.total_session_price).toLocaleString() }}
                                     </td>
+                                    <!-- <td class="whitespace-nowrap px-6 py-4">
+                                        {{ (invoice.total_discount).toLocaleString() }}
+                                    </td> -->
                                     <!-- <td class="whitespace-nowrap px-6 py-4">
                                         Service?
                                     </td> -->
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.sub_total }}
+                                        {{ invoice.sub_total.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span :class="invoice.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800 '" class="px-2 py-1 rounded capitalize font-semibold text-sm">
@@ -148,7 +152,7 @@
                                         Food
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.sub_total - invoiceDetail.total_session_price }}
+                                        {{ (invoiceDetail.sub_total - invoiceDetail.total_session_price).toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -164,7 +168,7 @@
                                         Discount
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.discount_value }}
+                                        {{ invoiceDetail.discount_value.toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -172,7 +176,7 @@
                                         Service Charge
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.service_charge }}
+                                        {{ invoiceDetail.service_charge.toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -180,7 +184,7 @@
                                         Tax
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.tax }}
+                                        {{ invoiceDetail.tax.toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -188,7 +192,7 @@
                                         Amount
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.total }}
+                                        {{ invoiceDetail.total.toLocaleString() }}
                                     </td>
                                 </tr>
 
@@ -305,6 +309,7 @@
     import { mapGetters } from "vuex";
     import PosLoadingBtn from "../Common/PosLoadingBtn.vue";
     import Multiselect from "vue-multiselect";
+    import { convertToFriendlyDateTime } from "../../../utilities/datetime-helpers";
 
     export default {
         components: {
@@ -394,7 +399,7 @@
 
             confirmBtnClicked(invoice){
                 this.selectedInvoice = invoice;
-                this.billedTotal = this.selectedInvoice.total;
+                this.billedTotal = this.selectedInvoice.sub_total;
                 this.selectedPayment = null;
                 this.paidAmount = this.billedTotal;
             },
@@ -455,6 +460,10 @@
                 }
                 // Calculate remaining for bank
                 this.bankPaidAmount = this.billedTotal - this.cashPaidAmount;
+            },
+
+            friendlyDateTime(dateTimeStr){
+                return convertToFriendlyDateTime(dateTimeStr, 'datetime');
             },
         },
         mounted()
