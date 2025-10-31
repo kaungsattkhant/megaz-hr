@@ -329,10 +329,12 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if($request->ip()!=="127.0.0.1"){
-                ResponseMessage('Push data is invalid',422);
-            }
-            $inventories = Inventory::whereIn('id', [1,2])->get(); //hot kitchen 555 and bar inventory
+            // if($request->ip()!=="127.0.0.1"){
+            //     ResponseMessage('Push data is invalid',422);
+            // }
+            // $inv=[2,8,9]; //local server
+            $inv=[2,8,9]; //165 server
+            $inventories = Inventory::whereIn('id', $inv)->get(); //hot kitchen 555 and bar inventory
             $items = Item::all();
             $inventoryLedgersData = [];
             $inventoryLedgerItemsData = [];
