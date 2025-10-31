@@ -23,7 +23,7 @@
                                 <i class="fal fa-network-wired"></i>
                             </button>
                             <button v-show="hasAnyPermission([
-                                'item', 'uom-conversion', 'accessory', 'supplier', 
+                                'item', 'uom-conversion', 'accessory', 'supplier',
                               ])" data-tab="tab-item" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Item">
                                 <i class="fal fa-hand-receiving"></i>
                             </button>
@@ -199,7 +199,7 @@
                                 </div>
                             </li>
                             <li  v-show="hasAnyPermission([
-                                'sale-target-menu', 'sale-target-position', 
+                                'sale-target-menu', 'sale-target-position',
                                 ])">
                                 <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
                                     data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseSaleTargetReport"
@@ -301,7 +301,7 @@
                     </div>
                     <div class="tab-content" id="tab-item">
                         <ul v-show="hasAnyPermission([
-                            'item', 'uom-conversion', 'accessory', 'supplier', 
+                            'item', 'uom-conversion', 'accessory', 'supplier',
                           ])">
                             <li>
                                 <p class="sidebar-tab-title">
@@ -323,8 +323,14 @@
                             </li>
                             <li v-show="checkFeaturePermission('uom-conversion')">
                                 <a href="/uoms" class="flex items-center sidebar-gap-x">
-                                    <i class="fal fa-balance-scale"></i>
-                                    UOMs
+                                    <i class="fal fa-weight"></i>
+                                    Units of Measurement (UOM)
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('uom-conversion')">
+                                <a href="/uom_conversions" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-balance-scale-right"></i>
+                                    UOM Conversions
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('accessory')">
@@ -426,8 +432,8 @@
                                     Equipment Assignment
                                 </a>
                             </li>
-    
-                            
+
+
                         </ul>
                     </div>
                     <div class="tab-content" id="tab-salary">
@@ -778,7 +784,7 @@
                                                 KTV Project Cash Book
                                             </a>
                                         </li>
-                                        
+
                                     </ul>
                                 </div>
                             </li>
@@ -821,7 +827,7 @@
                                     Financial Transactions
                                 </a>
                             </li>
-    
+
                             <li>
                                 <button class="flex items-center pl-9 my-2 text-sm sidebar-gap-x" type="button"
                                     data-te-collapse-init data-te-ripple-init data-te-ripple-color="light"
@@ -830,7 +836,7 @@
                                     <i class="fal fa-money-check-alt  pr-3"></i>
                                     Bank Book
                                 </button>
-    
+
                                 <div class="!visible hidden text-center" id="collapseBankbooks" data-te-collapse-item>
                                     <ul>
                                         <li>
@@ -1086,7 +1092,7 @@
             </div>
         </div>
     </nav>
-    
+
 </template>
 
 <script>
@@ -1098,7 +1104,7 @@
     export default{
         data() {
             return {
-                 
+
                 feature: this.getFeature(),
             };
         },
@@ -1112,11 +1118,11 @@
             hasAnyPermission(selectedFeatures) {
                 return selectedFeatures.some(p => this.feature.includes(p));
             }
-            
+
         },
 
         created(){
-             
+
         },
 
         mounted(){

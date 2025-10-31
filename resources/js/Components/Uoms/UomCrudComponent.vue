@@ -44,6 +44,10 @@
                                     Name
                                 </th>
 
+                                <th scope="col" class="  ">
+                                    Code
+                                </th>
+
                                 <th scope="col" class="">
                                     Action
                                 </th>
@@ -65,10 +69,13 @@
                             <div class="contents" v-for="(uom, itemIndex) in uomList" :key="itemIndex">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ per_page * (currentPage - 1) + (++itemIndex) }}
+                                        {{ perPage * (currentPage - 1) + (itemIndex + 1) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ uom.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ uom.uom_code }}
                                     </td>
 
                                     <td class="whitespace-nowrap ">
@@ -98,6 +105,24 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getUomConversionList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getUomConversionList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -136,6 +161,13 @@
                             Uom Name
                         </label>
                         <input type="text" placeholder="Uom" v-model="uom_name" class="input-ui">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Code
+                        </label>
+                        <input type="text" placeholder="Code" v-model="uom_code" class="input-ui">
                     </div>
 
                 </div>
@@ -189,14 +221,26 @@
                         <input type="text" placeholder="Uom" v-model="editUomName"
                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
+
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Code
+                        </label>
+                        <input type="text" placeholder="Code" v-model="editUomCode"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
                 </div>
 
                 <!--Modal footer-->
                 <div class="flex justify-center px-12 mb-6">
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 "
+                    <loading-button
+                    text="Edit"
+                    loading-text="Loading..."
+                    @click="confirmEditBtnClicked"></loading-button>
+                    <!-- <button type="button" class="add-btn focus:outline-none focus:ring-0 "
                         @click="confirmEditBtnClicked" data-te-modal-dismiss>
                         Edit
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -208,10 +252,12 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, putApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -224,14 +270,22 @@ export default {
             baseUnitId: null,
             conversionUnitId: null,
             uom_name:null,
+            uom_code: null,
             uomList:[],
 
             baseUnitedit:null,
             conversionUnitedit:null,
             editUomId:null,
             editUomName:null,
+            editUomCode: null,
 
             loading: true,
+            buttonLoading: false,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
         };
     },
 
@@ -244,11 +298,13 @@ export default {
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
-                this.uomList = response.data.uoms;
+                this.uomList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
-
-
 
         alertValiationMessage(field) {
             this.$notify({
@@ -264,14 +320,19 @@ export default {
                 this.alertValiationMessage(` uom name`);
                 return 1;
             }
+            if(!this.uom_code){
+                this.alertValiationMessage('code');
+                return;
+            }
             let url = `/api/uoms`;
             let formData = new FormData();
             formData.append('name', this.uom_name);
-
+            formData.append('uom_code',this.uom_code);
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 this.getUomList(this.currentPage);
                 this.uom_name = null;
+                this.uom_code = null;
                 // window.location.reload();
             }
         },
@@ -279,18 +340,21 @@ export default {
         editBtnClicked(uom){
             this.editUomId = uom.id;
             this.editUomName = uom.name;
-
+            this.editUomCode = uom.uom_code;
         },
 
         async confirmEditBtnClicked(){
+            this.loadingButton = true;
             let url = `/api/uoms/${this.editUomId}`;
             let formData = new FormData();
             formData.append('name', this.editUomName);
-
+            formData.append('uom_code',this.editUomCode);
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            this.loadingButton = false;
             if(response.success){
                 this.getUomList(this.currentPage);
                 this.editUomName = null;
+                this.editUomCode = null;
             }
         },
 
@@ -304,7 +368,7 @@ export default {
     },
 
     created() {
-        this.getUomList(null);
+        this.getUomList(1);
     },
 
     mounted() {
