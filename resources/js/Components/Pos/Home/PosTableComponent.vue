@@ -162,8 +162,8 @@
                                         Cancel
                                     </button>
                                     <pos-loading-btn
-                                    text="Order 2"
-                                    loading-text="Ordering 2..."
+                                    text="Order"
+                                    loading-text="Ordering..."
                                     :loading="menuOrderBtnLoading"
                                     :explicitDisable="cartMenus.length < 1"
                                     @click="confirmMenuOrder()"
