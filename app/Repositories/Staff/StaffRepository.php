@@ -132,7 +132,7 @@ class StaffRepository implements StaffRepositoryInterface
             }
 
             foreach ($data['feature_ids'] as $featureId) {
-                $staff->features()->attach($featureId);
+                $staff->features()->sync($featureId);
             }
 
             foreach ($data['inventory_ids'] as $inventoryId) {

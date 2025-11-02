@@ -505,6 +505,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('kitchen/total-expenses', 'getKitchenTotalExpense');
         Route::get('monthly-kitchen-menu-total', 'getMonthlyKitchenMenuTotal');//lists
     });
+    Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
+
 
 });
 
@@ -728,5 +730,4 @@ Route::controller(TagController::class)->group(function () {
     Route::post('/tags', 'createTag');
 });
 
-Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
 
