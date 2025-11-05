@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('page_title', 'UOM')
+@section('page_title', 'UOM Conversions')
 
 @section('uom_conversions', 'active-link')
 @section('content')

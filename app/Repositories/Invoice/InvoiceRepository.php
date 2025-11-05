@@ -983,13 +983,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage('This invoice has already been paid.', 419);
         }
         $customer = $invoice->customer;
-        $paidAmount = $request->paid_amount;
+        $paidAmount = ($request->payment_type !== 'split')? $request->paid_amount: ($request->cash_paid_amount + $request->bank_paid_amount);
         $entity = $invoice->entity;
         $authUser = UserData();
         $depositBalance = $customer ? $this->getCustomerDepositBalance($customer->id) : 0;
         try {
             DB::beginTransaction();
-            if ($depositBalance < 1 && $request->paid_amount < 1) {
+            if($depositBalance < 1 && $paidAmount < 1){
                 ResponseMessage('Paid amout must be entered', 400);
             }
 
@@ -1039,8 +1039,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'is_cashier_confirmed' => 0
                 ]);
             }
-            // $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
-            $invoiceCost = $invoice->total - $withdrawalAmt; // included with deposit amount
+            $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
+            // $invoiceCost = $invoice->total - $withdrawalAmt; // included with deposit amount
             if ($depositBalance > 1 && (int) $paidAmount > $invoiceCost) {
                 ResponseMessage('Deposit balance is enough.Customer Deposit Balance is ' . $depositBalance . '.Paid Amount does not require.Invoice cost is ' . $invoiceCost, 419);
             }
@@ -1082,11 +1082,35 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // credit cash
 
             // credit deposit
+            $ledgerTransactionWriter = new StoreTransactionLedger();
 
             $accountFetcher = new AccountFetcher();
-            $cashAccount = ($request->payment_type == 'bank') ? $accountFetcher->getAccountByName('POS Bank') : $accountFetcher->getAccountByName('POS Cash');
+            if ($paidAmount > 0) {
+                if($request->payment_type !== 'split'){
+                    $cashAccount = ($request->payment_type == 'bank') ? $accountFetcher->getAccountByName('POS Bank') : $accountFetcher->getAccountByName('POS Cash');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $request->paid_amount,
+                        'action' => 'debit',
+                        'account_id' => $cashAccount->id
+                    ], $transaction->id);
+                }else{
+                    $cashAccount = $accountFetcher->getAccountByName('POS Cash');
+                    $bankAccount = $accountFetcher->getAccountByName('POS Bank');
 
-            $ledgerTransactionWriter = new StoreTransactionLedger();
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $request->cash_paid_amount,
+                        'action' => 'debit',
+                        'account_id' => $cashAccount->id
+                    ], $transaction->id);
+
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $request->bank_paid_amount,
+                        'action' => 'debit',
+                        'account_id' => $bankAccount->id
+                    ], $transaction->id);
+                }
+            }
+
             // $transaction = Transaction::create([
             //     'date' => now(),
             //     'created_by' => UserData()->id,
@@ -1094,14 +1118,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     'transactionable_type' => 'invoice',
             //     'is_confirmed' => 1,
             // ]);
-            if ($paidAmount > 0) {
-                $ledgerTransactionWriter->storeLedger([
-                    'value' => $request->paid_amount,
-                    'action' => 'debit',
-                    'account_id' => $cashAccount->id
-                ], $transaction->id);
-            }
-
             if ($invoice->total_session_price > 0) {
                 $ledgerTransactionWriter->storeLedger([
                     'value' => $invoice->total_session_price,
@@ -1418,7 +1434,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 + $invoice->birthday_discount
                 + $invoice->customer_level_discount;
 
-            $invoice->total = ($invoice->sub_total + $invoice->service_charge + $invoice->tax) - $invoice->total_discount;
+            $invoice->sub_total = ($invoice->total + $invoice->service_charge + $invoice->tax) - $invoice->total_discount;
 
             $invoice->save();
 

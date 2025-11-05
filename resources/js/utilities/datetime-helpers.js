@@ -46,25 +46,45 @@ export function convertToFriendlyDate(dbDateString)
     return `${month} ${day}, ${year}`;
 }
 
-export function convertToFriendlyDateTime(dbDateString)
-{
-    if(!dbDateString){
-        return null;
+export function convertToFriendlyDateTime(dbDateString, display = 'time') {
+    if (!dbDateString) {
+        return "Invalid datetime";
     }
+
     const date = new Date(dbDateString);
-    const options = {
+    if (isNaN(date)) {
+        return "Invalid datetime";
+    }
+
+    // Define separate format options
+    const dateOptions = {
         year: 'numeric',
         month: 'short',
-        day: '2-digit',
+        day: '2-digit'
+    };
+
+    const timeOptions = {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true
-      };
+    };
 
-      const formattedDate = date.toLocaleDateString('en-US', options);
-      const formattedTime = date.toLocaleTimeString('en-US', options);
+    const dateTimeOptions = {
+        ...dateOptions,
+        ...timeOptions
+    };
 
-      return formattedTime;
+    // Format according to the chosen display type
+    switch (display) {
+        case 'datetime':
+            return date.toLocaleString('en-US', dateTimeOptions);
+        case 'date':
+            return date.toLocaleDateString('en-US', dateOptions);
+        case 'time':
+            return date.toLocaleTimeString('en-US', timeOptions);
+        default:
+            return "Invalid format option";
+    }
 }
 
 export function getFirstDate(dbDateString)
