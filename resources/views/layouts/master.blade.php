@@ -34,12 +34,12 @@
 </head>
 
 <body>
-    <div id="global-loader">
+    <!-- <div id="global-loader">
         <div class="spinner-wrapper">
             <div class="spinner-ring"></div>
             <img src="{{asset('img/logo.png')}}" alt="Loading..." width="100">
         </div>
-    </div>
+    </div> -->
     
 
      <script type="module">

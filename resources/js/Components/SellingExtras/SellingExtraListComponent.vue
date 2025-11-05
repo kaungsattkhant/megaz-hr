@@ -116,7 +116,7 @@
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
+                        aria-label="Close" id="close_create_modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -196,11 +196,17 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" @click="createBtnClicked"
+                    <!-- <button type="button" @click="createBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 " data-te-toggle="modal"
                         data-te-target="#create_modal">
                         Create
-                    </button>
+                    </button> -->
+                    <LoadingButton
+                        :loading="buttonLoading"
+                        text="Create"
+                        loadingText="Creating..."
+                        @click="createBtnClicked"
+                    />
                 </div>
             </div>
         </div>
@@ -221,7 +227,7 @@
                         Update Selling Extra
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" id="close_edit_modal" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -307,6 +313,12 @@
                         data-te-target="#update_modal">
                         Update
                     </button>
+                    <LoadingButton
+                        :loading="buttonLoading"
+                        text="Update"
+                        loadingText="Updating..."
+                        @click="confirmEditBtnClicked"
+                    />
                 </div>
             </div>
         </div>
@@ -369,11 +381,13 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
         Multiselect,
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton,
     },
     data() {
         return {
@@ -402,6 +416,7 @@ export default {
             categoryName: null,
 
             loading: true,
+            buttonLoading: false,
         }
     },
 
@@ -488,6 +503,7 @@ export default {
             }
 
             if(this.creatable){
+                this.buttonLoading = true;
                 let formData = new FormData();
                 formData.append('selling_extra_category_id',this.selectedCategory.id);
                 formData.append('item_id',this.selectedItem.id);
@@ -516,6 +532,9 @@ export default {
                             this.sellingExtras.push(response.data);
                             // this.getSellingExtras();
                         }
+                        setTimeout(() => {
+                            this.buttonLoading = false
+                        }, 500)
                     }
                 });
             }

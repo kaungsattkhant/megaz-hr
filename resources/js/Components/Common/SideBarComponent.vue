@@ -346,7 +346,7 @@
                         <ul v-show="hasAnyPermission([
                             'staff', 'okr-duty', 'meeting', 'training', 'org-new', 'warning',
                             'check-in', 'leave', 'exit-pass', 'resignation',
-                            'shift-assignment', 'equipment-assignment'
+                            'shift-assignment', 'equipment-assignment', 'complaint'
                           ])">
                             <li>
                                 <p class="sidebar-tab-title">
@@ -426,8 +426,12 @@
                                     Equipment Assignment
                                 </a>
                             </li>
-    
-                            
+                            <li v-show="checkFeaturePermission('complaint')">
+                                <a href="{{ route('complains') }}" class="flex items-center @yield('complains') sidebar-gap-x">
+                                    <i class="fal fa-envelope-open-text"></i>
+                                    Complaints
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content" id="tab-salary">
