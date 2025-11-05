@@ -284,10 +284,16 @@
                         </div>
 
                         <div class="flex justify-end px-12 mb-6">
-                            <button type="button" @click="createBtnClicked"
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                :text="modalType === 'create' ? 'Create' : 'Edit'"
+                                loadingText="Creating..."
+                                @click="createBtnClicked"
+                            />
+                            <!-- <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 {{ modalType === 'create' ? 'Create' : 'Edit' }}
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>
@@ -473,10 +479,12 @@ import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -522,6 +530,7 @@ export default {
             modalType: 'create',
 
             loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -745,6 +754,7 @@ export default {
         },
 
         async createInventory() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('inventoryable', JSON.stringify(this.selectedItem));
@@ -763,9 +773,16 @@ export default {
                 // window.location.reload();
                 this.closeModal();
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
@@ -845,6 +862,7 @@ export default {
         },
 
         async confirmEditBtnClicked() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('id', this.editId);
             formData.append('name', this.nameEdit);
@@ -860,9 +878,16 @@ export default {
                 console.log("success")
                 this.closeModal();
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
