@@ -433,7 +433,7 @@
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('complaint')">
-                                <a href="{{ route('complains') }}" class="flex items-center @yield('complains') sidebar-gap-x">
+                                <a href="/complaints" class="flex items-center @yield('complains') sidebar-gap-x">
                                     <i class="fal fa-envelope-open-text"></i>
                                     Complaints
                                 </a>
