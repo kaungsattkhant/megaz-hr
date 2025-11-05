@@ -383,12 +383,20 @@
                             {{ module.module }}
                         </p>
                         <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                            <label v-show="module.features.length > 1" class="block items-center space-x-2 cursor-pointer" @click="toggleGroup(module)">
+                                <span class="text-black break-all capitalize block mb-2"> All </span>
+                                <input
+                                type="checkbox" :checked="isAllSelected(module)"
+                                class="form-checkbox !ml-0.5 h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                                />
+    
+                            </label>
                             <div v-for="feature in module.features" class="">
 
                                 <label class="block items-center space-x-2 cursor-pointer">
                                     <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
                                     <input type="checkbox" :value="feature.id" v-model="selectedFeatures"
-                                        class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer" />
+                                        class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer !ml-0.5"  />
 
                                 </label>
                             </div>
@@ -683,6 +691,36 @@
             collapseRow(rowIndex) {
                 this.expandedRows = this.expandedRows.filter((index) => index !== rowIndex);
             },
+            toggleGroup(items) {
+                const allSelectedd = items.features.every(i => this.selectedFeatures.includes(i.id));
+                console.log('All fruit items selected?', allSelectedd); // true
+
+                items.features.forEach(item => {
+                    // const allSelected = items.features.every(i => this.selectedFeatures.includes(i.id));
+                    // console.log(`All items in  selected?`, allSelected);
+                    // const exists = this.selectedFeatures.some(i => i === item.id);
+
+
+                    if(allSelectedd){
+                        this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                    }
+                    else{
+                        this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                        this.selectedFeatures.push(item.id);
+                    }
+                    
+                });
+                
+            },
+            handleEscape(event) {
+                if (event.key === "Escape") {
+                    this.isShow = false
+                }
+            },
+            isAllSelected(module) {
+                const featureIds = module.features.map(f => f.id)
+                return featureIds.every(id => this.selectedFeatures.includes(id))
+            },
             // seeMore(event){
             //     console.log("hello")
             //     const button = $(event.target);
@@ -708,6 +746,8 @@
             this.getDepartmentList(1);
             this.getFeatureList();
             initTE({ Modal,Select, Ripple });
+            window.addEventListener("keydown", this.handleEscape);
+
         }
     }
 </script>
