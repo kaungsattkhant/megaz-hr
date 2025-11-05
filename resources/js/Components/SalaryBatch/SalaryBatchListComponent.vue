@@ -67,13 +67,6 @@
                         :rows="20"
                         :cols="6"
                         />
-
-                        <tr class=" !text-center" v-else-if="salaryBatchList.length < 1">
-                            <td class="" colspan="5">
-                                No Data Here
-                            </td>
-                        </tr>
-                        <TableSkeleton v-if="loading" :rows="20" :cols="6" />
                         <tbody>
                             <div class="contents" v-for="(batch, index) in salaryBatchList" :key="index">
                                 <tr class="">
