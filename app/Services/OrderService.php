@@ -546,6 +546,7 @@ class OrderService
             $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
             $menuCostQuantity = $item->total_quantity * $quantity;
             if ((float) $stockInInventory < $menuCostQuantity) {
+                // dd($stockInInventory,$menuCostQuantity);
                 return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
             }
         }
