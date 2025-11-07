@@ -18,7 +18,7 @@ class RefreshTargetActualMonthlyMenuSale extends Command
      *
      * @var string
      */
-    protected $signature = 'app:refresh-target-actual-monthly-menu-sale {areaToQuery?}';
+    protected $signature = 'app:refresh-target-actual-monthly-menu-sale {areaIdToQuery?} {areaToQuery?}';
 
     /**
      * The console command description.
@@ -33,26 +33,105 @@ class RefreshTargetActualMonthlyMenuSale extends Command
     public function handle()
     {
         //
+        $areaId = $this->argument('areaIdToQuery');
         $areaArg = $this->argument('areaToQuery');
-        $areaKeyword = ($areaArg)? "%{$areaArg}%": "%Sky%";
-        $targetArea = Area::where('name','like',$areaKeyword)->first();
-        if(!$targetArea){
-            $this->error("No area with the given keyword found for target actual sales report");
-            return;
-        }
+        $targetAreas = collect(); // Initialize an empty collection
 
-        $areaId    = $targetArea->id;
-        $areaName  = $targetArea->name;
+        if ($areaId) {
+            // 1. An ID was provided
+            $targetArea = Area::find($areaId);
+
+            if (!$targetArea) {
+                $this->error("Area with ID [{$areaId}] not found.");
+                Log::error("Area with ID [{$areaId}] not found.");
+                return 1; // Stop the command
+            }
+
+            // Put the single area into the collection
+            $targetAreas = collect([$targetArea]);
+
+        } elseif ($areaArg) {
+            // 2. No ID, but a keyword was provided
+            $areaKeyword = "%{$areaArg}%";
+            $targetAreas = Area::where('name', 'like', $areaKeyword)->get();
+
+            if ($targetAreas->isEmpty()) {
+                $this->error("No areas found matching keyword [{$areaArg}].");
+                Log::error("No areas found matching keyword [{$areaArg}].");
+                return 1; // Stop the command
+            }
+
+        } else {
+            // 3. No ID and no keyword were provided
+            $this->info("No specific area provided. Processing all areas...");
+            Log::info("No specific area provided. Processing all areas...");
+            $targetAreas = Area::where('area_category_id',2)->get();
+        }
 
         $year = now()->year;
         $month = now()->month;
         $monthName = now()->format('M');
 
-        $records = TargetMenu::query()
+        foreach($targetAreas as $targetArea){
+            $areaId    = $targetArea->id;
+            $areaName  = $targetArea->name;
+
+            $records = $this->fetchRecords($areaId, $areaName, $year, $month);
+
+            if($records->count() < 1){
+                $this->warn("No target_actual_monthly_menu_sales data for {$targetArea->name} (id: {$areaId}) to refresh for {$monthName} ({$year})");
+                Log::warning("No target_actual_monthly_menu_sales data for {$targetArea->name} (id: {$areaId}) to refresh for {$monthName} ({$year})");
+                continue;
+            }
+            try{
+                DB::beginTransaction();
+                foreach($records as $record){
+                    DB::table('target_actual_monthly_menu_sales')->updateOrInsert(
+                        [
+                            'year' => $year,
+                            'month_number' => $month,
+                            'area_id' => $record->area_id,
+                            'menu_id' => $record->menu_id,
+                        ],
+                        [
+                            'year' => $year,
+                            'month_number' => $month,
+                            'month_name' => $monthName,
+                            'area_id' => $record->area_id,
+                            'menu_id' => $record->menu_id,
+                            'target_quantity' => $record->target_quantity,
+                            'target_sales_amount' => $record->target_sales_amount,
+                            'actual_quantity' => $record->actual_quantity,
+                            'actual_sales_amount' => $record->actual_sales_amount,
+                            'achieved_percentage' => $record->achieved_percentage,
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
+                    );
+                }
+                DB::commit();
+                $this->info("target_actual_monthly_menu_sales for {$targetArea->name} (id: {$areaId}) refreshed successfully for {$monthName} ({$year})");
+                Log::info("target_actual_monthly_menu_sales for {$targetArea->name} (id: {$areaId}) refreshed successfully for {$monthName} ({$year})");
+            }catch(Exception $e){
+                DB::rollBack();
+                $this->error("Failed to refresh target_actual_monthly_menu_sales for {$targetArea->name} (id: {$areaId}). " . $e->getMessage());
+                Log::error("Failed to refresh target_actual_monthly_menu_sales for {$targetArea->name} (id: {$areaId}). " . $e->getMessage());
+            }
+        }
+
+        $this->info("Done refreshing target_actual_monthly_menu_sales");
+        Log::info("Done refreshing target_actual_monthly_menu_sales");
+    }
+
+    private function fetchRecords($areaId, $areaName, $year, $month)
+    {
+        return TargetMenu::query()
             ->from('target_menus as tm')
-            ->leftJoin('order_items as oi', function ($join) {
+            ->leftJoin('order_items as oi', function ($join) use ($year,$month) {
                 $join->on('oi.area_id', '=', 'tm.area_id')
-                    ->on('oi.menu_id', '=', 'tm.menu_id');
+                    ->on('oi.menu_id', '=', 'tm.menu_id')
+                    ->whereYear('oi.completed_at', $year)
+                    ->whereMonth('oi.completed_at', $month);
             })
             ->join('sale_target_menus as stm', 'tm.sale_target_menu_id', '=', 'stm.id')
             ->join('areas as a', 'tm.area_id', '=', 'a.id')
@@ -63,6 +142,7 @@ class RefreshTargetActualMonthlyMenuSale extends Command
                 $query->where('a.id', $areaId)
                     ->orWhere('a.name', 'like', $areaName);
             })
+            ->whereNotNull('oi.completed_at')
             ->selectRaw('
                 stm.id AS sale_target_menu_id,
                 tm.area_id,
@@ -80,38 +160,5 @@ class RefreshTargetActualMonthlyMenuSale extends Command
             ->orderBy('tm.area_id')
             ->orderBy('tm.menu_id')
             ->get();
-
-        try{
-            DB::beginTransaction();
-            foreach($records as $record){
-                DB::table('target_actual_monthly_menu_sales')->updateOrInsert(
-                    [
-                        'year' => $year,
-                        'month_number' => $month,
-                        'area_id' => $record->area_id,
-                        'menu_id' => $record->menu_id,
-                    ],
-                    [
-                        'year' => $year,
-                        'month_number' => $month,
-                        'month_name' => $monthName,
-                        'area_id' => $record->area_id,
-                        'menu_id' => $record->menu_id,
-                        'target_quantity' => $record->target_quantity,
-                        'target_sales_amount' => $record->target_sales_amount,
-                        'actual_quantity' => $record->actual_quantity,
-                        'actual_sales_amount' => $record->actual_sales_amount,
-                        'achieved_percentage' => $record->achieved_percentage,
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
-            }
-            DB::commit();
-            $this->info("target_actual_monthly_menu_sales for {$targetArea->name} refreshed successfully for {$monthName} ({$year})");
-        }catch(Exception $e){
-            DB::rollBack();
-            $this->error("Failed to refresh target_actual_monthly_menu_sales for {$targetArea->name}: " . $e->getMessage());
-        }
     }
 }

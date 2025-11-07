@@ -36,6 +36,7 @@
                     <tr>
                         <th class="py-3 px-4 text-left">#</th>
                         <th class="py-3 px-4 text-left">Menu</th>
+                        <th class="py-3 px-4 text-left">Area</th>
                         <th class="py-3 px-4 text-left">Target Qty</th>
                         <th class="py-3 px-4 text-left">Target Sales</th>
                         <th class="py-3 px-4 text-left">Actual Qty</th>
@@ -50,6 +51,7 @@
                      <tr v-for="(row, index) in reportRows" :key="index">
                         <td> {{ index + 1 }} </td>
                         <td> {{ row.menu_name }} </td>
+                        <td> {{ row.area_name }} </td>
                         <td> {{ row.target_qty }} </td>
                         <td> {{ row.target_amount.toLocaleString() }} </td>
                         <td> {{ row.actual_qty }} </td>
