@@ -100,34 +100,67 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $today = Carbon::today();
 
+    // $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
+    //   $now = now();
+    //   $graceMinutes = 30; // allow 30 mins early check-in
+    //   $nowTime = $now->format('H:i');
+    //   $graceTime = $now->copy()->addMinutes($graceMinutes)->format('H:i');
+    //   $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+    //     ->where(function ($q) use ($nowTime, $graceTime) {
+    //       $q->where(function ($q1) use ($nowTime, $graceTime): void {
+    //         $q1->where('time_shifts.from_time', '<=', $nowTime)
+    //           ->where('time_shifts.to_time', '>=', $nowTime);
+    //       })
+    //         ->orWhere(function ($q1) use ($nowTime) {
+    //           $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
+    //             ->where(function ($q2) use ($nowTime) {
+    //               $q2->where('time_shifts.from_time', '<=', $nowTime)
+    //                 ->orWhere('time_shifts.to_time', '>=', $nowTime);
+    //             });
+    //         });
+    //     })
+    //     ->where('time_shifts.is_active', 1);
+    // })
+    //   ->where("staff_id", $staffId)
+    //   ->whereHas('timeshift', function ($q) {
+    //     $q->where('is_active', 1);
+    //   })
+    //   ->whereDate('date_time', $today)
+    //   ->first();
     $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
-      $now = now();
-      $graceMinutes = 30; // allow 30 mins early check-in
-      $nowTime = $now->format('H:i');
-      $graceTime = $now->copy()->addMinutes($graceMinutes)->format('H:i');
+      $now = now()->format('H:i');
+      $earlyCheckMinutes = 30; // allow 30 mins early check-in
+
       $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
-        ->where(function ($q) use ($nowTime, $graceTime) {
-          $q->where(function ($q1) use ($nowTime, $graceTime) {
-            $q1->where('time_shifts.from_time', '<=', $graceTime)
-              ->where('time_shifts.to_time', '>=', $nowTime);
+        ->where(function ($q) use ($now, $earlyCheckMinutes) {
+          // Normal shift: from_time < to_time
+          $q->where(function ($q1) use ($now, $earlyCheckMinutes) {
+            $q1->whereRaw("
+                    TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME(? * 60))
+                    AND TIME(?) <= time_shifts.to_time
+                ", [$now, $earlyCheckMinutes, $now]);
           })
-            ->orWhere(function ($q1) use ($nowTime) {
-              $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
-                ->where(function ($q2) use ($nowTime) {
-                  $q2->where('time_shifts.from_time', '<=', $nowTime)
-                    ->orWhere('time_shifts.to_time', '>=', $nowTime);
-                });
-            });
+            // Overnight shift: from_time > to_time
+            ->orWhere(function ($q1) use ($now, $earlyCheckMinutes) {
+            $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
+              ->where(function ($q2) use ($now, $earlyCheckMinutes) {
+                $q2->whereRaw("
+                            TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME(? * 60))
+                            AND TIME(?) <= '23:59:59'
+                        ", [$now, $earlyCheckMinutes, $now])
+                  ->orWhereRaw("
+                            TIME(?) >= '00:00:00' AND TIME(?) <= time_shifts.to_time
+                        ", [$now, $now]);
+              });
+          });
         })
         ->where('time_shifts.is_active', 1);
     })
-      ->where("staff_id", $staffId)
-      ->whereHas('timeshift', function ($q) {
-        $q->where('is_active', 1);
-      })
-      ->whereDate('date_time', $today)
+      ->where('staff_id', $staffId)
+      ->where('status','confirmed')
+      ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
+      ->whereDate('date_time', today())
       ->first();
-
     if (!$existShiftAssign) {
       ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
     }

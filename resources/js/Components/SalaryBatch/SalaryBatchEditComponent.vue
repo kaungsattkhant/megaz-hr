@@ -121,9 +121,15 @@
         </div>
 
         <div>
-            <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
+            <!-- <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
                 Edit Salary Batch
-            </button>
+            </button> -->
+            <LoadingButton
+                :loading="buttonLoading"
+                text="Edit Salary Batch"
+                loadingText="Editing..."
+                @click="btnClickedCreateSalaryBatch()"
+            />
         </div>
     </div>
 </template>
@@ -134,10 +140,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     props: ["salaryBatchId"],
     data() {
@@ -155,6 +163,7 @@ export default {
             salaryBatchList: [],
 
             detail:null,
+            buttonLoading: false,
         };
     },
 
@@ -287,6 +296,7 @@ export default {
                 
             });
             console.log(staff_ids)
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name',this.batch_name);
             formData.append('day_of_monthly',this.date);
@@ -295,6 +305,16 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/salary_batch`);
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
+            }
+            else {
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 

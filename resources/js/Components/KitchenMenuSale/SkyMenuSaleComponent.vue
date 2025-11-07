@@ -5,7 +5,7 @@
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
-                    Accrued / Other Payable
+                    Kitchen For SKY
                 </p>
             </div>
             <div class="btn-container">
@@ -26,11 +26,11 @@
                                 :key="typeIndex"> {{ type.name }} </option>
                         </select>
                     </div> -->
-                    <button type="button" 
+                    <!-- <button type="button" 
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                         Add New
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -44,13 +44,43 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Account
+                                    Menu Item Name
                                 </th>
                                 <th scope="col" class="">
-                                    Category
+                                    Jan
                                 </th>
                                 <th scope="col" class="">
-                                    Balance
+                                    Fab
+                                </th>
+                                <th scope="col" class="">
+                                    March
+                                </th>
+                                <th scope="col" class="">
+                                    April
+                                </th>
+                                <th scope="col" class="">
+                                    May
+                                </th>
+                                <th scope="col" class="">
+                                    Jun
+                                </th>
+                                <th scope="col" class="">
+                                    July
+                                </th>
+                                <th scope="col" class="">
+                                    Aug
+                                </th>
+                                <th scope="col" class="">
+                                    Sep
+                                </th>
+                                <th scope="col" class="">
+                                    Oct
+                                </th>
+                                <th scope="col" class="">
+                                    Nov
+                                </th>
+                                <th scope="col" class="">
+                                    Dec
                                 </th>
                             </tr>
                         </thead>
@@ -68,16 +98,45 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a  :href="'accruals/detail/'+item.account_id" class=" underline underline-offset-2">
-                                            {{ item.account_name }}
-                                        </a>
+                                        {{ item.menu_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.category }}
+                                        {{ item.Jan }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.total_balance }}
+                                        {{ item.Feb }}
                                     </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Mar }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Apr }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.May }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Jun }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Jul }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Aug }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Sep }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Oct }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Nov }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Dec }}
+                                    </td>
+                                    
                                 </tr>
                             </div>
                             <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
@@ -157,126 +216,7 @@
         </div>
 
 
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">    
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-                <div
-                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative flex justify-between py-2 px-6 border-b">
-                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
-                            id="create_modalLabel">
-                            Create
-                        </h5>
-                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
-                            aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-4 w-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                        <div class="mb-6 col-span-3">
-                            <label for="" class="label-form mb-3">
-                                Type
-                            </label>
-                            <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
-                                data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Type" @change="getApAccountList"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black">
-                                    <option :value="type" v-for="(type, index) in typeList"
-                                        :key="index"> {{ type.name }} </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-6 col-span-3">
-                            <label for="" class="label-form mb-3">
-                                Category
-                            </label>
-                            <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
-                                data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Category" @change="getApAccountList"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedCategory" class="input-ui !text-black">
-                                    <option :value="category" v-for="(category, index) in categoryList"
-                                        :key="index"> {{ category.name }} </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-6 col-span-3" v-if="selectedType?.value === 'addition' && selectedCategory?.value === 'other_payable'">
-                            <label for="" class="label-form mb-3">
-                                AP Account
-                            </label>
-                            <multiselect
-                            v-model="selectedApAccount"
-                            :options="apAccountList"
-                            :close-on-select="true"
-                            :clear-on-select="false"
-                            :preserve-search="true"
-                            placeholder="Select Account"
-                            label="name"
-                            track-by="id"
-                            :preselect-first="false" ></multiselect>
-                        </div>
-                        <div class="mb-6 col-span-3">
-                            <label for="" class="label-form mb-3">
-                                Account
-                            </label>
-                            <multiselect
-                            v-model="selectedAccount"
-                            :options="accountList"
-                            :close-on-select="true"
-                            :clear-on-select="false"
-                            :preserve-search="true"
-                            placeholder="Select Account"
-                            label="name"
-                            track-by="id"
-                            :preselect-first="false" ></multiselect>
-                            <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
-                                data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Account"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedAccount" class="input-ui !text-black">
-                                    <option :value="account" v-for="(account, index) in accountList"
-                                        :key="index"> {{ account.name }} </option>
-                                </select>
-                            </div> -->
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                Amount
-                            </label>
-                            <input type="text" placeholder="Amount" v-model="amount" class="input-ui">
-                        </div>
-                        <div class="mb-6 col-span-3" v-show="selectedType?.value === 'settlement'">
-                            <label for="" class="label-form mb-3">
-                                Cashbook
-                            </label>
-                            <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
-                                data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Account"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedCashbook" class="input-ui !text-black">
-                                    <option :value="cashbook" v-for="(cashbook, index) in cashbookList"
-                                        :key="index"> {{ cashbook.name }} </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                        <!--Modal footer-->
-                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss aria-label="Close">
-                                Cancel
-                        </button>
-                        <button type="button" @click="btnClickedAddAccrual()"
-                                class="add-btn focus:outline-none focus:ring-0 " >
-                                Create
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div> 
+        
     </div>
 
 
@@ -297,24 +237,7 @@ export default {
     data() {
         return {
             primaryList: [],
-            typeList: [
-                {name : 'Addition', value: 'addition'},
-                {name : 'Settlement', value: 'settlement'},
-            ],
-            categoryList: [
-                {name : 'Accrued', value: 'accrued'},
-                {name : 'Other_payable', value: 'other_payable'},
-            ],
-            cashbookList: [],
-            apAccountList: [],
-            accountList: [],
-
-            selectedType: null,
-            selectedCategory: null,
-            selectedApAccount: null,
-            selectedAccount: null,
-            amount: null,
-            selectedCashbook: null,
+            
             
             currentPage: 0,
             perPage: 0,
@@ -323,7 +246,7 @@ export default {
 
             searchInput:null,
 
-            url:'/api/accruals',
+            url:'/api/report/monthly-kitchen-menu-total?area_type=bar_and_restaurant',
             url_search:'',
             deleteId:null,
 
@@ -347,110 +270,7 @@ export default {
                     this.perPage = response.data.per_page;
             }
         },
-        async getApAccountList(){
-            if(this.selectedType && this.selectedCategory){
-                let url = `/api/other-payable-accounts`;
-                let response = await getApiData({ url: url, token: this.getToken() });
-                if (response.data) {
-                    this.apAccountList = response.data;
-                }
-                else{
-                    this.$notify({
-                        title: 'Input validation',
-                        text: response.error,
-                        type: 'warn'
-                    });
-                }
-            }
-        },
-        async getExpenseAccountList() {
-            let url = `/api/get_expense_accounts`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.accountList = response.data;
-            }
-            else{
-                this.$notify({
-                    title: 'Input validation',
-                    text: response.error,
-                    type: 'warn'
-                });
-            }
-        },
-        async getCashAccountList() {
-            let url = `/api/get_cash_account`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.cashbookList = response.data;
-            }
-            else{
-                this.$notify({
-                    title: 'Input validation',
-                    text: response.error,
-                    type: 'warn'
-                });
-            }
-        },
-        addBtnClicked(){
-            this.selectedType = null;
-            this.selectedCategory = null;
-            this.amount = null;
-            this.selectedAccount = null;
-            this.selectedCashbook = null;
-        },
-        btnClickedAddAccrual(){
-            if(!this.selectedType){
-                this.alertValidationMessage(`Type`);
-                return 1;
-            }
-            else if(!this.selectedCategory){
-                this.alertValidationMessage(`Category`);
-                return 1;
-            }
-            else if(!this.selectedAccount){
-                this.alertValidationMessage(`Account`);
-                return 1;
-            }
-            else if(!this.amount){
-                this.alertValidationMessage(`Amount`);
-                return 1;
-            }
-            else if(this.selectedType.value === 'settlement' && !this.selectedCashbook){
-                this.alertValidationMessage(`Cashbook`);
-                return 1;
-            }
-            else{
-                this.addAccrual();
-            }
-        },
-        async addAccrual(){
-            let formData = new FormData();
-            formData.append('type', this.selectedType.value);
-            formData.append('category', this.selectedCategory.value);
-            if(this.selectedType.value === 'addition' && this.selectedCategory.value === 'other_payable'){
-                formData.append('other_payable_account_id',this.selectedApAccount.id);
-                formData.append('other_payable_account_code',this.selectedApAccount.account_code);
-            }
-            formData.append('expense_account_id', this.selectedAccount.id);
-            formData.append('expense_account_code', this.selectedAccount.account_code);
-            formData.append('amount',this.amount);
-            if(this.selectedType.value === 'settlement'){
-                
-                formData.append('cash_account_id',this.selectedCashbook.id);
-            }
-            let response = await postApiData({url:`/api/accruals`, form_data:formData, token:this.getToken()})
-            if(response.success){
-                this.getPrimaryList();
-                document.getElementById('close_create_modal').click();
-            }
-            else{
-                this.$notify({
-                    title: 'Input validation',
-                    text: response.error,
-                    type: 'warn'
-                });
-            }
-        },
+        
 
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
@@ -498,8 +318,6 @@ export default {
     created() {
 
         this.getPrimaryList(1);
-        this.getExpenseAccountList();
-        this.getCashAccountList();
     }
 }
 </script>

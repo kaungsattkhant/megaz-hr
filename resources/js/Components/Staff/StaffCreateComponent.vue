@@ -679,9 +679,9 @@
         leave-to-class="opacity-0"
         >
     <div v-show="isFeature" class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008]" @click="btnClickedChangeFeature">
-        <div class="container-card pb-4 px-8 m-16 z-50 overflow-hidden" @click.stop>
-            <div class="mb-6 flex justify-between">
-                <p class="text-lg font-semibold font-inter">
+        <div class="container-card pb-4 px-10 m-16 z-50 overflow-hidden" @click.stop>
+            <div class="mb-8 pt-3 flex justify-between">
+                <p class="text-2xl font-semibold font-inter">
                     Feature
                 </p>
                 <div>
@@ -696,13 +696,21 @@
                         {{ module.module }}
                     </p>
                     <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                        <label class="block items-center space-x-2 cursor-pointer" @click="toggleGroup(module)">
+                            <span class="text-black break-all capitalize block mb-2"> All </span>
+                            <input
+                            type="checkbox" :value="!module"
+                            class="form-checkbox !ml-0 h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                            />
+
+                        </label>
                         <div v-for="feature in module.features" class="">
 
                             <label class="block items-center space-x-2 cursor-pointer">
                                 <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
                                 <input
                                 type="checkbox" :value="feature.id" v-model="selectedFeatures"
-                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer !ml-1"
                                 />
 
                             </label>
@@ -1414,6 +1422,11 @@ export default {
                 
             });
             
+        },
+        handleEscape(event) {
+            if (event.key === "Escape") {
+                this.isFeature = false
+            }
         }
     },
 
@@ -1432,6 +1445,8 @@ export default {
     mounted() {
         initTE({ Modal, Select, Ripple });
         this.joinedDate = this.formatDate(this.joinedDate, '-', 'dd-mm-yyyy', '-', ['year','month','day']);
+        window.addEventListener("keydown", this.handleEscape);
+
     }
 }
 </script>

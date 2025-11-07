@@ -5,7 +5,7 @@
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
-                    Kitchen For Sky
+                    Kitchen For KTV
                 </p>
             </div>
             <div class="btn-container">
@@ -47,10 +47,40 @@
                                     Menu Item Name
                                 </th>
                                 <th scope="col" class="">
-                                    Category
+                                    Jan
                                 </th>
                                 <th scope="col" class="">
-                                    Balance
+                                    Fab
+                                </th>
+                                <th scope="col" class="">
+                                    March
+                                </th>
+                                <th scope="col" class="">
+                                    April
+                                </th>
+                                <th scope="col" class="">
+                                    May
+                                </th>
+                                <th scope="col" class="">
+                                    Jun
+                                </th>
+                                <th scope="col" class="">
+                                    July
+                                </th>
+                                <th scope="col" class="">
+                                    Aug
+                                </th>
+                                <th scope="col" class="">
+                                    Sep
+                                </th>
+                                <th scope="col" class="">
+                                    Oct
+                                </th>
+                                <th scope="col" class="">
+                                    Nov
+                                </th>
+                                <th scope="col" class="">
+                                    Dec
                                 </th>
                             </tr>
                         </thead>
@@ -71,11 +101,42 @@
                                         {{ item.menu_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.category }}
+                                        {{ item.Jan }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.total_balance }}
+                                        {{ item.Feb }}
                                     </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Mar }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Apr }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.May }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Jun }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Jul }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Aug }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Sep }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Oct }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Nov }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.Dec }}
+                                    </td>
+                                    
                                 </tr>
                             </div>
                             <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
@@ -209,110 +270,7 @@ export default {
                     this.perPage = response.data.per_page;
             }
         },
-        async getApAccountList(){
-            if(this.selectedType && this.selectedCategory){
-                let url = `/api/other-payable-accounts`;
-                let response = await getApiData({ url: url, token: this.getToken() });
-                if (response.data) {
-                    this.apAccountList = response.data;
-                }
-                else{
-                    this.$notify({
-                        title: 'Input validation',
-                        text: response.error,
-                        type: 'warn'
-                    });
-                }
-            }
-        },
-        async getExpenseAccountList() {
-            let url = `/api/get_expense_accounts`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.accountList = response.data;
-            }
-            else{
-                this.$notify({
-                    title: 'Input validation',
-                    text: response.error,
-                    type: 'warn'
-                });
-            }
-        },
-        async getCashAccountList() {
-            let url = `/api/get_cash_account`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.cashbookList = response.data;
-            }
-            else{
-                this.$notify({
-                    title: 'Input validation',
-                    text: response.error,
-                    type: 'warn'
-                });
-            }
-        },
-        addBtnClicked(){
-            this.selectedType = null;
-            this.selectedCategory = null;
-            this.amount = null;
-            this.selectedAccount = null;
-            this.selectedCashbook = null;
-        },
-        btnClickedAddAccrual(){
-            if(!this.selectedType){
-                this.alertValidationMessage(`Type`);
-                return 1;
-            }
-            else if(!this.selectedCategory){
-                this.alertValidationMessage(`Category`);
-                return 1;
-            }
-            else if(!this.selectedAccount){
-                this.alertValidationMessage(`Account`);
-                return 1;
-            }
-            else if(!this.amount){
-                this.alertValidationMessage(`Amount`);
-                return 1;
-            }
-            else if(this.selectedType.value === 'settlement' && !this.selectedCashbook){
-                this.alertValidationMessage(`Cashbook`);
-                return 1;
-            }
-            else{
-                this.addAccrual();
-            }
-        },
-        async addAccrual(){
-            let formData = new FormData();
-            formData.append('type', this.selectedType.value);
-            formData.append('category', this.selectedCategory.value);
-            if(this.selectedType.value === 'addition' && this.selectedCategory.value === 'other_payable'){
-                formData.append('other_payable_account_id',this.selectedApAccount.id);
-                formData.append('other_payable_account_code',this.selectedApAccount.account_code);
-            }
-            formData.append('expense_account_id', this.selectedAccount.id);
-            formData.append('expense_account_code', this.selectedAccount.account_code);
-            formData.append('amount',this.amount);
-            if(this.selectedType.value === 'settlement'){
-                
-                formData.append('cash_account_id',this.selectedCashbook.id);
-            }
-            let response = await postApiData({url:`/api/accruals`, form_data:formData, token:this.getToken()})
-            if(response.success){
-                this.getPrimaryList();
-                document.getElementById('close_create_modal').click();
-            }
-            else{
-                this.$notify({
-                    title: 'Input validation',
-                    text: response.error,
-                    type: 'warn'
-                });
-            }
-        },
+        
 
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
@@ -360,8 +318,6 @@ export default {
     created() {
 
         this.getPrimaryList(1);
-        this.getExpenseAccountList();
-        this.getCashAccountList();
     }
 }
 </script>

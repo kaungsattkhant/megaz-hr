@@ -2,21 +2,34 @@
 
 namespace App\Repositories\Inventory;
 
+use PDO;
 use Carbon\Carbon;
 use App\Models\Item;
+use App\Models\Menu;
+use App\Models\Pack;
 use App\Models\Staff;
+use App\Models\PackItem;
 use App\Models\Inventory;
+use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
 use App\Models\Inventoryable;
 use App\Models\InventoryItem;
+use App\Models\UomConversion;
+use App\Services\OrderService;
 use App\Models\InventoryLedger;
+use App\Jobs\ProcessInventoryJob;
 use Illuminate\Support\Facades\DB;
 use App\Models\InventoryLedgerItem;
+use Illuminate\Support\Facades\Log;
 use App\Actions\Inventory\GetInventoryStockAction;
-use App\Models\UomConversion;
 
 class InventoryRepository implements InventoryRepositoryInterface
 {
+    private $orderService;
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
     public function listAllData(Request $request)
     {
         $inventory_id = $request->inventory_id ?? '';
@@ -186,7 +199,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         $inventoryId = $request->inventory_id;
         $ledgers = (new GetInventoryStockAction($inventoryId))->run($request);
         // return $ledgers; //no pagination
-        return paginateCollection($ledgers,config('common.list_count'));
+        return paginateCollection($ledgers, config('common.list_count'));
     }
 
     public function inventoryList()
@@ -329,47 +342,413 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if($request->ip()!=="127.0.0.1"){
-                ResponseMessage('Push data is invalid',422);
-            }
-            $inventories = Inventory::whereIn('id', [1,2])->get(); //hot kitchen 555 and bar inventory
-            $items = Item::all();
-            $inventoryLedgersData = [];
-            $inventoryLedgerItemsData = [];
-            $today = Carbon::today();
-            $now = Carbon::now();
+        // if ($request->ip() !== "127.0.0.1") {
+        //     ResponseMessage('Push data is invalid', 422);
+        // }
+        // $inv = []; //local server
+        $inv = [8, 9]; //165 server
+        // $inv = [8]; //165 server
+        $inventories = Inventory::whereIn('id', $inv)->get(); //hot kitchen 555 and bar inventory
+        $items = Item::all();
+        $inventoryLedgersData = [];
+        $inventoryLedgerItemsData = [];
+        $today = Carbon::today();
+        $now = Carbon::now();
 
-            foreach ($inventories as $inventory) {
-                foreach ($items as $item) {
-                    $conversionRate = UomConversion::where('item_id', $item->id)->latest()->first();
-                    if (!$conversionRate) {
-                        ResponseMessage('Uom conversion not found for ' . $item->name, 419);
-                    }
-                    $inventoryLedger = InventoryLedger::create([
-                        'inventory_id' => $inventory->id,
-                        'date' => Carbon::now(),
-                        'action' => 'in',
-                    ]);
-                    $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
-                    $inventoryLedger->batch_no = $batchNo;
-                    $inventoryLedger->save();
-
-                    $inventoryLedger->inventory_ledger_items()->create([
-                        'inventory_id' => $inventory->id,
-                        'item_id' => $item->id,
-                        'inventory_ledger_id' => $inventoryLedger->id,
-                        'quantity' => 500 * $conversionRate->conversion,
-                    ]);
-                
-                }
-            }
-
-            DB::commit();
-            ResponseMessage('Insert successfully', 200);
+        foreach ($inventories as $inventory) {
+            // foreach ($items as $item) {
+            //     $conversionRate = UomConversion::where('item_id', $item->id)->latest()->first();
+            //     if (!$conversionRate) {
+            //         ResponseMessage('Uom conversion not found for ' . $item->name, 419);
+            //     }
+            //     $inventoryLedger = InventoryLedger::create([
+            //         'inventory_id' => $inventory->id,
+            //         'date' => Carbon::now(),
+            //         'action' => 'in',
+            //     ]);
+            //     $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
+            //     $inventoryLedger->batch_no = $batchNo;
+            //     $inventoryLedger->save();
+            //     $inventoryLedger->inventory_ledger_items()->create([
+            //         'inventory_id' => $inventory->id,
+            //         'item_id' => $item->id,
+            //         'inventory_ledger_id' => $inventoryLedger->id,
+            //         'quantity' => 100000 * $conversionRate->conversion,
+            //     ]);
+            // }
+            // ProcessInventoryJob::dispatch($inventory->id, 100)->delay(now()->addSeconds(2));
+            $this->pushPackToInventory($inventory->id, 100);
+        }
+        DB::commit();
+        ResponseMessage('Insert successfully', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function pushPackToInventory($inventoryId, $quantity)
+    {
+
+        // DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        // DB::table('inventory_ledgers')->truncate();
+        // DB::table('inventory_ledger_items')->truncate();
+        // DB::table('packs')->truncate();
+        // DB::table('pack_items')->truncate();
+        // DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+
+
+        $expiredAt = Carbon::now()->addMonth()->endOfMonth();
+        $createdBy = UserData()->id;
+        $now = now();
+
+        $menus = Menu::where('is_active', 1)->get(['id', 'name']);
+        DB::transaction(function () use ($menus, $inventoryId, $quantity, $now, $expiredAt, $createdBy) {
+
+            foreach ($menus as $menu) {
+                $menuId = $menu->id;
+
+                // 🟢 Step 1: Fetch IN items
+                $menuItems = MenuStepItem::join('items', 'menu_step_items.item_id', '=', 'items.id')
+                    ->whereHas('menuStep', fn($q) => $q->where('menu_id', $menuId))
+                    ->select(
+                        'items.id as item_id',
+                        'items.name',
+                        'items.uom_id',
+                        DB::raw('SUM(menu_step_items.quantity) as total_quantity')
+                    )
+                    ->groupBy('items.id', 'items.uom_id', 'items.name')
+                    ->havingRaw('SUM(menu_step_items.quantity) > 0')
+                    ->get();
+
+                if ($menuItems->isEmpty())
+                    continue;
+
+                // 🟢 Step 1 Bulk Insert (IN ledgers + items)
+                $ledgerData = [];
+                $ledgerItemsData = [];
+
+                foreach ($menuItems as $item) {
+                    $batchNo = now()->format('YmdHis') . '_' . $item->item_id;
+
+                    $ledgerData[] = [
+                        'batch_no' => $batchNo,
+                        'inventory_id' => $inventoryId,
+                        'date' => $now,
+                        'action' => 'in',
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                InventoryLedger::insert($ledgerData);
+
+                // Get inserted ledgers
+                $insertedLedgers = InventoryLedger::latest('id')
+                    ->take(count($ledgerData))
+                    ->get()
+                    ->reverse() // match order of insert
+                    ->values();
+
+                foreach ($menuItems as $index => $item) {
+                    $ledgerItemsData[] = [
+                        'inventory_ledger_id' => $insertedLedgers[$index]->id,
+                        'item_id' => $item->item_id,
+                        'quantity' => $item->total_quantity * $quantity,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                InventoryLedgerItem::insert($ledgerItemsData);
+
+                // 🟢 Step 2: Handle ready_to_sale
+                $readyItems = MenuStepItem::join('menu_steps', 'menu_step_items.menu_step_id', '=', 'menu_steps.id')
+                    ->join('items', 'menu_step_items.item_id', '=', 'items.id')
+                    ->where('menu_steps.menu_id', $menuId)
+                    ->where('menu_steps.type', 'ready_to_sale')
+                    ->select(
+                        'items.uom_id',
+                        'items.name',
+                        DB::raw('SUM(menu_step_items.quantity) as total_quantity'),
+                        'menu_step_items.item_id'
+                    )
+                    ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
+                    ->havingRaw('SUM(menu_step_items.quantity) > 0')
+                    ->get();
+
+                if ($readyItems->isEmpty())
+                    continue;
+
+                $itemIds = $readyItems->pluck('item_id');
+                $inventoryData = InventoryLedgerItem::join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+                    ->where('inventory_ledgers.inventory_id', $inventoryId)
+                    ->whereIn('inventory_ledger_items.item_id', $itemIds)
+                    ->select(
+                        'inventory_ledger_items.item_id',
+                        'inventory_ledgers.batch_no',
+                        DB::raw("
+                    SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) -
+                    SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END)
+                    AS in_stock_quantity
+                ")
+                    )
+                    ->groupBy('inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
+                    ->havingRaw('in_stock_quantity > 0')
+                    ->orderBy('inventory_ledgers.created_at', 'asc')
+                    ->get()
+                    ->groupBy('item_id');
+
+                // 🟢 Step 3: Create Packs in Bulk
+                $packData = [];
+                for ($i = 0; $i < $quantity; $i++) {
+                    $packData[] = [
+                        'menu_id' => $menuId,
+                        'date' => $now,
+                        'expired_at' => $expiredAt,
+                        'created_by' => $createdBy,
+                        'status' => 'ready',
+                        'inventory_id' => $inventoryId,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                Pack::insert($packData);
+                $packs = Pack::latest('id')->take($quantity)->get()->reverse()->values();
+
+                $packItemsData = [];
+                // $ledgerOutData = [];
+                // $ledgerOutItemsData = [];
+
+                $ledgerOutData = [];
+                $ledgerOutItemsData = [];
+
+                foreach ($packs as $pack) {
+                    foreach ($readyItems as $item) {
+                        $packItemsData[] = [
+                            'pack_id' => $pack->id,
+                            'item_id' => $item->item_id,
+                            'uom_id' => $item->uom_id,
+                            'quantity' => $item->total_quantity,
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                        $batches = $inventoryData->get($item->item_id, collect());
+                        if ($batches->isEmpty()) {
+                            throw new \Exception("Not enough stock for item {$item->name} in Menu {$menuId}");
+                        }
+
+                        $remainingQty = $item->total_quantity;
+                        foreach ($batches as $batch) {
+                            if ($remainingQty <= 0)
+                                break;
+                            $availableQty = (float) $batch->in_stock_quantity;
+                            if ($availableQty <= 0)
+                                continue;
+
+                            $qtyToTake = min($remainingQty, $availableQty);
+
+                            // build OUT ledger data
+                            $ledgerOutData[] = [
+                                'batch_no' => $batch->batch_no,
+                                'inventory_id' => $inventoryId,
+                                'date' => $now,
+                                'action' => 'out',
+                                'ledgerable_id' => $pack->id,
+                                'ledgerable_type' => 'pack',
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                                // optional: temp field to map later
+                                '_item_id' => $item->item_id,
+                                '_quantity' => $qtyToTake,
+                            ];
+
+                            $remainingQty -= $qtyToTake;
+                        }
+                    }
+                }
+
+                PackItem::insert($packItemsData);
+
+                // 🟢 Bulk insert all OUT ledgers
+                InventoryLedger::insert(collect($ledgerOutData)->map(fn($d) => collect($d)->except(['_item_id', '_quantity'])->toArray())->toArray());
+
+                // 🟢 Retrieve inserted ledgers
+                $insertedOutLedgers = InventoryLedger::latest('id')->take(count($ledgerOutData))->get()->reverse()->values();
+
+                // 🟢 Match them with items
+                foreach ($insertedOutLedgers as $index => $ledger) {
+                    $ledgerOutItemsData[] = [
+                        'inventory_ledger_id' => $ledger->id,
+                        'item_id' => $ledgerOutData[$index]['_item_id'],
+                        'quantity' => $ledgerOutData[$index]['_quantity'],
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+
+                // 🟢 Bulk insert all OUT ledger items
+                InventoryLedgerItem::insert($ledgerOutItemsData);
+            }
+        });
+
+        // foreach ($menus as $menu) {
+        //     $menuId = $menu->id;
+
+        //     // 🟢 Step 1: Create inventory IN ledgers (add stock)
+        //     $menuItems = MenuStepItem::join('items', 'menu_step_items.item_id', '=', 'items.id')
+        //         ->whereHas('menuStep', fn($q) => $q->where('menu_id', $menuId))
+        //         ->select(
+        //             'items.id as item_id',
+        //             'items.name',
+        //             'items.uom_id',
+        //             DB::raw('SUM(menu_step_items.quantity) as total_quantity')
+        //         )
+        //         ->groupBy('items.id', 'items.uom_id', 'items.name')
+        //         ->havingRaw('SUM(menu_step_items.quantity) > 0')
+
+        //         ->get();
+
+
+        //     if ($menuItems->isEmpty()) {
+        //         continue;
+        //     }
+
+        //     foreach ($menuItems as $item) {
+        //         $batchNo = now()->format('YmdHis') . '_' . $item->item_id;
+
+        //         // Create Inventory Ledger (IN)
+        //         $ledger = InventoryLedger::create([
+        //             'batch_no' => $batchNo,
+        //             'inventory_id' => $inventoryId,
+        //             'date' => $now,
+        //             'action' => 'in',
+        //             'created_at' => $now,
+        //             'updated_at' => $now,
+        //         ]);
+
+        //         // Create Ledger Item
+        //         $ledgerItem = $ledger->inventory_ledger_items()->create([
+        //             'item_id' => $item->item_id,
+        //             'quantity' => $item->total_quantity * $quantity, // add stock
+        //             'created_at' => $now,
+        //             'updated_at' => $now,
+        //         ]);
+
+        //     }
+
+        //     // 🟢 Step 2: Only handle pack creation for "ready_to_sale" steps
+        //     $readyItems = MenuStepItem::join('menu_steps', 'menu_step_items.menu_step_id', '=', 'menu_steps.id')
+        //         ->join('items', 'menu_step_items.item_id', '=', 'items.id')
+        //         ->where('menu_steps.menu_id', $menuId)
+        //         ->where('menu_steps.type', 'ready_to_sale')
+        //         ->select(
+        //             'items.uom_id',
+        //             'items.name',
+        //             DB::raw('SUM(menu_step_items.quantity) as total_quantity'),
+        //             'menu_step_items.item_id'
+        //         )
+        //         ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
+        //         ->havingRaw('SUM(menu_step_items.quantity) > 0')
+
+        //         ->get();
+
+        //     if ($readyItems->isEmpty()) {
+        //         continue; // skip if no ready_to_sale items
+        //     }
+
+        //     // 🟢 Step 3: Fetch current inventory stock (IN - OUT)
+        //     $itemIds = $readyItems->pluck('item_id');
+
+        //     $inventoryData = InventoryLedgerItem::join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+        //         ->where('inventory_ledgers.inventory_id', $inventoryId)
+        //         ->whereIn('inventory_ledger_items.item_id', $itemIds)
+        //         ->select(
+        //             'inventory_ledger_items.item_id',
+        //             'inventory_ledgers.batch_no',
+        //             DB::raw("
+        //             SUM(CASE WHEN inventory_ledgers.action = 'in' THEN inventory_ledger_items.quantity ELSE 0 END) -
+        //             SUM(CASE WHEN inventory_ledgers.action = 'out' THEN inventory_ledger_items.quantity ELSE 0 END)
+        //             AS in_stock_quantity
+        //         ")
+        //         )
+        //         ->groupBy('inventory_ledger_items.item_id', 'inventory_ledgers.batch_no')
+        //         ->havingRaw('in_stock_quantity > 0')
+        //         ->orderBy('inventory_ledgers.created_at', 'asc')
+        //         ->get()
+        //         ->groupBy('item_id');
+
+        //     // 🟢 Step 4: Create packs and consume batches
+        //     for ($i = 0; $i < $quantity; $i++) {
+        //         $pack = Pack::create([
+        //             'menu_id' => $menuId,
+        //             'date' => $now,
+        //             'expired_at' => $expiredAt,
+        //             'created_by' => $createdBy,
+        //             'status' => 'ready',
+        //             'inventory_id' => $inventoryId,
+        //         ]);
+
+        //         foreach ($readyItems as $item) {
+        //             // Create Pack Item
+        //             PackItem::create([
+        //                 'pack_id' => $pack->id,
+        //                 'item_id' => $item->item_id,
+        //                 'uom_id' => $item->uom_id,
+        //                 'quantity' => $item->total_quantity,
+        //             ]);
+
+        //             // Fetch inventory batches for this item
+        //             $batches = $inventoryData->get($item->item_id, collect());
+
+        //             if ($batches->isEmpty()) {
+        //                 if ($menuId == 72) {
+        //                     // dd($inventoryData);
+        //                     // dd($readyItems);
+        //                 }
+        //                 throw new \Exception("Not enough stock for item {$item->name} (ID: {$item->item_id}) in Menu ID {$menuId}");
+        //             }
+
+        //             $remainingQty = $item->total_quantity;
+
+        //             foreach ($batches as $batch) {
+        //                 if ($remainingQty <= 0)
+        //                     break;
+
+        //                 $availableQty = (float) $batch->in_stock_quantity;
+        //                 if ($availableQty <= 0)
+        //                     continue;
+
+        //                 $qtyToTake = min($remainingQty, $availableQty);
+
+        //                 // Create OUT ledger for pack consumption
+        //                 $ledgerOut = InventoryLedger::create([
+        //                     'batch_no' => $batch->batch_no,
+        //                     'inventory_id' => $inventoryId,
+        //                     'date' => $now,
+        //                     'action' => 'out',
+        //                     'ledgerable_id' => $pack->id,
+        //                     'ledgerable_type' => 'pack',
+        //                 ]);
+
+        //                 $ledgerOut->inventory_ledger_items()->create([
+        //                     'item_id' => $item->item_id,
+        //                     'quantity' => $qtyToTake,
+        //                 ]);
+
+        //                 $remainingQty -= $qtyToTake;
+        //                 $batch->in_stock_quantity -= $qtyToTake;
+        //             }
+
+        //             if ($remainingQty > 0) {
+        //                 throw new \Exception("Not enough stock to fulfill pack for item {$item->name} in Menu ID {$menuId}");
+        //             }
+        //         }
+        //     }
+        // }
+
     }
 }
