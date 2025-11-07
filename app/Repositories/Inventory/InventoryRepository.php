@@ -377,7 +377,7 @@ class InventoryRepository implements InventoryRepositoryInterface
             //     ]);
             // }
             // ProcessInventoryJob::dispatch($inventory->id, 100)->delay(now()->addSeconds(2));
-            $this->pushPackToInventory($inventory->id, 500);
+            $this->pushPackToInventory($inventory->id, 100);
         }
         DB::commit();
         ResponseMessage('Insert successfully', 200);
