@@ -2,6 +2,8 @@
 
 namespace App\Repositories\TimeShift;
 
+use Exception;
+
 use Carbon\Carbon;
 use App\Models\Gps;
 use App\Models\Shift;
@@ -270,6 +272,26 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     return $results;
   }
 
+  public function adminPostedcheckIn(array $requestData)
+  {
+    $staffId = $requestData['staff_id'];
+    $timeShiftId = $requestData['time_shift_id'];
+    $datetime = $requestData['chek_in_date_time'];
+    try{
+        DB::beginTransaction();
+        $checkIn = CheckIn::create([
+            'staff_id' => $staffId,
+            'time_shift_id' => $timeShiftId,
+            'check_in_date_time' => $datetime,
+            'is_current_checked_in' => true,
+        ]);
+        DB::commit();
+        ResponseData($checkIn);
+    }catch(Exception $e){
+        DB::rollBack();
+        ResponseMessage("Admin check-in posting failed: {$e->getMessage()}", 500);
+    }
+  }
 
   public function checkIn(array $requestData)
   {

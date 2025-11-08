@@ -26,6 +26,7 @@ Route::middleware('auth:api')->group(function () {
     //mobile check in out
     Route::get('/current_time_shifts', 'getCurrentTimeShift');
     Route::post('/check_ins', 'checkIn');
+    Route::post('/check_ins/admin_post', 'adminPostedCheckIn');
     Route::post('/check_ins/{id}', 'checkOut');
 
     //admin panel check in

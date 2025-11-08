@@ -33,6 +33,8 @@ interface TimeShiftRepositoryInterface
 
   public function getCurrentTimeShift($request);
 
+  public function adminPostedcheckIn(array $requestData);
+
   public function checkIn(array $validatedData);
 
   public function checkOut(array $validatedData, $checkInId);
