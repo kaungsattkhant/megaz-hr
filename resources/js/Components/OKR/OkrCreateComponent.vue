@@ -49,7 +49,39 @@
                 </div>
             </div>
             <div class="col-span-6"></div>
+            <div class="mb-4 col-span-4">
+                <label for="" class="label-form mb-3">
+                    Accountable
+                </label>
+                <multiselect v-model="accountableStaff" :options="staffList"
+                    :clear-on-select="false"
+                    :preserve-search="false" placeholder="Accountable" label="name" track-by="id"
+                :preselect-first="false"></multiselect>
+            </div>
+            <div class="mb-4 col-span-4">
+                <label for="" class="label-form mb-3">
+                    Consulted
+                </label>
+                <multiselect v-model="consultedStaff" :options="staffList"
+                    :clear-on-select="false"
+                    :preserve-search="false" placeholder="Consulted" label="name" track-by="id"
+                :preselect-first="false"></multiselect>
+            </div>
+            <div class="mb-4 col-span-4">
+                <label for="" class="label-form mb-3">
+                    Informed
+                </label>
+                <multiselect v-model="informedStaff" :options="staffList"
+                    :clear-on-select="false"
+                    :preserve-search="false" placeholder="Informed" label="name" track-by="id"
+                :preselect-first="false"></multiselect>
+            </div>
+            <!-- <div class="col-span-6">
+                <label for="" class="label-form mb-3">
+                    Consulted
+                </label>
 
+            </div> -->
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Objective
@@ -97,7 +129,7 @@
                 </button>
             </div>
 
-            
+
             <!-- <div class="mb-4 col-span-3"> -->
                 <!-- <label for="" class="label-form mb-3">
                     Date Assigned
@@ -122,28 +154,28 @@
             <!-- <div class="col-span-6"></div> -->
 
 
-            
+
             <!-- <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Duration
                 </label>
                 <input type="number" v-model="duration" class="input-ui ">
             </div> -->
-            
-            
-            
-            
+
+
+
+
 
             <div class="contents">
-                
-                
+
+
                 <!-- <div class="col-span-3">
                     <label for="" class="label-form mb-3">
                         Lead Time ( minutes )
                     </label>
                     <input type="number" v-model="duration" class="input-ui ">
                 </div> -->
-                
+
             </div>
         </div>
 
@@ -165,11 +197,11 @@
                     <tbody>
                         <tr class="" v-for="(keyResult, keyResultIndex) in key_result_list"
                             :key="keyResultIndex">
-                            
+
                             <td class="text-left">
                                 {{ keyResult.name }}
                             </td>
-                            
+
                             <td class="">
                                 <button @click="deleteKey(keyResultIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
@@ -181,10 +213,10 @@
                 </table>
             </div>
 
-            
+
 
         </div>
-        
+
         <div>
             <button class="add-btn" @click="btnclickedCreateOkr()">
                 Create OKR
@@ -238,6 +270,10 @@ export default {
             ],
             selectedType: null,
             selectedRepition: null,
+            staffList: [],
+            accountableStaff: null,
+            consultedStaff: null,
+            informedStaff: null,
         };
     },
 
@@ -249,13 +285,13 @@ export default {
                 return 1;
             }
             else{
-                this.key_result_list.push({ 
+                this.key_result_list.push({
                     name: this.key_result,
                     // department_name:this.selectedDepartment.name,
                     // role_id:this.selectedRole.id,
                     // role_name:this.selectedRole.name,
                     // okr_point: this.selectedOkrPoint,
-                    // assigned_days: this.selectedDate, 
+                    // assigned_days: this.selectedDate,
                     // duration: this.duration
                 });  // Add a new input box
                 // this.selectedDepartment = null;
@@ -301,7 +337,7 @@ export default {
                 });
             }
         },
-        
+
 
         btnclickedCreateOkr(){
             // if(!this.objName){
@@ -352,7 +388,19 @@ export default {
             //     selectedDate.push(date.value)
             // });
             // console.log(selectedDate)
-            
+
+            if(!this.accountableStaff){
+                this.alertValidationMessage("accountable person");
+                return;
+            }
+            if(!this.consultedStaff){
+                this.alertValidationMessage("consulted person");
+                return;
+            }
+            if(!this.informedStaff){
+                this.alertValidationMessage("informed person");
+                return;
+            }
             let formData = new FormData();
             formData.append('objective_name', this.objName);
             formData.append('okr_point', this.selectedOkrPoint);
@@ -360,11 +408,14 @@ export default {
             if(this.selectedType.value === 'daily'){
                 formData.append('repetition', this.selectedRepition);
             }
-            
+
             formData.append('role_id', this.selectedRole.id);
             formData.append('sop_id', this.selectedSop.id);
             // formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.key_result_list));
+            formData.append('accountable_id', this.accountableStaff.id);
+            formData.append('consulted_id', this.consultedStaff.id);
+            formData.append('informed_id', this.informedStaff.id);
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
@@ -389,6 +440,14 @@ export default {
             });
         },
 
+        getStaffList(){
+            getApiData({url: `/api/staffs`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.staffList = response.data;
+                }
+            });
+        },
     },
 
     watch: {
@@ -396,6 +455,7 @@ export default {
 
     async created() {
         this.getDepartment();
+        this.getStaffList();
         // this.getSopList();
 
     },
