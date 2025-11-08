@@ -47,7 +47,33 @@
                 </div>
             </div>
             <div class="col-span-6"></div>
-
+            <div class="mb-4 col-span-4">
+                <label for="" class="label-form mb-3">
+                    Accountable
+                </label>
+                <multiselect v-model="accountableStaff" :options="staffList"
+                    :clear-on-select="false"
+                    :preserve-search="false" placeholder="Accountable" label="name" track-by="id"
+                :preselect-first="false"></multiselect>
+            </div>
+            <div class="mb-4 col-span-4">
+                <label for="" class="label-form mb-3">
+                    Consulted
+                </label>
+                <multiselect v-model="consultedStaff" :options="staffList"
+                    :clear-on-select="false"
+                    :preserve-search="false" placeholder="Consulted" label="name" track-by="id"
+                :preselect-first="false"></multiselect>
+            </div>
+            <div class="mb-4 col-span-4">
+                <label for="" class="label-form mb-3">
+                    Informed
+                </label>
+                <multiselect v-model="informedStaff" :options="staffList"
+                    :clear-on-select="false"
+                    :preserve-search="false" placeholder="Informed" label="name" track-by="id"
+                :preselect-first="false"></multiselect>
+            </div>
 
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
@@ -88,7 +114,7 @@
                 </label>
                 <input type="text" v-model="key_result" class="input-ui ">
             </div>
-            
+
             <div class="">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -115,11 +141,11 @@
                     <tbody>
                         <tr class="" v-for="(keyResult, keyResultIndex) in key_result_list"
                             :key="keyResultIndex">
-                            
+
                             <td class="text-left">
                                 {{ keyResult.name }}
                             </td>
-                            
+
                             <td class="">
                                 <button @click="deleteKey(keyResultIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
@@ -131,7 +157,7 @@
                 </table>
             </div>
         </div>
-        
+
         <div>
             <button class="add-btn" @click="btnclickedCreateOkr()">
                 Edit OKR
@@ -179,6 +205,11 @@ export default {
             ],
             selectedType: null,
             selectedRepition: null,
+
+            staffList: [],
+            accountableStaff: null,
+            consultedStaff: null,
+            informedStaff: null,
         };
     },
 
@@ -188,8 +219,17 @@ export default {
             let response = await getApiData({ url: `/api/objectives/${this.okrId}`, token: this.getToken() });
             if (response.data) {
                 this.okrDetail = response.data[0];
+                if(this.okrDetail.accountable){
+                    this.accountableStaff = this.okrDetail.accountable;
+                }
+                if(this.okrDetail.consulted){
+                    this.consultedStaff = this.okrDetail.consulted;
+                }
+                if(this.okrDetail.informed){
+                    this.informedStaff = this.okrDetail.informed;
+                }
                 if(response.data[0]){
-                    this.addDetail(response.data[0])
+                    this.addDetail(response.data[0]);
                 }
             }
         },
@@ -247,9 +287,9 @@ export default {
                 });
             }
         },
-        
-        
-        
+
+
+
         async getMenuCategoryList(){
             let response = await getApiData({ url: '/api/menu_categories', token: this.getToken() });
             if (response.data) {
@@ -268,14 +308,14 @@ export default {
                 return 1;
             }
             else{
-                this.key_result_list.push({ 
+                this.key_result_list.push({
                     name: this.key_result,
                     // department_name: this.departmentList.find(depart => depart.id === this.selectedDepartment).name,
                     // role_id:this.selectedRole,
                     // role_name:this.roleList.find(role => role.id === this.selectedRole).name,
                     // okr_point: this.selectedOkrPoint,
-                    // assigned_days: this.selectedDate, 
-                    // duration: this.duration 
+                    // assigned_days: this.selectedDate,
+                    // duration: this.duration
                 });
                 this.key_result = null;
                 // this.selectedOkrPoint = null;
@@ -286,7 +326,7 @@ export default {
         deleteKey(index) {
             this.key_result_list.splice(index, 1);
         },
-        
+
 
         btnclickedCreateOkr(){
             if(!this.objName){
@@ -334,6 +374,9 @@ export default {
             formData.append('sop_id', this.selectedSop.id);
             formData.append('objective_key', JSON.stringify(this.key_result_list));
             formData.append('id', +this.okrId);
+            formData.append('accountable_id', this.accountableStaff.id);
+            formData.append('consulted_id', this.consultedStaff.id);
+            formData.append('informed_id', this.informedStaff.id);
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
@@ -353,7 +396,7 @@ export default {
 
         },
 
-        
+
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
@@ -362,6 +405,14 @@ export default {
             });
         },
 
+        getStaffList(){
+            getApiData({url: `/api/staffs`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.staffList = response.data;
+                }
+            });
+        },
     },
 
     watch: {
@@ -370,6 +421,7 @@ export default {
     async created() {
         this.getDepartment();
         this.getOkrDetail();
+        this.getStaffList();
     },
 
     mounted() {
