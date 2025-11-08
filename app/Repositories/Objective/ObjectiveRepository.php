@@ -105,7 +105,7 @@ class ObjectiveRepository implements ObjectiveInterface
         $roleId = $request->input('roleId');
         $type = $request->input('type');
 
-        $query = Objective::with(['role.department', 'sop', 'objectiveKeys'])
+        $query = Objective::with(['role.department', 'sop', 'objectiveKeys','accountable','consulted','informed'])
             ->objectiveFilter($search, $roleId, $type)->orderBy('id', 'desc');
         if ($request->per_page || $request->page) {
             return $query->orderBy('id', 'desc')->paginate(config('common.list_count'));
@@ -120,7 +120,8 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role.department', 'sop', 'objectiveKeys'])->where('id', $objId)->get();
+       
+        return Objective::with(['role.department', 'sop', 'objectiveKeys','accountable','consulted','informed'])->where('id', $objId)->get();
     }
 
     public function deleteObjective($objId)
@@ -318,13 +319,19 @@ class ObjectiveRepository implements ObjectiveInterface
         $staffId = UserData()->id;
 
         $objectiveStaffFilter = function ($query) use ($staffId, $currentDate) {
-            $query->where('staff_id', $staffId)
-                ->whereDate('start_date', $currentDate);
+            $query->where('staff_id', $staffId);
+            // ->whereDate('start_date', $currentDate);
+        };
+        $objectiveDateFilter = function ($query) use ($currentDate) {
+            // $query->where('staff_id', $staffId);
+            $query->whereDate('start_date', $currentDate);
         };
         $objectives = Objective::with([
-            'objectiveStaff' => $objectiveStaffFilter,
+            'objectiveAssigns' => $objectiveStaffFilter,
             'objectiveKeys'
-        ])->whereHas('objectiveStaff', $objectiveStaffFilter)
+        ])
+            ->whereHas('objectiveAssigns', $objectiveStaffFilter)
+            ->whereHas('objectiveAssigns.objectiveStaff', $objectiveDateFilter)
             ->get();
         return $objectives;
         // return ObjectiveResource::collection($objectives);
@@ -350,6 +357,10 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
+        $authUser = UserData()->id ?? null;
+        if (!$authUser) {
+            ResponseMessage('Authorized user not found', 401);
+        }
         $currentDate = now()->toDateString();
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
@@ -363,6 +374,10 @@ class ObjectiveRepository implements ObjectiveInterface
             })->get();
 
         foreach ($objectiveAssigns as $objectiveAssign) {
+            $objectiveAssign->approver = false;
+            if ($objectiveAssign->objective->accountable_id == $authUser) {
+                $objectiveAssign->approver = true;
+            }
             $objType = $objectiveAssign->objective->type;
             if ($objType == 'daily') {
                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
@@ -514,7 +529,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function updateDailyObjective($data, $objStaffId)
     {
-        $objStaff =  ObjectiveStaff::findOrFail($objStaffId);
+        $objStaff = ObjectiveStaff::findOrFail($objStaffId);
         $updateData = [];
         $userId = UserData()->id;
         if (!checkRoles(['Supervisor', 'Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {

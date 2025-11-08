@@ -342,9 +342,9 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
-        // if ($request->ip() !== "127.0.0.1") {
-        //     ResponseMessage('Push data is invalid', 422);
-        // }
+        if ($request->ip() !== "127.0.0.1") {
+            ResponseMessage('Push data is invalid on server', 422);
+        }
         // $inv = []; //local server
         $inv = [8, 9]; //165 server
         // $inv = [8]; //165 server
@@ -377,7 +377,7 @@ class InventoryRepository implements InventoryRepositoryInterface
             //     ]);
             // }
             // ProcessInventoryJob::dispatch($inventory->id, 100)->delay(now()->addSeconds(2));
-            $this->pushPackToInventory($inventory->id, 100);
+            $this->pushPackToInventory($inventory->id, quantity: 500);
         }
         DB::commit();
         ResponseMessage('Insert successfully', 200);
