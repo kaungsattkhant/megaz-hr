@@ -4,7 +4,7 @@
             Task Reports
         </p>
     </div>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="btn-container">
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">

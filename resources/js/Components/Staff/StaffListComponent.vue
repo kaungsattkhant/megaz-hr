@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
 
         <div class="card-shadow">
             <div>
@@ -52,10 +52,10 @@
                                 <th scope="col" class="">
                                     #
                                 </th>
-                                <th scope="col" class=" text-left">
+                                <th scope="col" class=" ">
                                     Name
                                 </th>
-                                <th scope="col" class=" text-left">
+                                <th scope="col" class=" ">
                                     Phone Number
                                 </th>
                                 <th scope="col" class=" ">

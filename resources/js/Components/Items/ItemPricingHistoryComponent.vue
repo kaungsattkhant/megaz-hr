@@ -4,7 +4,7 @@
             Item Pricing History
         </p>
     </div>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="btn-container"></div>
         <div class="box-container-table">
             <div class="overflow-x-auto">

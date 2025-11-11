@@ -1,13 +1,13 @@
 <template>
 
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
-            <div>
+            <div class="pt-2">
                 <p class=" page-title">
                     Check In
                 </p>
             </div>
-            <div class="btn-container pt-10">
+            <div class="btn-container pt-6">
                 <notifications position="top center" />
                 <div class=" flex gap-x-4">
                     <label for="search" class="search-input w-24">

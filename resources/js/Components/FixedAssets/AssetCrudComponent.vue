@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <notifications position="top center" />
         <h1 class="font-bold text-lg text-left px-8 pt-8 mb-4">Asset</h1>
         <div class=" px-8 pt-3 pb-8 flex justify-center">

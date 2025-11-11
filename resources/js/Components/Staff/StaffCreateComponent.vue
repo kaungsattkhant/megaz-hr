@@ -418,6 +418,16 @@
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
+                    Bank Account Number
+                </label>
+                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
+                <div class="mt-1" v-if="bankAccountNumberError">
+                    <span class="px-1 text-red-600 text-sm">{{ bankAccountNumberError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
                     Bank Name
                 </label>
                 <multiselect v-model="selectedBank"
@@ -443,15 +453,7 @@
                 <button data-te-toggle="modal" data-te-target="#add_bank_modal" > <i class="fas fa-plus"></i> </button>
             </div>
 
-            <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="label-form mb-3">
-                    Bank Account Number
-                </label>
-                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
-                <div class="mt-1" v-if="bankAccountNumberError">
-                    <span class="px-1 text-red-600 text-sm">{{ bankAccountNumberError }} *</span>
-                </div>
-            </div>
+            
 
             <div class="col-span-5"></div>
 
@@ -696,11 +698,11 @@
                         {{ module.module }}
                     </p>
                     <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
-                        <label class="block items-center space-x-2 cursor-pointer" @click="toggleGroup(module)">
+                        <label v-show="module.features.length > 1" class="block items-center space-x-2 cursor-pointer" @click="toggleGroup(module)">
                             <span class="text-black break-all capitalize block mb-2"> All </span>
                             <input
-                            type="checkbox" :value="!module"
-                            class="form-checkbox !ml-0 h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                            type="checkbox" :checked="isAllSelected(module)"
+                            class="form-checkbox !ml-0.5 h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
                             />
 
                         </label>
@@ -710,7 +712,7 @@
                                 <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
                                 <input
                                 type="checkbox" :value="feature.id" v-model="selectedFeatures"
-                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer !ml-1"
+                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer !ml-0.5"
                                 />
 
                             </label>
@@ -1427,7 +1429,11 @@ export default {
             if (event.key === "Escape") {
                 this.isFeature = false
             }
-        }
+        },
+        isAllSelected(module) {
+                const featureIds = module.features.map(f => f.id)
+                return featureIds.every(id => this.selectedFeatures.includes(id))
+            },
     },
 
     created() {
