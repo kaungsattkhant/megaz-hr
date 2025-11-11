@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-4 bg-white ">
+    <div class="margin-bg ">
 
         <div class="card-shadow" v-if="feature.includes('salary-calculate.create')">
             <notifications position="top center" />

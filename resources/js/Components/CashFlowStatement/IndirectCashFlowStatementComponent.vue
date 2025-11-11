@@ -4,7 +4,7 @@
             Indirect Cash Flow Statement
         </p>
     </div>
-    <div class="mt-4 bg-white mb-12">
+    <div class="margin-bg mb-12">
         <div class="btn-container">
             <div class=" flex gap-x-4">
                 <!-- <label for="search" class="search-input">

@@ -1,9 +1,9 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
-                <p class=" text-lg font-semibold font-inter px-4 pt-3">
+                <p class=" text-lg font-semibold font-inter px-4 pt-6">
                     Exit Pass
                 </p>
             </div>

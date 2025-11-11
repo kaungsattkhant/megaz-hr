@@ -5,9 +5,9 @@
   src: url("../fonts/Poppins-Regular.ttf") format("truetype"); }
 /* width */
 
-body{
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
+// body{
+//   font-family: 'Plus Jakarta Sans', sans-serif;
+// }
 
 .font-inter{
   font-family: Inter,sans-serif;
@@ -59,13 +59,14 @@ body{
   font-size: 14px;
   // color: black;
   color: rgb(107,114,128);
-  font-family: Inter, sans-serif; 
+  // font-family: Inter, sans-serif; 
+  font-family: 'Poppins';
 }
 
 .side-bar ul li a.active-link {
-  color: white!important;
+  color: #5d87ff!important;
   // background-color: #1111;
-  background-color: #5d87ff!important;
+  // background-color: #5d87ff!important;
   border-radius: 6px; }
 
 .side-bar ul li a:not(.active-link):hover {
@@ -83,7 +84,7 @@ body{
 
 .main-container {
   // background-color: rgb(243,244,246);
-  background-color: #fefefe;
+  background-color: #f0f8ff;
   min-height: 100vh;
   display: flex; }
 
@@ -114,7 +115,8 @@ body{
   font-size: 13px;
   padding: 6px 16px;
   border-radius: 4px;
-  background-color: #5d87ff!important;
+  // background-color: #5d87ff!important;
+  background-color: rgb(0, 158, 247)!important;
   color: white;}
 .cancel-btn {
   font-size: 13px;
@@ -126,7 +128,7 @@ body{
   display: block;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  @extend .font-inter;
+  font-family: 'Poppins';
 }
 
 .input-ui {
@@ -137,7 +139,7 @@ body{
   width: 100%!important;
   background: transparent!important;
   border-radius: 0.35rem!important;
-  @extend .font-inter;
+  font-family: 'Poppins';
 }
 .input-ui:focus{
   outline: none!important;
@@ -165,17 +167,24 @@ body{
 .page-title{
   padding-left: 1rem;
   padding-top: 1rem;
-  @extend .font-inter;
+  font-family: 'Poppins';
+}
+label{
+  font-family: 'Poppins';
 }
 .box-container-table{
   border-radius: 3px;
   box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+  background-color: white;
 }
 .card-shadow{
   box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
   border: 1px solid #f3f4f6;
   margin-bottom: 1.5rem;
   border-radius: 3px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: white;
 }
 .table-container{
   // border: 1px solid #e5e7eb;
@@ -198,7 +207,8 @@ body{
 .primary-table thead tr th{
   padding: 0.75rem;
   // border-right-width: 1px;
-  font-family: Inter, sans-serif;
+  // font-family: Inter, sans-serif;
+  font-family: 'Poppins';
   color: #333335;
 }
 .primary-table tbody tr{
@@ -206,7 +216,8 @@ body{
   td{
     padding: 1rem;
     // border-right-width: 1px;
-    font-family: Inter, sans-serif;
+    // font-family: Inter, sans-serif;
+    font-family: 'Poppins';
       color: #333335;
       font-weight: 500;
   }

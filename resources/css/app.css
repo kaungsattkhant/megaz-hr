@@ -54,6 +54,9 @@
     .sidebar-tab-title{
         @apply text-[#2a3547] text-sm font-semibold ml-1 pl-3 pb-1.5
     }
+    .margin-bg{
+        @apply mt-4 bg-[#f0f8ff]
+    }
     }
 
 

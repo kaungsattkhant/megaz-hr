@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <!-- Date Pickers -->
         <div class="flex flex-col gap-4 mb-6">
             <div class="flex flex-col sm:flex-row gap-4">

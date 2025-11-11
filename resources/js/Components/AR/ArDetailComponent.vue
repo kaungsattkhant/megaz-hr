@@ -4,7 +4,7 @@
             AR Detail
         </p>
     </div>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="btn-container">
             <div class=" flex">
                 <label for="search" class="search-input">

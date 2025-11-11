@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-4 bg-white" v-show="!isShow">
+    <div class="margin-bg" v-show="!isShow">
         <div class="card-shadow">
             <div>
                 <p class="page-title">

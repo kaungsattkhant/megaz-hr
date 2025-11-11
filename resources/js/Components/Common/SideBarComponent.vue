@@ -10,7 +10,7 @@
                 <div class="w-fit h-screen overflow-y-auto pb-20 no-scrollbar border-r border-gray-200" id="icon_sidebar">
                     <div class="w-20 sidebar-bg flex flex-col items-center py-6 space-y-4 text-gray-500">
                         <div class="w-12 h-12 flex items-center justify-center bg-white rounded-lg shadow-md mb-4">
-                            <img src="https://placehold.co/40x15/white/gray?text=cosmos" alt="Logo" class="w-10">
+                            <img src="../../../../public/img/logo.png" alt="Logo" class="w-10">
                         </div>
                         <div class="flex flex-col space-y-4 w-full items-center">
                             <button data-tab="tab1" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Report">
