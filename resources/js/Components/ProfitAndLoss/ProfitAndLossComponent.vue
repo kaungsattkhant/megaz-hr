@@ -58,7 +58,7 @@
                         </thead>
                         <tbody class="!rounded-none">
                             <div class="contents">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td  class=" !font-semibold !rounded-none">
                                         1
                                     </td>
@@ -119,7 +119,7 @@
 
 
                             <div class="contents">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td  class=" !font-semibold !rounded-none">
                                         2
                                     </td>
@@ -179,7 +179,7 @@
                             </div>
 
                             <div class="contents">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td  class=" !font-semibold !rounded-none">
                                         3
                                     </td>
@@ -240,7 +240,7 @@
 
 
                             <div class="contents">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td  class=" !font-semibold !rounded-none">
                                         4
                                     </td>
@@ -300,7 +300,7 @@
                             </div>
 
                             <div class="contents">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td  class=" !font-semibold !rounded-none">
                                         5
                                     </td>
@@ -360,7 +360,7 @@
                             </div>
 
                             <div class="contents">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td  class=" !font-semibold !rounded-none">
                                         6
                                     </td>

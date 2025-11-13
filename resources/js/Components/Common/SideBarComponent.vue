@@ -122,75 +122,75 @@
                                         </li>
                                         <li v-show="checkFeaturePermission('indirect-cash-flow')">
                                             <a href="/indirect_cashflow_statement"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0 ">
                                                 <i class="fal fa-tasks  pr-3"></i>
                                                 Indirect Cash Flow
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('working-capital')">
                                             <a href="/working_capital"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Working Capital
                                             </a>
                                         </li>
                                         <li>
                                             <a href="/profit_and_loss"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Profit And Loss
                                             </a>
                                         </li>
                                         <li>
                                             <a href="/trial_balance"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Trial Balance
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="/sale_ledger" class="flex items-center text-left ">
+                                            <a href="/sale_ledger" class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Sale Ledger
                                             </a>
                                         </li>
                                         <li>
                                             <a href="/sale_ledger_ktv"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Sale Ledger Ktv
                                             </a>
                                         </li>
                                         <li>
                                             <a href="/sale_ledger_restaurant"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Sale Ledger Restaurant
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('ap-balance')">
-                                            <a href="/ap_balances" class="flex items-center text-left ">
+                                            <a href="/ap_balances" class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 AP Balance
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('creditor-balance')">
                                             <a href="/creditor_balances"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Creditor Balance
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('asset-depreciation-balance')">
                                             <a href="/asset_depreciation_balance_list"
-                                                class="flex items-center text-left ">
+                                                class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Current Asset Depreciation
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('asset-depreciation-balance')">
                                             <a href="/fix_asset_depreciation"
-                                            class="flex items-center text-left ">
+                                            class="flex items-center text-left !px-0">
                                                 <i class="fal fa-braille pr-3"></i>
                                                 Fix Asset Depreciation
                                             </a>

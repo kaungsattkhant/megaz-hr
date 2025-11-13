@@ -49,7 +49,7 @@
             </div>
         </div>
         <div v-else class="py-1.5"></div>
-        <div class="box-container-table">
+        <div class="box-container-table pt-3">
             <div class="overflow-x-auto">
                 <div class="table-container">
                     <table class="primary-table">

@@ -5,47 +5,7 @@
                 <p class=" page-title">
                     Items
                 </p>
-                <div class="relative" data-te-dropdown-ref>
-                    <button
-                        class="flex items-center rounded px-6 pb-2 pt-2.5 text-base font-medium uppercase leading-normal
-                        text-black shadow-primary-3 transition duration-150 ease-in-out  hover:shadow-primary-2
-                         focus:shadow-primary-2 focus:outline-none focus:ring-0 
-                        active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong
-                        dark:focus:shadow-dark-strong dark:active:shadow-dark-strong"
-                        type="button" id="test1" data-te-dropdown-toggle-ref aria-expanded="false"
-                        data-te-ripple-init data-te-ripple-color="light" @click="sidebarNotificationTrayExpanded">
-                        Import
-                        <i class="fal fa-file-import"></i>
-                        
-                    </button>
-                    <ul class="absolute z-[1000] float-left m-0 hidden min-w-max list-none py-4 overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-base shadow-lg data-[te-dropdown-show]:block "
-                        aria-labelledby="test1" data-te-dropdown-menu-ref>
-                        <li>
-                            <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item-type.import')">
-                                Import Type
-                                <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
-                            </label>
-                        </li>
-                        <li>
-                            <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item-category.import')">
-                                Import Category
-                                <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
-                            </label>
-                        </li>
-                        <li>
-                            <label for="excel_import" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item.import')">
-                                Import Item
-                                <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
-                            </label>
-                        </li>
-                        <li>
-                            <label for="excel_import_price" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item.import')">
-                                Import Price
-                                <input type="file" placeholder="Excel" id="excel_import_price" class="opacity-0 w-0 h-0 hidden"  @change="handleItemPriceFileChange">
-                            </label>
-                        </li>
-                    </ul>
-                </div>
+                
                 
                 <!-- <div class="flex gap-x-4 pt-4 pr-4">
                     <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
@@ -66,7 +26,7 @@
                     </label>
                 </div> -->
             </div>
-            <div class="btn-container">
+            <div class="btn-container mb-0">
                 <div class=" flex gap-x-4 ">
                     <label for="search" class="search-input">
                         <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
@@ -107,6 +67,43 @@
                         data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                         Add New
                     </button> -->
+                    <div class="relative" data-te-dropdown-ref>
+                        <button
+                            class="add-btn h-8 cursor-pointer w-full block mb-3"
+                            type="button" id="test1" data-te-dropdown-toggle-ref aria-expanded="false"
+                            data-te-ripple-init data-te-ripple-color="light" @click="sidebarNotificationTrayExpanded">
+                            Import
+                            <i class="fal fa-file-import"></i>
+                            
+                        </button>
+                        <ul class="absolute z-[1000] float-left m-0 hidden min-w-max list-none pt-6 pb-3 px-6 overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-base shadow-lg data-[te-dropdown-show]:block "
+                            aria-labelledby="test1" data-te-dropdown-menu-ref>
+                            <li>
+                                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item-type.import')">
+                                    Import Type
+                                    <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
+                                </label>
+                            </li>
+                            <li>
+                                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item-category.import')">
+                                    Import Category
+                                    <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
+                                </label>
+                            </li>
+                            <li>
+                                <label for="excel_import" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item.import')">
+                                    Import Item
+                                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                                </label>
+                            </li>
+                            <li>
+                                <label for="excel_import_price" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item.import')">
+                                    Import Price
+                                    <input type="file" placeholder="Excel" id="excel_import_price" class="opacity-0 w-0 h-0 hidden"  @change="handleItemPriceFileChange">
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
                     <a href="/items/create"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New

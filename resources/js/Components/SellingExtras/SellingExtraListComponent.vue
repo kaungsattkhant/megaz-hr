@@ -27,73 +27,74 @@
                     </button>
                 </div>
             </div>
-            <div class="box-container-table">
-                <div class="overflow-x-auto">
-                    <div class="table-container">
-                        <table class="primary-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Item</th>
-                                    <th>Category</th>
-                                    <th>UOM</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th scope="col" class="">
+            
+        </div>
+        <div class="box-container-table mb-4">
+            <div class="overflow-x-auto">
+                <div class="table-container">
+                    <table class="primary-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>UOM</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th scope="col" class="">
 
-                                    </th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="sellingExtras.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+
+                        <tbody v-else>
+                            <div class="contents" v-for="(sellingExtra, index) in sellingExtras" :key="index">
+                                <tr class="">
+                                    <td class="">
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.item.name }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.category.name }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.uom.name }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.price }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.quantity }}
+                                    </td>
+                                    <td class="">
+                                        <button type="button" class="pr-3"
+                                            data-te-toggle="modal" data-te-target="#update_modal"
+                                            @click="editBtnClicked(sellingExtra, index)">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <TableSkeleton
-                            v-if="loading"
-                            :rows="20"
-                            :cols="6"
-                            />
-
-                            <tr class=" !text-center" v-else-if="sellingExtras.length < 1">
-                                <td class="" colspan="5">
+                            </div>
+                            <tr class=" !text-center" v-if="sellingExtras.length < 1 && !loading">
+                                <td class="" colspan="7">
                                     No Data Here
                                 </td>
                             </tr>
-
-                            <tbody v-else>
-                                <div class="contents" v-for="(sellingExtra, index) in sellingExtras" :key="index">
-                                    <tr class="">
-                                        <td class="">
-                                            {{ index + 1 }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.item.name }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.category.name }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.uom.name }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.price }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.quantity }}
-                                        </td>
-                                        <td class="">
-                                            <button type="button" class="pr-3"
-                                                data-te-toggle="modal" data-te-target="#update_modal"
-                                                @click="editBtnClicked(sellingExtra, index)">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </div>
-                                <tr class=" !text-center" v-if="sellingExtras.length < 1 && !loading">
-                                    <td class="" colspan="7">
-                                        No Data Here
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

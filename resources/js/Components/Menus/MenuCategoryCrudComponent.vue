@@ -21,7 +21,7 @@
                     <button type="button" v-if="feature.includes('menu-category.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
-                        Add New
+                        Add
                     </button>
                 </div>
             </div>

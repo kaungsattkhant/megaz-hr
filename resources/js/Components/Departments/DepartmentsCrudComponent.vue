@@ -23,7 +23,7 @@
                 </div>
             </div>
         </div>
-        <div class="box-container-table">
+        <div class="box-container-table mb-2">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
                 <div class="table-container">

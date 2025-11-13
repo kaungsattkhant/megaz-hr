@@ -83,7 +83,7 @@
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
-                <button class="add-btn py-[9px]" @click="btnClickedAddAssign()">
+                <button class="add-btn " @click="btnClickedAddAssign()">
                     Add
                 </button>
             </div>
@@ -133,16 +133,22 @@
                                 </button>
                             </td>
                         </tr>
+                        <tr class=" !text-center" v-if="assignList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
+            <div class="mt-6">
+                <button class="add-btn" @click="btnClickedCreateOkrAssign()">
+                    Create
+                </button>
+            </div>
         </div>
 
-        <div>
-            <button class="add-btn" @click="btnClickedCreateOkrAssign()">
-                Create
-            </button>
-        </div>
+        
 
     </div>
 </template>
