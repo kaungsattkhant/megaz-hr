@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shoulder">
             <div>
                 <p class=" text-lg font-semibold font-inter">

@@ -1,7 +1,7 @@
 <template>
     
 
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -97,23 +97,23 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="3"  class="text-right bg-blue-50">
+                                <td colspan="3"  class="text-right bg-gray-100">
                                     Total
                                 </td>
-                                <td class="bg-blue-50">
+                                <td class="bg-gray-100">
                                     {{ apBalanceList.total_opening_balance }} 
                                 </td> 
-                                <td class="bg-blue-50">
+                                <td class="bg-gray-100">
                                     {{ apBalanceList.total_addition }} 
                                 </td>
-                                <td class="bg-blue-50">
+                                <td class="bg-gray-100">
                                     {{ apBalanceList.total_settlement }} 
                                 </td>
-                                <td class="bg-blue-50"></td>
-                                <td class="bg-blue-50">
+                                <td class="bg-gray-100"></td>
+                                <td class="bg-gray-100">
                                     {{ apBalanceList.total_closing_balance }} 
                                 </td>
-                                <td class=" bg-blue-50"></td>
+                                <td class=" bg-gray-100"></td>
                             </tr>
                         </tbody>
                     </table>

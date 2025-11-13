@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -123,7 +123,6 @@
 
                     <!-- pagination -->
                     <div class="flex justify-center">
-
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
                                 @click="getInventoryList(currentPage - 1)">«</button>
@@ -133,7 +132,6 @@
                                     class="text-gray-400">{{
                                         lastPage }}</span>
                             </button>
-
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
                                 :disabled="currentPage === lastPage" @click="getInventoryList(currentPage + 1)">
                                 »</button>
@@ -151,9 +149,8 @@
                     class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                     <div
                         class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-
-                        <div class="relative  p-4">
-                            <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                                 id="create_modalLabel">
                                 {{ modalType === 'create' ? 'Create' : 'Edit' }} Inventory
                             </h5>
@@ -166,7 +163,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="relative px-6 py-4" data-te-modal-body-ref>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Inventory Name
@@ -248,8 +245,8 @@
                             </button>
 
                         </div>
-                        <div class="px-12 mb-8">
-                            <table class="min-w-full text-left text-sm font-light border-l border-t border-b">
+                        <div class="relative px-6 py-4 border-b">
+                            <table class="min-w-full text-left text-sm font-light border-l border-t border-b mb-4">
                                 <thead class="border-b font-medium">
                                     <tr>
                                         <th scope="col" class="px-6 py-4 border-r">Type</th>
@@ -283,7 +280,7 @@
                             </table>
                         </div>
 
-                        <div class="flex justify-end px-12 mb-6">
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-6">
                             <LoadingButton
                                 :loading="buttonLoading"
                                 :text="modalType === 'create' ? 'Create' : 'Edit'"

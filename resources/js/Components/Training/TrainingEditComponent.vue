@@ -1,12 +1,13 @@
 <template>
     <div class="px-0">
-        <div class="mb-4">
-            <p class="text-lg font-semibold font-inter">
-                Edit Training
-            </p>
-        </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
+        
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md mt-4">
+            <div class="mb-8 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Edit Training
+                </p>
+            </div>
             <div class="mb-4 col-span-9 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Title
@@ -180,15 +181,17 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="6"></textarea>
             </div>
+
+            <div class="flex gap-x-4 col-span-12">
+                <a href="/training" class="cancel-btn focus:shadow-none focus:outline-none ">
+                    Cancel
+                </a>
+                <button class="add-btn" @click="createBtnClicked">
+                    Update Training
+                </button>
+            </div>
         </div>
-        <div class="flex gap-x-4">
-            <a href="/training" class="cancel-btn focus:shadow-none focus:outline-none ">
-                Cancel
-            </a>
-            <button class="add-btn" @click="createBtnClicked">
-                Update Training
-            </button>
-        </div>
+        
     </div>
 
     <!-- type Modal -->

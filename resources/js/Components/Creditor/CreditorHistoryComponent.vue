@@ -10,7 +10,7 @@
             </button>
         </div>
     </div>
-    <div class=" px-4 py-4 mt-4 bg-white rounded">
+    <div class=" px-4 py-4 margin-bg rounded">
         <div class="overflow-x-auto">
             <div class="table-container">
                 <table class=" primary-table">
