@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class=" grid grid-cols-2 gap-x-8 gap-y-4">
             <div class="card-shadow p-8">
                 <p class=" text-black mb-2 font-semibold">

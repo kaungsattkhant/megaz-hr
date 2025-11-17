@@ -3,12 +3,12 @@
   font-family: 'Poppins';
   src: url("../fonts/Poppins-Regular.ttf") format("truetype"); }
 /* width */
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif; }
-
-.font-inter, .label-form, .input-ui, .page-title {
+.font-inter {
   font-family: Inter,sans-serif;
   color: #333335; }
+
+.font-poppins {
+  font-family: 'Poppins'; }
 
 .small-scrollbar::-webkit-scrollbar {
   width: 2px; }
@@ -53,11 +53,10 @@ body {
   position: relative;
   font-size: 14px;
   color: #6b7280;
-  font-family: Inter, sans-serif; }
+  font-family: 'Poppins'; }
 
 .side-bar ul li a.active-link {
-  color: white !important;
-  background-color: #5d87ff !important;
+  color: #5d87ff !important;
   border-radius: 6px; }
 
 .side-bar ul li a:not(.active-link):hover {
@@ -72,7 +71,7 @@ body {
   text-align: center; }
 
 .main-container {
-  background-color: #fefefe;
+  background-color: #f0f8ff;
   min-height: 100vh;
   display: flex; }
 
@@ -103,7 +102,7 @@ body {
   font-size: 13px;
   padding: 6px 16px;
   border-radius: 4px;
-  background-color: #5d87ff !important;
+  background-color: #009ef7 !important;
   color: white; }
 
 .cancel-btn {
@@ -115,16 +114,18 @@ body {
 .label-form {
   display: block;
   font-size: 0.875rem;
-  line-height: 1.25rem; }
+  line-height: 1.25rem;
+  font-family: 'Poppins'; }
 
 .input-ui {
   font-size: 0.875rem !important;
-  line-height: 1.25rem !important;
+  line-height: 1.15rem !important;
   border: 1px solid #d1d5db !important;
-  padding: 9px 6px !important;
+  padding: 8px 6px !important;
   width: 100% !important;
   background: transparent !important;
-  border-radius: 0.35rem !important; }
+  border-radius: 0.35rem !important;
+  font-family: 'Poppins'; }
 
 .input-ui:focus {
   outline: none !important;
@@ -150,17 +151,25 @@ body {
 
 .page-title {
   padding-left: 1rem;
-  padding-top: 1rem; }
+  padding-top: 1rem;
+  font-family: 'Poppins'; }
+
+label {
+  font-family: 'Poppins'; }
 
 .box-container-table {
   border-radius: 3px;
-  box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px; }
+  box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
+  background-color: white; }
 
 .card-shadow {
   box-shadow: rgba(145, 158, 171, 0.5) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px;
   border: 1px solid #f3f4f6;
   margin-bottom: 1.5rem;
-  border-radius: 3px; }
+  border-radius: 3px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: white; }
 
 .table-container {
   position: relative; }
@@ -177,14 +186,14 @@ body {
 
 .primary-table thead tr th {
   padding: 0.75rem;
-  font-family: Inter, sans-serif;
+  font-family: 'Poppins';
   color: #333335; }
 
 .primary-table tbody tr {
   border-top-width: 1px; }
   .primary-table tbody tr td {
     padding: 1rem;
-    font-family: Inter, sans-serif;
+    font-family: 'Poppins';
     color: #333335;
     font-weight: 500; }
 

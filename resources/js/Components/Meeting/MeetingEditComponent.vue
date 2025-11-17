@@ -1,5 +1,5 @@
 <template>
-    <div class="containe-card px-0">
+    <div class="container-card px-0">
         <div class="mb-4">
             <p class="page-title px-6">
                 Create Meeting 
