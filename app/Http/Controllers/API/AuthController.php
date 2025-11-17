@@ -32,10 +32,11 @@ class AuthController extends Controller
             ResponseData($loginResponse);
         }
     }
-    public function storeFcmToken($token, $customerId): PersonFcmToken
+    public function storeFcmToken($token, $customerId)
     {
         // Log::info('token ' , (array)$token);
         if ($token && $token != "null") {
+            
             $personToken = PersonFcmToken::firstOrCreate(
                 [
                     'fcm_token' => $token,
