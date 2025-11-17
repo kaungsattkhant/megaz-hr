@@ -1,14 +1,14 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Edit Job Specification
-            </p>
-        </div>
+        
 
 
         <div class="grid !grid-cols-10 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-
+            <div class="mb-4  col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Edit Job Specification
+                </p>
+            </div>
             <div class="mb-4 col-span-3 pb-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Department
@@ -118,13 +118,14 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-6">
+                <button class="add-btn" @click="btnClickedCreateJs()">
+                    Edit 
+                </button>
+            </div>
         </div>
 
-        <div>
-            <button class="add-btn" @click="btnClickedCreateJs()">
-                Edit Job Specification
-            </button>
-        </div>
+        
 
 
 
@@ -249,7 +250,7 @@ export default {
                     this.getJdList();
                     this.getSkillList();
                 }, 200);
-                if(response.data.skills.length > 1){
+                if(response.data.skills.length > 0){
                     response.data.skills.forEach(skill => {
                         this.selectedSkillList.push({
                             skill_name: skill.skill,

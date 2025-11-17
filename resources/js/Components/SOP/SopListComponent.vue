@@ -32,8 +32,8 @@
                         </select>
                     </div>
                     <a href="/SOP/create" v-show="feature.includes('sop.create')"
-                        class="add-btn  h-8 whitespace-nowrap">
-                        Add New
+                        class="add-btn  h-8 whitespace-nowrap text-center">
+                        Add
                     </a>
                 </div>
             </div>

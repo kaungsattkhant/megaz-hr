@@ -26,8 +26,8 @@
                         </select>
                     </div>
                     <a href="/menu_forecasting/create" v-if="feature.includes('menu-forecasting.create')"
-                        class="add-btn  h-8 whitespace-nowrap">
-                        Add New
+                        class="add-btn  h-8 whitespace-nowrap text-center">
+                        Add
                     </a>
                 </div>
             </div>

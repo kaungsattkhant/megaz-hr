@@ -7,6 +7,9 @@
   font-family: Inter,sans-serif;
   color: #333335; }
 
+p, span, button, a, h1, label, h2, h3, h4, h5 {
+  font-family: "Poppins" !important; }
+
 .font-poppins {
   font-family: 'Poppins'; }
 
@@ -136,7 +139,7 @@
   color: black; }
 
 .multi-select .multiselect__placeholder {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   padding-top: 2px; }
 
 .multi-select .multiselect__tags {

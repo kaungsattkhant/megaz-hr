@@ -1,5 +1,5 @@
 <template>
-    <div class="margin-bg">
+    <div class="margin-bg card-shadow bg-white">
         <notifications position="top center" />
         <h1 class="font-bold text-lg text-left px-8 pt-8 mb-4">Asset</h1>
         <div class=" px-8 pt-3 pb-8 flex justify-center">
@@ -580,7 +580,7 @@ export default {
                     text: `Asset created successfully`,
                     type: "success"
                 });
-                window.location.replace('/asset/list')
+                window.location.replace('/assets')
             } else {
                 this.$notify({
                     title: `Input validation`,

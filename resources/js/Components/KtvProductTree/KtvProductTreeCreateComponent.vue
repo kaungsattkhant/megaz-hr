@@ -1,16 +1,17 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Add Product Tree
-            </p>
-        </div>
+        
 
 
 
         
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Add Product Tree
+                </p>
+            </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Room
@@ -99,6 +100,11 @@
                                     </button>
                                 </td>
                             </tr>
+                            <tr class=" !text-center" v-if="obj_list.length < 1">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -163,18 +169,24 @@
                                     </button>
                                 </td>
                             </tr>
+                            <tr class=" !text-center" v-if="item_list.length < 1">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+            <div class="col-span-12 mt-6">
+                <button class="add-btn" @click="btnclickedCreate()">
+                    Create
+                </button>
+            </div>
         </div>
 
 
-        <div>
-            <button class="add-btn" @click="btnclickedCreate()">
-                Create
-            </button>
-        </div>
+        
         
     </div>
 </template>

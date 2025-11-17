@@ -1,13 +1,14 @@
 <template>
     <div class="px-0">
-        <div class="mb-6">
-            <p class="text-lg font-semibold font-inter">
-                Create Package
-            </p>
-        </div>
+        
 
 
         <div class="grid !grid-cols-12 gap-x-8 gap-y-4 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-3 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Create Package
+                </p>
+            </div>
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Package Name
@@ -274,6 +275,11 @@
                                         </td>
                                     </tr>
                                 </div>
+                                <tr v-if="selectedMenus.length < 1">
+                                    <td colspan="3">
+                                        No Data Here!
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -311,9 +317,19 @@
                                         </td>
                                     </tr>
                                 </div>
+                                <tr v-if="selectedAccessoryList.length < 1">
+                                    <td colspan="3">
+                                        No Data Here!
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
+                </div>
+                <div class="mt-4">
+                    <button class="add-btn" @click="createBtnClicked">
+                        Create
+                    </button>
                 </div>
             </div>
 
@@ -358,11 +374,7 @@
             </div>
         </div> -->
 
-        <div>
-            <button class="add-btn" @click="createBtnClicked">
-                Create Package
-            </button>
-        </div>
+        
     </div>
 </template>
 

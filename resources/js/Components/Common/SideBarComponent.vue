@@ -689,28 +689,28 @@
                                     <ul>
                                         <li v-show="checkFeaturePermission('customer')">
                                             <a href="/crm/customers"
-                                                class="flex items-center sidebar-gap-x">
+                                                class="flex items-center sidebar-gap-x !px-0">
                                                 <i class="fal fa-user-friends"></i>
                                                 Customers
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('customer-birthday')">
                                             <a href="/crm/customers/birthdays"
-                                                class="flex items-center sidebar-gap-x">
+                                                class="flex items-center sidebar-gap-x !px-0">
                                                 <i class="fal fa-tbirthday-cake"></i>
                                                 Customer Birthdays
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('customer-level-discount')">
                                             <a href="/crm/level_discounts"
-                                                class="flex items-center sidebar-gap-x">
+                                                class="flex items-center sidebar-gap-x !px-0">
                                                 <i class="fal fa-user-tag"></i>
                                                 Customer Level Discounts
                                             </a>
                                         </li>
                                         <li v-show="checkFeaturePermission('customer-birthday-promotion')">
                                             <a href="/crm/birthday_promotions"
-                                                class="flex items-center sidebar-gap-x">
+                                                class="flex items-center sidebar-gap-x !px-0">
                                                 <i class="fal fa-stopwatch-20"></i>
                                                 Birthday Promotions
                                             </a>
@@ -867,14 +867,14 @@
                                 </div>
                             </li>
                             <li v-show="checkFeaturePermission('asset-item')">
-                                <a href="/asset_items/list"
+                                <a href="/asset_items"
                                     class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-boxes"></i>
                                     Asset Items
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('asset')">
-                                <a href="/asset/list" class="flex items-center sidebar-gap-x">
+                                <a href="/assets" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-briefcase"></i>
                                     Assets
                                 </a>
