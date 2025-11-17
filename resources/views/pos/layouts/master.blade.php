@@ -2,14 +2,14 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-    <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-	<link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
 
-	<title> @yield('page_title')</title>
+    <title> @yield('page_title')</title>
     @vite('resources/js/app.js')
 
     <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
@@ -43,16 +43,15 @@
         //     messagingSenderId: "609911397064",
         //     appId: "1:609911397064:web:ec83c2db74e8ece72463fd"
         // };
-            const firebaseConfig = {
-            apiKey: "AIzaSyA_RiMlzMDYxKF_iT8wBxPAW3NpKxEPxas",
-            authDomain: "megaz-project.firebaseapp.com",
-            projectId: "megaz-project",
-            storageBucket: "megaz-project.appspot.com",
-            messagingSenderId: "25949618078",
-            appId: "1:25949618078:web:86369862c2a1fc084ca08f",
-            measurementId: "G-M6MF9D78DD"
-          };
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvUQJCbpIMC02ceunLnZI7Dyq5VrEjw2M",
+            authDomain: "megaz-78046.firebaseapp.com",
+            projectId: "megaz-78046",
+            storageBucket: "megaz-78046.firebasestorage.app",
+            messagingSenderId: "144736503266",
+            appId: "1:144736503266:web:50908d34738ad48d93a5bb",
+            measurementId: "G-20WGQM0S3T"
+        };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -61,7 +60,8 @@
     @yield('pos-body-content')
 
 </body>
-{{-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.5.7/src/index.min.js"></script> --}}
+{{--
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.5.7/src/index.min.js"></script> --}}
 @yield('script_index')
 
 </html>

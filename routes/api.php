@@ -733,4 +733,7 @@ Route::controller(TagController::class)->group(function () {
     Route::post('/tags', 'createTag');
 });
 
+Route::post("/test-notification", [TestController::class, "testNotification"]);
+
+
 

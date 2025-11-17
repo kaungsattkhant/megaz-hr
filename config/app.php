@@ -169,7 +169,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        LaravelFCM\FCMServiceProvider::class,
+        // LaravelFCM\FCMServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -185,8 +185,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
-        'FCM'      => LaravelFCM\Facades\FCM::class,
-        'FCMGroup' => LaravelFCM\Facades\FCMGroup::class, // Optional
+        // 'FCM'      => LaravelFCM\Facades\FCM::class,
+        // 'FCMGroup' => LaravelFCM\Facades\FCMGroup::class, // Optional
     ])->toArray(),
 
 ];

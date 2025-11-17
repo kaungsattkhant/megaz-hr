@@ -2,6 +2,7 @@
 
 namespace App\Repositories\StaffTimeShift;
 
+use App\Http\Action\SendNotification\FcmSendNotification;
 use App\Models\Staff;
 use App\Models\StaffTimeshift;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,7 @@ use App\Http\Action\SendNotification\SendNotification;
 class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 {
 
-  use SendNotification;
+  use SendNotification, FcmSendNotification;
   public function getStaffTimeShifts($request)
   {
     $query = StaffTimeshift::with(['staff.department', 'staff.roles', 'timeshift', 'area'])->orderBy('id', 'desc');
@@ -21,7 +22,6 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 
   public function createStaffTimeShift(array $data)
   {
-    // dd($data);
     DB::beginTransaction();
     try {
       if (isset($data['staff_time_shifts'])) {
@@ -37,8 +37,8 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 
           if ($exists) {
             // Return error or handle as needed
-            $staff=Staff::find($staff_time_shift['staff_id']);
-            ResponseMessage('Shift already assigned for '.$staff->name.' at this date and timeshift.',422);
+            $staff = Staff::find($staff_time_shift['staff_id']);
+            ResponseMessage('Shift already assigned for ' . $staff->name . ' at this date and timeshift.', 422);
           }
           $staffTimeshift = StaffTimeshift::updateOrCreate(
             [
@@ -55,9 +55,13 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
               'created_by' => UserData()->id,
             ]
           );
-          $this->sendShiftAssignedNotification($staffTimeshift);
+          $notiData['title'] = 'Shift Assigned';
+          $notiData['preview'] = "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}";
+          $this->sendFcmNotification($staffTimeshift, $staffTimeshift->staff, $notiData);
+          // $this->sendShiftAssignedNotification($staffTimeshift);
         }
       }
+      dd('abc');
       DB::commit();
       ResponseData($staffTimeshift, 201);
     } catch (\Exception $e) {

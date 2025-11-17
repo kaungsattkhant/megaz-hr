@@ -17,6 +17,8 @@ use App\Events\SendNotification as EventsSendNotification;
 
 trait SendNotification
 {
+    //sending notification 
+    
     public function send($model, $users, $data)
     {
         $morphMapName = RelationMorphName($model);
