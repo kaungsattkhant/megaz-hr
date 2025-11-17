@@ -1,12 +1,13 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Add Objective Key Results
-            </p>
-        </div>
+        
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold">
+                    Add Objective Key Results
+                </p>
+            </div>
             <div class="mb-6 col-span-3">
                 <label for="" class="label-form mb-3">
                     Department
@@ -176,20 +177,25 @@
                                 </button>
                             </td>
                         </tr>
+                        <tr class=" !text-center" v-if="key_result_list.length < 1">
+                            <td class="" colspan="2">
+                                No Data Here
+                            </td>
+                        </tr>
                     </tbody>
 
                 </table>
             </div>
-
+            <div class="mt-6">
+                <button class="add-btn" @click="btnclickedCreateOkr()">
+                    Create OKR
+                </button>
+            </div>
             
 
         </div>
         
-        <div>
-            <button class="add-btn" @click="btnclickedCreateOkr()">
-                Create OKR
-            </button>
-        </div>
+        
 
     </div>
 </template>

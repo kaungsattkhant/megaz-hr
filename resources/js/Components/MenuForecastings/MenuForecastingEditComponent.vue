@@ -1,12 +1,13 @@
 <template>
     <div class="px-0">
         <div v-show="is_step == 1">
-            <div class="mb-4 ">
-                <p class="text-lg font-semibold font-inter">
-                    Edit Menu Forecasting
-                </p>
-            </div>
+            
             <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+                <div class="mb-4 col-span-12">
+                    <p class="text-lg font-semibold font-inter">
+                        Edit Menu Forecasting
+                    </p>
+                </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Month
@@ -116,18 +117,24 @@
                                     </button>
                                 </td>
                             </tr>
+                            <tr class=" !text-center" v-if="menuTableList.length < 1">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
     
                     </table>
                 </div>
+                <div class="mt-6">
+                    <button class="add-btn" @click="clickedBtnCreate()">
+                        Calculate
+                    </button>
+                </div>
             </div>
-            <div>
-                <button class="add-btn" @click="clickedBtnCreate()">
-                    Calculate
-                </button>
-            </div>
+            
         </div>
-        <div v-show="is_step == 2">
+        <div v-show="is_step == 2" class="mt-3">
             <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">

@@ -39,7 +39,7 @@
                                 <th scope="col" class="">
                                     Name
                                 </th>
-                                <th scope="col" class="">
+                                <th scope="col" class=" text-left">
                                     Image
                                 </th>
                                 <th scope="col" class="" v-show="['menu-category.update', 'menu-category.toggle', 'menu-category.delete'].some(f => feature.includes(f))">
