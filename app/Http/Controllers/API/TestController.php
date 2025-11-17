@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Actions\Inventory\GetInventoryStockAction;
 use Reinbier\LaravelHoliday\Facades\LaravelHoliday;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class TestController extends Controller
 {
     //
+    use FcmSendNotification;
     public function index()
     {
         $invoiceId = 1;
@@ -64,12 +66,11 @@ class TestController extends Controller
 
     public function getHolidays()
     {
-        $holiday = LaravelHoliday::model();
-        return $holiday;
-        LaravelHoliday::forYear(2025)
-            ->addHoliday('2025-07-02', 'National-Day')
-            ->getHolidays();
-        $holidays = LaravelHoliday::getHolidays();
-        ResponseMessage($holidays, 200);
+    //    fcm token f5TYgI-PkJXLsj0YcWQBxm:APA91bHwKqDbtKtdKdXR-N7vrUt36AyF9sQqS-aeWU5DB0G6_fDhqODXgY_P3vFiEmg-krhNEcgqnVzYopKC3h83u4ysjxZjsXz2H86-dgDHA6QRenXnQv0
+    }
+
+    public function testNotification(Request $request){
+        $fcmToken=$request->fcm_token;
+        return $this->sendFcmNotification($fcmToken);
     }
 }

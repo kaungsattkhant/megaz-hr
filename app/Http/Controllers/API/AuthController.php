@@ -21,14 +21,35 @@ class AuthController extends Controller
     {
         $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Staff"))->run("staff_token");
 
-        if($loginResponse["code"] != 200){
+        if ($loginResponse["code"] != 200) {
             ResponseMessage($loginResponse["message"], $loginResponse["code"]);
-        }
-        else{
-            $staff = Staff::with(["gender","department","roles"])->find($loginResponse["user"]["id"]);
+        } else {
+            $staff = Staff::with(["gender", "department", "roles"])->find($loginResponse["user"]["id"]);
+            $this->storeFcmToken($request->fcm_token, $loginResponse['user']['id']);
+
             // dd($staff->features->pluck('slug')->toArray());
             $loginResponse["user"] = $staff;
             ResponseData($loginResponse);
+        }
+    }
+    public function storeFcmToken($token, $customerId): PersonFcmToken
+    {
+        // Log::info('token ' , (array)$token);
+        if ($token && $token != "null") {
+            $personToken = PersonFcmToken::firstOrCreate(
+                [
+                    'fcm_token' => $token,
+                    'personable_id' => $customerId,
+                    'personable_type' => 'staff',
+
+                ],
+                [
+                    'fcm_token' => $token,
+                    'personable_id' => $customerId,
+                    'personable_type' => 'staff'
+                ]
+            );
+            return $personToken;
         }
     }
 

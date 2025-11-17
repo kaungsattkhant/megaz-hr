@@ -20,10 +20,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class Staff extends Authenticatable
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory, HasApiTokens,Notifiable;
 
     protected $fillable = [
         'name',
@@ -80,6 +81,16 @@ class Staff extends Authenticatable
     public function emergencyContacts()
     {
         return $this->hasMany(StaffEmergencyContact::class);
+    }
+
+    public function routeNotificationForFcm()
+    {
+        return $this->personTokens()->pluck('fcm_token')->toArray();
+    }
+
+     public function personTokens()
+    {
+        return $this->morphMany(PersonFcmToken::class, 'personable');
     }
 
     public function getAuthPassword()
