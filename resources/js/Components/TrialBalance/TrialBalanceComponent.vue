@@ -60,7 +60,7 @@
                             </tr> -->
                             <!-- looping start -->
                             <div class="contents" v-if="primaryList.credit_balance">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td></td>
                                     <td scope="col" class=" !font-semibold !rounded-none text-left">
                                         Credit Balances
@@ -161,7 +161,7 @@
 
 
                             <div class="contents" v-if="primaryList.debit_balance">
-                                <tr class="bg-blue-50 !rounded-none">
+                                <tr class="bg-gray-100 !rounded-none">
                                     <td></td>
                                     <td scope="col" class=" !font-semibold !rounded-none text-left">
                                         Debit Balances

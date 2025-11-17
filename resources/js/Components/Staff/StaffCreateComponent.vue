@@ -1,5 +1,5 @@
 <template>
-    <div class=" container-card pb-4" v-show="!isFeature">
+    <div class=" container-card" v-show="!isFeature">
         <div class="mb-6">
             <p class="text-lg font-semibold font-inter">
                 Create New Staff
