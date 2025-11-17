@@ -1,12 +1,13 @@
 <template>
     <div class="px-0">
-        <div class="mb-4">
-            <p class="text-lg font-semibold font-inter">Add MRP</p>
-        </div>
-
+        
         <div
             class="grid !grid-cols-12 gap-x-8 gap-y-2 bg-white p-8 rounded-md shadow-md mb-8"
         >
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold font-inter">Add MRP</p>
+            </div>
+
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3"> Menu Name </label>
                 <input
@@ -30,7 +31,7 @@
                     Cooking Places
                 </label>
                 <div
-                    class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    class="bg-white mb-0 w-full text-sm inline-block h-[34px] multi-select"
                     data-te-select-wrapper-ref
                 >
                     <multiselect
@@ -530,7 +531,7 @@
             <div class="col-span-12"></div>
 
             <div class="col-span-3">
-                <label for="" class="label-form mb-3"> &nbsp; </label>
+                <!-- <label for="" class="label-form mb-3"> &nbsp; </label> -->
                 <button class="add-btn" @click="btnClickedAddMenuLevel()">
                     Add Item
                 </button>

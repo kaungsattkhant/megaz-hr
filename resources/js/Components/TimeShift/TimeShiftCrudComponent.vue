@@ -1,7 +1,7 @@
 <template>
     
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -190,7 +190,7 @@
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal"
                         id="create_modalLabel">
                         Create Time Shift
                     </h5>
@@ -275,7 +275,7 @@
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal "
                         id="edit_modalLabel">
                         Edit Time Shift
                     </h5>

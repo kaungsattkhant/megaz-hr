@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -47,8 +47,8 @@
                         </select>
                     </div>
                     <a href="/OKR/create" v-if="feature.includes('okr.create')"
-                        class="add-btn  h-8 whitespace-nowrap">
-                        Add New
+                        class="add-btn  h-8 whitespace-nowrap text-center">
+                        Add
                     </a>
                 </div>
             </div>

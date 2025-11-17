@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -110,7 +110,7 @@
                 <div
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
-                    <div class="relative  p-4">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
                             Add New
                         </h5>
@@ -123,7 +123,7 @@
                         </button>
                     </div>
                     <form @submit.prevent="btnClickedCreateAr()">
-                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
 
 
                             <div class="mb-4">
@@ -165,7 +165,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="flex justify-center px-12 mb-6">
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="submit"
                             class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
@@ -186,7 +186,7 @@
                 <div
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
-                    <div class="relative  p-4">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="paid_modalLabel">
                             Payment
                         </h5>
@@ -199,7 +199,7 @@
                         </button>
                     </div>
                     <form @submit.prevent="btnClickedCreatePaid()">
-                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Amount
@@ -218,7 +218,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="flex justify-center px-12 mb-6">
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="submit"
                             class="add-btn focus:outline-none focus:ring-0 ">
                                 Create

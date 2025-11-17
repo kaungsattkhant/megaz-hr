@@ -1,19 +1,22 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Upcoming Customer Bithdays
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label>
+    
+    <div class="margin-bg">
+        <div class="card-shadow">
+            <div class="pt-4 pl-4">
+                <p class=" text-lg font-semibold font-inter">
+                    Upcoming Customer Bithdays
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
+
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+                </div>
             </div>
         </div>
         <div class="box-container-table">

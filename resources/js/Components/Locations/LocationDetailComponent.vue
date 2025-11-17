@@ -4,7 +4,7 @@
             Location : {{ selectedFloor }}
         </p>
     </div>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="btn-container">
             <notifications position="top center" />
             <div class=" flex gap-x-4">

@@ -43,7 +43,7 @@
         @apply focus:ring-0 focus:outline-none focus:shadow-none
     }
     .container-card{
-        @apply bg-white mt-4 pt-4  px-5 shadow-lg border border-gray-100
+        @apply bg-white mt-4 pt-8  px-9 pb-8 mb-4 shadow-lg border border-gray-100
     }
     .sidebar-title{
         @apply text-[#2a3547] text-xs font-semibold ml-1 pt-2
@@ -53,6 +53,12 @@
     }
     .sidebar-tab-title{
         @apply text-[#2a3547] text-sm font-semibold ml-1 pl-3 pb-1.5
+    }
+    .margin-bg{
+        @apply mt-4 bg-[#f0f8ff]
+    }
+    .add-btn{
+        @apply min-w-[75px]
     }
     }
 

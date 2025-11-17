@@ -225,11 +225,11 @@ Route::middleware(['departments:fix-asset'])->group(function () {
 });
 Route::middleware(['departments:asset'])->group(function () {
     Route::view('/assets/create', 'fixed_assets.assets')->name('fixed_assets.assets');
-    Route::view('/asset/list', 'fixed_assets.asset_list')->name('assetList');
+    Route::view('/assets', 'fixed_assets.asset_list')->name('assetList');
 });
 
 Route::middleware(['departments:asset-item'])->group(function () {
-    Route::view('/asset_items/list', 'fixed_assets.asset_item_list')->name('assetItemList');
+    Route::view('/asset_items', 'fixed_assets.asset_item_list')->name('assetItemList');
 });
 Route::middleware(['departments:asset-item.create'])->group(function () {
     Route::view('/asset_items/create', 'fixed_assets.asset_items')->name('fixed_assets.asset_items');

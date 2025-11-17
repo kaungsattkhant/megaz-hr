@@ -1,7 +1,7 @@
 <template>
     <notifications position="top center" />
 
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -190,7 +190,7 @@
                                         </svg>
                                     </button>
                                 </div>
-                                <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                                     <div class="mb-4">
                                         <label for="" class="label-form mb-3">
                                             Title
