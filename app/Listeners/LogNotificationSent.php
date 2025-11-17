@@ -9,7 +9,7 @@ class LogNotificationSent
 {
     public function handle(NotificationSent $event)
     {
-        Log::error('Notification failed', [
+        Log::error('Notification Sent failed', [
             'notifiable_id' => $event->notifiable->id ?? null,
             'notifiable_type' => get_class($event->notifiable),
             'notification' => get_class($event->notification),
