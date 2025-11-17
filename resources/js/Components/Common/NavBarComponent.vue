@@ -8,7 +8,7 @@
             <button
                 class="flex items-center rounded px-6 pb-2 pt-2.5 text-base font-medium uppercase leading-normal
                 text-black shadow-primary-3 transition duration-150 ease-in-out  hover:shadow-primary-2
-                 focus:shadow-primary-2 focus:outline-none focus:ring-0 
+                 focus:shadow-primary-2 focus:outline-none focus:ring-0
                 active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong
                 dark:focus:shadow-dark-strong dark:active:shadow-dark-strong"
                 type="button" id="dropdownMenuButton1" data-te-dropdown-toggle-ref aria-expanded="false"
@@ -42,9 +42,6 @@
     import 'firebase/messaging';
     import { Dropdown ,Modal, Ripple, Select, initTE } from "tw-elements";
     import { mapGetters } from "vuex";
-
-    import Echo from 'laravel-echo';
-    import Pusher from 'pusher-js';
 
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getElapsedMoments } from '../../utilities/datetime-helpers';
@@ -108,10 +105,10 @@
             },
 
             async startOnMessageListener() {
-                // console.log(`im running`);
+                console.log(`firebase message listener`);
                 try {
                     await this.firebaseMessaging.onMessage((payload) => {
-                        // console.log('message received: ', payload);
+                        console.log('message received: ', payload);
                         let title = payload.notification.title;
                         let body = payload.notification.body;
                         let notiOptions = { body: body };
@@ -143,7 +140,7 @@
                         // console.log(`permission granted`);
                         this.firebaseMessaging = firebase.messaging();
                         this.fcmToken = await this.firebaseMessaging.getToken();
-                        console.log(this.fcmToken);
+                        console.log('fcm token in navbar',this.fcmToken);
                         this.startOnMessageListener();
                     }
                 }
@@ -152,6 +149,8 @@
                         text: 'Firebase error',
                         type: "error"
                     });
+
+                    console.log("error: ", error);
                 }
             },
 
