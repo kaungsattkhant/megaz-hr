@@ -61,7 +61,6 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
           // $this->sendShiftAssignedNotification($staffTimeshift);
         }
       }
-      dd('abc');
       DB::commit();
       ResponseData($staffTimeshift, 201);
     } catch (\Exception $e) {
