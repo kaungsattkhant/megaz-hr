@@ -131,7 +131,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     //   ->first();
     $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
       $now = now()->format('H:i');
-      $earlyCheckMinutes = 30; // allow 30 mins early check-in
+      $earlyCheckMinutes = 60; // allow 60 mins early check-in
 
       $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
         ->where(function ($q) use ($now, $earlyCheckMinutes) {
@@ -179,6 +179,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     $response = [
       'gps' => $gps,
       'current_time_shift' => $currentTimeShift ? new GetCurrentTimeShiftResource($currentTimeShift) : null,
+      'staff_timeshif_id'=>$existShiftAssign->id,
     ];
 
     $staffId = $request->input('staff_id');

@@ -25,8 +25,15 @@ trait FcmSendNotification
     // }
     public function sendFcmNotification($model, $people, $data)
     {
+        Log::info('Reach Notification Function');
         $morphMapName = RelationMorphName($model);
         $people = $this->normalizeToCollection($people);
+        Log::info('Notification Model',[
+            'model'=>$model
+        ]);
+        Log::info('Model Map',[$morphMapName]);
+        // Log::info('Authorized User',[UserData()]);
+
         // $user_ids = $people->pluck('id');
         $notification = Notification::updateOrCreate(
             [
@@ -37,10 +44,11 @@ trait FcmSendNotification
                 'title' => $data['title'],
                 'preview' => $data['preview'],
                 'date_time' => now(),
-                'created_by' => UserData()->id,
+                'created_by' => $model->created_by,
             ]
         );
 
+        Log::info('Notification Person');
 
         $notificationPersons = [];
         // dd($people);

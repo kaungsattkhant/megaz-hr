@@ -1082,6 +1082,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         'title' => $typeName,
         'body' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
+          $this->sendFcmNotification($staffTimeshift, $staffTimeshift->staff, $notiData);
 
       $this->sendParticipantNoti($object, $users, $notificationData);
     }
