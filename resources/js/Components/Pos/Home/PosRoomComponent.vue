@@ -1256,7 +1256,8 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnAddHour()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnAddHour()" class="pos-add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                             Add Hours
                         </button>
                     </div>
@@ -1415,7 +1416,8 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                             Change
                         </button>
                     </div>
