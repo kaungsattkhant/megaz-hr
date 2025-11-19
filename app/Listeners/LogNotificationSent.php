@@ -9,12 +9,12 @@ class LogNotificationSent
 {
     public function handle(NotificationSent $event)
     {
-        Log::error('Notification failed', [
-            'notifiable_id' => $event->notifiable->id ?? null,
+       Log::info('Notification sent', [
+            'notifiable_id'   => $event->notifiable->id ?? null,
             'notifiable_type' => get_class($event->notifiable),
-            'notification' => get_class($event->notification),
-            'channel' => $event->channel,
-            'data' => $event->response, // this is the only valid key
+            'notification'    => get_class($event->notification),
+            'channel'         => $event->channel,
+            'response'        => $event->response, // allowed ONLY here
         ]);
     }
 
