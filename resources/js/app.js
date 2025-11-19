@@ -280,7 +280,7 @@ import BarReportChartComponent from './Components/BarReport/BarReportChartCompon
 import KitchenReportChartComponent from './Components/KitchenReport/KitchenReportChartComponent.vue';
 import KtvMenuSaleComponent from './Components/KitchenMenuSale/KtvMenuSaleComponent.vue';
 import SkyMenuSaleComponent from './Components/KitchenMenuSale/SkyMenuSaleComponent.vue';
-
+import BudgetAccountCrudComponent from './Components/BudgetAccounts/BudgetAccountCrudComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -538,6 +538,7 @@ app.component('BarReportChartComponent',BarReportChartComponent);
 app.component('KitchenReportChartComponent',KitchenReportChartComponent);
 app.component('KtvMenuSaleComponent',KtvMenuSaleComponent);
 app.component('SkyMenuSaleComponent',SkyMenuSaleComponent);
+app.component('BudgetAccountCrudComponent',BudgetAccountCrudComponent);
 
 const toastificationOptions = {};
 app.use(store);

@@ -39,4 +39,12 @@ class BudgetAccountRepository implements BudgetAccountRepositoryInterface
         $budgetAccount->load(['budgetPriority','mainAccount','subAccount']);
         return $budgetAccount;
     }
+
+    public function confirm(int $id)
+    {
+        $budgetAccount = BudgetAccount::find($id);
+        $budgetAccount->status = 'confirmed';
+        $budgetAccount->save();
+        ResponseMessage("Budget account confirmed successfully");
+    }
 }

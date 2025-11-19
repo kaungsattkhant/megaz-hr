@@ -291,7 +291,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 return $returnData;
             }
             //change
-        } catch (\Throwable $e) {
+        } catch (\Excepiton $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;

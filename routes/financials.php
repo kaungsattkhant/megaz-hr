@@ -33,9 +33,11 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::controller(BudgetAccountController::class)->group(function () {
+        Route::get('budget_priorities','getBudgetPriorities');
         Route::get('budget_accounts','index');
         Route::post('budget_accounts','create');
         Route::post('budget_accounts/{id}','edit');
+        Route::post('budget_accounts/{id}/confirm','confirmBudgetAccount');
     });
 });
 

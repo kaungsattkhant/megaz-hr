@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 
 use App\Repositories\BudgetAccount\BudgetAccountRepositoryInterface;
 
+use App\Models\BudgetPriority;
+
 class BudgetAccountController extends Controller
 {
     //
@@ -44,5 +46,16 @@ class BudgetAccountController extends Controller
         $data = $request->all();
         $budgetAcc = $this->repo->update($id, $data);
         ResponseData($budgetAcc);
+    }
+
+    public function confirmBudgetAccount(Request $request, int $id)
+    {
+        $data = $request->all();
+        $this->repo->confirm($id, $data);
+    }
+
+    public function getBudgetPriorities(Request $request)
+    {
+        ResponseData(BudgetPriority::all());
     }
 }

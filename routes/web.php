@@ -775,6 +775,7 @@ Route::view('/bar_report', 'bar_reports.chart');
 Route::view('/kitchen_report', 'kitchen_reports.chart');
 Route::view('/ktv_menu_sale', 'kitchen_menu_sale.ktv_menu_sale');
 Route::view('/sky_menu_sale', 'kitchen_menu_sale.sky_menu_sale');
+Route::view('/budget_accounts', 'budget_accounts.index');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');
