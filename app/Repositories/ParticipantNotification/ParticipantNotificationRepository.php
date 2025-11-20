@@ -2,6 +2,7 @@
 
 namespace App\Repositories\ParticipantNotification;
 
+use App\Http\Action\SendNotification\FcmSendNotification;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\Type;
@@ -25,7 +26,7 @@ use App\Http\Action\SendNotification\SendNotification;
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
-  use SendNotification;
+  use SendNotification, FcmSendNotification;
 
   public function getStaffByDepartmentRole($depId, $roleId)
   {
@@ -46,6 +47,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $meeting = Meeting::create($data);
 
       if (isset($data['meeting_type'])) {
+        // $this->sendFcmNotification($staffTimeshift, $staffTimeshift->staff, $notiData);
+
         $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
       }
 
@@ -229,9 +232,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           if ($allUsers->isNotEmpty()) {
             $notificationData = [
               'title' => 'Meeting Update',
-              'body' => 'A meeting has been updated. Please check the details.',
+              'preview' => 'A meeting has been updated. Please check the details.',
             ];
-            $this->sendParticipantNoti($meeting, $allUsers, $notificationData);
+            $this->sendFcmNotification($meeting, $allUsers, $notificationData);
+            // $this->sendParticipantNoti($meeting, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($meeting, 'meeting');
@@ -476,9 +480,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           if ($allUsers->isNotEmpty()) {
             $notificationData = [
               'title' => 'Training Update',
-              'body' => 'A training has been updated. Please check the details.',
+              'preview' => 'A training has been updated. Please check the details.',
             ];
-            $this->sendParticipantNoti($training, $allUsers, $notificationData);
+            $this->sendFcmNotification($training, $allUsers, $notificationData);
+            // $this->sendParticipantNoti($training, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($training, 'training');
@@ -727,12 +732,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               }
             }
           }
-          if($allUsers->isNotEmpty()){
+          if ($allUsers->isNotEmpty()) {
             $notificationData = [
               'title' => 'orgNew Update',
-              'body' => 'A orgNew has been updated. Please check the details.Please check the details.',
+              'preview' => 'A orgNew has been updated. Please check the details.Please check the details.',
             ];
-            $this->sendParticipantNoti($orgNew, $allUsers, $notificationData);
+            $this->sendFcmNotification($orgNew, $allUsers, $notificationData);
+            // $this->sendParticipantNoti($orgNew, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($orgNew, 'orgNew');
@@ -962,12 +968,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               }
             }
           }
-          if($allUsers->isNotEmpty()){
+          if ($allUsers->isNotEmpty()) {
             $notificationData = [
               'title' => 'Warning Update',
-              'body' => 'A warning has been updated. Please check the details.',
+              'preview' => 'A warning has been updated. Please check the details.',
             ];
-            $this->sendParticipantNoti($warning, $allUsers, $notificationData);
+            $this->sendFcmNotification($warning, $users, $notificationData);
+            // $this->sendParticipantNoti($warning, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($warning, 'warning');
@@ -1080,11 +1087,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     if ($users->isNotEmpty()) {
       $notificationData = [
         'title' => $typeName,
-        'body' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
+        'preview' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
-          $this->sendFcmNotification($staffTimeshift, $staffTimeshift->staff, $notiData);
+      $this->sendFcmNotification($object, $users, $notificationData);
 
-      $this->sendParticipantNoti($object, $users, $notificationData);
+      // $this->sendParticipantNoti($object, $users, $notificationData);
     }
   }
 
@@ -1095,59 +1102,60 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getallNoties($request, $staffId)
   {
-      $type = $request->query('type');
+    $type = $request->query('type');
 
-      $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift','staff_equipment_handover'];
-      $notificationUsers = NotificationUser::with(['notification' => function ($query) {
+    $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift', 'staff_equipment_handover'];
+    $notificationUsers = NotificationUser::with([
+      'notification' => function ($query) {
         $query->with('notificationable');
-    }])
-    ->where('staff_id', $staffId)
-    ->whereHas('notification', function ($query) use ($type, $validTypes) {
+      }
+    ])
+      ->where('staff_id', $staffId)
+      ->whereHas('notification', function ($query) use ($type, $validTypes) {
         if ($type && in_array($type, $validTypes)) {
-            $query->where('notificationable_type', $type);
+          $query->where('notificationable_type', $type);
         } else {
-            $query->whereIn('notificationable_type', $validTypes);
+          $query->whereIn('notificationable_type', $validTypes);
         }
-    })
-    ->orderBy('id', 'desc')
-    ->paginate(config('common.list_count'));
+      })
+      ->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
 
     $filteredNotifications = $notificationUsers->getCollection()->filter(function ($notificationUser) {
-        return $notificationUser->notification && $notificationUser->notification->notificationable;
+      return $notificationUser->notification && $notificationUser->notification->notificationable;
     });
 
     foreach ($filteredNotifications as $notificationUser) {
       $notificationType = $notificationUser->notification->notificationable_type;
 
       if (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
-          $notificationUser->notification->notificationable->load([
-              'participants',
-              'participants.department.roles',
-              'participants.role.department',
-              'participants.staff.department',
-              'participants.staff.roles'
-          ]);
+        $notificationUser->notification->notificationable->load([
+          'participants',
+          'participants.department.roles',
+          'participants.role.department',
+          'participants.staff.department',
+          'participants.staff.roles'
+        ]);
 
-          if ($notificationType === Relation::getMorphedModel('meeting') || $notificationType === 'meeting') {
-              $notificationUser->notification->notificationable->load('chairedBy');
-          } elseif ($notificationType === Relation::getMorphedModel('training') || $notificationType === 'training') {
-              $notificationUser->notification->notificationable->load('trainedBy');
-          }
+        if ($notificationType === Relation::getMorphedModel('meeting') || $notificationType === 'meeting') {
+          $notificationUser->notification->notificationable->load('chairedBy');
+        } elseif ($notificationType === Relation::getMorphedModel('training') || $notificationType === 'training') {
+          $notificationUser->notification->notificationable->load('trainedBy');
+        }
       } elseif ($notificationType === Relation::getMorphedModel('staff_timeshift') || $notificationType === 'staff_timeshift') {
-          $notificationUser->notification->notificationable->load([
-              'timeshift.shift',
-              'area'
-          ]);
-      }
-      elseif ($notificationType === Relation::getMorphedModel('staff_equipment_handover') || $notificationType === 'staff_equipment_handover') {
-          $notificationUser->notification->notificationable->load([
-              'fromStaff',
-              'toStaff',
-              'staffTimeshift',
-              'staffTimeshift.timeshift',
-              'staffTimeshift.timeshift.shift',
-              'staffTimeshift.area'
-          ]);
+        $notificationUser->notification->notificationable->load([
+          'timeshift.shift',
+          'area'
+        ]);
+      } elseif ($notificationType === Relation::getMorphedModel('staff_equipment_handover') || $notificationType === 'staff_equipment_handover') {
+        $notificationUser->notification->notificationable->load([
+          'fromStaff',
+          'toStaff',
+          'staffTimeshift',
+          'staffTimeshift.timeshift',
+          'staffTimeshift.timeshift.shift',
+          'staffTimeshift.area'
+        ]);
       }
     }
     return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
