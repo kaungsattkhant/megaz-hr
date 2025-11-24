@@ -4,6 +4,10 @@ namespace App\Repositories\Report;
 use App\Models\Area;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use DatePeriod;
+use DateInterval;
 
 class ReportRepository implements ReportInterface
 {
@@ -308,5 +312,70 @@ class ReportRepository implements ReportInterface
             });
 
             return $result;
+    }
+
+    public function getBudgetAccountsCashflow(Request $request)
+    {
+        $yearMonth = explode("-",$request->month);
+        $year = $yearMonth[0];
+        $month = $yearMonth[1];
+        $start = Carbon::create($year, $month, 1);
+        $end   = $start->copy()->endOfMonth();
+
+        $raw = DB::table('budget_accounts as ba')
+        ->selectRaw('
+            a.id AS account_id,
+            a.name AS account,
+            bp.priority,
+            DATE(ba.date) AS day,
+            SUM(ba.amount) AS total
+        ')
+        ->join('budget_priorities as bp', 'bp.id', '=', 'ba.budget_priority_id')
+        ->join('accounts as a', function($j){
+            $j->on('a.id', '=', 'ba.sub_account_id')
+            ->where('ba.sub_account_type', 'account');
+        })
+        ->where('ba.status','confirmed')
+        ->whereBetween('ba.date', [$start, $end])
+        ->groupBy('a.id', 'a.name', 'bp.priority', 'day')
+        ->orderBy('bp.priority')
+        ->orderBy('a.name')
+        ->get();
+
+        $dates = collect(
+            new DatePeriod($start, new DateInterval('P1D'), $end->copy()->addDay())
+        )->map(fn($d) => $d->format('Y-m-d'));
+
+        // Group by account_id + priority
+        $grouped = $raw->groupBy(function($row){
+            return $row->account_id . '-' . $row->priority;
+        });
+
+        $final = [];
+
+        foreach ($grouped as $rows) {
+
+            $first = $rows->first();
+
+            $entry = [
+                'account_id' => $first->account_id,
+                'account'    => $first->account,
+                'priority'   => $first->priority,
+                'dates'      => []
+            ];
+
+            // Initialize all dates to zero
+            foreach ($dates as $date) {
+                $entry['dates'][$date] = 0;
+            }
+
+            // Fill in actual totals
+            foreach ($rows as $row) {
+                $entry['dates'][$row->day] = $row->total;
+            }
+
+            $final[] = $entry;
+        }
+        return $final;
     }
 }

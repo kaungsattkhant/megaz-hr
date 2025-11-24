@@ -10,6 +10,8 @@ use App\Repositories\BudgetAccount\BudgetAccountRepositoryInterface;
 
 use App\Models\BudgetPriority;
 
+use App\Repositories\Report\ReportInterface;
+
 class BudgetAccountController extends Controller
 {
     //
