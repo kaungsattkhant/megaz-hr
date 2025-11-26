@@ -31,7 +31,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   }
 
   public function storeShifts($data)
-  {
+  { 
     return Shift::updateOrCreate(
       ['id' => $data['id'] ?? null],
       $data
@@ -40,12 +40,12 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getTimeShift($request)
   {
-    return TimeShift::with('shift')->orderBy('id', 'desc')->get();
+    return TimeShift::with(['gps','shift'])->orderBy('id', 'desc')->get();
   }
 
   public function getTimeShiftById($timeShiftId)
   {
-    return TimeShift::with('shift')->find($timeShiftId);
+    return TimeShift::with(['gps', 'shift'])->find($timeShiftId);
   }
 
   public function storeTimeShift($data)
