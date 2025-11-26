@@ -513,6 +513,9 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(GpsController::class)->group(function () {
         Route::post('gps', 'updateOrCreateGps');
+        Route::get('/gps', 'getGPS');
+        Route::get('/gps/{id}', 'getGPSById');
+        // Route::post('/gps/{id}', 'updateGPSById');
     });
 });
 

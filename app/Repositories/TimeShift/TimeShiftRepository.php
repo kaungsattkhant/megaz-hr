@@ -20,25 +20,6 @@ use App\Http\Resources\GetCurrentTimeShiftResource;
 class TimeShiftRepository implements TimeShiftRepositoryInterface
 {
 
-  public function getGPS($request)
-  { 
-    $gpsQuery= Gps::orderBy('id', 'desc');
-    $gps = isset($request['page']) ? $gpsQuery->paginate(config('common.list_count')) : $gpsQuery->get();
-    return $gps;
-  }
-
-  public function getGPSById(int $gpsId)
-  {
-    return Gps::find($gpsId);
-  }
-
-  public function updateGPSById($request, int $gpsId)
-  {
-    $gps = Gps::find($gpsId);
-    $gps->update($request);
-    return $gps;
-  }
-
   public function getShifts($request)
   {
     return Shift::orderBy('id', 'desc')->get();

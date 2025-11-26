@@ -7,6 +7,18 @@ use Illuminate\Support\Facades\DB;
 
 class GpsService
 {
+    public function getGps($request)
+    {
+        $gpsQuery = Gps::orderBy('id', 'desc');
+        $gps = isset($request['page']) ? $gpsQuery->paginate(config('common.list_count')) : $gpsQuery->get();
+        return $gps;
+    }
+
+    public function getGpsById($gpsId)
+    {
+        return Gps::find($gpsId);
+    }
+
     public function updateOrCreateGps(array $data)
     {
         try {
@@ -20,7 +32,7 @@ class GpsService
                     [
                         'latitude'  => $data['latitude'],
                         'longitude' => $data['longitude'],
-                        'name'    => $data['name'] ,
+                        'name'    => $data['name'],
                         'branch_name'    => $data['branch_name'],
                         'updated_at' => now(),
                     ]

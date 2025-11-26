@@ -7,12 +7,6 @@ use Illuminate\Http\Request;
 interface TimeShiftRepositoryInterface
 {
 
-  public function getGPS($request);
-
-  public function getGPSById(int $gpsId);
-
-  public function updateGPSById($request, int $gpsId);
-
   public function getShifts($request);
 
   public function getShiftsById(int $shiftId);
