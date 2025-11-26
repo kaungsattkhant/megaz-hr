@@ -18,7 +18,7 @@ class GpsController extends Controller
     }
 
     public function updateOrCreateGps(GpsCreateRequest $request){
-        $gps=$this->gpsService->updateOrCreateGps($request->validated());
+        $gps=$this->gpsService->updateOrCreateGps($request->all());
         ResponseData($gps);
     }
 }

@@ -23,7 +23,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   public function getGPS($request)
   { 
     $gpsQuery= Gps::orderBy('id', 'desc');
-    $gps = isset($request->page) ? $gpsQuery->paginate(config('common.list_count')) : $gpsQuery->get();
+    $gps = isset($request['page']) ? $gpsQuery->paginate(config('common.list_count')) : $gpsQuery->get();
     return $gps;
   }
 

@@ -10,7 +10,7 @@ class GpsService
     public function updateOrCreateGps(array $data)
     {
         try {
-            if (!isset($data->id)) {
+            if (!isset($data['id'])) {
                 $data['id'] = null;
             }
             return DB::transaction(function () use ($data) {
