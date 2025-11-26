@@ -387,10 +387,10 @@ class OrderService
                     // dd($menuData);
                     $orderData['invoice_id'] = $invoiceId;
                     $orderData['date'] = CurrentTime();
-                    $orderData['total'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $orderData['total'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc']) && $menuData['is_foc'])
                         ? 0
                         : ($menuData['original_price'] + $totalExtraPrice) * $menuData['quantity'];
-                    $orderData['order_sub_total'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $orderData['order_sub_total'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc']) && $menuData['is_foc'])
                         ? 0
                         : (($menuData['original_price'] + $totalExtraPrice) * $menuData['quantity']) - $discountAmount;
                     $orderData['total_quantity'] = $menuData['quantity'];
@@ -420,9 +420,9 @@ class OrderService
                     $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc'])&& $menuData['is_foc'])
                         ? 0
                         : ($menuData['original_price'] + $totalExtraPrice) - $defaultDiscountAmont; //after  
-                    $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package']) 
                         ? 0
-                        : $menuData['original_price']; //after  
+                        : $menuData['original_price']; //after  //original price
 
                     // $menuData['order_id'] = $order->id;
                     // $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
