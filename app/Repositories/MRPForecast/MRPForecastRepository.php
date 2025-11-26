@@ -1,0 +1,1142 @@
+<?php
+
+namespace App\Repositories\MRPForecast;
+
+use Exception;
+use Carbon\Carbon;
+use App\Models\Item;
+use App\Models\Menu;
+use App\Models\MrpHr;
+use App\Models\KtvItem;
+use App\Models\MenuStep;
+use App\Models\Inventory;
+use App\Models\ItemPrice;
+use App\Models\DayInOffDay;
+use App\Models\MrpForecast;
+use App\Models\KtvObjective;
+use App\Models\SupplierItem;
+use App\Models\PurchaseOrder;
+use App\Models\KtvProductTree;
+use App\Models\MrpRawMaterial;
+use App\Services\MrpWorkingHour;
+use App\Models\PurchaseOrderItem;
+use App\Models\TargetMrpForecast;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
+use App\Services\AveragePriceCalculator;
+use App\Http\Resources\HrForecastResource;
+use Illuminate\Database\Eloquent\Collection;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
+
+class MRPForecastRepository implements MRPForecastRepositoryInterface
+{
+  protected $averagePriceCalculator;
+  protected MrpWorkingHour $MrpWorkingHour;
+  public function __construct(AveragePriceCalculator $repo, MrpWorkingHour $MrpWorkingHour)
+  {
+    $this->averagePriceCalculator = $repo;
+    $this->MrpWorkingHour = $MrpWorkingHour;
+  }
+
+
+  public function getForcastHrByMenuId($request, $menuId)
+  {
+    $quantity = $request->quantity;
+    $date = Carbon::parse($request->date);
+    $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($menuId, $quantity, $date);
+    return  $hrDurations;
+  }
+
+  public function getForcastHR($data)
+  {
+    $forecastMenuDatas = json_decode($data['forecast_datas'], true);
+    $allHrDurations = collect();
+    foreach ($forecastMenuDatas as $forecastMenuData) {
+      $menuId = $forecastMenuData['menu_id'];
+      $quantity = $forecastMenuData['quantity'];
+      $date = Carbon::parse($forecastMenuData['date']);
+      $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($menuId,  $quantity, $date);
+      $allHrDurations = $allHrDurations->merge($hrDurations);
+    }
+    $groupedHrDurations = $allHrDurations->groupBy('role_id')->map(function ($roles) {
+      $first = $roles->first();
+      $totalMinutes = $roles->reduce(function ($carry, $role) {
+        return $carry + $role['total_working_hour'];
+      }, 0);
+      $totalHrCost = $roles->sum(function ($role) {
+        return $role['hr_cost_cal'];
+      });
+      return [
+        'role_id' => $first['role_id'],
+        'position' => $first['position'],
+        'total_working_hour' => $totalMinutes,
+        'hr_cost_cal' => round($totalHrCost, 3),
+      ];
+    })->values();
+
+    return $groupedHrDurations;
+  }
+
+  public function getForcastMenusByMenuId($request, $menuId)
+  {
+    $quantity = $request->quantity;
+    $menu = Menu::where('id', $menuId)
+      ->with(['menuSteps.menuStepItem.item', 'subMenus.menuSteps.menuStepItem.item'])
+      ->first();
+
+    if (!$menu) {
+      return ['error' => 'Menu not found'];
+    }
+    $totals = $this->calculateMenuTotals($menu);
+
+    $mrpForecast = $quantity * $totals['totalWeightedPrice'];
+    $result = [
+      'id' => $menu->id,
+      'menu' => $menu->name,
+      'quantity' => $quantity,
+      'total_menu_forecast_amt' => $mrpForecast,
+    ];
+
+    return $result;
+  }
+
+  private function calculateMenuTotals($menu)
+  {
+    $totalWeightedPrice = 0;
+    $totalWeight = 0;
+
+    $menuStepItems = $menu->menuSteps
+      ->flatMap(function ($menuStep) {
+        return $menuStep->menuStepItem;
+      });
+
+
+    foreach ($menuStepItems as $menuStepItem) {
+      $item = $menuStepItem->item;
+
+      $averagePrice = $this->averagePriceCalculator->getAveragePriceForItem($item->id);
+      $weight = $menuStepItem->quantity ?? 0;
+      if($menuStepItem->uom_type=='uom'){
+        $unitPrice=$averagePrice/$item->conversion;
+      }else if($menuStepItem->uom_type=='base_uom'){
+        $unitPrice=$averagePrice;
+      }else{
+        ResponseMessage('Unit Price is missing for '.$item->name,422);
+      }
+      $totalWeightedPrice += $unitPrice * $weight;
+      $totalWeight += $weight;
+    }
+
+    foreach ($menu->subMenus as $subMenu) {
+      $subMenuTotals = $this->calculateMenuTotals($subMenu);
+      $totalWeightedPrice += $subMenuTotals['totalWeightedPrice'];
+      $totalWeight += $subMenuTotals['totalWeight'];
+    }
+
+    return [
+      'totalWeightedPrice' => $totalWeightedPrice,
+      'totalWeight' => $totalWeight
+    ];
+  }
+
+  public function getForcastMenus($data)
+  {
+    $forecastMenuDatas = json_decode($data['forecast_datas'], true);
+    $results = [];
+    foreach ($forecastMenuDatas as $forecastMenuData) {
+      $menu = Menu::where('id', $forecastMenuData['menu_id'])
+        ->with(['menuSteps.menuStepItem.item', 'subMenus.menuSteps.menuStepItem.item'])
+        ->first();
+
+      if (!$menu) {
+        return ['error' => 'Menu not found'];
+      }
+      $totals = $this->calculateMenuTotals($menu);
+
+      $mrpForecast = $forecastMenuData['quantity'] * $totals['totalWeightedPrice'];
+      $results[] = [
+        'id' => $menu->id,
+        'menu' => $menu->name,
+        'quantity' => $forecastMenuData['quantity'],
+        'total_menu_forecast_amt' => $mrpForecast,
+      ];
+    }
+    return $results;
+  }
+
+
+  public function getForcastRawMaterialByMenuId($request, $menuId)
+  {
+    $quantity = $request->quantity;
+    // $inventoryId = Inventory::where('name', '=', 'Main Inventory')->pluck('id')->first();
+    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
+    if (!$inventoryId) {
+      ResponseMessage('Main Inventory not found.', 404);
+    }
+    $menu = Menu::where('id', $menuId)
+      ->with([
+        'subMenus',
+        'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
+          $query->with([
+            'item' => function ($itemQuery) use ($inventoryId) {
+              $itemQuery->with([
+                'balance' => function ($balanceQuery) use ($inventoryId) {
+                  $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                    $q->where('inventory_id', $inventoryId);
+                  });
+                },
+                'brands'
+              ]);
+            },
+            'uom'
+          ]);
+        }
+      ])
+      ->first();
+
+    if (!$menu) {
+      return collect();
+    }
+
+    $menuIds = collect([$menu->id])
+      ->merge($menu->subMenus->pluck('id'))
+      ->toArray();
+
+    $menuStepDatas = MenuStep::whereIn('menu_id', $menuIds)
+      ->with([
+        'menuStepItem'
+        => function ($query) use ($inventoryId) {
+          $query->with([
+            'item' => function ($itemQuery) use ($inventoryId) {
+              $itemQuery->with([
+                'balance' => function ($balanceQuery) use ($inventoryId) {
+                  $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                    $q->where('inventory_id', $inventoryId);
+                  });
+                },
+                'brands'
+              ]);
+            },
+            'uom'
+          ]);
+        }
+      ])->get();
+
+
+    $result = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
+      return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
+        return $this->processMenuStepItem($data, $quantity);
+      })->filter();
+    });
+
+    return $this->groupMenuStepItems($result);
+  }
+
+  public function getForcastRawMaterial($data)
+  {
+    $forecastMenuDatas = json_decode($data['forecast_datas'], true);
+
+    $result = collect();
+
+    foreach ($forecastMenuDatas as $forecastData) {
+      $menuId = $forecastData['menu_id'];
+      $quantity = $forecastData['quantity'];
+
+
+      $inventoryId = 6;
+      $menu = Menu::where('id', $menuId)
+        ->with([
+          'subMenus',
+          'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
+            $query->with([
+              'item' => function ($itemQuery) use ($inventoryId) {
+                $itemQuery->with([
+                  'balance' => function ($balanceQuery) use ($inventoryId) {
+                    $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                      $q->where('inventory_id', $inventoryId);
+                    });
+                  },
+                  'brands'
+                ]);
+              },
+              'uom',
+
+            ]);
+          }
+        ])
+        ->first();
+
+      if (!$menu) {
+        continue;
+      }
+
+
+      $menuIds = collect([$menu->id])
+        ->merge($menu->subMenus->pluck('id'))
+        ->toArray();
+
+
+      $menuStepDatas = MenuStep::whereIn('menu_id', $menuIds)
+        ->with([
+          'menuStepItem' => function ($query) use ($inventoryId) {
+            $query->with([
+              'item' => function ($itemQuery) use ($inventoryId) {
+                $itemQuery->with([
+                  'balance' => function ($balanceQuery) use ($inventoryId) {
+                    $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                      $q->where('inventory_id', $inventoryId);
+                    });
+                  },
+                  'brands'
+                ]);
+              },
+              'uom',
+
+            ]);
+          }
+        ])
+        ->get();
+
+      $menuStepDataProcessed = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
+        return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
+          return $this->processMenuStepItem($data, $quantity);
+        })->filter();
+      });
+
+      $result = $result->merge($menuStepDataProcessed);
+    }
+
+    return $this->groupMenuStepItems($result);
+  }
+
+  private function processMenuStepItem($data, $quantity)
+  {
+    if (!isset($data->item)) {
+      return null;
+    }
+
+    $conversionRate = $data->item->uom_conversion ?? 0;
+    $average_price = $data->item->average_price ?? 0;
+
+    $totalUom = $data->weight * (int)$quantity;
+    $forecastPrice = round($totalUom * round($average_price / $conversionRate, 4), 4);
+    $uomForecastAmt = round($totalUom / $conversionRate, 4);
+    $balance = $data->item->balance ?? null;
+    $inBalance = $balance->in_balance ?? 0;
+    $outBalance = $balance->out_balance ?? 0;
+    $closingBalance = $balance->closing_balance ?? 0;
+
+    $currentHolding = $closingBalance / $conversionRate;
+
+    return [
+      'menu_step_id' => $data->menu_step_id ?? 'null',
+      'item_id' => $data->item_id,
+      'name' => $data->item->name ?? 'null',
+      'code' => $data->item->code ?? 'null',
+      'base_uom_id' => $data->item->base_uom_id,
+      'base_uom_name' => $data->item->base_uom_name ?? 'null',
+      'uom_name' => $data->item->item_uom ?? 'null',
+      'weight' => $data->weight,
+      'uom_conversion_id' => $data->item->uom_conversion_id,
+      'uom_conversion' => $conversionRate,
+      'uom_id' => $data->item->uom_id,
+      // 'uom_name' => $data->uom->name ?? 'null',
+      'total_uom_amt' => $totalUom,
+      'average_price' => round($average_price, 4),
+      'forecast_price' => $forecastPrice,
+      'forecast_uom_amt' => $uomForecastAmt,
+      'in_balance' => $inBalance,
+      'out_balance' => $outBalance,
+      'closing_balance' => $closingBalance,
+      'current_holdings' => $currentHolding,
+      'minimum_holding_amount' =>  $data->item->minimum_holding_amount,
+      'min_holding_base_uom_quantity' => $data->item->min_holding_base_uom_quantity,
+      'min_holding_uom_quantity' => $data->item->min_holding_uom_quantity,
+      'brands'             => isset($data->item->brands) ? $data->item->brands->toArray() : []
+    ];
+  }
+
+  private function groupMenuStepItems($result)
+  {
+    return $result->groupBy('item_id')->map(function ($items) {
+      $first = $items->first();
+      return [
+        'item_id' => $items->first()['item_id'],
+        'name' => $items->first()['name'],
+        'code' => $items->first()['code'],
+        'base_uom_id' =>  $items->first()['base_uom_id'],
+        'base_uom_name' => $items->first()['base_uom_name'],
+        'uom_name' => $items->first()['uom_name'],
+        'weight' => $items->sum('weight'),
+        'uom_conversion_id' =>  $items->first()['uom_conversion_id'],
+        'uom_conversion' => $items->first()['uom_conversion'],
+        'uom_id' => $items->first()['uom_id'],
+        // 'uom_name' => $items->first()['uom_name'],
+        'total_uom_amt' => $items->sum('total_uom_amt'),
+        'average_price' => $items->sum(function ($item) {
+          return $item['average_price'];
+        }),
+        'forecast_price' => $items->sum('forecast_price'),
+        'forecast_uom_amt' => $items->sum('forecast_uom_amt'),
+        'in_balance' => $items->sum(function ($item) {
+          return $item['in_balance'];
+        }),
+        'out_balance' => $items->sum(function ($item) {
+          return $item['out_balance'];
+        }),
+        'closing_balance' => $items->sum(function ($item) {
+          return $item['closing_balance'];
+        }),
+        'current_holdings' => $items->sum(function ($item) {
+          return $item['current_holdings'];
+        }),
+        'minimum_holding_amount' => $items->sum(function ($item) {
+          return $item['minimum_holding_amount'];
+        }),
+        'min_holding_base_uom_quantity' => $items->sum(function ($item) {
+          return $item['min_holding_base_uom_quantity'];
+        }),
+        'min_holding_uom_quantity' => $items->sum(function ($item) {
+          return $item['min_holding_uom_quantity'];
+        }),
+        'brands'            => $first['brands']
+      ];
+    })->values();
+  }
+
+
+  public function storeForecast($data)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::create($data);
+
+      if (isset($data['target_mrp'])) {
+
+        $targetMrps = json_decode($data['target_mrp'], true);
+
+        foreach ($targetMrps as $targetMrp) {
+
+          TargetMrpForecast::create([
+            'mrp_forecast_id' => $mrpForecast->id,
+            'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
+            'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
+            'quantity' => $targetMrp['quantity'],
+            'amount' => $targetMrp['amount'] ?? null,
+            'hour' => $targetMrp['hour'] ?? null,
+          ]);
+        }
+      }
+
+      $forecastHrs = json_decode($data['forecast_hr'], true);
+      foreach ($forecastHrs as  $forecastHr) {
+
+        MrpHr::create([
+          'mrp_forecast_id' => $mrpForecast->id,
+          'role_id' =>  $forecastHr['role_id'],
+          'total_duration' => $forecastHr['total_duration'],
+        ]);
+      }
+
+
+      $forecastRaws = json_decode($data['forecast_raw'], true);
+      foreach ($forecastRaws as  $forecastRaw) {
+
+        MrpRawMaterial::create([
+          'mrp_forecast_id' => $mrpForecast->id,
+          'item_id' => $forecastRaw['item_id'],
+          'uom_id' => $forecastRaw['uom_id'],
+          'quantity' => $forecastRaw['quantity'],
+          'amount' => $forecastRaw['amount'],
+        ]);
+      }
+
+      DB::commit();
+      return $mrpForecast;
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  public function updateMenuForecast($data, int $mrpForecastId)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::findOrFail($mrpForecastId);
+
+      $mrpForecast->update($data);
+
+      if (isset($data['target_mrp'])) {
+
+        $targetMrps = json_decode($data['target_mrp'], true);
+        foreach ($targetMrps as $targetMrp) {
+
+          if (isset($targetMrp['id'])) {
+            $targetMrpData = TargetMrpForecast::find($targetMrp['id']);
+            if ($targetMrpData) {
+              $targetMrpData->update([
+                'mrp_forecast_id' => $mrpForecast->id,
+                'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
+                'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
+                'quantity' => $targetMrp['quantity'],
+                'amount' => $targetMrp['amount'] ?? null,
+                'hour' => $targetMrp['hour'] ?? null,
+              ]);
+            }
+          } else {
+            TargetMrpForecast::create([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
+              'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
+              'quantity' => $targetMrp['quantity'],
+              'amount' => $targetMrp['amount'] ?? null,
+              'hour' => $targetMrp['hour'] ?? null,
+            ]);
+          }
+        }
+      }
+      $forecastHrs = json_decode($data['forecast_hr'], true);
+      foreach ($forecastHrs as  $forecastHr) {
+        if (isset($forecastHr['id'])) {
+          $mrpHrdata = MrpHr::find($forecastHr['id']);
+          if ($mrpHrdata) {
+            $mrpHrdata->update([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'role_id' =>  $forecastHr['role_id'],
+              'total_duration' => $forecastHr['total_duration'],
+            ]);
+          }
+        } else {
+          MrpHr::create([
+            'mrp_forecast_id' => $mrpForecast->id,
+            'role_id' => $forecastHr['role_id'],
+            'total_duration' => $forecastHr['total_duration'],
+          ]);
+        }
+      }
+
+
+      $forecastRaws = json_decode($data['forecast_raw'], true);
+      foreach ($forecastRaws as  $forecastRaw) {
+        if (isset($forecastRaw['id'])) {
+          $mrpRawData =  MrpRawMaterial::find($forecastRaw['id']);
+          if ($mrpRawData) {
+            $mrpRawData->update([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'item_id' => $forecastRaw['item_id'],
+              'uom_id' => $forecastRaw['uom_id'],
+              'quantity' => $forecastRaw['quantity'],
+              'amount' => $forecastRaw['amount'],
+            ]);
+          }
+        } else {
+          MrpRawMaterial::create([
+            'mrp_forecast_id' => $mrpForecast->id,
+            'item_id' => $forecastRaw['item_id'],
+            'uom_id' => $forecastRaw['uom_id'],
+            'quantity' => $forecastRaw['quantity'],
+            'amount' => $forecastRaw['amount'],
+          ]);
+        }
+      }
+
+      DB::commit();
+      return $mrpForecast;
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  public function getMonthlyMenuForecasts($request)
+  {
+    $type = $request->input('type');
+    $inventoryId = 6;
+
+    $query = MrpForecast::query();
+
+    if ($type) {
+      $query->where('type', $type);
+    } else {
+      $query->whereIn('type', ['ktv', 'restaurant']);
+    }
+
+    return $query->with([
+      'targetMrpForecasts' => function ($q) {
+        $q->where('mrp_forecastable_type', 'menu');
+      },
+      'targetMrpForecasts.mrp_forecastable',
+      'MrpHrs.role',
+      'MrpRawMaterials.item' => function ($itemQuery) use ($inventoryId) {
+        $itemQuery->with([
+          'balance' => function ($balanceQuery) use ($inventoryId) {
+            $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+              $q->where('inventory_id', $inventoryId);
+            });
+          }
+        ]);
+      },
+      'MrpRawMaterials.uom'
+    ])->get();
+  }
+
+
+  public function getMonthlyKTVProductTreeForecasts($request)
+  {
+
+    $inventoryId = 6;
+
+    return MrpForecast::where('type', 'ktv_product_tree')->with([
+      'targetMrpForecasts' => function ($q) {
+        $q->where('mrp_forecastable_type', 'entity');
+      },
+      'targetMrpForecasts.mrp_forecastable',
+      'MrpHrs.role',
+      'MrpRawMaterials.item' => function ($itemQuery) use ($inventoryId) {
+        $itemQuery->with([
+          'balance' => function ($balanceQuery) use ($inventoryId) {
+            $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+              $q->where('inventory_id', $inventoryId);
+            });
+          }
+        ]);
+      },
+      'MrpRawMaterials.uom'
+    ])->get();
+  }
+
+  public function getMonthlyMenuForecastsById($mrpForecastId)
+  {
+    $inventoryId = 6;
+    $mrpdata = MRPForecast::findOrFail($mrpForecastId);
+    $forecastableType = ($mrpdata->type === 'restaurant' || $mrpdata->type === 'ktv') ? 'menu' : 'entity';
+
+    return $this->getForecastDataByType($mrpForecastId, $forecastableType, $inventoryId);
+  }
+  private function getForecastDataByType($mrpForecastId, $forecastableType, $inventoryId)
+  {
+
+    return  MrpForecast::with([
+      'targetMrpForecasts' => function ($q) use ($forecastableType) {
+        $q->where('mrp_forecastable_type', $forecastableType);
+      },
+      'targetMrpForecasts.mrp_forecastable',
+      'MrpHrs.role.department',
+      'MrpRawMaterials.item' => function ($itemQuery) use ($inventoryId) {
+        $itemQuery->with([
+          'balance' => function ($balanceQuery) use ($inventoryId) {
+            $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+              $q->where('inventory_id', $inventoryId);
+            });
+          }
+        ]);
+      },
+      'MrpRawMaterials.uom'
+    ])->where('id', $mrpForecastId)->first();
+  }
+
+
+  public function getPoForecasts($request)
+  {
+    return PurchaseOrder::where('status', 'created')->get();
+  }
+
+  public function storePoForecastsByItemId($data, $itemId)
+  {
+
+    $averagePrice = $this->averagePriceCalculator->getAveragePriceForItem($itemId);
+    $totalPrice = $data['quantity'] * $averagePrice;
+
+    if (isset($data['status'])) {
+      DB::beginTransaction();
+      try {
+        $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
+        $count = 4;
+        $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
+        $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
+
+        $po =  PurchaseOrder::create([
+          'po_id' => $po_id,
+          'total_price' => $totalPrice,
+          'date' => now()->format('Y-m-d'),
+          'created_by' => UserData()->id,
+          'status' => $data['status']
+        ]);
+        $poItem = PurchaseOrderItem::create([
+          'base_uom_id' => $data['base_uom_id'],
+          'base_uom_quantity' => $data['base_uom_quantity'],
+          'uom_id' => $data['uom_id'],
+          'uom_quantity' => $data['uom_quantity'],
+          'quantity' => $data['quantity'],
+          'purchase_order_id' => $po->id,
+          'item_id' => $itemId,
+          'brand_id' => $data['brand_id'],
+          'amount' => $data['amount'],
+          'original_quantity' => $data['quantity'],
+          'uom_conversion_id' => $data['uom_conversion_id'],
+          'unit_price' => $data['unit_price']
+        ]);
+        DB::commit();
+        return $poItem;
+      } catch (Exception $e) {
+        DB::rollBack();
+        throw $e;
+      }
+    } else {
+
+      $po =  PurchaseOrder::findOrFail($data['purchase_order_id']);
+      $po->increment('total_price', $totalPrice);
+      return PurchaseOrderItem::create(
+        [
+          'base_uom_id' => $data['base_uom_id'],
+          'base_uom_quantity' => $data['base_uom_quantity'],
+          'uom_quantity' => $data['uom_quantity'],
+          'purchase_order_id' => $po->id,
+          'item_id' => $itemId,
+          'brand_id' => $data['brand_id'],
+          'amount' => $data['amount'],
+          'original_quantity' => $data['quantity'],
+          'quantity' => $data['quantity'],
+          'uom_id' => $data['uom_id'],
+          'uom_conversion_id' => $data['uom_conversion_id'],
+          'unit_price' => $data['unit_price']
+        ]
+      );
+    }
+  }
+
+
+  public function deleteMenuForecast($request, $target_mrp_forecast_id)
+  {
+
+    DB::beginTransaction();
+    try {
+
+      $targetMenuMrp = TargetMrpForecast::where('id',  $target_mrp_forecast_id)
+        ->first();
+      $quantity =   $targetMenuMrp->quantity;
+
+      if (!$targetMenuMrp) {
+        return null;
+      }
+
+      $mrpForecast = $targetMenuMrp->mrpForecast;
+      if ($targetMenuMrp->mrp_forecastable_type === 'menu') {
+
+        $menuId = $targetMenuMrp->mrp_forecastable_id;
+
+        $menu = Menu::where('id', $menuId)
+          ->with(['menuSteps.menuStepItem', 'subMenus.menuSteps.menuStepItem'])
+          ->firstOrFail();
+
+        $data = $this->getForcastMenusByMenuId($request, $menuId);
+        $totalForecastAmount = $data['total_menu_forecast_amt'];
+
+        if ($mrpForecast) {
+          $rawMaterials = $mrpForecast->MrpRawMaterials;
+          $menuStepItemIds = $this->collectMenuStepItemIds($menu);
+
+          foreach ($rawMaterials as $rawMaterial) {
+            if (in_array($rawMaterial->item_id, $menuStepItemIds)) {
+              $originalAmount = $rawMaterial->amount;
+              $reducedAmount = $originalAmount - $totalForecastAmount;
+              $rawMaterial->amount = max(0, $reducedAmount);
+              $rawMaterial->save();
+            } else {
+              $rawMaterial->amount = $rawMaterial->amount;
+            }
+          }
+          $mrpHrs = $mrpForecast->MrpHrs;
+          $menuStepRoleIds = $this->collectMenuStepRoleIds($menu);
+
+          foreach ($mrpHrs  as $mrpHr) {
+
+            if (in_array($mrpHr->role_id, $menuStepRoleIds)) {
+              $menuStep = $menu->menuSteps->firstWhere('role_id', $mrpHr->role_id);
+
+              if ($menuStep) {
+
+                $totalHrDuration = (int)$mrpHr->total_duration;
+                $menuStepDuration = (int) $menuStep->duration * $quantity;
+                $durationDifference = $totalHrDuration - $menuStepDuration;
+                $mrpHr->total_duration = max(0, $durationDifference);
+                $mrpHr->save();
+              }
+            } else {
+              $mrpHr->total_duration = $mrpHr->total_duration;
+            }
+          }
+        }
+      } elseif ($targetMenuMrp->mrp_forecastable_type === 'entity') {
+
+        $mrpHrs = $mrpForecast->MrpHrs;
+        $entityId = $targetMenuMrp->mrp_forecastable_id;
+        $ktvHrData = KtvObjective::with('objectiveKey.role.department')
+          ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+            $query->where('entity_id', $entityId);
+          })
+          ->get();
+        $ktvRoleData = $ktvHrData->map(function ($ktvHr) {
+          return [
+            'role_id' => $ktvHr->objectiveKey->role_id,
+            'duration' => $ktvHr->objectiveKey->duration,
+          ];
+        });
+        $ktvRoleIds = $ktvRoleData->pluck('role_id')->toArray();
+
+        foreach ($mrpHrs  as $mrpHr) {
+
+          if (in_array($mrpHr->role_id, $ktvRoleIds)) {
+            $ktvHr = $ktvRoleData->firstWhere('role_id', $mrpHr->role_id);
+
+            if ($ktvHr) {
+              $ktvDuration = (int) $ktvHr['duration'];
+              $totalDuration = $ktvDuration * $quantity;
+
+              $totalHrDuration = (int) $mrpHr->total_duration;
+              $durationDifference = $totalHrDuration - $totalDuration;
+
+              $mrpHr->total_duration = max(0, $durationDifference);
+
+              $mrpHr->save();
+            }
+          } else {
+            $mrpHr->total_duration = $mrpHr->total_duration;
+          }
+        }
+
+        $inventoryId = 6;
+        $ktvItems = KtvItem::with([
+          'item' => function ($itemQuery) use ($inventoryId) {
+            $itemQuery->with([
+              'balance' => function ($balanceQuery) use ($inventoryId) {
+                $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                  $q->where('inventory_id', $inventoryId);
+                });
+              }
+            ]);
+          }
+        ])
+          ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+            $query->where('entity_id', $entityId);
+          })
+          ->get();
+        $ktvItemsId = $ktvItems->pluck('item_id')->toArray();
+
+        $rawMaterials = $mrpForecast->MrpRawMaterials;
+        foreach ($rawMaterials as $rawMaterial) {
+
+          if (in_array($rawMaterial->item_id, $ktvItemsId)) {
+            $ktvRaw = $ktvItems->firstWhere('item_id', $rawMaterial->item_id);
+
+            $forecastOriginalAmount = $rawMaterial->amount;
+            $ktvAmount =  $ktvRaw->quantity * $quantity;
+            $reducedAmount = $forecastOriginalAmount -  $ktvAmount;
+            $rawMaterial->amount = max(0, $reducedAmount);
+
+            $rawMaterial->save();
+          } else {
+            $rawMaterial->amount = $rawMaterial->amount;
+          }
+        }
+        $targetMenuMrp->delete();
+        DB::commit();
+        return $ktvItems;
+      }
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+  private function collectMenuStepItemIds(Menu $menu)
+  {
+    $menuStepItemIds = $menu->menuSteps->flatMap(function ($menuStep) {
+      return $menuStep->menuStepItem->pluck('item_id');
+    });
+
+
+    foreach ($menu->subMenus as $subMenu) {
+      $menuStepItemIds = $menuStepItemIds->merge(
+        $this->collectMenuStepItemIds($subMenu)
+      );
+    }
+
+    return $menuStepItemIds->unique()->toArray();
+  }
+
+  private function collectMenuStepRoleIds(Menu $menu)
+  {
+    $menuStepRoleIds = $menu->menuSteps->flatMap(function ($menuStep) {
+      return $menuStep->pluck('role_id');
+    });
+
+
+    foreach ($menu->subMenus as $subMenu) {
+      $menuStepRoleIds = $menuStepRoleIds->merge(
+        $this->collectMenuStepRoleIds($subMenu)
+      );
+    }
+
+    return $menuStepRoleIds->unique()->toArray();
+  }
+
+
+
+
+  //ktv forecast
+  public function getForecastKTV($data)
+  {
+    $forecastKTVDatas = json_decode($data['forecast_datas'], true);
+    $results = [];
+    foreach ($forecastKTVDatas as $forecastKTV) {
+
+      $ktvData =  KtvProductTree::with(['entity'])->where('entity_id',  $forecastKTV['entity_id'])->first();
+      if (!$ktvData) {
+        continue;
+      }
+      $results[] = [
+        'id' => $ktvData->id,
+        'entity_id' => $ktvData->entity_id,
+        'name' => $ktvData->entity->name,
+        'session' => $forecastKTV['quantity'],
+        'hour' => $forecastKTV['hour'],
+      ];
+    }
+    return $results;
+  }
+
+  public function getForecastKTVByEntityId($data, $entityId)
+  {
+    $results = [];
+    $ktvData =  KtvProductTree::with(['entity'])->where('entity_id', $entityId)->first();
+
+    $results[] = [
+      'id' => $ktvData->id,
+      'entity_id' => $ktvData->entity_id,
+      'name' => $ktvData->entity->name,
+      'session' => $data['quantity'],
+      'hour' => $data['hour'],
+    ];
+    return $results;
+  }
+
+  public function getForecastKTVRawMaterials($data)
+  {
+    $inventoryId = 6;
+    $result = collect();
+    $forecastKTVDatas = json_decode($data['forecast_datas'], true);
+
+    foreach ($forecastKTVDatas as $forecastKTV) {
+      $quantity = $forecastKTV['quantity'];
+      $entityId = $forecastKTV['entity_id'];
+
+      $ktvItems = KtvItem::with([
+        'item' => function ($itemQuery) use ($inventoryId) {
+          $itemQuery->with([
+            'balance' => function ($balanceQuery) use ($inventoryId) {
+              $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                $q->where('inventory_id', $inventoryId);
+              });
+            },
+            'brands'
+          ]);
+        }
+      ])
+        ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+          $query->where('entity_id', $entityId);
+        })
+        ->get();
+
+      $processedItems = $ktvItems->map(function ($ktvItem) use ($quantity, $entityId) {
+        $item = $ktvItem->item;
+        $processedData = $this->processKTVItem($ktvItem, $item,  $quantity);
+        $processedData['entity_id'] = $entityId;
+        $processedData['brands'] = isset($item->brands) ? $item->brands->toArray() : [];
+        return $processedData;
+      });
+      $result = $result->merge($processedItems);
+    }
+    return $this->groupMenuStepItems($result);
+  }
+
+  public function getForecastKTVRawMaterialsByEntityId($data, $entityId)
+  {
+
+    $inventoryId = 6;
+    $quantity = $data['quantity'];
+    $ktvItems = KtvItem::with([
+      'item' => function ($itemQuery) use ($inventoryId) {
+        $itemQuery->with([
+          'balance' => function ($balanceQuery) use ($inventoryId) {
+            $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+              $q->where('inventory_id', $inventoryId);
+            });
+          },
+          'brands'
+        ]);
+      }
+    ])
+      ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+        $query->where('entity_id', $entityId);
+      })
+      ->get();
+
+    $processedItems = $ktvItems->map(function ($ktvItem) use ($quantity, $entityId) {
+      $item = $ktvItem->item;
+      $processedData = $this->processKTVItem($ktvItem, $item,  $quantity);
+      $processedData['entity_id'] = $entityId;
+      $processedData['brands'] = isset($item->brands) ? $item->brands->toArray() : [];
+      return $processedData;
+    });
+    return $this->groupMenuStepItems($processedItems);
+  }
+
+  private function processKTVItem($ktvItem, $item, $quantity)
+  {
+
+    $conversionRate = $item->uom_conversion ?? 0;
+    $averagePrice = $item->average_price ?? 0;
+    $balance = $item->balance ?? null;
+    $closingBalance = $balance->closing_balance ?? 0;
+    if ($conversionRate == 0) {
+      $forecastPrice = 0;
+      $uomForecastAmt = 0;
+      $currentHolding = 0;
+    } else {
+      $totalUom = $ktvItem->quantity * $quantity;
+      $forecastPrice = round($totalUom * round($averagePrice / $conversionRate, 4), 4);
+      $uomForecastAmt = round($totalUom / $conversionRate, 4);
+      $closingBalance = $balance->closing_balance ?? 0;
+      $currentHolding = $closingBalance / $conversionRate;
+    }
+    $inBalance = $balance->in_balance ?? 0;
+    $outBalance = $balance->out_balance ?? 0;
+
+
+    return [
+      'ktv_product_tree_id' => $ktvItem->ktv_product_tree_id,
+      'item_id' => $ktvItem->item_id,
+      'name' =>  $item->name ?? 'null',
+      'code' => $item->code ?? 'null',
+      'base_uom_id' => $item->base_uom_id ?? null,
+      'base_uom_name' => $item->base_uom_name ?? 'null',
+      'uom_id' => $item->uom_id ?? 0,
+      'uom_name' => $item->item_uom ?? 'null',
+      'weight' => $ktvItem->quantity ?? 0,
+      'uom_conversion_id' => $item->uom_conversion_id,
+      'uom_conversion' => $conversionRate ?? 0,
+      'total_uom_amt' => $totalUom ?? 0,
+      'average_price' => round($averagePrice, 4),
+      'forecast_price' => $forecastPrice ?? 0,
+      'forecast_uom_amt' => $uomForecastAmt ?? 0,
+      'in_balance' => $inBalance,
+      'out_balance' => $outBalance,
+      'closing_balance' => $closingBalance ?? 0,
+      'current_holdings' => $currentHolding ?? 0,
+      'minimum_holding_amount' => $item->minimum_holding_amount ?? 0,
+      'min_holding_base_uom_quantity' => $item->min_holding_base_uom_quantity ?? 0,
+      'min_holding_uom_quantity' => $item->min_holding_uom_quantity ?? 0,
+      'brands'             => isset($data->item->brands) ? $item->brands->toArray() : []
+    ];
+  }
+
+
+  public function getForecastKTVHr($data)
+  {
+    $forecastKTVDatas = json_decode($data['forecast_datas'], true);
+    $result = collect();
+    foreach ($forecastKTVDatas as $forecastKTV) {
+      $quantity = $forecastKTV['quantity']; //session = quantity 
+      $entityId = $forecastKTV['entity_id'];
+      $date = Carbon::parse($forecastKTV['date']);
+
+      $ktvHrData = KtvObjective::with('objectiveKey.role.department')
+        ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+          $query->where('entity_id', $entityId);
+        })
+        ->get();
+
+      $KtvHr =  $ktvHrData->map(function ($ktvHr) use ($quantity, $date) {
+        $role = $ktvHr->objectiveKey->role;
+        $departmentName = $role->department->name;
+        $roleId = $role->id;
+        $pricePerHr = $this->MrpWorkingHour->getPricePerHr([$roleId], $date);
+        $duration = $ktvHr->objectiveKey->duration;
+        $totalDuration = $duration * $quantity;
+        $cost = ($totalDuration / 60) * $pricePerHr;
+        return [
+          'role_id' => $roleId,
+          'department_name' => $departmentName,
+          'total_duration' => $totalDuration,
+          'hr_cost_cal' => $cost
+        ];
+      });
+      $result = $result->merge($KtvHr);
+    }
+
+    return $this->groupKTVHr($result);
+  }
+  private function groupKTVHr($result)
+  {
+
+    return $result->groupBy('role_id')->map(function ($roles) {
+      $totalDuration = $roles->sum('total_duration');
+      // $hours = floor($totalDuration  / 60);
+      // $minutes = $totalDuration  % 60;
+      // $totalDurationInHrs = sprintf('%02d:%02d', $hours, $minutes);
+      $departmentName = $roles->first()['department_name'];
+
+      return [
+        'role_id' => $roles->first()['role_id'],
+        'department_name' => $departmentName,
+        'total_duration' => $totalDuration,
+        'hr_cost_cal' =>  round($roles->first()['hr_cost_cal'], 3)
+      ];
+    })->values();
+  }
+
+  public function getForecastKTVHrByEntityId($data, $entityId)
+  {
+    $quantity = $data['quantity']; //session = quantity 
+    $date = Carbon::parse($data['date']);
+    $ktvHrData = KtvObjective::with('objectiveKey.role.department')
+      ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+        $query->where('entity_id', $entityId);
+      })
+      ->get();
+    $KtvHr =  $ktvHrData->map(function ($ktvHr) use ($quantity, $date) {
+      $role = $ktvHr->objectiveKey->role;
+      $departmentName = $role->department->name;
+      $roleId = $role->id;
+      $pricePerHr = $this->MrpWorkingHour->getPricePerHr([$roleId], $date);
+      $duration = $ktvHr->objectiveKey->duration;
+      $totalDuration = $duration * $quantity;
+      $cost = ($totalDuration / 60) * $pricePerHr;
+      return [
+        'role_id' => $roleId,
+        'department_name' => $departmentName,
+        'total_duration' => $totalDuration,
+        'hr_cost_cal' => $cost
+      ];
+    });
+    return $this->groupKTVHr($KtvHr);
+  }
+
+  public function deleteMrpForecast($mrpForecastId)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::findOrFail($mrpForecastId);
+      $mrpForecast->MrpHrs()->delete();
+      $mrpForecast->MrpRawMaterials()->delete();
+      $mrpForecast->targetMrpForecasts()->delete();
+      $mrpForecast->delete();
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+}

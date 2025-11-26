@@ -5,6 +5,18 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\StaffSeeder;
+use Database\Seeders\GenderSeeder;
+use Database\Seeders\FeatureSeeder;
+use Database\Seeders\DivisionSeeder;
+use Database\Seeders\TownshipSeeder;
+use Database\Seeders\InventorySeeder;
+use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\NrcTownshipSeeder;
+use Database\Seeders\ComplaintCategorySeeder;
+use Database\Seeders\ExtraTagSeeder;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -12,11 +24,42 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            // FeatureSeeder::class,//important
+            // DivisionSeeder::class,//important
+            // TownshipSeeder::class,//important
+            // GenderSeeder::class,//important
+            // NrcTownshipSeeder::class,//important
+            // StaffSeeder::class,//important
+            // AreaCategorySeeder::class,//important
+            // HeadAccountSeeder::class, //important
+            // SubAccountSeeder::class,//important
+            // MenuCategorySeeder::class, //important
+            // AccessoryCategorySeeder::class, //important
+            // ServiceCategorySeeder::class, //important
+            // GpsSeeder::class,
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+            ComplaintCategorySeeder::class,
+            // InventorySeeder::class,
+            FeatureSeeder::class,
+            DepartmentSeeder::class,
+            // AreaCategorySeeder::class, //tem command
+            AreaSeeder::class,
+            RoleSeeder::class,
+            GenderSeeder::class,
+            AccessoryCategorySeeder::class,
+            MenuCategorySeeder::class,
+            ServiceCategorySeeder::class,
+            HeadAccountSeeder::class,
+            SubAccountSeeder::class,
+            AccountTableSeeder::class,
+            // RoomAndTableSeeder::class,
+            InventorySeeder::class,
+            StaffSeeder::class,
+            GpsSeeder::class,
+            DepartmentFeatureSeeder::class,
+            NrcTownshipSeeder::class,
+            ExtraTagSeeder::class
+        ]);
     }
 }

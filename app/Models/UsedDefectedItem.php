@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class UsedDefectedItem extends Model
+{
+    use HasFactory;
+
+    protected $fillable =[
+        'date','item_id','uom_id','type','quantity','remark','created_by','uom_conversion_id','created_by','is_confirmed','confirmed_by','confirmed_at','inventory_id'
+    ];
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function uom()
+    {
+        return $this->belongsTo(Uom::class);
+    }
+}

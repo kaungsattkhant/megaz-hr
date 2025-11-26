@@ -39,7 +39,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
@@ -71,6 +71,12 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
+        public_path('menuImages') => storage_path('app/menuImages'),
+        public_path('okrImages') => storage_path('app/okrImages'),
+        public_path('staffImages') => storage_path('app/staffImages'),
+        public_path('leaveImgs') => storage_path('app/leaveImgs'),
+        public_path('resignImgs') => storage_path('app/resignImgs'),
+        public_path('handBookImgs') => storage_path('app/handBookImgs'),
     ],
 
 ];

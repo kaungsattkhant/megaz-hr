@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Repositories\Transfer;
+
+use Illuminate\Http\Request;
+
+interface TransferRepositoryInterface
+{
+
+    public function listAllData(Request $request);
+
+    public function createData(array $data);
+
+    public function updateData(array $data,int $id);
+
+    public function deleteData(int $id);
+
+    public function transferConfirm(int $id);
+
+    public function createOrUpdate($request);
+
+    public function list($request);
+
+    public function transferConfirmationList($request);
+
+    public function confirmTransferItem($request);
+
+    public function cancelTransferItem(Request $request);
+}

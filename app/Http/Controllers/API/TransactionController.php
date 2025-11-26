@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TransactionRequest;
+use App\Repositories\Transaction\TransactionInterface;
+
+class TransactionController extends Controller
+{
+    //
+    private TransactionInterface $transactionRepo;
+
+    public function __construct(TransactionInterface $transaction_repo)
+    {
+        $this->transactionRepo = $transaction_repo;
+    }
+
+    public function index(Request $request){
+        $transactions= $this->transactionRepo->list($request);
+        ResponseData($transactions);
+    }
+    public function store(TransactionRequest $request){
+        $transaction= $this->transactionRepo->updateOrCreate($request);
+        ResponseData($transaction);
+    }
+
+    public function show(Transaction $transaction){
+        $transaction= $this->transactionRepo->detail($transaction);
+        ResponseData($transaction);
+    }
+
+    public function destroy($id){
+        $transaction= $this->transactionRepo->delete($id);
+        ResponseData($transaction);
+    }
+
+    public function transactionConfirmed(Request $request){
+        $transaction= $this->transactionRepo->transactionConfirmed($request);
+    }
+
+}

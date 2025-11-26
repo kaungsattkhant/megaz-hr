@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+use App\Models\Gender;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
+
+class Customer extends Authenticatable
+{
+    // use HasFactory, Notifiable;
+    use HasFactory, HasApiTokens;
+
+    protected $hidden = [
+        'password',
+        'otp'
+    ];
+
+    protected $fillable = [
+        'gender_id',
+        'name',
+        'phone_number',
+        'birthdate',
+        'email',
+        'is_active',
+        'rentation',
+        'password',
+        'otp',
+        'image_url',
+        'image_path',
+        'is_active',
+        'is_verified',
+        'account_id',
+        'credit_limit',
+        'credit_opening_date',
+        'credit_opening_amount',
+        'account_receivable_id',
+    ];
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+
+    public function getOtpCode()
+    {
+        return $this->otp;
+    }
+
+    public function checkOtp($value)
+    {
+        return ($value == $this->otp);
+    }
+
+    public function gender()
+    {
+        return $this->belongsTo(Gender::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(CustomerAddress::class);
+    }
+}

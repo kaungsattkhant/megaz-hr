@@ -1,0 +1,1999 @@
+<?php
+
+namespace App\Repositories\Invoice;
+
+use Exception;
+
+use Carbon\Carbon;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Order;
+use App\Models\Staff;
+use App\Models\Entity;
+use App\Models\Account;
+use App\Models\Invoice;
+use App\Models\Package;
+use App\Models\Service;
+use App\Models\Customer;
+use App\Models\HeadCount;
+use App\Models\Department;
+use App\Models\RoomSession;
+use App\Models\RoomDiscount;
+use Illuminate\Http\Request;
+use App\Models\EntitySession;
+use App\Traits\CustomerTrait;
+use App\Models\InvoiceService;
+use App\Models\TargetPosition;
+use App\Services\OrderService;
+use App\Models\TargetMenuResult;
+use App\Models\BirthdayPromotion;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\TargetPositionResult;
+use App\Models\CustomerLevelDiscount;
+use App\Services\InvoiceModelService;
+use App\Events\RoomNotificationRequest;
+use App\Events\WaiterNotificationRequest;
+use App\Events\RoomDoneNotificationRequest;
+use App\Repositories\Order\OrderRepository;
+use App\Http\Action\Transaction\StoreTransactionLedger;
+use App\Http\Action\Transaction\PurchaseOrderTransaction;
+use App\Models\CustomerDeposit;
+use App\Models\InvoiceSession;
+
+use App\Models\AreaType;
+
+use App\Http\Action\Common\AccountFetcher;
+use App\Models\AccountReceivable;
+use App\Models\Transaction;
+
+class InvoiceRepository implements InvoiceRepositoryInterface
+{
+    use CustomerTrait;
+    private $orderService;
+    private $invoiceService;
+    public function __construct(OrderService $orderService, InvoiceModelService $invoiceService)
+    {
+        $this->orderService = $orderService;
+        $this->invoiceService = $invoiceService;
+    }
+    public function listAllData(Request $request)
+    {
+        $page = $request->page;
+        $perPage = 20;
+        $date = isset($request->date) ? $request->date : null;
+        $invoiceQuery = Invoice::with(['customer', 'entity'])
+            ->whereIn('payment_status', ['checkout', 'paid'])
+            ->when($date, function ($q) use ($date) {
+                $q->whereDate('created_at', $date);
+            })
+            ->orderBy('created_at', 'desc');
+        if (isset($request->page)) {
+            return $invoiceQuery->paginate($perPage);
+        }
+        return $invoiceQuery->get();
+        // if ($request->per_page || $request->page) {
+        //     $totalCount = Invoice::where('payment_status', 'checkout')->count();
+        //     $pageNumber = 1;
+        //     $perPage = 20;
+        //     if ($request->page) {
+        //         $pageNumber = $request->page;
+        //     }
+        //     if ($request->per_page) {
+        //         $perPage = $request->per_page;
+        //     }
+        //     $skip = ($pageNumber - 1) * $perPage;
+
+        //     if ($request->date) {
+        //         $invoices = Invoice::with(['customer'])
+        //             ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+        //             ->orderBy('created_at', 'desc')
+        //             ->skip($skip)
+        //             ->take($perPage)
+        //             ->get();
+        //     } else {
+        //         $invoices = Invoice::with(['customer'])
+        //             ->where('payment_status', 'checkout')
+        //             ->orderBy('created_at', 'desc')
+        //             ->skip($skip)
+        //             ->take($perPage)
+        //             ->get();
+        //     }
+        //     $paginationData = MakePaginationData($request, $totalCount, 'invoices');
+        //     $paginationData['invoices'] = $invoices;
+        //     $paginationData = MakePaginationData($request, $totalCount, 'invoices');
+        //     $paginationData['invoices'] = $invoices;
+        //     return $paginationData;
+        // } else {
+        //     if ($request->date) {
+        //         $invoices = Invoice::with(['customer'])
+        //             ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+        //             ->where('payment_status', 'checkout')
+        //             ->orderBy('created_at', 'desc')
+        //             ->get();
+        //     } else {
+        //         $invoices = Invoice::with(['customer'])
+        //             ->where('payment_status', 'checkout')
+        //             ->get();
+        //     }
+
+        //     foreach ($invoices as $invoice) {
+        //         // $lastRoomSession = $invoice->roomSession()->get()->last();
+        //         // $lastRoom = $lastRoomSession->entitySession->entity;
+        //         // $invoice->room = $lastRoom;
+        //     }
+        //     return $invoices;
+        // }
+    }
+
+
+    public function entitySessionLeftTime($entity_session_id)
+    {
+        $entitySession = EntitySession::find($entity_session_id);
+        if (!$entitySession) {
+            ResponseMessage('Entity is invalid', 419);
+        }
+        $endTime = Carbon::parse($entitySession->end_time);
+        $now = Carbon::now();
+        $remainingTime = floor($now->diffInMinutes($endTime));
+        $leftHours = $remainingTime / 60;
+        // dd(round($leftHours, 2));
+        return round($leftHours, 2);
+    }
+
+    public function createData(array $data)
+    {
+
+        DB::beginTransaction();
+        try {
+            // $sessionStartedTime = Carbon::parse($data['start_time'])->format('H:i');
+            $roomDiscountId = isset($data['room_discount_id']) ? $data['room_discount_id'] : null;
+            $roomDiscount = null;
+            if ($roomDiscountId) {
+                $roomDiscount = RoomDiscount::where('is_active', 1)->find($roomDiscountId);
+            }
+            if ($data['entity_type'] == 'table') { //create table invoice
+                $tableInvoice = $this->createInvoiceForTable($data);
+                DB::commit();
+                return $tableInvoice;
+            }
+            if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
+                $entitySession = null;
+                if (isset($data['entity_id']) && $data['entity_id'] != null && $data['is_waiter']) {
+                    $entity = Entity::find($data['entity_id']);
+                    // $currentTime = Carbon::parse(now())->format('H:i');
+                    $currentTime = Carbon::parse($data['start_time'])->format('H:i');
+                    $entitySession = $entity->currentEntitySession($currentTime)->first();
+                    if (!$entitySession) {
+                        ResponseMessage('Entity is invalid', 422);
+                    }
+                    $data['entity_session_id'] = $entitySession->id;
+                    $entity = $entitySession->entity;
+                } else if (isset($data['entity_session_id']) && !$data['is_waiter']) {
+                    // $currentTime = Carbon::parse(now())->format('H:i');
+                    $currentTime = Carbon::parse($data['start_time'])->format('H:i');
+                    $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                        ->where(function ($query) use ($currentTime) {
+                            $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                                ->orWhere(function ($subQuery) use ($currentTime) {
+                                    $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
+                                        ->where(function ($innerQuery) use ($currentTime) {
+                                            $innerQuery->whereRaw('? >= start_time', [$currentTime])
+                                                ->orWhereRaw('? <= end_time', [$currentTime]);
+                                        });
+                                });
+                        })
+                        ->first();
+                    // $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                    //     ->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                    //     ->first();
+                    if (!$entitySession) {
+                        ResponseMessage('Start Time and Session does not  match at this time', 419);
+                    }
+                    $entity = Entity::find($entitySession->entity_id);
+                }
+                if (!isset($data['head_count_id'])) {
+                    $headCount = $this->headCountCreate($data);
+                    $data['head_count_id'] = $headCount->id;
+                }
+                $freeDiscountSession = 0;
+                $startTime = $data['start_time'];
+                if ($data['type'] == 'package') {
+                    $package = Package::find($data['package_id']);
+                    if (!$package) {
+                        ResponseMessage('Package not found', 404);
+                    }
+                    // $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
+                    // $data['total_session_price'] = $package->pay_session * $entity->price_per_hour;
+                    $data['total_session_price'] = 0;
+                    // $data['paid_amount'] = $package->price;
+                    $data['package_id'] = $package->id;
+                    $data['session_duration'] = $package->pay_session + $package->free_session; // nullable
+                    $freeDiscountSession = $package->free_session;
+                    $data['invoice_type'] = 'package';
+                    $data['total'] = $package->price;
+                    $data['sub_total'] = $package->price;
+                    $data['room_discount_value'] = 0;
+                } else if ($data['type'] == 'session') {
+                    // $end_date = Carbon::now()->addMinutes($data['session_duration'] * 60);
+                    $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
+                    // $roomSessionData['price'] = $data['total_session_price'];
+                    $data['total'] = $data['total_session_price'];
+                    $data['sub_total'] = $data['total_session_price'];
+                    $data['invoice_type'] = 'session';
+                    if ($roomDiscount) {
+                        $freeSessionCount = intdiv($data['session_duration'], $roomDiscount->session);
+                        $freeDiscountSession = (int) $freeSessionCount * $roomDiscount->free_session;
+                    }
+                    $data['session_duration'] = $data['session_duration'] + $freeDiscountSession;
+                    $data['room_discount_value'] = $freeDiscountSession * $entity->price_per_hour;
+                } else if ($data['type'] == 'endless_time') {
+                    // $end_date = Carbon::now()->addMinute(1 * 60);
+                    $data['session_duration'] = 1;
+                    $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
+                    $roomSessionData['price'] = $data['total_session_price'];
+                    $data['total'] = $data['total_session_price'];
+                    $data['sub_total'] = $data['total_session_price'];
+                    $data['invoice_type'] = 'endless_time';
+                    $data['session_duration'] = 1;
+                    $data['room_discount_value'] = 0;
+                }
+                $data['area_id'] = $entity->area_id;
+                $data['created_by'] = UserData()->id;
+                $data['invoice_date'] = Carbon::now();
+                $invoice = Invoice::create($data);
+                $invoice->invoice_id = sprintf('%05d', $invoice->id);
+                $invoice->save();
+                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice, $startTime, $entitySession->entity_id, $data['session_duration'], $freeDiscountSession, $entity->price_per_hour, $data['is_waiter'], $discountId = null);
+                //create deposit
+                $this->storeCustomerDeposit($data, UserData()->id);
+                //
+                $customer = Customer::find($invoice->customer_id);
+                //change ksk
+                if ($data['type'] == 'package' && $invoice) {
+                    $orderData['invoice_id'] = $invoice->id;
+                    $orderData['menuArray'] = json_decode($data['orders'], true);
+                    $decodedAccessories = json_decode($data['accessories'], true);
+                    if (!empty($orderData['menuArray'])) {
+                        $order = $this->orderService->createMultipleOrder($orderData);
+                    }
+                    if (!empty($decodedAccessories)) {
+                        $accessories = $this->orderService->createAccessorty($invoice, $decodedAccessories);
+                        if (!$accessories) {
+                            ResponseMessage('Accessory Created Fail', 419);
+                        }
+                    }
+                    if (isset($data['is_waiter'])) {
+                        if ($data['is_waiter'] == 1) {
+                            //send only package
+                            $receptionistRole = Role::getRoleByName('Receptionist');
+                            if (!$receptionistRole) {
+                                ResponseMessage('Reception Role Not found', 419);
+                            }
+                            broadcast(new RoomNotificationRequest($customer, $entity, $invoice, UserData()->department_id, $order['order'], $order['orderItems']));
+                        }
+                    }
+                }
+                //broadcast on room opening to waiter
+                //broadcast
+                if (!$data['is_waiter']) {
+                    $waiterRole = Role::getRoleByName('Waiter');
+                    $latestUpdatedEntity = Entity::find($entity->id);
+                    broadcast(new WaiterNotificationRequest($latestUpdatedEntity, $waiterRole->department_id));
+                }
+                //end
+                DB::commit();
+                $returnData = [
+                    'customer' => $customer,
+                    'invoice' => $invoice,
+                    'entity' => $entity,
+                ];
+                return $returnData;
+            }
+            //change
+        } catch (\Throwable $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function createInvoiceForTable($data)
+    {
+        // $data['area_id'] = $entity->area_id;
+        $entity = Entity::find($data['entity_id']);
+        $entity->is_active = 1;
+        $entity->status = 'active';
+        $entity->save();
+        if (!isset($data['head_count_id'])) {
+            $headCount = $this->headCountCreate($data);
+            $data['head_count_id'] = $headCount->id;
+        }
+        $data['created_by'] = UserData()->id;
+        $data['entity_id'] = $data['entity_id'];
+        $data['area_id'] = $entity->area_id;
+        $data['invoice_date'] = Carbon::now();
+        $invoice = Invoice::create($data);
+        $invoice->invoice_id = sprintf('%05d', $invoice->id);
+        $invoice->save();
+        $this->storeCustomerDeposit($data, UserData()->id);
+        $customer = null;
+        if (isset($data['customer_id'])) {
+            $customer = $invoice->customer;
+        }
+        $returnData = [
+            'customer' => $customer,
+            'invoice' => $invoice,
+            'entity' => $entity,
+        ];
+        return $returnData;
+        // return $invoice;
+    }
+
+
+    public function updateData(array $data, int $id)
+    {
+        $invoice = Invoice::find($id);
+        if ($invoice) {
+            $invoice->update($data);
+            return $invoice;
+        }
+
+        return $invoice;
+    }
+
+    public function storeCustomerDeposit($data, $userId)
+    {
+        $isDeposit = (bool) $data['is_deposit'];
+        if ($isDeposit) {
+            if ((!isset($data['cash_account_id']) || (isset($data['cash_account_id']) && $data['cash_account_id'] == null))) {
+                ResponseMessage('Cash Account is required', 419);
+            }
+            if (!isset($data['account_id']) || (isset($data['account_id']) && $data['account_id'] == null)) {
+                ResponseMessage('Customer Deposit Account is required', 419);
+                // ResponseMessage(message: 'Customer Deposit Account is required',419);
+            }
+            $customerDeposit = CustomerDeposit::create([
+                'type' => 'deposit',
+                'date_time' => now(),
+                'amount' => $data['deposit'],
+                'account_id' => $data['account_id'],
+                'cash_account_id' => $data['cash_account_id'],
+                'customer_id' => $data['customer_id'],
+            ]);
+            // $cash_account_id = $data['cash_account_id'];
+            // $data['date'] = now();
+            // $data['created_by'] = $userId;
+            // $morphMapName = RelationMorphName($customerDeposit);
+            // $data['transactionable_id'] = $customerDeposit->id;
+            // $data['transactionable_type'] = $morphMapName;
+            // $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            // $debitLedger = (new StoreTransactionLedger())->storeLedger([
+            //     'date' => now(),
+            //     'value' => $data['deposit'],
+            //     'personable_id' => $data['customer_id'],
+            //     'personable_type' => 'customer',
+            //     'transaction_id' => $transaction->id,
+            //     'account_id' => $cash_account_id,
+            //     'action' => 'debit',
+            // ]);
+            // #store credit ledger
+            // $creditLedger = (new StoreTransactionLedger())->storeLedger([
+            //     'date' => now(),
+            //     'value' => $data['deposit'],
+            //     'personable_id' => $data['customer_id'],
+            //     'personable_type' => 'customer',
+            //     'transaction_id' => $transaction->id,
+            //     'account_id' => $data['account_id'],
+            //     'action' => 'credit',
+            // ]);
+            // return $customerDeposit;
+        }
+    }
+
+    public function storeInvoiceCustomerDeposit($data, $userId)
+    {
+        // $isUsedDeposit = (bool) $data['is_used_deposit'];
+        $depositBalance = $data['deposit_balance'];
+        if ($depositBalance > 0) {
+            if ($depositBalance >= $data['amount']) {
+                $amount = $data['amount'];
+            } elseif ($depositBalance < $data['amount']) {
+                $amount = $depositBalance;
+            }
+
+            $customerDeposit = CustomerDeposit::create([
+                'type' => 'withdrawal',
+                'date_time' => now(),
+                'amount' => $amount,
+                'account_id' => $data['account_id'],
+                // 'cash_account_id' => $data['cash_account_id'],
+                'customer_id' => $data['customer_id'],
+            ]);
+            $data['date'] = now();
+            $data['created_by'] = $userId;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $amount,
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'credit',
+            ]);
+            return $customerDeposit;
+        }
+    }
+
+    public function storeInvoiceTransaction($data)
+    {
+    }
+
+    public function deleteData(int $id)
+    {
+        $invoice = Invoice::find($id);
+        if ($invoice) {
+            $invoice->delete();
+            return true;
+        }
+        return false;
+    }
+
+    public function headCountCreate(array $data)
+    {
+        $data['total_head_count'] = $data['female'] + $data['male'] + $data['child'];
+        $headCount = HeadCount::create($data);
+        return $headCount;
+    }
+    // public function addSessionDurations(array $data)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
+    //         $roomSessionsWithInvoice = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+    //         $originalDuration = 0;
+    //         foreach ($roomSessionsWithInvoice as $room_session) {
+    //             $originalDuration += $room_session->session_duration;
+    //         }
+    //         $invoice = Invoice::find($data['invoice_id']);
+    //         if ($invoice->invoice_type == 'endless_time') {
+    //             ResponseMessage('Room with session and package can only be added duration', 422);
+    //         }
+
+    //         $invoice->total_session_price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
+
+    //         if ($data['session_duration'] >= 1) {
+    //             $sessionDuration = (float) $data['session_duration'];
+    //             $end_date = Carbon::parse($roomAndSession->end_date)->addHours($sessionDuration);
+    //         } else {
+    //             $sessionDuration = (float) $data['session_duration'];
+    //             $end_date = Carbon::parse($roomAndSession->end_date)->addMinutes($sessionDuration * 60);
+    //         }
+
+    //         $roomAndSession->price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
+    //         $roomAndSession->end_date = $end_date->format('Y-m-d H:i:s');
+    //         $roomAndSession->session_duration += $data['session_duration'];
+    //         $roomAndSession->save();
+    //         $invoice->save();
+
+    //         DB::commit();
+    //         return $roomAndSession;
+    //     } catch (\Throwable $e) {
+    //         DB::rollback();
+    //         ResponseMessage($e->getMessage(), 402);
+    //         throw $e;
+    //     }
+    // }
+
+    public function addSessionDuration(array $data)
+    {
+        // ResponseMessage('Add Session duration is not available now', 419);
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::find($data['invoice_id']);
+            $addedSessionDuration = $data['session_duration'];
+            if ($invoice->invoice_type == 'endless_time') {
+                ResponseMessage('Room with session and package can only be added duration', 422);
+            }
+            // dd($invoice->activeInvoiceSession);
+            $activeInvoiceSession = $invoice->activeInvoiceSession;
+            if (!$activeInvoiceSession) {
+                ResponseMessage('Active Invoice Session is invalid', 422);
+            }
+            $lastEntitySession = $activeInvoiceSession->roomSessions->sortByDesc('entity_session_id')->first();
+            if (!$lastEntitySession) {
+                ResponseMessage('Entity Session is invalid', 422);
+            }
+            $addedEntitySessions = $this->getAddedEntitySession($addedSessionDuration, $lastEntitySession);
+            $addedSessionPrice = $addedSessionDuration * $activeInvoiceSession->entity->price_per_hour;
+
+            // $activeInvoiceSession->total_session_duration += $addedSessionDuration;
+            // $activeInvoiceSession->total_session_price += $addedSessionPrice;
+            // $activeInvoiceSession->end_date_time = Carbon::parse($activeInvoiceSession->end_date_time)
+            //     ->addHours((int) $addedSessionDuration);
+            // $activeInvoiceSession->save();
+            // $invoice->total += $addedSessionPrice;
+            // $invoice->sub_total += $addedSessionPrice;
+            // $invoice->total_session_price += $addedSessionPrice;
+            // $invoice->save();
+
+            $activeInvoiceSession->update([
+                'total_session_duration' => $activeInvoiceSession->total_session_duration + $addedSessionDuration,
+                'total_session_price' => $activeInvoiceSession->total_session_price + $addedSessionPrice,
+                'end_date_time' => Carbon::parse($activeInvoiceSession->end_date_time)->addHours((int) $addedSessionDuration),
+            ]);
+            $invoice->update([
+                'total' => $invoice->total + $addedSessionPrice,
+                'sub_total' => $invoice->sub_total + $addedSessionPrice,
+                'total_session_price' => $invoice->total_session_price + $addedSessionPrice,
+            ]);
+            DB::commit();
+            return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseMessage($e->getMessage(), 402);
+        }
+    }
+
+    public function getAddedEntitySession($sessionDuration, $lastEntitySession)
+    {
+        $addedSessions = [];
+        $entityId = $lastEntitySession->entitySession->entity_id;
+        for ($i = 1; $i <= $sessionDuration; $i++) {
+            $addedEntitySessionId = $lastEntitySession->entity_session_id + $i;
+            $addedEntitySession = EntitySession::where('entity_id', $entityId)
+                ->whereId($addedEntitySessionId)
+                ->first();
+            if ($addedEntitySession) {
+                $addedEntitySession->update(['is_active' => 1]);
+                $addedSessions[] = $addedEntitySession;
+                $roomSession = RoomSession::create([
+                    'invoice_session_id' => $lastEntitySession->invoice_session_id,
+                    'entity_session_id' => $addedEntitySessionId,
+                ]);
+            }
+        }
+        return $addedSessions;
+    }
+
+    public function invoiceEntityChange(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $entity = Entity::find($data['entity_id']);
+            if ($entity->entity_type == 'table') {
+                $invoice = Invoice::find($data['invoice_id']);
+                $invoice->entity_id = $data['entity_id'];
+                $invoice->save();
+                $this->changeTable($data['previous_entity_id'], $data['entity_id']);
+                DB::commit();
+                ResponseData($invoice, 200);
+            }
+            $invoice = $this->modifyEntityChange($data);
+            // $newEntity = Entity::find($data['entity_id']);
+            // if ($newEntity->is_active) {
+            //     ResponseMessage('Room is invalid', 422);
+            // }
+            // //current comment
+            // // if ($invoice->invoice_type == 'endless_time') {
+            // //     return $this->invoiceService->changeRoomForEndlessTime($invoice, $newEntity);
+            // // }
+
+
+            // $roomSessions = RoomSession::where('invoice_id', $invoice->id)
+            //     ->where('is_active', 1)
+            //     ->get();
+            // $firstRoomSession = $roomSessions->first();
+            // $latestRoomSession = $roomSessions->last();
+            // $current_time = Carbon::now();
+            // $entitySession = EntitySession::where('entity_id', $latestRoomSession->entitySession->entity_id)
+            //     ->whereTime('start_time', '<=', $current_time)
+            //     ->whereTime('end_time', '>=', $current_time)
+            //     ->first();
+            // //added ksk
+            // $newEntitySession = EntitySession::where('entity_id', $data['entity_id'])
+            //     ->whereTime('start_time', '<=', $current_time)
+            //     ->whereTime('end_time', '>=', $current_time)
+            //     ->first();
+            // //end
+            // $previousEntity = Entity::find($entitySession->entity_id);
+            // $endTime = Carbon::parse($latestRoomSession->end_date);
+            // $sessionStartTime = Carbon::parse($firstRoomSession->start_date);
+            // $useHours = $sessionStartTime->diffInHours(Carbon::now());
+            // $totalDuration = $roomSessions->sum('session_duration');
+            // $leftDuration = $totalDuration - $useHours;
+            // $remainingEntitySessions = EntitySession::where('id', '>=', $newEntitySession->id)
+            //     ->where('entity_id', $data['entity_id'])
+            //     // whereIn('id', $roomSessions->pluck('entity_session_id'))
+            //     // ->where('is_active', 1)
+            //     ->get();
+            // // dd($remainingEntitySessions);
+            // $deleteEntitySessions = EntitySession::whereIn('id', $roomSessions->pluck('entity_session_id'))
+            //     ->where('id', '>', $entitySession->id)
+            //     ->where('is_active', 1)
+            //     ->get();
+            // $nextEntitySessions = [];
+            // foreach ($remainingEntitySessions as $nextSession) {
+            //     $nextEntitySession = EntitySession::where('entity_id', $data['entity_id'])->where('start_time', $nextSession->start_time)->where('end_time', $nextSession->end_time)->first();
+            //     if ($nextEntitySession->is_active == 1) {
+            //         ResponseMessage('Session is not available', 422);
+            //     }
+            //     $nextEntitySessions[] = $nextEntitySession;
+            // }
+
+
+            // // $matchingSessions = EntitySession::where('start_time', '>', $entitySession->start_time)
+            // //     ->where('end_time',)
+            // //     ->where('entity_id', $data['entity_id'])
+            // //     ->take(ceil($leftDuration))
+            // //     ->get();
+
+            // // dd($remainingEntitySessions,$matchingSessions);
+
+            // foreach ($nextEntitySessions as $nextSession) {
+            //     $nextSession->is_active = 1;
+            //     $nextSession->save();
+            // }
+            // foreach ($remainingEntitySessions as $leftSession) {
+            //     $leftSession->is_active = 0;
+            //     $leftSession->save();
+            // }
+            // $selectedRoomSession = $entitySession->roomSession;
+            // $diffHours = Carbon::parse($selectedRoomSession->start_date)->diffInHours(Carbon::now());
+
+            // $selectedRoomSession->session_duration = number_format($diffHours, 2);
+            // $selectedRoomSession->price = $diffHours * $newEntity->price_per_hour;
+            // $selectedRoomSession->end_date = Carbon::parse($selectedRoomSession->start_date)->addHours($diffHours);
+            // $selectedRoomSession->save();
+
+            // $wholeHours = floor($leftDuration);
+            // $fractionalHours = $leftDuration - $wholeHours;
+
+            // $leftSession = [];
+
+            // for ($i = 0; $i < $wholeHours; $i++) {
+            //     $leftSession[] = 1.0;
+            // }
+            // if ($fractionalHours > 0) {
+            //     $leftSession[] = number_format($fractionalHours, 2);
+            // }
+
+            // $newEntity = Entity::find($data['entity_id']);
+            // $loopEndTime = 0;
+
+            // foreach ($leftSession as $index => $session) {
+            //     $session = (float) $session;
+            //     $newRoomSession['invoice_id'] = $data['invoice_id'];
+            //     if ($index == 0) {
+            //         $newRoomSession['start_date'] = $selectedRoomSession->end_date;
+            //     } else {
+            //         $newRoomSession['start_date'] = $loopEndTime;
+            //     }
+            //     $newRoomSession['end_date'] = Carbon::parse($newRoomSession['start_date'])->addHours((float) $session);
+            //     $newRoomSession['session_duration'] = $session;
+            //     $newRoomSession['entity_session_id'] = $nextEntitySessions[$index]->id;
+            //     $newRoomSession['price'] = $session * $newEntity->price_per_hour;
+            //     RoomSession::create($newRoomSession);
+            //     $loopEndTime = $newRoomSession['end_date'];
+            // }
+            // foreach ($deleteEntitySessions as $deleteEntitySession) {
+            //     $deleteEntitySession->roomSession->delete();
+            // }
+
+            // $newEntity->status = 'active';
+            // $newEntity->is_active = 1;
+            // $newEntity->save();
+
+            // $previousEntity->status = 'inactive';
+            // $previousEntity->is_active = 0;
+            // $previousEntity->save();
+            // dd('abc');
+            DB::commit();
+            ResponseData($invoice, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function modifyEntityChange($data)
+    {
+        $entityId = $data['entity_id'];
+        $previousEntityId = $data['previous_entity_id'];
+        $invoiceId = $data['invoice_id'];
+        $start_date_time = Carbon::parse($data['start_date_time']);
+        $isAvailableEntity = $this->invoiceService->checkIsActiveChangeRoom($entityId);
+        if ($isAvailableEntity) {
+            $now = now();
+            //get reamin session duration from previous room
+            $invoice = Invoice::find($invoiceId);
+            $invoice->save();
+            if (!$invoice) {
+                ResponseMessage('Invoice not found', 419);
+            }
+            $activeInvoiceSession = $invoice->activeInvoiceSession;
+
+            $priviousTotalSessionPrice = $activeInvoiceSession->total_session_price;
+
+            //calculate used session
+            $previousStartDateTime = Carbon::parse($activeInvoiceSession->start_date_time);
+            $usedSessionMinutes = $previousStartDateTime->diffInMinutes($now);
+            $usedSessionHour = $usedSessionMinutes / 60;
+            $remainSession = $activeInvoiceSession->total_session_duration - $usedSessionHour;
+            $remainSession = round($remainSession, precision: 2);
+            //end
+            // $previousSessionPerPrice=$activeInvoiceSession->session_unit_price;
+            // $previousUsedSessionPrice=$remainSession*$previousSessionPerPrice;
+            //update active session after room change
+            $activeInvoiceSession->total_session_duration = round($usedSessionHour, 2);
+            $activeInvoiceSession->total_session_price = round(($usedSessionHour * $activeInvoiceSession->session_unit_price), 2);
+            $activeInvoiceSession->is_active = 0;
+            $activeInvoiceSession->save();
+
+            //update active sesion
+
+            $roomSessions = $activeInvoiceSession->roomSessions;
+            foreach ($roomSessions as $roomSession) {
+                $entitySesion = $roomSession->entitySession;
+                $entitySesion->is_active = 0;
+                $entitySesion->save();
+            }
+            // dd($activeInvoiceSession->roomSessions);
+
+            if (!$activeInvoiceSession) {
+                ResponseMessage('Active Invoice Session not found', 419);
+            }
+
+            $previousEntity = Entity::find($previousEntityId);
+            // $previousEntity = $invoice->activeInvoiceSession->entity;
+            $previousEntity->is_active = 0;
+            $previousEntity->status = 'inactive';
+            $previousEntity->save();
+
+
+            // $previousStartDateTime = Carbon::parse($activeInvoiceSession->start_date_time);
+            // $usedSessionMinutes = $previousStartDateTime->diffInMinutes($now);
+            // // dd($usedSessionMinutes);
+            // $usedSessionHour = $usedSessionMinutes / 60;
+            // $remainSession = $activeInvoiceSession->total_session_duration - $usedSessionHour;
+            // $remainSession = round($remainSession, 2);
+            //end previous session
+
+
+            // session for new room
+            //update new entiy
+            $newEntity = Entity::find($entityId); //new entity
+            $newEntity->is_active = 1;
+            $newEntity->status = 'active';
+            $newEntity->save();
+            $newSessionDate = Carbon::parse($data['start_date_time']);
+            $startTime = Carbon::parse($data['start_date_time'])->format('H:i');
+            $endTime = Carbon::parse($data['start_date_time'])->addHours($remainSession)->format('H:i');
+
+            // Check if endTime goes past midnight
+            if ($startTime > $endTime) {
+                $endDate = $newSessionDate->copy()->addDay(); // Move to tomorrow
+            } else {
+                $endDate = $newSessionDate->copy(); // Stay on the same day
+            }
+            $startDateTime = Carbon::parse($now->toDateString() . ' ' . $startTime);
+            $endDateTime = Carbon::parse($endDate->toDateString() . ' ' . $endTime);
+
+            $sessionPerPrice = $newEntity->price_per_hour;
+
+            $totalNewSessionPrice = $remainSession * $sessionPerPrice;
+            //create new invoice session
+            // $activeInvoiceSession->start_date_time=$startDateTime;
+            // $activeInvoiceSession->end_date_time=$endDateTime;
+            // $activeInvoiceSession->total_session_duration=$remainSession;
+            // $activeInvoiceSession->total_session_price=$totalNewSessionPrice;
+            // $activeInvoiceSession->session_unit_price=$sessionPerPrice;
+            // $activeInvoiceSession->invoice_id=$invoiceId;
+            // $activeInvoiceSession->entity_id=$newEntity->id;
+            // $activeInvoiceSession->save();
+            $invoiceSession = InvoiceSession::create([
+                'start_date_time' => $startDateTime,
+                'end_date_time' => $endDateTime,
+                'total_session_duration' => $remainSession,
+                'total_session_price' => $totalNewSessionPrice,
+                'session_unit_price' => $sessionPerPrice,
+                'invoice_id' => $invoiceId,
+                'entity_id' => $newEntity->id,
+            ]);
+
+            //update session price for invoice
+            $invoice->entity_id = $entityId;
+            $invoice->total = ($invoice->total - $priviousTotalSessionPrice) + $totalNewSessionPrice;
+            $invoice->sub_total = ($invoice->sub_total - $priviousTotalSessionPrice) + $activeInvoiceSession->total_session_price + $totalNewSessionPrice;
+            $invoice->total_session_price = $activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
+            $invoice->save();
+            //end
+            $entitySesions = $this->invoiceService->getEntitySessionBySessionDuration($entityId, $startTime, $endTime);
+            $this->invoiceService->defineActiveEntitySession($invoiceSession, $entitySesions); //update is_active related entity session
+            return $invoice;
+        }
+    }
+
+    public function changeTable($previousEntityId, $newEntityId)
+    {
+        Entity::where('id', $newEntityId)->update([
+            'status' => 'active',
+            'is_active' => 1,
+        ]);
+        Entity::where('id', $previousEntityId)->update([
+            'status' => 'inactive',
+            'is_active' => 0,
+        ]);
+    }
+
+
+
+    public function doneRoom(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::find($data['invoice_id']);
+            if ($data['entity_type'] == 'table') {
+                $tableResponseData = $this->doneInvoiceForTable($invoice);
+                DB::commit();
+                ResponseData($tableResponseData);
+            }
+            $invoiceSession = $this->invoiceService->getTotalInvoiceSession($invoice->id);
+            $total_session_value = $invoiceSession->total_session_value;
+            $total_duration = 0;
+            $total_service_value = 0;
+            $total_accessory_value = 0;
+            $invoiceServices = $invoice->invoiceService;
+            if ($invoice->order) {
+                $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
+            }
+            $invoiceAccessories = $invoice->accessories;
+            $roomDoneResponse['is_service'] = 1;
+            if ($invoiceServices->isEmpty()) {
+                $roomDoneResponse['is_service'] = 0;
+            }
+            foreach ($invoiceServices as $invoiceService) {
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $time);
+                $total_service_value += $serviceValue;
+            }
+
+            foreach ($invoiceAccessories as $invoiceAccessorie) {
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+            }
+
+            $roomDoneResponse['total_session_price'] = $invoiceSession->total_session_value;
+            //current comment for birthday discount
+            // $today = Carbon::today();
+            // $customer = Customer::find($invoice->customer_id);
+            // $customerTotal = 0;
+            // if ($customer->invoices) {
+            //     foreach ($customer->invoices as $customerInvoice) {
+            //         $customerTotal += $customerInvoice->total;
+            //     }
+            // }
+
+            // $levels = CustomerLevelDiscount::all();
+            // $customerLevel = null;
+            // foreach ($levels as $level) {
+            //     if ($customerTotal >= $level->amount) {
+            //         $customerLevel = $level;
+            //     } else {
+            //         break;
+            //     }
+            // }
+            // if ($customerLevel !== null) {
+            //     $roomDoneResponse['customer_level'] = $customerLevel->name;
+            //     $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+            // } else {
+            //     $roomDoneResponse['customer_level'] = 'no customer level';
+            // }
+
+            // $roomDoneResponse['customer_total'] = $customerTotal;
+            // if ($customer) {
+            //     $birthdate = Carbon::parse($customer->birthdate);
+            //     $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+            // } else {
+            //     $roomDoneResponse['is_birthday'] = false;
+            // }
+            //end
+
+            $roomDoneResponse['total_order_value'] = 0;
+            $roomDoneResponse['total_order_discount_price'] = 0;
+            if ($invoice->order) {
+                $roomDoneResponse['total_order_value'] = $invoice->order->total;
+                $roomDoneResponse['total_order_discount_price'] = $invoice->order->total_discount_price;
+            }
+            // $roomDoneResponse['total_session_value'] = $total_session_value;
+            $roomDoneResponse['total_service_value'] = $total_service_value;
+            $roomDoneResponse['total_accessory_value'] = $total_accessory_value;
+            DB::commit();
+            ResponseData($roomDoneResponse);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function doneInvoiceForTable($invoice)
+    {
+        if (!$invoice) {
+            ResponseMessage('Invoice is invalid', 422);
+        }
+        // if(!$invoice->order){
+        //     ResponseMessage('Order is require',419);
+        // }
+        if ($invoice->order) {
+            $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
+        }
+        $customerTotal = $invoice->customer_id ? $this->getCustomerTotal($invoice->customer_id) : 0;
+        $total = 0;
+        $totalDiscount = 0;
+        $invoiceServiceCollection = collect();
+        $total_service_value = 0;
+        $total_accessory_value = 0;
+        $invoiceServices = $invoice->invoiceService;
+        foreach ($invoiceServices as $invoiceService) {
+            $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+            $this->invoiceService->calculateInvoiceService($invoiceService, $time);
+            $total_service_value += $invoiceService->service_value;
+        }
+        $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+        // end service
+        // invoice accessory
+        $invoiceAccessories = $invoice->accessories;
+        foreach ($invoiceAccessories as $invoiceAccessorie) {
+            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+        }
+
+        foreach ($invoice->orders as $order) {
+            if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
+                ResponseMessage('Some items still cooking', 419);
+            }
+            foreach ($order->orderItems as $orderItem) {
+                // if ($orderItem->status == 'done') {
+                $total += $orderItem->price;
+                $totalDiscount += $orderItem->discount_value;
+                // }
+            }
+            // $total += $order->total;
+            // $totalDiscount += $order->total_discount_price;
+        }
+
+        $responseData = [];
+        $responseData = $this->getCustomerLevel($customerTotal, $responseData);
+        $responseData['invoice_id'] = $invoice->id;
+        $responseData['entity_id'] = $invoice->entity_id;
+        $responseData['food_discount'] = $totalDiscount;
+        $responseData['total'] = $total;
+        $responseData['customer_total'] = $customerTotal;
+        $responseData['total_service_value'] = $total_service_value;
+        $responseData['total_accessory_value'] = $total_accessory_value;
+        return $responseData;
+        // dd($totalDiscount);
+    }
+
+    public function paidInvoice(Request $request)
+    {
+        $invoice = Invoice::find($request->id);
+        if ($invoice->payment_status == "paid") {
+            ResponseMessage('This invoice has already been paid.', 419);
+        }
+        $customer = $invoice->customer;
+        $paidAmount = ($request->payment_type !== 'split')? $request->paid_amount: ($request->cash_paid_amount + $request->bank_paid_amount);
+        $entity = $invoice->entity;
+        $authUser = UserData();
+        $depositBalance = $customer ? $this->getCustomerDepositBalance($customer->id) : 0;
+        try {
+            DB::beginTransaction();
+            if($depositBalance < 1 && $paidAmount < 1){
+                ResponseMessage('Paid amout must be entered', 400);
+            }
+
+            $transaction = Transaction::create([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'transactionable_id' => $invoice->id,
+                'transactionable_type' => 'invoice',
+                'is_confirmed' => 1,
+            ]);
+            $withdrawalAmt = 0;
+            if ($depositBalance > 0) {
+                $withdrawalAmt = $invoice->sub_total;
+                $updatedCustomerDepositBalance = $depositBalance - $invoice->sub_total;
+                $ApOrAr = null;
+                if ($updatedCustomerDepositBalance != 0) {
+                    $ApOrAr = ($updatedCustomerDepositBalance > 0) ? 'ap' : 'ar';
+                    if ($ApOrAr == 'ap') {
+                        // stores AP transaction for customer deposit balance
+                        // deposit credit
+                        $withdrawalAmt = $invoice->sub_total;
+                    }
+                    if ($ApOrAr == 'ar') {
+                        // stores AR transaction for receivable from customer
+                        $withdrawalAmt = $depositBalance;
+                    }
+                }
+
+                // dd('does not have ar amunt '.$invoiceCost);
+                // ဖြတ်ရမယ့် အမောင့်က
+                // ကျသင့်ငွေက balance ထက်များနေရင် ရှိသလောက် balance အကုန်ဖြတ်
+                // ကျသင့်ငွေက balance ထက်နည်းနေရင်တော့ ရှင်းရမယ့် အမောင့်တိုင်း ဖြတ်
+                $customerDeposit = CustomerDeposit::create([
+                    'type' => 'withdrawal',
+                    'date_time' => now(),
+                    'amount' => $withdrawalAmt, // **
+                    'account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->account_id,
+                    'cash_account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->cash_account_id,
+                    'customer_id' => $customer->id,
+                    'is_cashier_confirmed' => 1,
+                ]);
+                $debitDepositLeder = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $withdrawalAmt,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $customer->account_id, //deposit amount
+                    'action' => 'debit',
+                    'is_cashier_confirmed' => 0
+                ]);
+            }
+            $invoiceCost = $invoice->sub_total - $withdrawalAmt; // included with deposit amount
+            // $invoiceCost = $invoice->total - $withdrawalAmt; // included with deposit amount
+            if ($depositBalance > 1 && (int) $paidAmount > $invoiceCost) {
+                ResponseMessage('Deposit balance is enough.Customer Deposit Balance is ' . $depositBalance . '.Paid Amount does not require.Invoice cost is ' . $invoiceCost, 419);
+            }
+            if ($depositBalance > 1 && $invoiceCost > $paidAmount) {
+                ResponseMessage('Paid amount is required ' . $invoiceCost, 419);
+            }
+            if ($depositBalance < 1 && $invoiceCost > $paidAmount) {
+                ResponseMessage('Paid amount is invalid!', 419);
+            }
+            $arAmount = $invoiceCost - $paidAmount;
+            if ($arAmount > 0) {
+                // dd('Have ar amount '.$arAmount);
+                // $this->createAR($customer,$authUser,$arAmount);
+                $accountReceivable = AccountReceivable::create([
+                    'type' => 'ar',
+                    'date_time' => now(),
+                    'account_id' => $customer->account_receivable_id,
+                    'amount' => $arAmount,
+                    'created_by' => $authUser->id,
+                ]);
+                $debitReceivableLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $arAmount,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $customer->account_receivable_id,
+                    'action' => 'debit',
+                    'is_cashier_confirmed' => 0
+                ]);
+            }
+            // debit cash bank
+            // credit menu (inv food)
+
+            // credit service charge
+            // credit tax
+            // credit services
+            // credit accessory
+            // credit room
+
+            // debit discount
+            // credit cash
+
+            // credit deposit
+            $ledgerTransactionWriter = new StoreTransactionLedger();
+
+            $accountFetcher = new AccountFetcher();
+            if ($paidAmount > 0) {
+                if($request->payment_type !== 'split'){
+                    $cashAccount = ($request->payment_type == 'bank') ? $accountFetcher->getAccountByName('POS Bank') : $accountFetcher->getAccountByName('POS Cash');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $request->paid_amount,
+                        'action' => 'debit',
+                        'account_id' => $cashAccount->id
+                    ], $transaction->id);
+                }else{
+                    $cashAccount = $accountFetcher->getAccountByName('POS Cash');
+                    $bankAccount = $accountFetcher->getAccountByName('POS Bank');
+
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $request->cash_paid_amount,
+                        'action' => 'debit',
+                        'account_id' => $cashAccount->id
+                    ], $transaction->id);
+
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $request->bank_paid_amount,
+                        'action' => 'debit',
+                        'account_id' => $bankAccount->id
+                    ], $transaction->id);
+                }
+            }
+
+            // $transaction = Transaction::create([
+            //     'date' => now(),
+            //     'created_by' => UserData()->id,
+            //     'transactionable_id' => $invoice->id,
+            //     'transactionable_type' => 'invoice',
+            //     'is_confirmed' => 1,
+            // ]);
+            if ($invoice->total_session_price > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_session_price,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-0103')->id,
+                ], $transaction->id);
+            }
+
+            if ($invoice->service_charge > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->service_charge,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1009')->id, // Service Charges(8%)
+                ], $transaction->id);
+            }
+            if ($invoice->tax > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->tax,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('2-1057')->id, // Receivable 5% Tax
+                ], $transaction->id);
+            }
+
+            if ($invoice->total_service_value > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_service_value,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1014')->id, // Event/Function-Service Fees
+                ], $transaction->id);
+            }
+
+            if ($invoice->total_accessory_value > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_accessory_value,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1014')->id, // should be the account for accessory sales
+                ], $transaction->id);
+            }
+
+            if ($invoice->total_discount > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_discount,
+                    'action' => 'debit',
+                    'account_id' => $accountFetcher->getAccountByCode('6-2003')->id, // Discount Allowed
+                ], $transaction->id);
+            }
+
+            if ($invoice->order) {
+
+                if (!$entity) {
+                    ResponseMessage('Invoice Entity not found', 419);
+                }
+                $RtAreaTypeId = AreaType::where('type', 'bar_and_restaurant')->first()->id;
+                $KtvAreaTypeId = AreaType::where('type', 'ktv')->first()->id;
+
+                if ($entity->entity_type == 'room') {
+                    $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $KtvAreaTypeId);
+                    $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], $KtvAreaTypeId);
+
+                    if (($foodMenusKTV)->count() > 0) {
+                        $foodTotal = $foodMenusKTV->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $foodTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0101')->id, // Income - Food (KTV)
+                        ], $transaction->id);
+                    }
+                    if (($beverageMenusKTV->count() > 0)) {
+                        $beverageTotal = $beverageMenusKTV->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $beverageTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0102')->id, // Income - Beverages (KTV)
+                        ], $transaction->id);
+                    }
+                }
+                if ($entity->entity_type == 'table') {
+                    $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $RtAreaTypeId);
+                    $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $RtAreaTypeId);
+                    if (($foodMenusRT)->count() > 0) {
+                        $foodTotal = $foodMenusRT->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $foodTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0001')->id, // Income - Food (RT)
+                        ], $transaction->id);
+                    }
+                    if (($beverageMenusRT->count() > 0)) {
+                        $beverageTotal = $beverageMenusRT->sum('total_price');
+                        $ledgerTransactionWriter->storeLedger([
+                            'value' => $beverageTotal,
+                            'action' => 'credit',
+                            'account_id' => $accountFetcher->getAccountByCode('5-0002')->id, // Income - Beverages (RT)
+                        ], $transaction->id);
+                    }
+                }
+            }
+
+            $invoice->paid_amount = $request->paid_amount;
+            $invoice->payment_status = 'paid';
+            $invoice->payment_type = $request->payment_type;
+            $invoice->save();
+            DB::commit();
+
+            ResponseData($invoice);
+        } catch (Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 500);
+        }
+    }
+
+    private function getOrderedMenusSummary($invoiceId, array $menuCategoryIds, $areaTypeId)
+    {
+        $menus = Invoice::where('invoices.id', $invoiceId)
+            ->whereIn('menu_categories.id', $menuCategoryIds)
+            ->where('areas.area_type_id', $areaTypeId)
+            ->join('orders', 'invoices.id', '=', 'orders.invoice_id') // Join orders
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id') // Join order items
+            ->join('menus', 'order_items.menu_id', '=', 'menus.id') // Join menus
+            ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id') // Join menu categories
+            ->join('areas', 'invoices.area_id', '=', 'areas.id') // Join areas
+            ->join('area_types', 'areas.area_type_id', '=', 'area_types.id') // Join area types
+            ->select(
+                'menu_categories.id as category_id',
+                'menu_categories.name as category_name',
+                'areas.id as area_id',
+                'areas.name AS area_name',
+                'areas.area_type_id as area_type_id',
+                'area_types.name AS area_type_name',
+                'area_types.type AS area_type',
+                DB::raw('COUNT(order_items.id) as menu_count'), // Count number of menu items in each category
+                DB::raw('SUM(order_items.price) as total_price') // Sum of order item prices per category
+            )
+            ->groupBy(
+                'menu_categories.id',
+                'areas.id',
+                'areas.area_type_id',
+            ) // Group by category
+            ->orderBy('menu_categories.name')
+            ->get();
+
+        return $menus;
+    }
+
+    public function doneEntityWithInvoice(array $data)
+    {
+        // dd($data);
+        //payload
+        //invoice_id: 36
+        // discount_type: null
+        // order_categories: []
+        // total: 10000
+        // order_discount: 0
+        // discount_total: 0
+        // end_date: null
+        //end
+        DB::beginTransaction();
+        try {
+            // dd($data);
+            $invoice = Invoice::find($data['invoice_id']);
+            $data['total'] = $invoice['total'] != null ? $invoice['total'] : 0;
+            $data['total_service_value'] = $invoice->total_service_value;
+            $data['sub_total'] = $invoice->sub_total;
+            if (!$invoice) {
+                ResponseMessage('Invoice not found', 404);
+            }
+            //added end_invoice for table oct 25 2024
+            if ($invoice && $data['entity_type'] == 'table') {
+                $invoice = $this->doneTableForInvoice($data, $invoice);
+                $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
+                $this->addTargetPosition($invoice->id, $invoice->created_by, $data['sub_total']); //add sale target position for related role
+                $this->addTargetMenu($invoice->id); //add sale target position for related role
+                $this->broadcastNotification($invoice->entity_id); //send notifcation;
+                DB::commit();
+                return $invoice;
+            }
+            $foodCharge = 0;
+            $beverageCharge = 0;
+            $total_session_price = 0;
+            $order_discount = 0;
+            $service_charge = 0;
+            $tax = 0;
+            $foodDrink = 0;
+            // $discount_value = 0;
+            $room_discount_value = 0;
+            $bdDiscount = 0;
+            $customerLevelDiscount = 0;
+            $discount_value = 0;
+            if (isset($data['customer_level_discount'])) {
+                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
+            }
+
+            if (isset($data['tax'])) {
+                $tax = $data['tax'];
+            }
+            if (isset($data['service_charge'])) {
+                $service_charge = $data['service_charge'];
+            }
+
+            if (isset($data['order_discount'])) {
+                $order_discount = $data['order_discount'];
+            }
+
+            if (isset($data['birthday_discount'])) {
+                $bdDiscount = $data['birthday_discount'] ?? 0;
+            }
+            if (isset($data['order_categories'])) {
+                $data['order_categories'] = json_decode($data['order_categories'], true);
+                foreach ($data['order_categories'] as $menu) {
+                    if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
+                        $foodCharge += $menu['price'];
+                    } else {
+                        $beverageCharge += $menu['price'];
+                    }
+                }
+            }
+            $customer = Customer::find($invoice->customer_id);
+            $invoice_id = $invoice->invoice_id;
+            $activeInvoiceSession = $invoice->activeInvoicesession;
+            $entity = $activeInvoiceSession->entity;
+            $activeInvoiceSession->is_active = 0;
+            $activeInvoiceSession->save();
+            $totalInvoiceSession = $this->invoiceService->getTotalInvoiceSession($invoice->id);
+            $total_session_price = $totalInvoiceSession->total_session_value;
+            $roomSessionsByInvoice = $activeInvoiceSession->roomSessions;
+            // $lastRoomSession = $invoice->latestSession;
+            // $entity = Entity::find($lastRoomSession->entitySession->entity_id);
+
+            //claculate total_session_price
+
+            // $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+            // if ($invoice->invoice_type != 'package') {
+            //     foreach ($roomSessions as $room) {
+            //         $total_session_price += $room->price;
+            //     }
+            // }
+
+
+            $order = Order::where('invoice_id', $invoice->id)->first();
+            //temp command
+            // if ($order) {
+            //     $allSold = $order->orderItems->every(function ($item) {
+            //         return $item->status === 'done';
+            //     });
+            //     if ($allSold == false) {
+            //         ResponseMessage('Not all order items are done', 422);
+            //     }
+            // }
+            //end temp
+
+
+            if (isset($data['discount_type'])) {
+                if ($data['discount_type'] == 'room_discount') {
+                    ResponseMessage('Room Discount is invalid', 419);
+                    $roomDiscount = RoomDiscount::find($data['room_discount_id']);
+                    if (!$roomDiscount->rooms->contains($entity->id)) {
+                        ResponseMessage('Selected discount cannot be applied', 422);
+                    }
+
+                    if ($roomDiscount->session <= $totalInvoiceSession->total_duration) {
+                        $room_discount_value = $total_session_price - $data['room_discount_amount'];
+                        $total_session_price = $data['room_discount_amount'];
+                        $invoiceSession = InvoiceSession::where('invoice_id', $invoice->id)
+                            ->where('is_active', 1)->first();
+
+                        //discount is not complete
+
+                        // $lastRoomSession->discount_session = $data['discount_session'];
+                        // $lastRoomSession->save();
+
+                    } else {
+                        ResponseMessage('Discount cannot be applied', 422);
+                    }
+                }
+            }
+
+            // $data['room_discount_value'] = $room_discount_value;
+            //doesn't have discount value when done session
+            // if (isset($data['discount_value'])) {
+            //     $discount_value = $data['discount_value'];
+            // }
+            //end
+            $total_service_value = 0;
+            $invoiceServices = $invoice->invoiceService;
+            foreach ($invoiceServices as $invoiceService) {
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
+                if ($invoiceService->is_active == 1) {
+                    $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
+                    $invoiceService->service_value = $serviceValue;
+                    $invoiceService->is_active = 0;
+                    $invoiceService->save();
+                    $total_service_value += $serviceValue;
+                    // $updatedInvoice=$this->orderService->updateServiceAmountToInvoice($invoice,$serviceValue);
+                }
+            }
+            // $data['discount_value'] = $discount_value;
+            $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $order_discount;
+
+            // $data['tax'] = $tax;
+            // $data['service_charge'] = $service_charge;
+            $data['total_session_price'] = $total_session_price;
+            $data['total_service_value'] += $total_service_value;
+            $data['total'] += $total_service_value;
+            $data['sub_total'] += $total_service_value;
+            // $data['order_discount_value'] = $order_discount;
+            $data['payment_status'] = 'received';
+            $data['complete_date'] = CurrentTime();
+            $data['invoice_id'] = $invoice_id;
+            $invoice->update($data);
+
+            $invoice->total_discount = $invoice->discount_value
+                + $invoice->order_discount_value
+                + $invoice->room_discount_value
+                + $invoice->birthday_discount
+                + $invoice->customer_level_discount;
+
+            $invoice->sub_total = ($invoice->total + $invoice->service_charge + $invoice->tax) - $invoice->total_discount;
+
+            $invoice->save();
+
+            //update is active  to room_session
+            // $this->invoiceService->updateIsActive($invoice->id, 0);
+            //customer deposit
+
+            $customerDepositData['customer_id'] = $invoice->customer_id;
+            $customerDepositData['account_id'] = $invoice->customer->account_id;
+            $customerDepositData['amount'] = $data['total'];
+            $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
+            //end
+            foreach ($roomSessionsByInvoice as $roomSession) {
+                $entitySession = $roomSession->entitySession;
+                $entitySession->is_active = 0;
+                $entitySession->save();
+                $entity = $entitySession->entity;
+                $entity->status = 'inactive';
+                $entity->is_active = 0;
+                $entity->save();
+                // dd($entitySession);
+                Log::info('Room sesion is active updated ');
+            }
+
+            // $soldStaff = Staff::find($invoice->created_by);
+            // $firstRole = $soldStaff->roles->first();
+            // TargetPositionResult::create([
+            //     'role_id' => $firstRole->id,
+            //     'date_time' => CurrentTime(),
+            //     'invoice_id' => $invoice->id,
+            //     'amount' => $data['total']
+            // ]);
+            $this->addTargetPosition($invoice->id, $invoice->created_by, $data['sub_total']); //add sale target position for related role
+            if ($order != null) {
+                $orderItems = $order->orderItems;
+                if ($orderItems->isNotEmpty()) {
+                    $unChooseOrderItemByArea = $orderItems
+                        ->where('area_id', null)
+                        ->first();
+                    if ($unChooseOrderItemByArea) {
+                        ResponseMessage('Area need to conifirm by area', 419);
+                    }
+                }
+                $this->addTargetMenu($invoice->id);
+                // $groupedOrderItems = $orderItems
+                //     ->groupBy(function ($item) {
+                //         return $item['menu_id'] . '-' . $item['area_id'];
+                //     })
+                //     ->map(function ($items) {
+                //         return [
+                //             'menu_id' => $items->first()->menu_id, // Access as an object
+                //             'area_id' => $items->first()->area_id, // Access as an object
+                //             'quantity' => $items->sum('quantity'),  // Sum the quantities
+                //         ];
+                //     })
+                //     ->values();
+                // foreach ($groupedOrderItems as $orderItem) {
+                //     TargetMenuResult::create([
+                //         'date_time' => CurrentTime(),
+                //         'invoice_id' => $invoice->id,
+                //         'area_id' => $orderItem['area_id'],
+                //         'menu_id' => $orderItem['menu_id'],
+                //         'quantity' => $orderItem['quantity'],
+                //     ]);
+                // }
+            }
+
+            $catering_department = Department::where('name', 'Catering')->first();
+            $msg = "The {$entity->name} is now closed. Thank you.";
+            if ($catering_department) {
+                $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+                if ($role) {
+                    broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+                }
+
+            }
+            $entity->is_active = 0;
+            $entity->status = 'inactive';
+            $entity->save();
+
+            $invoice->payment_status = 'checkout';
+            $invoice->save();
+            DB::commit();
+            return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function doneTableForInvoice($data, $invoice)
+    {
+        $total_service_value = 0;
+        $invoiceServices = $invoice->invoiceService;
+        foreach ($invoiceServices as $invoiceService) {
+            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
+            if ($invoiceService->is_active == 1) {
+                $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
+                $invoiceService->service_value = $serviceValue;
+                $invoiceService->is_active = 0;
+                $invoiceService->save();
+            }
+            $total_service_value += $serviceValue;
+        }
+
+        if (!isset($data['birthday_discount'])) {
+            $data['birthday_discount'] = 0;
+        }
+        if (!isset($data['discount_value'])) {
+            $data['discount_value'] = 0;
+        }
+        if (!isset($data['order_discount'])) {
+            $data['order_discount'] = 0;
+        }
+        if (!isset($data['customer_level_discount'])) {
+            $data['customer_level_discount'] = 0;
+        }
+        if (!isset($data['tax'])) {
+            $data['tax'] = 0;
+        }
+        if (!isset($data['service_charge'])) {
+            $data['service_charge'] = 0;
+        }
+
+        if (isset($data['discount_type'])) {
+            $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
+        }
+        $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
+        $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge']) - $data['total_discount'];
+        $data['total'] = $data['total'] + $data['total_discount'];
+        $data['payment_status'] = 'checkout';
+        $data['complete_date'] = CurrentTime();
+        $invoice->update($data);
+        return $invoice;
+    }
+
+    public function addTargetPosition($invoiceId, $staffId, $total)
+    {
+        $soldStaff = Staff::find($staffId);
+        if (!$soldStaff) {
+            ResponseMessage('Staff not found', 404);
+        }
+        $firstRole = $soldStaff->roles->first();
+        if (!$firstRole) {
+            ResponseMessage('Role not found', 404);
+        }
+        TargetPositionResult::create([
+            'role_id' => $firstRole->id,
+            'date_time' => CurrentTime(),
+            'invoice_id' => $invoiceId,
+            'amount' => $total,
+        ]);
+    }
+
+    public function addTargetMenu($invoiceId)
+    {
+        $order = Order::where('invoice_id', $invoiceId)
+            ->first();
+        if ($order) {
+            // $groupedOrderItems = $orderItems
+            //     ->groupBy(function ($item) {
+            //         return $item['menu_id'] . '-' . $item['area_id'];
+            //     })
+            //     ->map(function ($items) {
+            //         return [
+            //             'menu_id' => $items->first()->menu_id, // Access as an object
+            //             'area_id' => $items->first()->area_id, // Access as an object
+            //             'quantity' => $items->sum('quantity'),  // Sum the quantities
+            //         ];
+            //     })
+            //     ->values();
+            // $orderItems = $order->orderItems->where('status','pos_confirmed');
+            $invoice = $order->invoice;
+            $areaId = $invoice->area_id;
+            $orderItems = $order->orderItems->filter(fn($item) => $item->status === 'pos_confirmed');
+            $groupedOrderItems = $orderItems
+                ->groupBy('menu_id')
+                ->map(fn($items) => [
+                    'menu_id' => $items->first()->menu_id,
+                    'quantity' => $items->sum('quantity'),
+                ])
+                ->values();
+            // Prepare data for bulk insert
+            $insertData = $groupedOrderItems->map(fn($orderItem) => [
+                'date_time' => CurrentTime(),
+                'invoice_id' => $invoiceId,
+                'area_id' => $areaId,
+                'menu_id' => $orderItem['menu_id'],
+                'quantity' => $orderItem['quantity'],
+            ])->toArray();
+            // Bulk insert for better performance
+            TargetMenuResult::insert($insertData);
+            // foreach ($groupedOrderItems as $orderItem) {
+            //     TargetMenuResult::create([
+            //         'date_time' => CurrentTime(),
+            //         'invoice_id' => $invoiceId,
+            //         'area_id' => $orderItem['area_id'],
+            //         'menu_id' => $orderItem['menu_id'],
+            //         'quantity' => $orderItem['quantity'],
+            //     ]);
+            // }
+        }
+
+    }
+    public function broadcastNotification($entityId)
+    {
+        $entity = Entity::find($entityId);
+        if (!$entity) {
+            ResponseMessage('Entity No found', 404);
+        }
+        $catering_department = Department::whereIn('name', ['Catering'])->first();
+        if ($catering_department) {
+            // ResponseMessage('Catering department not found', 404);
+            $msg = "The {$entity->name} is now closed. Thank you.";
+            //i think this role is not reliable to send notification
+            //need to confirm  which role to send notification Catering'staff of Catering'waiter
+            $role = Role::whereIn('name', ['Waiter'])->first();
+            if ($role) {
+                // ResponseMessage('Role not found', 419);
+                broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+            }
+            // $catering_department = Department::where('name', 'Catering')->first();
+            // $msg = "The {$entity->name} is now closed. Thank you.";
+            // $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+        }
+
+    }
+
+    public function invoiceConfirm(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::find($data['invoice_id']);
+            $entity = $invoice->entity;
+            if (!$entity) {
+                ResponseMessage('Entity is not found to confirm', 419);
+            }
+            if ($data['is_confirm'] == 1) {
+                if ($entity->entity_type == 'room') {
+                    $activeInvoiceSession = $invoice->activeInvoiceSession;
+                    $activeInvoiceSession->is_active = 1;
+                    $activeInvoiceSession->save();
+                    //update active sesion
+                    $roomSessions = $activeInvoiceSession->roomSessions;
+                    foreach ($roomSessions as $roomSession) {
+                        $entitySesion = $roomSession->entitySession;
+                        $entitySesion->is_active = 1;
+                        $entitySesion->save();
+                        $entity = $entitySesion->entity;
+                        $entity->is_active = 1;
+                        $entity->status = 'active';
+                        $entity->save();
+                    }
+                } elseif ($entity->entity_type == 'table') {
+                    $entity->is_active = 1;
+                    $entity->status = 'active';
+                    $entity->save();
+                }
+            }
+
+            // $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
+            // $entity = Entity::find($latestSession->entitySession->entity_id);
+
+            // $roomSession = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+
+            // if ($data['is_confirm'] == 1) {
+            //     foreach ($roomSession as $session) {
+            //         $session->entitySession->is_active = 1;
+            //         $session->save();
+            //     }
+            //     $entity->is_active = 1;
+            //     $entity->status = 'active';
+            // } else {
+            //     foreach ($roomSession as $session) {
+            //         $session->entitySession->is_active = 0;
+            //         $session->entitySession->save();
+            //     }
+            //     $entity->is_active = 0;
+            //     $entity->status = 'inactive';
+            // }
+            $entity->save();
+            DB::commit();
+            $catering_department = Department::where('name', 'Catering')->first();
+            if ($catering_department) {
+                broadcast(new WaiterNotificationRequest($entity, $catering_department->id));
+            }
+            Responsemessage('Room status updated');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function ledgerAndTransactionForInvoice(array $data)
+    {
+        $posBook = $data['payment_type'] == 'cash' ? $this->invoiceService->accountByCode('2-1011') : $this->invoiceService->accountByCode('2-1012');
+
+        // $data['date'] = now();
+        // $data['created_by'] = ; //example
+        // $data['transactionable_id'] = $invoice->id;
+        // $data['transactionable_type'] = 'invoice';
+        // $data['is_confirmed'] = 1;
+        $transaction = (new StoreTransactionLedger())->createTransaction([
+            'date' => now(),
+            'created_by' => UserData()->id,
+            'transactionable_id' => $data['invoice_id'],
+            'transactionable_type' => 'invoice',
+            'is_confirmed' => 1,
+        ]);
+
+        $debit_total = 0;
+
+        if (isset($data['food_charge']) && $data['food_charge'] != 0) {
+            $foodKtvAcc = $this->invoiceService->accountByCode('5-0101')->first();
+            if ($foodKtvAcc != null) {
+                $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['food_charge'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $foodKtvAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['food_charge'];
+        }
+
+        if (isset($data['beverage_charge']) && $data['beverage_charge'] != 0) {
+
+            $beverageKtvAcc = $this->invoiceService->accountByCode('5-0102')->first();
+
+            if ($beverageKtvAcc != null) {
+                $beverageCreditLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['beverage_charge'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $beverageKtvAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['beverage_charge'];
+        }
+
+
+        if ($data['total_session_price'] != 0) {
+            $ktvRoomAcc = $this->invoiceService->accountByCode('5-0103');
+            if ($ktvRoomAcc != null) {
+                $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['total_session_price'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $ktvRoomAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['total_session_price'];
+        }
+
+
+        if ($data['service_charge'] != 0) {
+            $serviceMoneyAcc = $this->invoiceService->accountByCode('6-2009');
+
+            if ($serviceMoneyAcc != null) {
+                $serviceLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['service_charge'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $serviceMoneyAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['service_charge'];
+        }
+        if ($data['tax'] != 0) {
+            $taxAcc = $this->invoiceService->accountByCode('6-9002');
+            if ($data['tax'] != null) {
+                $taxLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['tax'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $taxAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+            $debit_total += $data['tax'];
+        }
+
+
+
+        if ($data['discount_total'] != 0) {
+            $discountAcc = $this->invoiceService->accountByCode('6-2003');
+
+            if ($discountAcc != null) {
+                $debit_total += $data['discount_total'];
+
+                $debitDiscountLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['discount_total'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $discountAcc->id,
+                    'action' => 'debit',
+                    'is_cashier_confirmed' => 1
+                ]);
+
+                $creditDiscountLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['discount_total'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $posBook->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+                ]);
+            }
+        }
+
+        $debitLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $debit_total,
+            'transaction_id' => $transaction->id,
+            'account_id' => $posBook->id,
+            'action' => 'debit',
+            'is_cashier_confirmed' => 1
+        ]);
+    }
+
+
+    //add service
+    public function addService($request)
+    {
+
+        DB::beginTransaction();
+        try {
+            $existingService = InvoiceService::where('service_id', $request->service_id)
+                ->where('invoice_id', $request->invoice_id)
+                ->where('is_active', 1)
+                ->first();
+            if (!$existingService) {
+                $createdService = InvoiceService::create([
+                    'start_date' => $request->start_date,
+                    'invoice_id' => $request->invoice_id,
+                    'service_id' => $request->service_id,
+                    'is_active' => 1,
+                ]);
+                DB::commit();
+                ResponseMessage('Invoice Service Create Successfully', 200);
+                // Optionally, you can return or do something with the created service
+            } else {
+                ResponseMessage('InvoiceService already exists.', 409);
+                // If it exists, you can return a response or handle accordingly
+            }
+            ResponseMessage('Service Added Succesfully', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function endService($request)
+    {
+        DB::beginTransaction();
+        try {
+            $existingService = InvoiceService::where('id', $request->invoice_service_id)
+                ->whereNull('end_date')
+                ->first();
+            if ($existingService) {
+                $calculatedServiceValue = $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
+                $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
+                    ->update([
+                        'end_date' => $request->end_date,
+                        'service_value' => $calculatedServiceValue->service_value,
+                        'is_active' => 0,
+                    ]);
+                $service = $existingService->service;
+                $service->is_active = 0;
+                $service->save();
+                $invoice = $this->orderService->updateServiceAmountToInvoice($existingService->invoice, $calculatedServiceValue->service_value);
+                DB::commit();
+                ResponseMessage('InvoiceService End successfully', 200);
+                // return $invoiceService;
+            } else {
+                ResponseMessage('InvoiceService already ended', 200);
+            }
+            // If it doesn't exist, create a new InvoiceService
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function getCustomerDeposits($request)
+    {
+        return CustomerDeposit::with(['account', 'customer'])
+            ->where('type', 'deposit')
+            ->orderBy('created_at', 'desc')->get();
+    }
+
+    public function cashierConfirm($request, $customerDepositId)
+    {
+        DB::beginTransaction();
+        try {
+
+            $customerDeposit = CustomerDeposit::findOrFail($customerDepositId);
+            if (!$customerDeposit) {
+                ResponseMessage('Customer Deposit not found', 404);
+            }
+            if ($customerDeposit->is_cashier_confirmed) {
+                ResponseMessage('Customer Deposit is already confirmed!', 419);
+            }
+            $customerDeposit->is_cashier_confirmed = 1;
+            $customerDeposit->save();
+            $data['date'] = now();
+            $data['created_by'] = UserData()->id;
+            $data['is_confirmed'] = 1;
+            $morphMapName = RelationMorphName($customerDeposit);
+            $data['transactionable_id'] = $customerDeposit->id;
+            $data['transactionable_type'] = $morphMapName;
+            //it is created transaction first and confirm later
+            // Transaction::where('transactionable_id', $customerDeposit->id)
+            //     ->update(['is_confirmed' => 1]);
+
+
+            //after confirming and then create transaction
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $customerDeposit->amount,
+                'personable_id' => $customerDeposit->customer_id,
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $customerDeposit->cash_account_id,
+                'action' => 'debit',
+            ], null, true);
+            #store credit ledger
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $customerDeposit->amount,
+                'personable_id' => $customerDeposit->customer_id,
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $customerDeposit->account_id,
+                'action' => 'credit',
+            ], null, true);
+            DB::commit();
+            ResponseMessage('Customer Deposit is successfully confirmed', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+}

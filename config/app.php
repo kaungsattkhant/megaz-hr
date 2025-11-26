@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Yangon'),
 
     /*
     |--------------------------------------------------------------------------
@@ -165,9 +165,11 @@ return [
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\RepositoryServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        // LaravelFCM\FCMServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -183,6 +185,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        // 'FCM'      => LaravelFCM\Facades\FCM::class,
+        // 'FCMGroup' => LaravelFCM\Facades\FCMGroup::class, // Optional
     ])->toArray(),
 
 ];

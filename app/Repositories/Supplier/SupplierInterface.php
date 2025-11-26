@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Repositories\Supplier;
+
+use Illuminate\Http\Request;
+
+interface SupplierInterface
+{
+    public function list($request);
+
+    public function updateOrCreate($request);
+
+    public function detail($supplier);
+
+    public function createSupplierAccount($request);
+
+    public function toggleBrandItem($supplieItemId);
+
+    public function toggleSupplierPhone($supplierPhoneId);
+
+    public function toggleSupplierBankAccount($supplierBankAccountId);
+
+    public function supplierImport($request);
+
+    public function brandImport($request);
+}

@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Notification;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class SendNotification implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    /**
+     * Create a new event instance.
+     */
+    public $role_id;
+    public $date;
+    public $title;
+    public $body;
+
+    public function __construct(Notification $notification,$role_id)
+    {
+        //
+        $this->role_id=$role_id;
+        $this->date=$notification->date;
+        $this->title=$notification->title;
+        $this->body=$notification->body;
+
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel("send-notification.{$this->role_id}"),
+        ];
+    }
+    public function broadcastWith()
+    {
+        return [
+            'date' => $this->date,
+            'title' => $this->title,
+            'body' => $this->body,
+        ];
+    }
+}

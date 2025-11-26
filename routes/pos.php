@@ -1,0 +1,72 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\MenuAPIController;
+use App\Http\Controllers\API\PackAPIController;
+use App\Http\Controllers\API\OrderAPIController;
+use App\Http\Controllers\API\AccessoryController;
+use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\InvoiceAPIController;
+use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\API\RoomDiscountAPIController;
+use App\Http\Controllers\API\SellingExtraAPIController;
+
+Route::middleware('auth:api')->group(function () {
+    Route::controller(EntityAPIController::class)->group(function () {
+        Route::get('/areas/{id}/entities', 'getEntityWithInvoice');
+        Route::get('/entities_sessions/{id}', 'getEntitySessionDetail');
+        Route::get('/entities/{id}', 'entitySessionWithInvoiceDetail');
+        Route::get('/table/{id}', 'tableWithInvoiceDetail');
+        Route::get('/areas/{id}/inactive_entities', 'getOnlyInactiveEntities');
+    });
+    Route::controller(InvoiceAPIController::class)->group(function () {
+        Route::post('entities/add_service', 'addService');
+        Route::post('entities/end_service', 'endService');
+        Route::get('/pos/invoices', 'getInvoiceData');
+        Route::post('/pos/invoices', 'settleInvoice');
+        Route::post('/entities/start', 'startEntity');
+        Route::post('/entities/add_more_sessions', 'addMoreSessions');
+        Route::post('/entities/change', 'changeRoom');
+        Route::post('/entities/done', 'endRoom');
+        Route::post('/room_done', 'doneRoom');
+        Route::post('/entities/confirm', 'roomConfirm');
+        Route::post('/clear_invioces', 'clearInvoice'); //for only developer testing
+        Route::get('/customer_deposits', 'getCustomerDeposits');
+        Route::post('/customer_deposits/{id}/confirm', 'cashierConfirm');
+    });
+    Route::controller(NotificationController::class)->group(function () {
+        Route::post('pos/send_notification', 'sendPosNotification');
+    });
+    Route::controller(OrderAPIController::class)->group(function () {
+        Route::post('/entities/orders', 'addOrder');
+        Route::post('/order_status_change', 'orderItemChangeStatus');
+        Route::get('/order_items', 'getOrderItemList');
+        Route::get('/order_items/{invoiceId}/invoice', 'getOrderItemByInvoice');
+        Route::get('/pos_order_items', 'getOrderItemForPOS');
+        Route::post('/pos_order_items/{order_item_id}/status', 'orderItemAreaConfirm');
+        Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
+        Route::post('combine_order_items', 'combineOrderItem');
+        Route::get('/order_item_group_list', 'getOrderItemGroupList');
+        Route::get('/order_items_group_by_menu', 'getOrderItemsGroupByMenu');
+    });
+    //ksk
+    Route::prefix('pos')->controller(AccessoryController::class)->group(function () {
+        Route::get('accessory_by_category/{accessory_category}', 'getAccessoryByCategory');
+        Route::get('/get_accessory_category', 'getAccessoryCategory');
+        Route::post('/add_accessory', 'createInvoiceAccessory');
+    });
+    Route::prefix('pos')->controller(RoomDiscountAPIController::class)->group(function () {
+        Route::get('/get_room_discount_list', 'getRoomDiscountList');
+    });
+    Route::prefix('pos')->controller(SellingExtraAPIController::class)->group(function () {
+        Route::get('/selling_extra_categories', 'getSellingExtraCategories');
+        Route::get('/selling_extras', 'getSellingExtrasFromPos');
+    });
+    Route::controller(PackAPIController::class)->group(function () {
+        Route::get('/packs', 'getPacksData');
+        Route::post('/packs', 'createPack');
+        Route::post('change_pack','changePack');
+    });
+  
+});
+

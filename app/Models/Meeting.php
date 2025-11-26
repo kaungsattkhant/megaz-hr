@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Notification;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Meeting extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'date_time',
+        'from_date',
+        'to_date',
+        'place',
+        'chaired_by',
+        'title',
+        'description',
+        'created_by',
+        'meeting_type' //dep_type,role_type,staff
+    ];
+
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public function chairedBy()
+    {
+        return $this->belongsTo(Staff::class,  'chaired_by');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(Staff::class,  'created_by');
+    }
+
+    public function participants(): MorphMany
+    {
+        return $this->morphMany(Participant::class, 'participantable');
+    }
+
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
+    }
+}
