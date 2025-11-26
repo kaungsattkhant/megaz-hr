@@ -115,27 +115,33 @@
 
                                         <div class="padding-section text-sm">
                                             <div class=" grid grid-cols-10 gap-x-6 gap-y-5">
-                                                <p class="text-black font-semibold col-span-4">
+                                                <p class="text-black font-semibold col-span-5">
                                                     Menu
                                                 </p>
-                                                <div class="col-span-2"></div>
-                                                <p class="text-black font-semibold col-span-3 text-right">
+                                                <p class="text-black font-semibold col-span-4 text-right">
                                                     Price
                                                 </p>
-                                                <div>
-
-                                                </div>
+                                                <div class="col-span-1"></div>
                                                 <div v-for="(menu,index) in cartMenus" class="contents" :key="menu">
                                                     <button class=" col-span-4 text-sm text-left">
                                                         {{ menu.name }}
                                                     </button>
-                                                    <div class=" col-span-2 text-center text-sm flex justify-between items-center">
+                                                    <div class=" col-span-3 text-center text-sm flex justify-between items-center">
                                                         <p>
                                                             {{ menu.quantity }}
                                                         </p>
+                                                        <div>
+                                                            <input class="input-check-pos" type="checkbox"
+                                                            @change="updateCartMenusPriceTotal()"
+                                                            v-model="cartMenus[index].foc_applied" value="" id="foc" />
+                                                            <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="foc">
+                                                                FOC
+                                                            </label>
+                                                        </div>
                                                     </div>
-                                                    <p class=" col-span-3 text-sm text-right">
-                                                        {{ (menu.price).toLocaleString() }}
+                                                    <p class=" col-span-2 text-sm text-right">
+                                                        <div v-if="cartMenus[index].foc_applied"><s>{{ (menu.price).toLocaleString() }}</s></div>
+                                                        <div v-else>{{ (menu.price).toLocaleString() }}</div>
                                                     </p>
                                                     <button @click="removeMenuFromCart(menu, index)">
                                                         <i class="fal fa-times"></i>
@@ -145,11 +151,31 @@
                                             <hr class="my-2"></hr>
                                             <div class=" grid grid-cols-10 gap-x-6 gap-y-5 mt-2">
                                                 <p class="text-black font-semibold col-span-4">
+                                                    Sub Total
+                                                </p>
+                                                <div class="col-span-2"></div>
+                                                <p class="text-black font-semibold col-span-3 text-right">
+                                                    {{ (cartMenusPriceTotal + cartMenusFocTotal).toLocaleString() }}
+                                                </p>
+                                            </div>
+                                            <hr class="my-2"></hr>
+                                            <div class=" grid grid-cols-10 gap-x-6 gap-y-5 mt-2">
+                                                <p class="text-black font-semibold col-span-4">
+                                                    FOC
+                                                </p>
+                                                <div class="col-span-2"></div>
+                                                <p class="text-black font-semibold col-span-3 text-right">
+                                                    {{ cartMenusFocTotal.toLocaleString() }}
+                                                </p>
+                                            </div>
+                                            <hr class="my-2"></hr>
+                                            <div class=" grid grid-cols-10 gap-x-6 gap-y-5 mt-2">
+                                                <p class="text-black font-semibold col-span-4">
                                                     Total
                                                 </p>
                                                 <div class="col-span-2"></div>
                                                 <p class="text-black font-semibold col-span-3 text-right">
-                                                    {{ cartMenusPriceTotal.toLocaleString() }}
+                                                    {{ (cartMenusPriceTotal).toLocaleString() }}
                                                 </p>
                                             </div>
                                         </div>
@@ -681,8 +707,8 @@
                                             Tax
                                         </label>
                                     </div>
-                                    <input type="number" v-show="printInvoiceData.isTax" placeholder="Discount" v-model="selectedTaxPercent"
-                                    @change="btnClickedTax()"
+                                    <input type="number" v-show="printInvoiceData.isTax" placeholder="Tax" v-model="selectedTaxPercent"
+                                    @input="btnClickedTax()"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0 mt-2">
                                 </div>
                                 <div class="mb-4">
@@ -1542,6 +1568,7 @@
                 menuLoading: false,
                 cartMenus: [],
                 cartMenusPriceTotal: 0,
+                cartMenusFocTotal: 0,
                 entityDetails: null,
                 menuOrderBtnLoading: false,
             };
@@ -1913,7 +1940,7 @@
                     this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.05
                 }
                 if (this.isTax = true) {
-                    this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
+                    this.printInvoiceData.tax = this.printInvoiceData.food * (this.selectedTaxPercent * 0.01);
                 }
 
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
@@ -2557,6 +2584,8 @@
                         menu_category_id: this.selectedMenuCategory,
                         cooking_area_id: menu.cooking_area_id,
                         is_package: 0,
+                        is_foc: 0,
+                        foc_applied: false,
                     });
                 }
 
@@ -2570,7 +2599,14 @@
 
             updateCartMenusPriceTotal(){
                 this.cartMenusPriceTotal = this.cartMenus.reduce((total, menu) => {
-                    const amount = Number(menu.price) || 0;
+                    // If foc_applied is true, amount is 0; otherwise, use the parsed price
+                    const amount = menu.foc_applied ? 0 : (Number(menu.price) || 0);
+                    menu.is_foc = (menu.foc_applied)? 1:0;
+                    return total + amount;
+                }, 0);
+                this.cartMenusFocTotal = this.cartMenus.reduce((total, menu) => {
+                    // If foc_applied is false, amount is 0; otherwise, use the parsed price
+                    const amount = (!menu.foc_applied) ? 0 : (Number(menu.price) || 0);
                     return total + amount;
                 }, 0);
             },
