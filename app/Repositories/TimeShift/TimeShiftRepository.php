@@ -147,6 +147,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
       ->whereDate('date_time', today())
       ->first();
+    // dd($existShiftAssign);
     if (!$existShiftAssign) {
       ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
     }
@@ -297,6 +298,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->where('timeshift_id', $timeShiftId)
         ->whereDate('date_time', $today)
         ->first();
+      // dd($existShiftAssign);
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -315,6 +317,8 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $userLng = $requestData['longitude'];
 
       $officeGps = Gps::where('name', 'GPS Point')->first();
+      $officeGps=$existShiftAssign->timeshift->gps;
+      dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
       }
