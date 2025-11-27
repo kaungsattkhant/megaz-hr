@@ -487,11 +487,12 @@
                                         Menu Total
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }}
+                                        <!-- {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} -->
+                                        {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].order_sub_total.toLocaleString() : '0' }}
                                         MMks
                                     </p>
                                 </div>
-                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                <div class=" grid grid-cols-11 gap-x-2 gap-y-3">
                                     <div v-for="(menu, index) in purchaseMenuList" class="contents" :key="index">
                                         <div v-for="menu2 in combinedMenuList" class="contents" :key="menu2">
                                             <p class=" col-span-4 text-sm">
@@ -509,8 +510,11 @@
                                                 class=" col-span-2 text-center text-xs pt-0.5">
                                                 {{ menu2.status }}
                                             </p>
-                                            <p class=" col-span-3 text-sm text-right">
-                                                {{ menu2.price.toLocaleString() }} MMKs
+                                            <p class=" col-span-4 text-sm text-right">
+                                                <!-- {{ menu2.price.toLocaleString() }} MMKs -->
+                                                {{ menu2.sub_total_price.toLocaleString() }} 
+                                                <!-- {{ menu2.discount_value ? '(-' + menu2.discount_value + ')': '' }}  -->
+                                                <!-- MMKs -->
                                             </p>
                                         </div>
 
@@ -2279,6 +2283,9 @@
                         this.purchaseMenuList = response.data.invoice.orders;
                         if (response.data.invoice.orders.length > 0) {
                             this.foodDiscount = response.data.invoice.orders[0].total_discount_price
+                        }
+                        else{
+                            this.foodDiscount = 0;
                         }
                     }
                     this.getMenuCategoryList();
