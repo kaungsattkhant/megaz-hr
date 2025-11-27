@@ -536,9 +536,9 @@ Route::view('/suppliers/{id}/lead_times', 'supplier.supplier_leadtime')->name('s
 Route::view('/creditor', 'creditor.index')->name('creditor');
 Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
 
-Route::middleware(['departments:gps'])->group(function () {
+// Route::middleware(['departments:gps'])->group(function () {
     Route::view('/gps', 'GPS.index')->name('gps');
-});
+// });
 Route::middleware(['departments:check-in'])->group(function () {
     Route::view('/check_in', 'check_in.index')->name('check_in');
 });

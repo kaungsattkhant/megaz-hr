@@ -25,11 +25,11 @@
                                 :key="typeIndex"> {{ type.name }} </option>
                         </select>
                     </div> -->
-                    <!-- <button type="button"
+                    <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                        data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
-                        Add New
-                    </button> -->
+                        data-te-toggle="modal" data-te-target="#edit_modal" @click="addBtnClicked">
+                        Add
+                    </button>
                 </div>
             </div>
         </div>
@@ -182,12 +182,18 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <!-- <div class="mb-4">
+                    <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Name
                         </label>
                         <input type="text" placeholder="Name" v-model="name" class="input-ui">
-                    </div> -->
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Branch Name
+                        </label>
+                        <input type="text" placeholder="Branch Name" v-model="branch_name" class="input-ui">
+                    </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Latitude
@@ -246,6 +252,7 @@ export default {
             searchInput:null,
 
             name:null,
+            branch_name: null,
             latitude:null,
             longitude:null,
             editDetail:null,
@@ -258,6 +265,7 @@ export default {
 
             feature: this.getFeature(),
             loading: false,
+            is_edit: false,
         };
     },
 
@@ -287,8 +295,11 @@ export default {
                 // this.perPage = response.data.per_page;
             }
         },
-
+        addBtnClicked(){
+            this.is_edit = false;
+        },
         async editBtnClicked(gps, index){
+            this.is_edit = true;
             let url = `/api/gps/` + gps.id;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
@@ -301,6 +312,10 @@ export default {
         btnClickedEditGps(){
             if(!this.name){
                 this.alertValidationMessage(`Name`);
+                return 1;
+            }
+            if(!this.branch_name){
+                this.alertValidationMessage(`Branch Name`);
                 return 1;
             }
             if(!this.latitude){
@@ -316,9 +331,13 @@ export default {
         async editGps(){
             let formData = new FormData();
             formData.append('name',this.name);
+            formData.append('branch_name',this.branch_name);
             formData.append('latitude',this.latitude);
             formData.append('longitude',this.longitude);
-            let response = await postApiData({url:`/api/gps/`+this.editDetail.id, form_data:formData, token:this.getToken()})
+            if(this.is_edit){
+                formData.append('id', this.editDetail.id)
+            }
+            let response = await postApiData({url:`/api/gps`, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getGpsList();
                 document.getElementById("close_edit_modal").click();
