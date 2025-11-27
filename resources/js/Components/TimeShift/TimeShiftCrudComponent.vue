@@ -47,6 +47,9 @@
                                     Shift
                                 </th>
                                 <th scope="col" class="">
+                                    GPS
+                                </th>
+                                <th scope="col" class="">
                                     From
                                 </th>
                                 <th scope="col" class="">
@@ -72,6 +75,9 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ shift.shift.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ shift.gps?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ shift.from_time }}
@@ -223,6 +229,23 @@
                             </div>
                         </div>
                         <div class="mb-4">
+                            <div>
+                                <label class="block text-sm text-black mb-3">GPS</label>
+                                <div class="flex gap-x-2">
+                                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                                        data-te-select-wrapper-ref>
+                                        <select data-te-select-init data-te-select-placeholder="Select GPS"
+                                            data-te-select-filter="true" name="" id="" v-model="selectedGps" class="input-ui">
+                                            <option v-if="gpsList.length < 1" selected disabled> Not Found! </option>
+                                            <option :value="gps" v-for="(gps, index) in gpsList"
+                                                :key="index"> {{ gps.name }} </option>
+                                        </select>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 From
                             </label>
@@ -308,6 +331,21 @@
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <label class="block text-sm text-black mb-3">GPS</label>
+                            <div class="flex gap-x-2">
+                                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                                    data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select GPS"
+                                        data-te-select-filter="true" name="" id="" v-model="selectedGpsEdit" class="input-ui">
+                                        <option v-if="gpsList.length < 1" selected disabled> Not Found! </option>
+                                        <option :value="gps" v-for="(gps, index) in gpsList"
+                                            :key="index"> {{ gps.name }} </option>
+                                    </select>
+                                    
+                                </div>
+                            </div>
+                        </div>
                         <div class="mb-4">
                             <label for="ftime" class="label-form mb-3">
                                 From
@@ -387,12 +425,15 @@ export default {
             shiftName:null,
             isShiftStep:false,
             shiftList:[],
+            gpsList: [],
             selectedShift:null,
+            selectedGps: null,
             fromTime:null,
             toTime:null,
 
             editDetail:null,
             selectedShiftEdit:null,
+            selectedGpsEdit: null,
             fromTimeEdit:null,
             toTimeEdit:null,
 
@@ -415,12 +456,19 @@ export default {
                 this.shiftList = response.data;
             }
         },
+        async getGpsList(){
+            let response = await getApiData({ url: '/api/gps', token: this.getToken() });
+            if (response.data) {
+                this.gpsList = response.data;
+            }
+        },
         addBtnClicked(){
             this.isShiftStep = false;
             this.shiftName = null;
             this.selectedShift = null;
             this.fromTime = null;
             this.toTime = null;
+            this.selectedGps = null;
         },
         btnClickedAddShift(){
             if(!this.shiftName){
@@ -457,6 +505,10 @@ export default {
                 this.alertValidationMessage(`To`);
                 return 1;
             }
+            else if(!this.selectedGps){
+                this.alertValidationMessage(`GPS`);
+                return 1;
+            }
             else{
                 this.createShift();
             }
@@ -466,6 +518,7 @@ export default {
             formData.append('shift_id',this.selectedShift.id);
             formData.append('from_time',this.fromTime);
             formData.append('to_time',this.toTime);
+            formData.append('gps_id',this.selectedGps.id);
             let response = await postApiData({url:`/api/time_shifts`, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getTimeShiftList();
@@ -480,6 +533,7 @@ export default {
                 this.editDetail = response.data;
             }
             this.selectedShiftEdit = this.shiftList.find(shift => shift.id == this.editDetail.shift_id);
+            this.selectedGpsEdit = this.gpsList.find(gps => gps.id == this.editDetail.gps_id);
             if(this.editDetail.from_time){
                 let from_time = this.editDetail.from_time;
                 let Ftime = from_time.split(':').slice(0, 2).join(':');
@@ -505,6 +559,10 @@ export default {
                 this.alertValidationMessage(`To`);
                 return 1;
             }
+            else if(!this.selectedGpsEdit){
+                this.alertValidationMessage(`GPS`);
+                return 1;
+            }
             else{
                 this.editShift();
             }
@@ -514,6 +572,7 @@ export default {
             formData.append('shift_id',this.selectedShiftEdit.id);
             formData.append('from_time',this.fromTimeEdit);
             formData.append('to_time',this.toTimeEdit);
+            formData.append('gps_id',this.selectedGpsEdit.id    );
             let response = await postApiData({url:`/api/time_shifts/`+this.editDetail.id, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getTimeShiftList();
@@ -608,6 +667,7 @@ export default {
     created() {
 
         this.getShiftList();
+        this.getGpsList();
         this.getTimeShiftList(1);
     }
 }
