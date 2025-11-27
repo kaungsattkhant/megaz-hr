@@ -19,24 +19,6 @@ class TimeShiftController extends Controller
         $this->TimeShiftRepository = $TimeShiftRepository;
     }
 
-    public function getGPS(Request $request)
-    {
-        $data =  $this->TimeShiftRepository->getGPS($request->all());
-        ResponseData($data);
-    }
-
-    public function getGPSById(int $gpsId)
-    {
-        $data =  $this->TimeShiftRepository->getGPSById($gpsId);
-        ResponseData($data);
-    }
-
-    public function updateGPSById(Request $request, int $gpsId)
-    {
-        $data =  $this->TimeShiftRepository->updateGPSById($request->all(), $gpsId);
-        ResponseData($data);
-    }
-
     public function getShifts(Request $request)
     {
         $data =  $this->TimeShiftRepository->getShifts($request->all());
@@ -101,6 +83,11 @@ class TimeShiftController extends Controller
     {
         $data =  $this->TimeShiftRepository->checkIn($request->all());
         ResponseData($data);
+    }
+
+    public function adminPostedCheckIn(Request $request)
+    {
+        $this->TimeShiftRepository->adminPostedCheckIn($request->all());
     }
 
     public function checkOut(CheckOutRequest $request, int $checkInId)

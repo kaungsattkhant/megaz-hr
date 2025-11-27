@@ -76,7 +76,6 @@
     import { mapGetters } from "vuex";
     import TableSkeleton from "../Common/TableSkeleton.vue";
     import Multiselect from 'vue-multiselect';
-import { dropRightWhile } from 'lodash';
 
     export default {
         components: {

@@ -95,6 +95,7 @@ use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerA
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 use App\Http\Controllers\API\ReportController;
+use App\Http\Controllers\GpsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -411,7 +412,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () { });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -503,14 +504,19 @@ Route::middleware('auth:api')->group(function () {
         Route::get('bar/total-expenses', 'getBarTotalExpense');
         Route::get('kitchen-for-sky-and-ktv', 'getKitchenForSktyAndKtv');
         Route::get('kitchen/total-expenses', 'getKitchenTotalExpense');
-        Route::get('monthly-kitchen-menu-total', 'getMonthlyKitchenMenuTotal');//lists
+        Route::get('monthly-kitchen-menu-total', 'getMonthlyKitchenMenuTotal'); //lists
 
         Route::get('catering/target_actual_menu_sales', 'getMenuSales');
         Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
     });
     Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
 
-
+    Route::controller(GpsController::class)->group(function () {
+        Route::post('gps', 'updateOrCreateGps');
+        Route::get('/gps', 'getGPS');
+        Route::get('/gps/{id}', 'getGPSById');
+        // Route::post('/gps/{id}', 'updateGPSById');
+    });
 });
 
 Route::controller(FeatureAPIController::class)->group(function () {
@@ -518,7 +524,6 @@ Route::controller(FeatureAPIController::class)->group(function () {
     Route::post('/feature_import', 'featureImport');
     Route::get('feature_by_department/{department_id}', 'getFeatureByDepartment');
     Route::get('feature_by_module', 'getFeatureByModule');
-
 });
 Route::controller(AdsAPIController::class)->group(function () {
     Route::get('/ads', 'getAds');
@@ -733,4 +738,4 @@ Route::controller(TagController::class)->group(function () {
     Route::post('/tags', 'createTag');
 });
 
-
+Route::get("/test-notification", [TestController::class, "testNotification"]);

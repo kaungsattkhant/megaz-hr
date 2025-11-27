@@ -98,7 +98,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                     $data = [
                         'date' => $complaint->created_at,
                         'title' => 'Complaints',
-                        'body' => 'You need To Check',
+                        'preview' => 'You need To Check',
                     ];
 
                     if($staffs->isNotEmpty()){

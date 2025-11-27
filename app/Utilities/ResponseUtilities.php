@@ -41,7 +41,7 @@ if (!function_exists('ResponseCreatedData')) {
 }
 
 if (!function_exists('ResponseData')) {
-    function ResponseData(mixed $data, int $status_code = 200, bool $success = true, string $extra_message = null, string $name = "data", ?array $extra_headers = null)
+    function ResponseData(mixed $data, int $status_code = 200, bool $success = true, ?string $extra_message = null, string $name = "data", ?array $extra_headers = null)
     {
         if ($status_code >= 400) {
             $success = false;

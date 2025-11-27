@@ -11,12 +11,17 @@ use Illuminate\Http\Request;
 use App\Models\InventoryLedger;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use App\Actions\Inventory\GetInventoryStockAction;
 use Reinbier\LaravelHoliday\Facades\LaravelHoliday;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class TestController extends Controller
 {
     //
+    use FcmSendNotification;
     public function index()
     {
         $invoiceId = 1;
@@ -64,12 +69,37 @@ class TestController extends Controller
 
     public function getHolidays()
     {
-        $holiday = LaravelHoliday::model();
-        return $holiday;
-        LaravelHoliday::forYear(2025)
-            ->addHoliday('2025-07-02', 'National-Day')
-            ->getHolidays();
-        $holidays = LaravelHoliday::getHolidays();
-        ResponseMessage($holidays, 200);
+        //    fcm token f5TYgI-PkJXLsj0YcWQBxm:APA91bHwKqDbtKtdKdXR-N7vrUt36AyF9sQqS-aeWU5DB0G6_fDhqODXgY_P3vFiEmg-krhNEcgqnVzYopKC3h83u4ysjxZjsXz2H86-dgDHA6QRenXnQv0
+    }
+
+    public function testNotification(Request $request)
+    {
+        $tokens = [
+            "fwKw9vdmqS2M4_OlgP8mlL:APA91bEmjsK5cMgJAFxpoHJAO2IvcoS8ocil3VLJ8B3hc7gNR4VzN9OmnLulRXuJwtCuaf7QN2bXNZRUVGsXXp3CF0WxSgvt5EaSlHTXSIO7lbWToBPK-4Q",
+            "eTZw_wYsuk0TpfFsMdjHRm:APA91bEMpEguNGI8HyGqxwdF78SZn2clM9VqvkbtNxlHJV8NT9UcB2uDdqYBUKBG_dSPkWfeJpLzGfvrKoBewsalKUsh56hDd4YaxgCtbogt-_6HjWpfuKw"
+        ];
+
+        $messaging = Firebase::messaging();
+
+        $message = CloudMessage::new()
+            ->withNotification(Notification::create('🔥 Test Title', 'This is a test message'))
+            ->withData([
+                'type' => 'test',
+                'foo' => 'bar',
+            ]);
+
+        $report = $messaging->sendMulticast($message, $tokens);
+
+        logger()->info("🔥 FCM Multicast Report", [
+            'success_count' => $report->successes()->count(),
+            'failure_count' => $report->failures()->count(),
+            'failures' => $report->failures()->getItems(),
+        ]);
+
+        return response()->json([
+            'success_count' => $report->successes()->count(),
+            'failure_count' => $report->failures()->count(),
+            'failures' => $report->failures()->getItems(),
+        ]);
     }
 }

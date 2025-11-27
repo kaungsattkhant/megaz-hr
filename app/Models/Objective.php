@@ -21,6 +21,9 @@ class Objective extends Model
         'repetition',
         'role_id',
         'sop_id',
+        'accountable_id',
+        'consulted_id',
+        'informed_id',
     ];
 
     public function objectiveAssigns(): HasMany
@@ -56,4 +59,18 @@ class Objective extends Model
     {
         return $this->belongsTo(Sop::class, 'sop_id');
     }
+
+    public function accountable(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'accountable_id');
+    }
+    public function consulted(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'consulted_id');
+    }
+    public function informed(): BelongsTo
+    {
+        return $this->belongsTo(Staff::class, 'informed_id');
+    }
+
 }

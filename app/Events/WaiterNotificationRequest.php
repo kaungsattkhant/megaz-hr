@@ -44,6 +44,10 @@ class WaiterNotificationRequest implements ShouldBroadcast
     public function broadcastWith()
     {
         Log::info('Reach Room open and close request');
+         Log::info('Wait Noti Request',[
+            'department_id'=>$this->department_id,
+            'entity_id'=>$this->entity,
+         ]);
         return [
             'department_id' => $this->department_id,
             'entity_id' => $this->entity,

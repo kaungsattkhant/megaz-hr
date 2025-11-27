@@ -17,12 +17,17 @@ class TimeShift extends Model
         'shift_id',
         'from_time',
         'to_time',
+        'gps_id',
         'is_active',
     ];
 
     public function shift()
     {
         return $this->belongsTo(Shift::class);
+    }
+    public function gps()
+    {
+        return $this->belongsTo(Gps::class);
     }
 
     public function checkIns()

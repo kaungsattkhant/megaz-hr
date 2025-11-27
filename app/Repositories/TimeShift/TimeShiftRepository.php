@@ -2,6 +2,8 @@
 
 namespace App\Repositories\TimeShift;
 
+use Exception;
+
 use Carbon\Carbon;
 use App\Models\Gps;
 use App\Models\Shift;
@@ -18,23 +20,6 @@ use App\Http\Resources\GetCurrentTimeShiftResource;
 class TimeShiftRepository implements TimeShiftRepositoryInterface
 {
 
-  public function getGPS($request)
-  {
-    return Gps::orderBy('id', 'desc')->get();
-  }
-
-  public function getGPSById(int $gpsId)
-  {
-    return Gps::find($gpsId);
-  }
-
-  public function updateGPSById($request, int $gpsId)
-  {
-    $gps = Gps::find($gpsId);
-    $gps->update($request);
-    return $gps;
-  }
-
   public function getShifts($request)
   {
     return Shift::orderBy('id', 'desc')->get();
@@ -46,7 +31,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   }
 
   public function storeShifts($data)
-  {
+  { 
     return Shift::updateOrCreate(
       ['id' => $data['id'] ?? null],
       $data
@@ -55,16 +40,17 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getTimeShift($request)
   {
-    return TimeShift::with('shift')->orderBy('id', 'desc')->get();
+    return TimeShift::with(['gps','shift'])->orderBy('id', 'desc')->get();
   }
 
   public function getTimeShiftById($timeShiftId)
   {
-    return TimeShift::with('shift')->find($timeShiftId);
+    return TimeShift::with(['gps', 'shift'])->find($timeShiftId);
   }
 
   public function storeTimeShift($data)
   {
+
     return TimeShift::create($data);
   }
 
@@ -129,7 +115,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     //   ->first();
     $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
       $now = now()->format('H:i');
-      $earlyCheckMinutes = 30; // allow 30 mins early check-in
+      $earlyCheckMinutes = 60; // allow 60 mins early check-in
 
       $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
         ->where(function ($q) use ($now, $earlyCheckMinutes) {
@@ -177,6 +163,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     $response = [
       'gps' => $gps,
       'current_time_shift' => $currentTimeShift ? new GetCurrentTimeShiftResource($currentTimeShift) : null,
+      'staff_timeshif_id'=>$existShiftAssign->id,
     ];
 
     $staffId = $request->input('staff_id');
@@ -270,6 +257,26 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     return $results;
   }
 
+  public function adminPostedcheckIn(array $requestData)
+  {
+    $staffId = $requestData['staff_id'];
+    $timeShiftId = $requestData['time_shift_id'];
+    $datetime = $requestData['chek_in_date_time'];
+    try{
+        DB::beginTransaction();
+        $checkIn = CheckIn::create([
+            'staff_id' => $staffId,
+            'time_shift_id' => $timeShiftId,
+            'check_in_date_time' => $datetime,
+            'is_current_checked_in' => true,
+        ]);
+        DB::commit();
+        ResponseData($checkIn);
+    }catch(Exception $e){
+        DB::rollBack();
+        ResponseMessage("Admin check-in posting failed: {$e->getMessage()}", 500);
+    }
+  }
 
   public function checkIn(array $requestData)
   {

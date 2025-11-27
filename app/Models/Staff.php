@@ -20,10 +20,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
-class Staff extends Authenticatable
+use Illuminate\Notifications\Notifiable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable; // trait
+class Staff extends Authenticatable implements AuditableContract
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory, HasApiTokens,Notifiable,Auditable;
 
     protected $fillable = [
         'name',
@@ -80,6 +82,16 @@ class Staff extends Authenticatable
     public function emergencyContacts()
     {
         return $this->hasMany(StaffEmergencyContact::class);
+    }
+
+    public function routeNotificationForFcm()
+    {
+        return $this->personTokens()->pluck('fcm_token')->toArray();
+    }
+
+     public function personTokens()
+    {
+        return $this->morphMany(PersonFcmToken::class, 'personable');
     }
 
     public function getAuthPassword()
@@ -202,7 +214,7 @@ class Staff extends Authenticatable
         return $this->hasMany(StaffAdvance::class);
     }
 
-    public function staffBalance()
+    public function staffBalance() 
     {
         return $this->hasOne(StaffBalance::class)->latest();
     }
