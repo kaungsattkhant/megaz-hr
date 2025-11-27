@@ -78,7 +78,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getCurrentTimeShift($request)
   {
-    $gps = Gps::first();
+    // $gps = Gps::first();
     if (!isset($request->staff_id) || $request->staff_id == null) {
       ResponseMessage('Staff ID is required', 419);
     }
@@ -159,6 +159,11 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if ($existShiftAssign->status === 'cancelled') {
         ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
       }
+    }
+    $gps = optional(optional($existShiftAssign)->timeshift)->gps;
+    // dd($officeGps);
+    if (!$gps) {
+      ResponseData('Office GPS coordinates not found.', 422);
     }
     $currentTimeShift = $existShiftAssign->timeshift;
 
@@ -317,7 +322,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $userLng = $requestData['longitude'];
 
       // $officeGps = Gps::where('name', 'GPS Point')->first();
-      $officeGps=$existShiftAssign->timeshift->gps;
+      $officeGps = optional(optional($existShiftAssign)->timeshift)->gps;
       // dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
