@@ -14,6 +14,7 @@ class CheckIn extends Model
     protected $fillable = [
         'staff_id',
         'time_shift_id',
+        'staff_timeshift_id',
         'check_in_date_time',
         'check_out_date_time',
         'check_in_photo_url',

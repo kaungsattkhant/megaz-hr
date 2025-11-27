@@ -113,7 +113,8 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     //   })
     //   ->whereDate('date_time', $today)
     //   ->first();
-    $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
+    $existShiftAssign = StaffTimeshift::select('staff_timeshifts.*')
+    ->join('time_shifts', function ($join) {
       $now = now()->format('H:i');
       $earlyCheckMinutes = 60; // allow 60 mins early check-in
 
@@ -298,7 +299,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->where('timeshift_id', $timeShiftId)
         ->whereDate('date_time', $today)
         ->first();
-      // dd($existShiftAssign);
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -316,9 +316,9 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
 
-      $officeGps = Gps::where('name', 'GPS Point')->first();
+      // $officeGps = Gps::where('name', 'GPS Point')->first();
       $officeGps=$existShiftAssign->timeshift->gps;
-      dd($officeGps);
+      // dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
       }
@@ -329,7 +329,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if ($distance > 500) {
         return ResponseData($data = null, $status_code = 422, false, $extra_message = "You are not within the allowed range.");
       }
-
 
       if (isset($requestData['check_in_photo'])) {
         $image = $requestData['check_in_photo'];
@@ -342,6 +341,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $checkIn = CheckIn::create([
         'staff_id' => $requestData['staff_id'],
         'time_shift_id' => $requestData['time_shift_id'],
+        'staff_timeshift_id' => $requestData['staff_timeshift_id'],
         'check_in_date_time' => now(),
         'check_in_photo_path' => $imagePath ?? null,
         'check_in_photo_url' => $imageUrl ?? null,
