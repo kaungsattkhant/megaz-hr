@@ -39,6 +39,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/objectives/key_staff/{objStaffId}/images', 'getObjKeyStaffImage');
     Route::delete('/objectives/key_staff/images/{objStaffId}', 'deleteObjKeystaffImage');
     Route::get('/complete-objective/{objectiveId}/staff/{staffId}', 'getCompletedObjKeysByStaffId');
+    Route::post('objectives/reject_objective_key', 'rejectObjectKeyByObjectiveStaffId');
 
     //ktv-objective-tree
     Route::get('/ktv/entity_room', 'getKtvRoom');
