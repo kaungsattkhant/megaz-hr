@@ -46,6 +46,9 @@
                                     GPS
                                 </th>
                                 <th scope="col" class="">
+                                    Branch Name
+                                </th>
+                                <th scope="col" class="">
                                     Latitude
                                 </th>
                                 <th scope="col" class="">
@@ -71,6 +74,9 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ gps.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ gps.branch_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ gps.latitude }}
@@ -102,13 +108,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getGpsList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getGpsList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -274,7 +280,7 @@ export default {
         async getGpsList(pageNumber) {
             this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url;
+            let url = this.url + '?page=' + pageNumber;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -289,14 +295,19 @@ export default {
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
-                this.gpsList = response.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
+                this.gpsList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         addBtnClicked(){
             this.is_edit = false;
+            this.name = null;
+            this.branch_name = null;
+            this.latitude = null;
+            this.longitude = null;
         },
         async editBtnClicked(gps, index){
             this.is_edit = true;
@@ -307,6 +318,7 @@ export default {
                 this.name = response.data.name;
                 this.latitude = response.data.latitude;
                 this.longitude = response.data.longitude;
+                this.branch_name = response.data.branch_name;
             }
         },
         btnClickedEditGps(){
