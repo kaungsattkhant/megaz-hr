@@ -197,6 +197,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function storeAssignDutiesByObjectives($validatedData)
     {
+        // dd($validatedData);
         DB::beginTransaction();
         try {
             if (isset($validatedData['okr_assign'])) {
@@ -204,25 +205,14 @@ class ObjectiveRepository implements ObjectiveInterface
                 if (!is_array($okrAssigns)) {
                     return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
                 }
-                // if (isset($validatedData['del_ids'])) {
-                //     $delIds = json_decode($validatedData['del_ids'], true);
-                //     if (!is_array($delIds)) {
-                //         return ResponseMessage('Invalid JSON format for delete IDs.', 400);
-                //     }
-                //     ObjectiveStaff::whereIn('id', $delIds)->delete();
-                // }
                 foreach ($okrAssigns as $okrAssign) {
-
                     $objective = Objective::findOrFail($okrAssign['objective_id']);
-                    $objectiveAssign = ObjectiveAssign::firstOrCreate([
+                    $objectiveAssign = ObjectiveAssign::create([
                         'objective_id' => $okrAssign['objective_id'],
                         'staff_id' => $okrAssign['staff_id']
                     ]);
-
-                    $objectiveStaff = ObjectiveStaff::updateOrCreate(
-                        [
-                            'objective_assign_id' => $objectiveAssign->id,
-                        ],
+                    // dd($objectiveAssign);
+                    $objectiveStaff = ObjectiveStaff::create(
                         [
                             'start_date' => $okrAssign['start_date'],
                             'end_date' => $okrAssign['end_date'],
@@ -231,7 +221,6 @@ class ObjectiveRepository implements ObjectiveInterface
                     );
                 }
             }
-            DB::commit();
             return $objectiveStaff;
         } catch (Exception $e) {
             DB::rollBack();
@@ -309,7 +298,7 @@ class ObjectiveRepository implements ObjectiveInterface
     {
         // $objKeyStaff = ObjectivekeyStaff::findOrFail($objKeyStaffId);
         // $objKeyStaff->delete();
-        // return $objKeyStaff;
+        // return $objKeyStaff; 
     }
 
     //mobile

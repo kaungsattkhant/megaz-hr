@@ -322,7 +322,8 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $userLng = $requestData['longitude'];
 
       // $officeGps = Gps::where('name', 'GPS Point')->first();
-      $officeGps = optional(optional($existShiftAssign)->timeshift)->gps;
+      $officeGps = $existShiftAssign?->timeshift?->gps;
+
       // dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
