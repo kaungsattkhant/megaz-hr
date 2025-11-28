@@ -561,23 +561,27 @@ class ObjectiveRepository implements ObjectiveInterface
         try {
             $authUser = \UserData();
             if (!$authUser) {
-                \ResponseMessage('Objective Staff Not found', 404);
+                \ResponseMessage('User not authenticated', 404);
             }
             $objectiveStaff = ObjectiveStaff::find($data['objective_staff_id']);
             if (!$objectiveStaff) {
                 \ResponseMessage('Objective Staff Not found', 404);
             }
-            $objectiveStaff->completed_at = null;
-            $objectiveStaff->completed_by = null;
-            $objectiveStaff->status = 'rejected';
-            $objectiveStaff->reject_remark = $data['reject_remark'];
-            $objectiveStaff->rejected_at = now();
-            $objectiveStaff->rejected_by = $authUser->id;
-            $objectiveStaff->save();
+            if($objectiveStaff->status=='rejected'){
+                \ResponseMessage('Objective  is already rejected', 419);
+            }
+            $objectiveStaff->update([
+                'completed_at'   => null,
+                'completed_by'   => null,
+                'status'         => 'rejected',
+                'reject_remark'  => $data['reject_remark'] ?? null,
+                'rejected_at'    => now(),
+                'rejected_by'    => $authUser->id,
+            ]);
             $deleteRejectedObjectiveKey = CompletedObjectiveKey::whereIn('objective_key_id', $data['reject_objective_keys'])
                 ->delete();
             DB::commit();
-            return $objectiveStaff;
+            ResponseMessage('Objective rejected successfully', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

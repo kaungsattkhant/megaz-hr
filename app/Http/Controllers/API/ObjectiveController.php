@@ -164,6 +164,7 @@ class ObjectiveController extends Controller
 
     public function rejectObjectKeyByObjectiveStaffId(RejectObjectiveKeyRequest $request){
         $data = $this->objectiveRepository->rejectObjectKeyByObjectiveStaffId($request->all());
+        ResponseData($data);
     }
 
 
