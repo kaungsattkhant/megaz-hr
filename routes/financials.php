@@ -9,6 +9,7 @@ use App\Http\Controllers\API\FinancialReportController;
 use App\Http\Controllers\API\SalesLedgerReportController;
 use App\Http\Controllers\API\CustomerDepositReportController;
 use App\Http\Controllers\API\DepositReceivableReportController;
+use App\Http\Controllers\API\BudgetAccountController;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(FinancialReportController::class)->group(function () {
@@ -29,6 +30,14 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(CashbookController::class)->group(function () {
         Route::get('get_cashbook_closing_history','getCashbookClosingHistory');
+    });
+
+    Route::controller(BudgetAccountController::class)->group(function () {
+        Route::get('budget_priorities','getBudgetPriorities');
+        Route::get('budget_accounts','index');
+        Route::post('budget_accounts','create');
+        Route::post('budget_accounts/{id}','edit');
+        Route::post('budget_accounts/{id}/confirm','confirmBudgetAccount');
     });
 });
 
