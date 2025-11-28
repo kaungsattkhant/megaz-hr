@@ -211,16 +211,18 @@ class ObjectiveRepository implements ObjectiveInterface
                         'objective_id' => $okrAssign['objective_id'],
                         'staff_id' => $okrAssign['staff_id']
                     ]);
-                    // dd($objectiveAssign);
                     $objectiveStaff = ObjectiveStaff::create(
                         [
                             'start_date' => $okrAssign['start_date'],
                             'end_date' => $okrAssign['end_date'],
                             'okr_point' => $objective->okr_point,
+                            'objective_assign_id'=>$objectiveAssign->id,
                         ]
                     );
+                    // dd($objectiveAssign);
                 }
             }
+            DB::commit();
             return $objectiveStaff;
         } catch (Exception $e) {
             DB::rollBack();
@@ -304,22 +306,25 @@ class ObjectiveRepository implements ObjectiveInterface
     //mobile
     public function objectiveLists(Request $request)
     {
-        $currentDate = now()->toDateString();
-        $staffId = UserData()->id;
+        // $currentDate = now()->toDateString();
+        $currentDate = now()->format('Y-m-d');
 
+        $staffId = UserData()->id;
         $objectiveStaffFilter = function ($query) use ($staffId, $currentDate) {
             $query->where('staff_id', $staffId);
             // ->whereDate('start_date', $currentDate);
         };
-        $objectiveDateFilter = function ($query) use ($currentDate) {
-            // $query->where('staff_id', $staffId);
-            $query->whereDate('start_date', $currentDate);
-        };
+        // $objectiveDateFilter = function ($query) use ($currentDate) {
+        //     // $query->where('staff_id', $staffId);
+        //     $query->whereDatewhere('start_date', $currentDate);
+        // };
+        $objectiveDateFilter = fn($q) => $q->whereDate('start_date', $currentDate);
+
         $objectives = Objective::with([
             'objectiveAssigns' => $objectiveStaffFilter,
             'objectiveKeys'
         ])
-            ->whereHas('objectiveAssigns', $objectiveStaffFilter)
+            // ->whereHas('objectiveAssigns', $objectiveStaffFilter)
             ->whereHas('objectiveAssigns.objectiveStaff', $objectiveDateFilter)
             ->get();
         return $objectives;
@@ -519,24 +524,70 @@ class ObjectiveRepository implements ObjectiveInterface
     public function updateDailyObjective($data, $objStaffId)
     {
         $objStaff = ObjectiveStaff::findOrFail($objStaffId);
+        $objective= $objStaff->objectiveAssign->objective;
+        $objectiveAssign = $objStaff->objectiveAssign;
         $updateData = [];
         $userId = UserData()->id;
         if (!checkRoles(['Supervisor', 'Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {
             ResponseMessage('Permission is not allowed', 403);
             return;
         }
-
-        if (checkRoles(['Supervisor'])) {
-            $updateData = $this->getSupervisorUpdateData($data, $userId);
-        } elseif (checkRoles(['Manager'])) {
+        if($objective->accountable_id==$userId){
+            // if(!in_array($data['status'], ['approved', 'cancelled'])){
+            //     ResponseMessage('Status is invalid', 403);
+            // }
             $updateData = $this->getManagerUpdateData($data, $userId);
-        } else {
+        }elseif($objectiveAssign->staff_id==$userId){
+            if (!in_array($data['status'], ['in_progress', 'completed'])) {
+                ResponseMessage('Status is invalid', 403);
+            }
             $updateData = $this->getStaffUpdateData($data, $userId, $objStaffId);
+        }else{
+            ResponseMessage('Permission is not allowed', 403);
         }
-
+        // dd($objStaff->objectiveAssign->objective);
+        // if (checkRoles(['Supervisor'])) {
+        //     $updateData = $this->getSupervisorUpdateData($data, $userId);
+        // } elseif (checkRoles(['Manager'])) {
+        //     $updateData = $this->getManagerUpdateData($data, $userId);
+        // } else {
+        //     $updateData = $this->getStaffUpdateData($data, $userId, $objStaffId);
+        // }
         $objStaff->update($updateData);
-
         return $objStaff;
+    }
+    public function rejectObjectKeyByObjectiveStaffId($data){
+        DB::beginTransaction();
+        try {
+            $authUser = \UserData();
+            if (!$authUser) {
+                \ResponseMessage('User not authenticated', 404);
+            }
+            $objectiveStaff = ObjectiveStaff::find($data['objective_staff_id']);
+            if (!$objectiveStaff) {
+                \ResponseMessage('Objective Staff Not found', 404);
+            }
+            if($objectiveStaff->status=='rejected'){
+                \ResponseMessage('Objective  is already rejected', 419);
+            }
+            $objectiveStaff->update([
+                'completed_at'   => null,
+                'completed_by'   => null,
+                'status'         => 'rejected',
+                'reject_remark'  => $data['reject_remark'] ?? null,
+                'rejected_at'    => now(),
+                'rejected_by'    => $authUser->id,
+            ]);
+            $deleteRejectedObjectiveKey = CompletedObjectiveKey::whereIn('objective_key_id', $data['reject_objective_keys'])
+                ->delete();
+            DB::commit();
+            ResponseMessage('Objective rejected successfully', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+       
     }
 
     private function getSupervisorUpdateData($data, $userId)
@@ -588,8 +639,8 @@ class ObjectiveRepository implements ObjectiveInterface
         if ($data['status'] == 'in_progress') {
             $updateData['in_progressed_at'] = now();
             $updateData['in_progressed_by'] = $userId;
-
             if (isset($data['complete_okr_keys'])) {
+                // dd($data['complete_okr_keys']);
                 $completeOkrKeys = json_decode($data['complete_okr_keys'], true);
                 if (!is_array($completeOkrKeys)) {
                     return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
