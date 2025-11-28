@@ -28,6 +28,7 @@ class TimeShiftRequest extends APIRequest
             'shift_id' => 'required|integer|exists:shifts,id',
             'from_time' => 'required|date_format:H:i',
             'to_time' => 'required|date_format:H:i',
+            'gps_id'=>'required|integer|exists:gps,id'
         ];
     }
 

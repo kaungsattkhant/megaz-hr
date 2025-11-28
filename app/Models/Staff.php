@@ -21,10 +21,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-class Staff extends Authenticatable
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable; // trait
+class Staff extends Authenticatable implements AuditableContract
 {
-    use HasFactory, HasApiTokens,Notifiable;
+    use HasFactory, HasApiTokens,Notifiable,Auditable;
 
     protected $fillable = [
         'name',
@@ -213,7 +214,7 @@ class Staff extends Authenticatable
         return $this->hasMany(StaffAdvance::class);
     }
 
-    public function staffBalance()
+    public function staffBalance() 
     {
         return $this->hasOne(StaffBalance::class)->latest();
     }

@@ -15,8 +15,9 @@
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
         "mrlinnth/mm-regions-cities": "^0.1.1",
+        "owen-it/laravel-auditing": "^14.0",
         "reinbier/laravel-holiday": "^2.2"
-    },
+    }, 
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.0",
@@ -68,6 +69,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": ["PKSA-h3yd-snth-x1dh"]
         }
     },
     "minimum-stability": "stable",

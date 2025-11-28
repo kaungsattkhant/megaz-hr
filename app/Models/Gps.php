@@ -12,6 +12,7 @@ class Gps extends Model
     protected $fillable = [
         'name',
         'latitude',
-        'longitude'
+        'longitude',
+        'branch_name'
     ];
 }

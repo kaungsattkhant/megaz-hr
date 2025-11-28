@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Scopes\WithAveragePriceScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class Item extends BaseModel
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
+use OwenIt\Auditing\Auditable; // trait
+class Item extends BaseModel implements AuditableContract
 {
 
-    use HasFactory;
+    use HasFactory,Auditable;
 
     protected $fillable = [
         'name',

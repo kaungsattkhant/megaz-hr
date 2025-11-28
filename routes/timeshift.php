@@ -4,14 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\API\ParticipantNotificationController;
 use App\Http\Controllers\API\PoOrderController;
-use App\Http\Controllers\API\TimeShiftController;
+use App\Http\Controllers\API\TimeShiftController; 
 
 Route::middleware('auth:api')->group(function () {
   Route::controller(TimeShiftController::class)->group(function () {
-    Route::get('/gps', 'getGPS');
-    Route::get('/gps/{id}', 'getGPSById');
-    Route::post('/gps/{id}', 'updateGPSById');
-
     Route::get('/shifts', 'getShifts');
     Route::get('/shifts/{id}', 'getShiftsById');
     Route::post('/shifts', 'storeShifts');

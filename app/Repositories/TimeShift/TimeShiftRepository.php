@@ -20,23 +20,6 @@ use App\Http\Resources\GetCurrentTimeShiftResource;
 class TimeShiftRepository implements TimeShiftRepositoryInterface
 {
 
-  public function getGPS($request)
-  {
-    return Gps::orderBy('id', 'desc')->get();
-  }
-
-  public function getGPSById(int $gpsId)
-  {
-    return Gps::find($gpsId);
-  }
-
-  public function updateGPSById($request, int $gpsId)
-  {
-    $gps = Gps::find($gpsId);
-    $gps->update($request);
-    return $gps;
-  }
-
   public function getShifts($request)
   {
     return Shift::orderBy('id', 'desc')->get();
@@ -48,7 +31,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   }
 
   public function storeShifts($data)
-  {
+  { 
     return Shift::updateOrCreate(
       ['id' => $data['id'] ?? null],
       $data
@@ -57,16 +40,17 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getTimeShift($request)
   {
-    return TimeShift::with('shift')->orderBy('id', 'desc')->get();
+    return TimeShift::with(['gps','shift'])->orderBy('id', 'desc')->get();
   }
 
   public function getTimeShiftById($timeShiftId)
   {
-    return TimeShift::with('shift')->find($timeShiftId);
+    return TimeShift::with(['gps', 'shift'])->find($timeShiftId);
   }
 
   public function storeTimeShift($data)
   {
+
     return TimeShift::create($data);
   }
 
@@ -94,7 +78,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getCurrentTimeShift($request)
   {
-    $gps = Gps::first();
+    // $gps = Gps::first();
     if (!isset($request->staff_id) || $request->staff_id == null) {
       ResponseMessage('Staff ID is required', 419);
     }
@@ -129,7 +113,8 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     //   })
     //   ->whereDate('date_time', $today)
     //   ->first();
-    $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
+    $existShiftAssign = StaffTimeshift::select('staff_timeshifts.*')
+    ->join('time_shifts', function ($join) {
       $now = now()->format('H:i');
       $earlyCheckMinutes = 60; // allow 60 mins early check-in
 
@@ -163,6 +148,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
       ->whereDate('date_time', today())
       ->first();
+    // dd($existShiftAssign);
     if (!$existShiftAssign) {
       ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
     }
@@ -173,6 +159,11 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if ($existShiftAssign->status === 'cancelled') {
         ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
       }
+    }
+    $gps = optional(optional($existShiftAssign)->timeshift)->gps;
+    // dd($officeGps);
+    if (!$gps) {
+      ResponseData('Office GPS coordinates not found.', 422);
     }
     $currentTimeShift = $existShiftAssign->timeshift;
 
@@ -330,7 +321,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
 
-      $officeGps = Gps::where('name', 'GPS Point')->first();
+      // $officeGps = Gps::where('name', 'GPS Point')->first();
+      $officeGps = $existShiftAssign?->timeshift?->gps;
+
+      // dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
       }
@@ -341,7 +335,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if ($distance > 500) {
         return ResponseData($data = null, $status_code = 422, false, $extra_message = "You are not within the allowed range.");
       }
-
 
       if (isset($requestData['check_in_photo'])) {
         $image = $requestData['check_in_photo'];
@@ -354,6 +347,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $checkIn = CheckIn::create([
         'staff_id' => $requestData['staff_id'],
         'time_shift_id' => $requestData['time_shift_id'],
+        'staff_timeshift_id' => $requestData['staff_timeshift_id'],
         'check_in_date_time' => now(),
         'check_in_photo_path' => $imagePath ?? null,
         'check_in_photo_url' => $imageUrl ?? null,
