@@ -91,6 +91,10 @@ class TimeShiftController extends Controller
         $this->TimeShiftRepository->adminPostedCheckIn($request->all());
     }
 
+    public function getStaffTimeShfitByStaff($staffId){
+        $this->TimeShiftRepository->getStaffTimeShfitByStaff($staffId);
+    }
+
     public function checkOut(CheckOutRequest $request, int $checkInId)
     {
         $data =  $this->TimeShiftRepository->checkOut($request->all(), $checkInId);

@@ -289,6 +289,19 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ResponseMessage("Admin check-in posting failed: {$e->getMessage()}", 500);
     }
   }
+  public function getStaffTimeShfitByStaff($staffId){
+    $currentTime = now()->format('H:i'); 
+    $existShiftAssigns = StaffTimeshift::where('staff_id', $staffId)
+      ->where('status', 'confirmed')
+      // ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
+      ->whereDate('date_time', today())
+      ->whereHas('timeshift',function($q)use($currentTime){
+        $q->where('from_time','>',$currentTime)
+        ->where('is_active', 1);
+      })
+      ->get();
+      return $existShiftAssigns;
+  }
 
   public function validateCheckInEdit($timeShiftId, $checkInDateTime){
     $timeShift = TimeShift::find($timeShiftId);

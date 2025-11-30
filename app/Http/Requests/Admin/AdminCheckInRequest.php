@@ -25,6 +25,7 @@ class AdminCheckInRequest extends FormRequest
             //
             'staff_id'=>'required|exists:staff,id',
             'time_shift_id'=>'required|exists:time_shifts,id',
+            'staff_timeshift_id' => 'required|exists:staff_timeshifts,id',
             'check_in_date_time'=>'required',
             'check_out_date_time' => 'required'
         ];
