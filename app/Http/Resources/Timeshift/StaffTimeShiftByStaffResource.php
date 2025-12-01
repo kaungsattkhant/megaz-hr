@@ -5,7 +5,7 @@ namespace App\Http\Resources\Timeshift;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StaffTimeShiftResource extends JsonResource
+class StaffTimeShiftByStaffResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +16,9 @@ class StaffTimeShiftResource extends JsonResource
     {
         return [
             "id"=>$this->id,
-            "from_time"=>$this->timeshfit->from_time,
-            "to_time"=>$this->timeshfit->to_time,
+            "time_shift_id"=>$this->timeshift->id,
+            "from_time"=>$this->timeshift?->from_time,
+            "to_time"=>$this->timeshift?->to_time,
             "shift_name"=>$this->timeshift->shift->name,
         ];
     }
