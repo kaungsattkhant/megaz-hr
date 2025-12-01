@@ -234,12 +234,17 @@ export default {
                 if(response.data.data){
                     this.primaryList = response.data.data;
                     this.lastPage = response.data.last_page;
-                    this.currentPage = pageNumber;
+                    this.currentPage = response.current_page;
                     this.perPage = response.data.per_page;
                     this.totalData = response.data.total;
                 }
                 else{
                     this.primaryList = response.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = response.current_page;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
+                    console.log(response.current_page)
                 }
             }
         },
