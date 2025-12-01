@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdminCheckInRequest;
 use App\Http\Requests\TimeShift\ShiftRequest;
 use App\Http\Requests\TimeShift\CheckInRequest;
 use App\Http\Requests\TimeShift\CheckOutRequest;
@@ -88,6 +89,11 @@ class TimeShiftController extends Controller
     public function adminPostedCheckIn(Request $request)
     {
         $this->TimeShiftRepository->adminPostedCheckIn($request->all());
+    }
+
+    public function getStaffTimeShfitByStaff($staffId){
+        $data=$this->TimeShiftRepository->getStaffTimeShfitByStaff($staffId);
+        ResponseData($data);
     }
 
     public function checkOut(CheckOutRequest $request, int $checkInId)
