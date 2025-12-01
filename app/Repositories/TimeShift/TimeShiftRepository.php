@@ -16,6 +16,7 @@ use App\Http\Resources\CheckInResource;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\mobileCheckInResource;
 use App\Http\Resources\GetCurrentTimeShiftResource;
+use App\Http\Resources\Timeshift\StaffTimeShiftResource;
 
 class TimeShiftRepository implements TimeShiftRepositoryInterface
 {
@@ -291,7 +292,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   }
   public function getStaffTimeShfitByStaff($staffId){
     $currentTime = now()->format('H:i'); 
-    $existShiftAssigns = StaffTimeshift::where('staff_id', $staffId)
+    $existShiftAssigns = StaffTimeshift::with('timeshift.shift')->where('staff_id', $staffId)
       ->where('status', 'confirmed')
       // ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
       ->whereDate('date_time', today())
@@ -300,7 +301,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->where('is_active', 1);
       })
       ->get();
-      return $existShiftAssigns;
+      return StaffTimeShiftResource::collection($existShiftAssigns);
   }
 
   public function validateCheckInEdit($timeShiftId, $checkInDateTime){
@@ -380,7 +381,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $checkIn = CheckIn::create([
         'staff_id' => $requestData['staff_id'],
         'time_shift_id' => $requestData['time_shift_id'],
-        'staff_timeshift_id' => $requestData['staff_timeshift_id'],
+        'staff_timeshift_id' => $requestData['staff_timeshift_id'] ?? null,
         'check_in_date_time' => now(),
         'check_in_photo_path' => $imagePath ?? null,
         'check_in_photo_url' => $imageUrl ?? null,
