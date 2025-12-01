@@ -1111,12 +1111,31 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       }
     ])
       ->where('staff_id', $staffId)
-      ->whereHas('notification', function ($query) use ($type, $validTypes) {
-        if ($type && in_array($type, $validTypes)) {
-          $query->where('notificationable_type', $type);
-        } else {
-          $query->whereIn('notificationable_type', $validTypes);
-        }
+      // ->whereHas('notification', function ($query) use ($type, $validTypes) {
+      //   if ($type && in_array($type, $validTypes)) {
+      //     $query->where('notificationable_type', $type);
+      //   } else {
+      //     $query->whereIn('notificationable_type', $validTypes);
+      //   }
+      // })
+      ->whereHas('notification', function ($query) use ($type, $validTypes, $staffId) {
+
+        $query->whereIn('notificationable_type', $validTypes);
+
+        // Apply staff-based filter only for models that have staff_id
+        $query->where(function ($q) use ($staffId) {
+          $q->whereHasMorph(
+            'notificationable',
+            ['staff_timeshift', 'staff_equipment_handover'],
+            function ($q2) use ($staffId) {
+              $q2->where('staff_id', $staffId);
+            }
+          )
+            ->orWhereDoesntHaveMorph(
+              'notificationable',
+              ['staff_timeshift', 'staff_equipment_handover']
+            );
+        });
       })
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
