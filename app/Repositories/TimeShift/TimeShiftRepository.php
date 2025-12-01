@@ -16,7 +16,7 @@ use App\Http\Resources\CheckInResource;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\mobileCheckInResource;
 use App\Http\Resources\GetCurrentTimeShiftResource;
-use App\Http\Resources\Timeshift\StaffTimeShiftResource;
+use App\Http\Resources\Timeshift\StaffTimeShiftByStaffResource;
 
 class TimeShiftRepository implements TimeShiftRepositoryInterface
 {
@@ -297,11 +297,11 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       // ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
       ->whereDate('date_time', today())
       ->whereHas('timeshift',function($q)use($currentTime){
-        $q->where('from_time','>',$currentTime)
-        ->where('is_active', 1);
+        // $q->where('from_time','>',$currentTime)
+        $q->where('is_active', 1);
       })
       ->get();
-      return StaffTimeShiftResource::collection($existShiftAssigns);
+      return StaffTimeShiftByStaffResource::collection($existShiftAssigns);
   }
 
   public function validateCheckInEdit($timeShiftId, $checkInDateTime){
