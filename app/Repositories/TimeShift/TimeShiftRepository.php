@@ -118,7 +118,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ->join('time_shifts', function ($join) {
         $now = now()->format('H:i');
         $earlyCheckMinutes = 60; // allow 60 mins early check-in
-
         $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
           ->where(function ($q) use ($now, $earlyCheckMinutes) {
             // Normal shift: from_time < to_time

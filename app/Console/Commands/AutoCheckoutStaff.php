@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\CheckIn;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AutoCheckoutStaff extends Command
 {
@@ -34,7 +35,7 @@ class AutoCheckoutStaff extends Command
         $checkIns = CheckIn::with('timeShift')
             ->where('is_current_checked_in', 1)
             ->get();
-
+        Log::info(['check_ins'=>$checkIns]);
         foreach ($checkIns as $checkIn) {
             $toTime = $checkIn->timeShift->to_time;
             $autoCheckoutTime = now()->setTimeFromTimeString($toTime)->addMinutes(30);
