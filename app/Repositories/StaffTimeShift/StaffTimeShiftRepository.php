@@ -40,12 +40,7 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
             $staff = Staff::find($staff_time_shift['staff_id']);
             ResponseMessage('Shift already assigned for ' . $staff->name . ' at this date and timeshift.', 422);
           }
-          $staffTimeshift = StaffTimeshift::updateOrCreate(
-            [
-              'date_time' => $staff_time_shift['date_time'],
-              'staff_id' => $staff_time_shift['staff_id'],
-              'timeshift_id' => $staff_time_shift['timeshift_id'],
-            ],
+          $staffTimeshift = StaffTimeshift::create(
             [
               'date_time' => $staff_time_shift['date_time'],
               'staff_id' => $staff_time_shift['staff_id'],
