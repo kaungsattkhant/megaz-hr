@@ -287,14 +287,13 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if(isset($requestData['id']) && !empty($requestData['id'])){
         self::validateCheckInEdit($requestData['time_shift_id'], $requestData['check_in_date_time']);
       }
-      $requestData['is_current_checked_in']=true;
+      $requestData['is_current_checked_in']=false;
       DB::beginTransaction();
       $checkIn = CheckIn::updateOrCreate([
         'id'=>$requestData['id']
       ],
         $requestData
       );
-      dd($checkIn);
       DB::commit();
       ResponseData($checkIn);
     } catch (Exception $e) {

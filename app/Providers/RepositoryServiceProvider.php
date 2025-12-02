@@ -213,6 +213,9 @@ use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportReposi
 use App\Repositories\Report\ReportInterface;
 use App\Repositories\Report\ReportRepository;
 
+use App\Repositories\BudgetAccount\BudgetAccountRepositoryInterface;
+use App\Repositories\BudgetAccount\BudgetAccountRepository;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -320,5 +323,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(StaffEquipmentHandoverRepositoryInterface::class, StaffEquipmentHandoverRepository::class);
         $this->app->bind(ReportInterface::class, ReportRepository::class);
 
+        $this->app->bind(BudgetAccountRepositoryInterface::class, BudgetAccountRepository::class);
     }
 }

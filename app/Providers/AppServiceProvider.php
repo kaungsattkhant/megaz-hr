@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'menu_category' => 'App\Models\MenuCategory',
             'menu' => 'App\Models\Menu',
             'sub_account' => 'App\Models\SubAccount',
+            'head_account' => 'App\Models\HeadAccount',
             'task' => 'App\Models\Task',
             'uom' => 'App\Models\UOM',
             'invoice' => 'App\Models\Invoice',

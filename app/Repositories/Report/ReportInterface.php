@@ -1,5 +1,8 @@
 <?php
 namespace App\Repositories\Report;
+
+use Illuminate\Http\Request;
+
 interface ReportInterface
 {
    public function getBarForSky($request);
@@ -26,4 +29,6 @@ interface ReportInterface
    public function getKitchenTotalExpense($request);
 
    public function getMonthlyKitchenMenuTotal($request);
+
+   public function getBudgetAccountsCashflow(Request $request);
 }
