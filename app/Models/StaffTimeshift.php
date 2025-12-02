@@ -43,4 +43,16 @@ class StaffTimeshift extends Model
     {
         return $this->morphOne(Notification::class, 'notificationable');
     }
+    public function checkIn()
+    {
+        return $this->hasOne(CheckIn::class, 'time_shift_id', 'timeshift_id')
+            ->whereColumn('check_ins.staff_id', 'staff_timeshifts.staff_id')
+            ->orderBy('check_in_date_time', 'desc'); // ensures latest check-in first
+    }
+    public function checkInForStaff($staffId)
+    {
+        return $this->hasOne(CheckIn::class, 'time_shift_id', 'timeshift_id')
+            ->where('staff_id', $staffId)
+            ->orderBy('check_in_date_time', 'desc');
+    }
 }

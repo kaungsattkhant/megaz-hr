@@ -2,12 +2,12 @@
 
 namespace App\Repositories\ParticipantNotification;
 
-use App\Http\Action\SendNotification\FcmSendNotification;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\Type;
 use App\Models\Staff;
 use App\Models\OrgNew;
+use App\Models\CheckIn;
 use App\Models\Meeting;
 use App\Models\Warning;
 use App\Models\Training;
@@ -19,10 +19,12 @@ use App\Models\NotificationUser;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\MeetingResource;
 use Illuminate\Support\Facades\Request;
+use App\Http\Resources\mobileCheckInResource;
 use App\Http\Resources\StaffTimeShiftResource;
 use App\Http\Resources\NotificationUserResource;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
@@ -1111,12 +1113,31 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       }
     ])
       ->where('staff_id', $staffId)
-      ->whereHas('notification', function ($query) use ($type, $validTypes) {
-        if ($type && in_array($type, $validTypes)) {
-          $query->where('notificationable_type', $type);
-        } else {
-          $query->whereIn('notificationable_type', $validTypes);
-        }
+      // ->whereHas('notification', function ($query) use ($type, $validTypes) {
+      //   if ($type && in_array($type, $validTypes)) {
+      //     $query->where('notificationable_type', $type);
+      //   } else {
+      //     $query->whereIn('notificationable_type', $validTypes);
+      //   }
+      // })
+      ->whereHas('notification', function ($query) use ($type, $validTypes, $staffId) {
+
+        $query->whereIn('notificationable_type', $validTypes);
+
+        // Apply staff-based filter only for models that have staff_id
+        $query->where(function ($q) use ($staffId) {
+          $q->whereHasMorph(
+            'notificationable',
+            ['staff_timeshift', 'staff_equipment_handover'],
+            function ($q2) use ($staffId) {
+              $q2->where('staff_id', $staffId);
+            }
+          )
+            ->orWhereDoesntHaveMorph(
+              'notificationable',
+              ['staff_timeshift', 'staff_equipment_handover']
+            );
+        });
       })
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
@@ -1237,12 +1258,103 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getShiftsByStaffId($staffId, $request)
   {
-    $shifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')->where('staff_id', $staffId)
-      ->where('status', 'confirmed')->orderBy('id', 'desc')->paginate(config('common.list_count'));
-    if ($shifts->isEmpty()) {
-      return [];
+    // $shifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
+    //   ->where('staff_id', $staffId)
+    //   ->where('status', 'confirmed')
+    //   ->orderBy('id', 'desc')
+    //   ->get();
+    $currentDate = now()->format('Y-m-d');
+    // $assignedShifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
+    //   ->join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+    //   ->where('staff_timeshifts.staff_id', $staffId)
+    //   ->where('staff_timeshifts.status', 'confirmed')
+    //   ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
+    //   ->orderBy('staff_timeshifts.date_time')  // Then order by assigned date
+    //   ->orderBy('time_shifts.from_time')       // First order by shift start time
+    //   ->select('staff_timeshifts.*')           // Important: avoid column conflicts
+    //   ->get();
+    // foreach ($assignedShifts as $assignedShift) {
+    //   // dd($assignedShift);
+    //   $currentDate = now()->format('Y-m-d');
+    //   $checkIn = CheckIn::where('staff_id', $staffId)
+    //     ->where('time_shift_id', $assignedShift->timeshift_id)
+    //     ->whereDate('check_in_date_time', $currentDate)
+    //     ->orderBy('check_in_date_time', 'desc')
+    //     ->first();
+    //   $assignedShift->check_in = 'check_in';
+    //   $assignedShift->check_in_status = 'check_in';
+
+    //   if (!$checkIn) {
+    //     $assignedShift->check_in_status= 'check_in';
+    //   } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+    //     $assignedShift->check_in_status = 'already_checked_in';
+    //     $assignedShift->check_in = new mobileCheckInResource($checkIn);
+    //   } else {
+    //     $assignedShift->check_in_status = 'check_out';
+    //     $assignedShift->check_in = new mobileCheckInResource($checkIn);
+    //   }
+    // }
+    $assignedShifts = StaffTimeshift::join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+      ->leftJoin('check_ins', function ($join) use ($currentDate) {
+        $join->on('staff_timeshifts.staff_id', '=', 'check_ins.staff_id')
+          ->on('staff_timeshifts.timeshift_id', '=', 'check_ins.time_shift_id')
+          ->whereDate('check_ins.check_in_date_time', '=', $currentDate);
+      })
+      ->with(['staff', 'timeshift.shift', 'area'])
+      ->where('staff_timeshifts.staff_id', $staffId)
+      ->where('staff_timeshifts.status', 'confirmed')
+      ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
+      ->orderBy('time_shifts.from_time')
+      ->orderBy('staff_timeshifts.date_time')
+      ->select(
+        'staff_timeshifts.*',
+        'check_ins.id as check_in_id',
+        'check_ins.is_current_checked_in',
+        'check_ins.is_self_checkout',
+        'check_ins.check_in_date_time'
+      )
+      ->get()
+      ->map(function ($shift) {
+      $checkIn = null;
+      if ($shift->check_in_id) {
+        $checkIn = new CheckIn();
+        $checkIn->id = $shift->check_in_id;
+        $checkIn->is_current_checked_in = $shift->is_current_checked_in;
+        $checkIn->is_self_checkout = $shift->is_self_checkout;
+        $checkIn->check_in_date_time = $shift->check_in_date_time;
+      }
+      if (!$checkIn) {
+        $shift->check_in_status = 'check_in';
+        $shift->check_in = 'check_in';
+      } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+        $shift->check_in_status = 'already_checked_in';
+        $shift->check_in = $checkIn;
+      } else {
+        $shift->check_in_status = 'check_out';
+        $shift->check_in = $checkIn;
+      }
+        return $shift;
+      });
+      // dd($assignedShifts);
+      foreach($assignedShifts as $assignedShift){
+        if($assignedShift->id==263){
+          // dd($assignedShift->timeshift);
+        }
+      }
+    return StaffTimeShiftResource::collection($assignedShifts);
+  }
+
+  private function resolveCheckInStatus($checkIn)
+  {
+    if (!$checkIn) {
+      return 'check_in';
     }
-    return StaffTimeShiftResource::collection($shifts);
+
+    if (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+      return 'already_checked_in';
+    }
+
+    return 'check_out';
   }
 
   public function getConfirmedShiftsByStaffIdTimeShiftId($staffId, $staffTimeshiftId)
