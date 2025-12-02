@@ -8,6 +8,10 @@
                     Shift Management
                 </p>
             </div>
+
+            <!-- <input id="multiDate" class="border px-3 py-2 rounded w-64" />
+
+  <pre>{{ selectedDates }}</pre> -->
             <div class="btn-container">
                 <notifications position="top center" />
                 <div class=" flex gap-x-4">
@@ -104,13 +108,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getPrimaryList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getPrimaryList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -301,6 +305,9 @@ export default {
 
             feature: this.getFeature(),
             loading: false,
+
+            selectedDates: []
+
         };
     },
 
@@ -362,7 +369,7 @@ export default {
         async getPrimaryList(pageNumber) {
             this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url;
+            let url = this.url + '?page=' + pageNumber;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -378,9 +385,10 @@ export default {
             if (response.data) {
                 this.loading = false;
                 this.primaryList = response.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         
@@ -427,6 +435,13 @@ export default {
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
+        flatpickr("#multiDate", {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            onChange: (dates, strDates) => {
+                this.selectedDates = strDates.split(', ');
+            }
+        });
     },
     created() {
 

@@ -29,6 +29,7 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
         if (json_last_error() !== JSON_ERROR_NONE) {
           return ResponseMessage('Invalid JSON data provided for staff_time_shifts.', 400);
         }
+
         foreach ($staff_time_shifts as $staff_time_shift) {
           $exists = StaffTimeshift::where('date_time', $staff_time_shift['date_time'])
             ->where('staff_id', $staff_time_shift['staff_id'])
@@ -40,12 +41,7 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
             $staff = Staff::find($staff_time_shift['staff_id']);
             ResponseMessage('Shift already assigned for ' . $staff->name . ' at this date and timeshift.', 422);
           }
-          $staffTimeshift = StaffTimeshift::updateOrCreate(
-            [
-              'date_time' => $staff_time_shift['date_time'],
-              'staff_id' => $staff_time_shift['staff_id'],
-              'timeshift_id' => $staff_time_shift['timeshift_id'],
-            ],
+          $staffTimeshift = StaffTimeshift::create(
             [
               'date_time' => $staff_time_shift['date_time'],
               'staff_id' => $staff_time_shift['staff_id'],
@@ -60,6 +56,21 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
           $this->sendFcmNotification($staffTimeshift, $staffTimeshift->staff, $notiData);
           // $this->sendShiftAssignedNotification($staffTimeshift);
         }
+        //bulk insert 
+        // $insertData = [];
+
+        // foreach ($staff_time_shifts as $shift) {
+        //   $insertData[] = [
+        //     'date_time'    => $shift['date_time'],
+        //     'staff_id'     => $shift['staff_id'],
+        //     'timeshift_id' => $shift['timeshift_id'],
+        //     'area_id'      => $shift['area_id'] ?? null,
+        //     'status'       => 'pending',
+        //     'created_by'   => UserData()->id,
+        //     'created_at'   => now(),
+        //     'updated_at'   => now(),
+        //   ];
+        // }
       }
       DB::commit();
       ResponseData($staffTimeshift, 201);

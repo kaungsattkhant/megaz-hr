@@ -16,7 +16,8 @@ class StaffTimeShiftController extends Controller
 
     public function getStaffTimeShifts(Request $request)
     {
-        return $this->staffTimeShiftRepository->getStaffTimeShifts($request);
+        $data= $this->staffTimeShiftRepository->getStaffTimeShifts($request);
+        \ResponseMessage($data);
     }
 
     public function createStaffTimeShift(Request $request)

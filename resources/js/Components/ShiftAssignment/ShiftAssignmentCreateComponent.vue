@@ -67,7 +67,7 @@
                     <select data-te-select-init data-te-select-placeholder="Select Shift"
                         data-te-select-filter="true" name="" id="" v-model="selectedTimeShift" class="input-ui !text-black text-sm">
                         <option :value="timeShift" v-for="(timeShift, index) in timeShiftList"
-                            :key="index"> {{ timeShift.shift.name }} </option>
+                            :key="index"> {{ timeShift.shift.name }} ({{ timeShift.from_time }} - {{ timeShift.to_time }})</option>
                     </select>
                 </div>
             </div>

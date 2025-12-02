@@ -197,6 +197,12 @@
                         </label>
                         <input type="datetime-local" placeholder="Check In At" v-model="checkInDateTime" class="input-ui">
                     </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Check Out Datetime
+                        </label>
+                        <input type="datetime-local" placeholder="Check Out At" v-model="checkOutDateTime" class="input-ui">
+                    </div>
                 </div>
 
                 <!--Modal footer-->
@@ -259,6 +265,7 @@ export default {
             timeshifts: [],
             selectedTimeshift: null,
             checkInDateTime: null,
+            checkOutDateTime: null,
         };
     },
 
@@ -334,11 +341,16 @@ export default {
                 this.alertValidationMessage("check-in time");
                 return;
             }
+            if(!this.checkOutDateTime){
+                this.alertValidationMessage("check-out time");
+                return;
+            }
             this.checkInCreateBtnLoading = true;
             let formData = new FormData();
             formData.append('staff_id', this.createCheckinStaff.id);
             formData.append('time_shift_id', this.selectedTimeshift.id);
             formData.append('chek_in_date_time', this.checkInDateTime);
+            formData.append('chek_out_date_time', this.checkOutDateTime);
             postApiData({url: `/api/check_ins/admin_post`, form_data: formData, token: this.getToken()})
             .then((response)=>{
                 this.checkInCreateBtnLoading = false;
