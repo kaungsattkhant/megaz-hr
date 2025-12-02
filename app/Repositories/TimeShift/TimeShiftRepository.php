@@ -189,8 +189,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     if (isset($staffId)) {
 
       if ($currentTimeShift) {
+        $currentDate = now()->format('Y-m-d');
         $checkIn = CheckIn::where('staff_id', $staffId)
           ->where('time_shift_id', $currentTimeShift->id)
+        ->whereDate('check_in_date_time', $currentDate)
           ->orderBy('check_in_date_time', 'desc')
           ->first();
         //if checkin not exist,need to checkin for this timeshift
