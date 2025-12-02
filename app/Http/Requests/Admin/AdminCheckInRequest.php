@@ -9,11 +9,6 @@ class AdminCheckInRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -25,7 +20,7 @@ class AdminCheckInRequest extends FormRequest
             //
             'staff_id'=>'required|exists:staff,id',
             'time_shift_id'=>'required|exists:time_shifts,id',
-            'staff_timeshift_id' => 'required|exists:staff_timeshifts,id',
+            // 'staff_timeshift_id' => 'required|exists:staff_timeshifts,id',
             'check_in_date_time'=>'required',
             'check_out_date_time' => 'required'
         ];
