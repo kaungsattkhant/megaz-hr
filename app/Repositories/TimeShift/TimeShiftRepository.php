@@ -278,7 +278,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function adminPostedcheckIn(array $requestData)
   {
-    
+    // dd($requestData);
     try {
       if (!isset($requestData['id'])) {
         $requestData['id'] = null;
@@ -294,6 +294,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ],
         $requestData
       );
+      dd($checkIn);
       DB::commit();
       ResponseData($checkIn);
     } catch (Exception $e) {
