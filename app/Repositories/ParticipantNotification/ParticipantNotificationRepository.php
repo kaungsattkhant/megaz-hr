@@ -1304,8 +1304,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       ->where('staff_timeshifts.staff_id', $staffId)
       ->where('staff_timeshifts.status', 'confirmed')
       ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
-      ->orderBy('time_shifts.from_time')
       ->orderBy('staff_timeshifts.date_time')
+      ->orderBy('time_shifts.from_time')
       ->select(
         'staff_timeshifts.*',
         'check_ins.id as check_in_id',

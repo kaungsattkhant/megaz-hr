@@ -339,18 +339,41 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     try {
       $staffId = $requestData['staff_id'];
       $timeShiftId = $requestData['time_shift_id'];
+      // $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
       $currentDate = now()->format('Y-m-d');
 
       $existingCheckIn = CheckIn::where('staff_id', $staffId)
         ->whereDate('check_in_date_time', $currentDate)
+        ->where('time_shift_id',$timeShiftId)
         ->where('is_current_checked_in', true)
         ->first();
 
       $existShiftAssign = StaffTimeshift::where("staff_id", $staffId)
         ->where('timeshift_id', $timeShiftId)
+        ->where('status','confirmed')
         ->whereDate('date_time', $today)
         ->first();
+
+      // $now = now()->format('H:i');
+      // $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
+      // $earlyCheckMinutes = 30;
+      // if (!$existShiftAssign) {
+      //   \ResponseMessage('No shift assigned for this time.',419);
+      // }
+
+      // // shift start time
+      // $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
+      // $nowTime    = Carbon::now();
+
+      // $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
+
+      // // Validate
+      // if ($nowTime->lt($earlyAllowedTime)) {
+      //   \ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.",400);
+        
+      // }
+
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -371,7 +394,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       // $officeGps = Gps::where('name', 'GPS Point')->first();
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
-      // dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
       }
