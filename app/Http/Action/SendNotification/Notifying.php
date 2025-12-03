@@ -44,11 +44,10 @@ class Notifying extends Notification implements ShouldQueue
                     FcmNotification::create()
                         ->title($this->title)
                         ->body($this->preview)
-                )
-                ->data([
+                );
+                // ->data([
                     // 'date_time' => $this->date_time,
-                    'type' => 'staff_notification',
-                ]);
+                // ]);
 
         } catch (\Throwable $e) {
 
