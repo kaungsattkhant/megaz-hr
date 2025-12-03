@@ -5,6 +5,7 @@ use App\Http\Controllers\API\LoanController;
 use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AdvanceController;
 use App\Http\Controllers\API\FinancialReportController;
 use App\Http\Controllers\API\SalesLedgerReportController;
 use App\Http\Controllers\API\CustomerDepositReportController;
@@ -38,6 +39,12 @@ Route::middleware('auth:api')->group(function () {
         Route::post('budget_accounts','create');
         Route::post('budget_accounts/{id}','edit');
         Route::post('budget_accounts/{id}/confirm','confirmBudgetAccount');
+    });
+    // Route::controller(AdvanceController::class)->group(function(){
+    //     Route::post('advances','create');
+    // });
+    Route::prefix('advances')->controller(AdvanceController::class)->group(function () {
+        Route::post('/', 'create');
     });
 });
 
