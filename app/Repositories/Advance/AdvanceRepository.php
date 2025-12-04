@@ -43,43 +43,49 @@ class AdvanceRepository implements AdvanceInterface
     }
 
     public function createAdvancePayment($data){
-        $advanceId=$data['advance_id'];
-        $paidAmount=$data['paid_amount'];
-        $advance = Advance::findOrFail($advanceId);
+        try {
+            $advanceId = $data['advance_id'];
+            $paidAmount = $data['paid_amount'];
+            $advance = Advance::findOrFail($advanceId);
+            if (!$advance) {
+                \ResponseMessage('Data not found', 419);
+            }
 
-        // 1. Update remaining amount
-        $remainingAmount = $advance->remaining_amount - $paidAmount;
+            if($advance->remaining_amount<$paidAmount){
+                \ResponseMessage(
+                    "Paid amount is invalid,must be less than {$advance->remaining_amount}",419);
+            }
+            $remainingAmount = $advance->remaining_amount - $paidAmount;
+            $remainingMonths = $advance->remaining_months - 1;
 
-        // 2. Reduce remaining months by 1
-        $remainingMonths = $advance->remaining_months - 1;
+            // Avoid division by zero
+            if ($remainingMonths <= 0) {
+                $newDeduction = 0;
+            } else {
+                // 3. Recalculate deduction amount
+                $newDeduction = round($remainingAmount / $remainingMonths, 2);
+            }
 
-        // Avoid division by zero
-        if ($remainingMonths <= 0) {
-            $newDeduction = 0;
-        } else {
-            // 3. Recalculate deduction amount
-            $newDeduction = round($remainingAmount / $remainingMonths, 2);
+            // 4. Save payment
+            $advancePayment = AdvancePayment::create([
+                'advance_id' => $advance->id,
+                'paid_amount'      => $paidAmount,
+                'payment_month'    => Carbon::now()->format('Y-m-d'),
+            ]);
+
+            // 5. Update advance main record
+            $advance->update([
+                'remaining_amount'          => $remainingAmount,
+                'remaining_months'          => $remainingMonths,
+                'current_deduction_amount'  => $newDeduction,
+            ]);
+            DB::commit();
+            return $advancePayment;
+        } catch (\Exception $e) {
+            DB::rollBack(); // rollback all queries if any error occurs
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
         }
-
-        // 4. Save payment
-        AdvancePayment::create([
-            'staff_advance_id' => $advance->id,
-            'paid_amount'      => $paidAmount,
-            'payment_month'    => Carbon::now()->format('Y-m-d'),
-        ]);
-
-        // 5. Update advance main record
-        $advance->update([
-            'remaining_amount'          => $remainingAmount,
-            'remaining_months'          => $remainingMonths,
-            'current_deduction_amount'  => $newDeduction,
-        ]);
-
-        return [
-            'message' => 'Payment recorded successfully',
-            'remaining_amount' => $remainingAmount,
-            'remaining_months' => $remainingMonths,
-            'next_month_deduction' => $newDeduction,
-        ];
+        
     }
 }
