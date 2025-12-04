@@ -353,7 +353,21 @@
                 </div>
             </div>
 
-            <div class="col-span-6"></div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="nrc-front" class="label-form mb-3">
+                    Profile Picture
+                </label>
+                <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-front" ref="nrc_front_image"
+                class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                @change="onProfilePicFileChange">
+                <img v-if="profilePicPreview" :src="profilePicPreview" alt="NRC Front Preview" class="mt-2 h-24" />
+                <div class="mt-1" v-if="profilePicFileError">
+                    <span class="px-1 text-red-600 text-sm">{{ profilePicFileError }} *</span>
+                </div>
+            </div>
+
+            <div class="col-span-3"></div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="nrc-front" class="label-form mb-3">
@@ -453,7 +467,7 @@
                 <button data-te-toggle="modal" data-te-target="#add_bank_modal" > <i class="fas fa-plus"></i> </button>
             </div>
 
-            
+
 
             <div class="col-span-5"></div>
 
@@ -828,6 +842,10 @@ export default {
             houseHoldRegistrationFile: null,
             houseHoldRegistrationPreview: null,
 
+            profilePicFile: null,
+            profilePicPreview: null,
+            profilePicFileError: null,
+
             nrcFrontFileError: null,
             nrcBackFileError: null,
             houseHoldRegistrationFileError: null,
@@ -908,6 +926,11 @@ export default {
             const file = e.target.files[0];
             this.houseHoldRegistrationFile = file;
             this.houseHoldRegistrationPreview = file ? URL.createObjectURL(file) : null;
+        },
+        onProfilePicFileChange(e) {
+            const file = e.target.files[0];
+            this.profilePicFile = file;
+            this.profilePicPreview = file ? URL.createObjectURL(file) : null;
         },
 
         certificationFilesChange(e){
@@ -1187,6 +1210,11 @@ export default {
                 this.creatable = false;
             }
 
+            if(!this.profilePicFile){
+                this.alertValiationMessage('Profile image');
+                this.profilePicFileError = 'Profile image must be uploaded';
+                this.creatable = false;
+            }
             if(!this.nrcFrontFile){
                 this.alertValiationMessage('NRC front image');
                 this.nrcFrontFileError = 'NRC front image must be uploaded';
@@ -1321,6 +1349,9 @@ export default {
 
             formData.append('joined_date', this.formatDate(this.joinedDate, '/', 'yyyy-mm-dd', '-', ['day','month','year']));
 
+            if(this.profilePicFile){
+                formData.append('profile_image', this.profilePicFile);
+            }
             if (this.nrcFrontFile) {
                 formData.append('nrc_front_image', this.nrcFrontFile);
             }
@@ -1421,9 +1452,9 @@ export default {
                     this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
                     this.selectedFeatures.push(item.id);
                 }
-                
+
             });
-            
+
         },
         handleEscape(event) {
             if (event.key === "Escape") {
