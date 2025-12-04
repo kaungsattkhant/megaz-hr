@@ -339,7 +339,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     try {
       $staffId = $requestData['staff_id'];
       $timeShiftId = $requestData['time_shift_id'];
-      // $staffTimeShiftId = $requestData['staff_timeshift_id'];
+      $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
       $currentDate = now()->format('Y-m-d');
 
@@ -356,11 +356,11 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->first();
 
       // $now = now()->format('H:i');
-      // $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
+      $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
       // $earlyCheckMinutes = 30;
-      // if (!$existShiftAssign) {
-      //   \ResponseMessage('No shift assigned for this time.',419);
-      // }
+      if (!$existShiftAssign) {
+        \ResponseMessage('No shift assigned for this time.',419);
+      }
 
       // // shift start time
       // $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
@@ -422,9 +422,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         'check_in_photo_url' => $imageUrl ?? null,
         'is_current_checked_in' => true,
       ]);
-
+      $checkIn->check_in_status= 'check_out';
       DB::commit();
       return $checkIn;
+
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred during check-in.");
@@ -454,7 +455,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           'is_current_checked_in' => false,
           'is_self_checkout' => true
         ]);
-
+        $checkIn->check_in_status = 'already_checked_in';
         DB::commit();
         return $checkIn;
       }
