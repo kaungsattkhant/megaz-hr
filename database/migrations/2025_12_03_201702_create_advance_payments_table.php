@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('advance_payments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('advance_id');
-            $table->decimal('paid_amount', 15, 2);
+            $table->double('paid_amount');
             $table->date('payment_month'); // e.g., 2025-01-01
             $table->timestamps();
         });

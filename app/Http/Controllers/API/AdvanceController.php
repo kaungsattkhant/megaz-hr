@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Advance;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdvancePaymentCreateRequest;
 use App\Repositories\Advance\AdvanceInterface;
 use App\Http\Requests\Admin\AdvanceStoreRequest;
 
@@ -28,6 +29,11 @@ class AdvanceController extends Controller
 
     public function getAdvancePaymentDetailByAdvance($advanceId){
         $data = $this->advanceRepo->getAdvancePaymentDetailByAdvance($advanceId);
+        \ResponseMessage($data);
+    }
+
+    public function createAdvancePayment(AdvancePaymentCreateRequest $request){
+        $data = $this->advanceRepo->createAdvancePayment($request->all());
         \ResponseMessage($data);
     }
 }
