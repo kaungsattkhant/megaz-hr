@@ -5,14 +5,16 @@
                 Assign Shift
             </p>
         </div>
-
+        <!-- <p v-for="value in selectedDates">
+            {{ value }}
+        </p> -->
 
         <div class="grid !grid-cols-10 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-6 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Date
                 </label>
-                <input type="date" v-model="selectedDate" autocomplete="off"
+                <input v-model="selectedDate" autocomplete="off" ref="picker"   
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div><div class="col-span-7"></div>
             <div class="mb-4 col-span-3 pb-3 rounded-md">
@@ -61,6 +63,23 @@
                 <label for="" class="label-form mb-3">
                     Shift
                 </label>
+                <!-- <multiselect
+                v-model="selectedTimeShift"
+                :options="timeShiftList"
+                :multiple="true"
+                :close-on-select="false"
+                :clear-on-select="false"
+                :preserve-search="true"
+                placeholder="Select Shift"
+                label="name"
+                track-by="id"
+                :custom-label="timeshiftCustomLabel"
+                :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                        Shift selected</span>
+                    </template>
+                </multiselect> -->
 
                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
@@ -188,7 +207,7 @@ export default {
             timeShiftList: [],
             areaList: [],
 
-            selectedDate: null,
+            selectedDate: [],
             selectedDepartment: null,
             selectedRole: null,
             selectedStaff: null,
@@ -196,6 +215,8 @@ export default {
             selectedArea: null,
             
             selectedAssignList: [],
+
+            selectedDates: [],
         };
     },
 
@@ -286,18 +307,21 @@ export default {
             }
         },
         async addShift(){
+            this.selectedDates.forEach(item => {
+                this.selectedAssignList.push({
+                    date_time: item,
+                    department_name: this.selectedDepartment.name,
+                    role_name: this.selectedRole.name,
+                    staff_name: this.selectedStaff.name,
+                    staff_id: this.selectedStaff.id,
+                    timeshift_name: this.selectedTimeShift.shift.name,
+                    timeshift_id: this.selectedTimeShift.id,
+                    area_name: this.selectedArea?.name,
+                    area_id: this.selectedArea?.id,
+                })
+            });
             
-            this.selectedAssignList.push({
-                date_time: this.selectedDate,
-                department_name: this.selectedDepartment.name,
-                role_name: this.selectedRole.name,
-                staff_name: this.selectedStaff.name,
-                staff_id: this.selectedStaff.id,
-                timeshift_name: this.selectedTimeShift.shift.name,
-                timeshift_id: this.selectedTimeShift.id,
-                area_name: this.selectedArea?.name,
-                area_id: this.selectedArea?.id,
-            })
+            
             // this.selectedDate = null;
             this.selectedDepartment = null;
             this.selectedRole = null;
@@ -346,6 +370,10 @@ export default {
                 type: "warn"
             });
         },
+        timeshiftCustomLabel(timeshift){
+            return `${timeshift.shift.name} (${timeshift.from_time} - ${timeshift.to_time})`;
+        },
+
     },
 
     watch: {
@@ -359,6 +387,23 @@ export default {
         this.getDepartmentList();
         this.getTimeShiftList();
         initTE({ Modal, Select, Tab, Ripple });
+        flatpickr(this.$refs.picker,{
+          mode: "multiple",
+          dateFormat: "Y-m-d",
+          onChange: (dates,dateStr) => {
+
+            console.log("Console shows:", dates)  // works for you
+            console.log("Vue should update now", dateStr)
+
+            // 🔥 THIS is the update Vue listens to
+            // this.selectedDate = dates.map(d => d.toISOString().slice(0,10))
+            this.selectedDate = dateStr.split(", ").map(d => d.trim()); // just testing
+            // this.selectedDate = dates;
+            this.selectedDates = dates.map(d => // selectedDates is used
+                d.toISOString().slice(0, 10)       // Output → 2025-12-01
+            );;
+          }
+        })
     }
 }
 </script>
