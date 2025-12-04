@@ -111,6 +111,7 @@ class StaffRepository implements StaffRepositoryInterface
             $data['is_active'] = 1;
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
+            dd($staff); 
 
             if (isset($data['certificate_images']) && is_array($data['certificate_images'])) {
                 foreach ($data['certificate_images'] as $certificateImage) {
