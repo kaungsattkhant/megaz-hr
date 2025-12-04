@@ -19,7 +19,7 @@ return new class extends Migration
             $table->double('advance_amount');
             $table->integer('total_months');          
             $table->double('remaining_amount'); 
-            $table->integer('remaining_months');     
+            $table->integer('remaining_months');
             $table->double('current_deduction_amount');
             $table->timestamps();
         });

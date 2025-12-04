@@ -12,7 +12,7 @@ class AdvanceRepository implements AdvanceInterface
 {
 
     public function list($data){
-        $advances=Advance::orderBy('id','desc');
+        $advances=Advance::with(['staff:id,name'])->orderBy('id','desc');
         if(isset($data['page'])){
             $perPage=$data['perPage'] ?? config('common.list_count');
             return $advances->paginate($perPage);
@@ -35,7 +35,7 @@ class AdvanceRepository implements AdvanceInterface
     }
 
     public function getAdvancePaymentDetailByAdvance($advanceId){
-        $advancePayments=AdvancePayment::where('advance_id',$advanceId)->get();
+        $advancePayments=AdvancePayment::with(['advance'])->where('advance_id',$advanceId)->get();
         // if($advancePayments){
         //     \ResponseMessage('No one of advance payment of this advance',419);
         // }
@@ -70,6 +70,7 @@ class AdvanceRepository implements AdvanceInterface
             $advancePayment = AdvancePayment::create([
                 'advance_id' => $advance->id,
                 'paid_amount'      => $paidAmount,
+                'remaining_balance'=> $remainingAmount,
                 'payment_month'    => Carbon::now()->format('Y-m-d'),
             ]);
 

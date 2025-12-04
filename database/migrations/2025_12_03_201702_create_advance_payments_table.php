@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('advance_id');
             $table->double('paid_amount');
             $table->date('payment_month'); // e.g., 2025-01-01
+            $table->double('remaining_balance');
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Advance extends Model
@@ -17,7 +18,10 @@ class Advance extends Model
             $staffId = $advance->staff_id;
             $datetime = str_pad(now()->timestamp, 10, '0', STR_PAD_LEFT);
             $random = str_pad(random_int(0, 9999999999), 10, '0', STR_PAD_LEFT);
-            $advance->advance_ref_no = 'ADV' . '-' .$staffId . $datetime . $random;
+            $advance->advance_ref_no = 'ADV' . '-' .$staffId .$datetime . Str::ulid();;
         });
+    }
+    public function staff()  {
+      return $this->belongsTo(Staff::class);
     }
 }
