@@ -3,6 +3,7 @@
 namespace App\Repositories\Advance;
 
 use App\Models\Advance;
+use App\Models\AdvancePayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,5 +32,13 @@ class AdvanceRepository implements AdvanceInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function getAdvancePaymentDetailByAdvance($advanceId){
+        $advancePayments=AdvancePayment::where('advance_id',$advanceId)->get();
+        // if($advancePayments){
+        //     \ResponseMessage('No one of advance payment of this advance',419);
+        // }
+        return $advancePayments;
     }
 }
