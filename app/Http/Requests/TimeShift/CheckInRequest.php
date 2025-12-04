@@ -27,7 +27,8 @@ class CheckInRequest extends APIRequest
             'longitude' => 'required',
             'check_in_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'staff_id' => 'required',
-            'time_shift_id' => 'required'
+            'time_shift_id' => 'required',
+            'staff_timeshift_id'=>'required|exists:staff_timeshifts,id',
         ];
     }
 
