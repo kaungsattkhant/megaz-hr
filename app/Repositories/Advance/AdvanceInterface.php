@@ -6,5 +6,7 @@ use Illuminate\Http\Request;
 
 interface AdvanceInterface
 {
+    public function list($data);
+
     public function create($data);
 }

@@ -15,6 +15,11 @@ class AdvanceController extends Controller
     {
        $this->advanceRepo=$advance;
     }
+
+    public function index(Request $request){
+        $data = $this->advanceRepo->list($request->all());
+        \ResponseMessage($data);
+    }
     public function create(AdvanceStoreRequest $request){
         $data=$this->advanceRepo->create($request->all());
         \ResponseMessage($data);

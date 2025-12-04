@@ -8,12 +8,20 @@ use Illuminate\Support\Facades\DB;
 
 class AdvanceRepository implements AdvanceInterface
 {
+
+    public function list($data){
+        $advances=Advance::orderBy('id','desc');
+        if(isset($data['page'])){
+            $perPage=$data['perPage'] ?? config('common.list_count');
+            return $advances->paginate($perPage);
+        }
+        return $advances->get();
+    }
     public function create($data)
     {
         DB::beginTransaction(); // start transaction
 
         try {
-            // 1. Create Staff Advance
             $advance= Advance::create($data);
             DB::commit();
            return $advance;

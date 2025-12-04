@@ -44,6 +44,7 @@ Route::middleware('auth:api')->group(function () {
     //     Route::post('advances','create');
     // });
     Route::prefix('advances')->controller(AdvanceController::class)->group(function () {
+        Route::get('/', 'index');
         Route::post('/', 'create');
     });
 });
