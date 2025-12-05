@@ -349,31 +349,8 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->where('is_current_checked_in', true)
         ->first();
 
-      $existShiftAssign = StaffTimeshift::where("staff_id", $staffId)
-        ->where('timeshift_id', $timeShiftId)
-        ->where('status','confirmed')
-        ->whereDate('date_time', $today)
-        ->first();
-
       // $now = now()->format('H:i');
       $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
-      // $earlyCheckMinutes = 30;
-      if (!$existShiftAssign) {
-        \ResponseMessage('No shift assigned for this time.',419);
-      }
-
-      // // shift start time
-      // $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
-      // $nowTime    = Carbon::now();
-
-      // $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
-
-      // // Validate
-      // if ($nowTime->lt($earlyAllowedTime)) {
-      //   \ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.",400);
-        
-      // }
-
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -385,6 +362,31 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
         }
       }
+
+      $earlyCheckMinutes = 30;
+      $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
+      $shiftEnd   = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->to_time);
+      $nowTime    = Carbon::now();
+
+      // EARLY CHECK — cannot check in before allowed time
+      $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
+
+      if ($nowTime->lt($earlyAllowedTime)) {
+        ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.", 400);
+      }
+
+      // LATE CHECK 
+      if ($nowTime->gt($shiftEnd)) {
+        ResponseMessage("You cannot check in after your shift end time.", 400);
+      }
+
+      // VALID TIME RANGE
+      if (!($nowTime->between($earlyAllowedTime, $shiftEnd))) {
+        ResponseMessage("Check-in time is not valid for this shift.", 400);
+      }
+      
+   
+      
       if ($existingCheckIn) {
         return ResponseData('You have already checked in today', 422);
       }
