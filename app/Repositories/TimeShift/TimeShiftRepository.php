@@ -339,7 +339,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     try {
       $staffId = $requestData['staff_id'];
       $timeShiftId = $requestData['time_shift_id'];
-      // $staffTimeShiftId = $requestData['staff_timeshift_id'];
+      $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
       $currentDate = now()->format('Y-m-d');
 
@@ -349,31 +349,8 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->where('is_current_checked_in', true)
         ->first();
 
-      $existShiftAssign = StaffTimeshift::where("staff_id", $staffId)
-        ->where('timeshift_id', $timeShiftId)
-        ->where('status','confirmed')
-        ->whereDate('date_time', $today)
-        ->first();
-
       // $now = now()->format('H:i');
-      // $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
-      // $earlyCheckMinutes = 30;
-      // if (!$existShiftAssign) {
-      //   \ResponseMessage('No shift assigned for this time.',419);
-      // }
-
-      // // shift start time
-      // $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
-      // $nowTime    = Carbon::now();
-
-      // $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
-
-      // // Validate
-      // if ($nowTime->lt($earlyAllowedTime)) {
-      //   \ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.",400);
-        
-      // }
-
+      $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -385,13 +362,37 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
         }
       }
+
+      $earlyCheckMinutes = 30;
+      $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
+      $shiftEnd   = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->to_time);
+      $nowTime    = Carbon::now();
+
+      // EARLY CHECK — cannot check in before allowed time
+      $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
+
+      if ($nowTime->lt($earlyAllowedTime)) {
+        ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.", 400);
+      }
+
+      // LATE CHECK 
+      if ($nowTime->gt($shiftEnd)) {
+        ResponseMessage("You cannot check in after your shift end time.", 400);
+      }
+
+      // VALID TIME RANGE
+      if (!($nowTime->between($earlyAllowedTime, $shiftEnd))) {
+        ResponseMessage("Check-in time is not valid for this shift.", 400);
+      }
+      
+   
+      
       if ($existingCheckIn) {
         return ResponseData('You have already checked in today', 422);
       }
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
 
-      // $officeGps = Gps::where('name', 'GPS Point')->first();
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
       if (!$officeGps) {
@@ -422,9 +423,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         'check_in_photo_url' => $imageUrl ?? null,
         'is_current_checked_in' => true,
       ]);
-
+      $checkIn->check_in_status= 'check_out';
       DB::commit();
       return $checkIn;
+
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred during check-in.");
@@ -454,7 +456,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           'is_current_checked_in' => false,
           'is_self_checkout' => true
         ]);
-
+        $checkIn->check_in_status = 'already_checked_in';
         DB::commit();
         return $checkIn;
       }
