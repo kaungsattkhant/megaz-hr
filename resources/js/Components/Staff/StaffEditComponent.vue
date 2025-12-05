@@ -1255,12 +1255,12 @@ export default {
                 // return 1;
                 this.creatable = false;
             }
-            if (this.selectedFeatures.length < 1) {
-                this.alertValiationMessage('authorized features');
-                this.featuresInputError = "At least one feature must be authroized";
-                // return 1;
-                this.creatable = false;
-            }
+            // if (this.selectedFeatures.length < 1) {
+            //     this.alertValiationMessage('authorized features');
+            //     this.featuresInputError = "At least one feature must be authroized";
+            //     // return 1;
+            //     this.creatable = false;
+            // }
             if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
                 this.alertValiationMessage('inventories');
                 this.inventoryInputError = "Inventory staff must select at least one inventory";
@@ -1356,7 +1356,9 @@ export default {
             formData.append('role_id', this.selectedRole.id);
             formData.append('skill_ids',JSON.stringify(this.skillIds));
             // formData.append('feature_ids', JSON.stringify(this.featureIds));
-            formData.append('feature_ids', JSON.stringify(this.selectedFeatures));
+            if(this.selectedFeatures.length > 0){
+                formData.append('feature_ids', JSON.stringify(this.selectedFeatures));
+            }
             if (this.inventoryIds.length > 0) {
                 formData.append('inventory_ids', JSON.stringify(this.inventoryIds));
             }
