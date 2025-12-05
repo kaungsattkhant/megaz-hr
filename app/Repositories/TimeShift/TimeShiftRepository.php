@@ -393,7 +393,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
 
-      // $officeGps = Gps::where('name', 'GPS Point')->first();
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
       if (!$officeGps) {
