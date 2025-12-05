@@ -191,6 +191,8 @@ use App\Repositories\CustomerDepositReport\CustomerDepositReportRepository;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
+use App\Repositories\Advance\AdvanceInterface;
+use App\Repositories\Advance\AdvanceRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepository;
@@ -212,6 +214,9 @@ use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepositoryInterface;
 use App\Repositories\Report\ReportInterface;
 use App\Repositories\Report\ReportRepository;
+
+use App\Repositories\BudgetAccount\BudgetAccountRepositoryInterface;
+use App\Repositories\BudgetAccount\BudgetAccountRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -320,5 +325,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(StaffEquipmentHandoverRepositoryInterface::class, StaffEquipmentHandoverRepository::class);
         $this->app->bind(ReportInterface::class, ReportRepository::class);
 
+        $this->app->bind(BudgetAccountRepositoryInterface::class, BudgetAccountRepository::class);
+        $this->app->bind(AdvanceInterface::class, AdvanceRepository::class);
     }
 }

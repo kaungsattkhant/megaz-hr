@@ -87,69 +87,80 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $today = Carbon::today();
 
-    // $existShiftAssign = StaffTimeshift::join('time_shifts', function ($join) {
-    //   $now = now();
-    //   $graceMinutes = 30; // allow 30 mins early check-in
-    //   $nowTime = $now->format('H:i');
-    //   $graceTime = $now->copy()->addMinutes($graceMinutes)->format('H:i');
-    //   $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
-    //     ->where(function ($q) use ($nowTime, $graceTime) {
-    //       $q->where(function ($q1) use ($nowTime, $graceTime): void {
-    //         $q1->where('time_shifts.from_time', '<=', $nowTime)
-    //           ->where('time_shifts.to_time', '>=', $nowTime);
+
+    // $existShiftAssign = StaffTimeshift::select('staff_timeshifts.*')
+    //   ->join('time_shifts', function ($join) {
+    //     $now = now()->format('H:i');
+    //     $earlyCheckMinutes = 60; // allow 60 mins early check-in
+    //     $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+    //       ->where(function ($q) use ($now, $earlyCheckMinutes) {
+    //         // Normal shift: from_time < to_time
+    //         $q->where(function ($q1) use ($now, $earlyCheckMinutes) {
+    //           $q1->whereRaw("
+    //                 TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME(? * 60))
+    //                 AND TIME(?) <= time_shifts.to_time
+    //             ", [$now, $earlyCheckMinutes, $now]);
+    //         })
+    //           // Overnight shift: from_time > to_time
+    //           ->orWhere(function ($q1) use ($now, $earlyCheckMinutes) {
+    //             $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
+    //               ->where(function ($q2) use ($now, $earlyCheckMinutes) {
+    //                 $q2->whereRaw("
+    //                         TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME(? * 60))
+    //                         AND TIME(?) <= '23:59:59'
+    //                     ", [$now, $earlyCheckMinutes, $now])
+    //                   ->orWhereRaw("
+    //                         TIME(?) >= '00:00:00' AND TIME(?) <= time_shifts.to_time
+    //                     ", [$now, $now]);
+    //               }); 
+    //           });
     //       })
-    //         ->orWhere(function ($q1) use ($nowTime) {
-    //           $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
-    //             ->where(function ($q2) use ($nowTime) {
-    //               $q2->where('time_shifts.from_time', '<=', $nowTime)
-    //                 ->orWhere('time_shifts.to_time', '>=', $nowTime);
-    //             });
-    //         });
-    //     })
-    //     ->where('time_shifts.is_active', 1);
-    // })
-    //   ->where("staff_id", $staffId)
-    //   ->whereHas('timeshift', function ($q) {
-    //     $q->where('is_active', 1);
+    //       ->where('time_shifts.is_active', 1);
     //   })
-    //   ->whereDate('date_time', $today)
+
+    //   ->where('staff_id', $staffId)
+    //   ->where('status', 'confirmed')
+    //   ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
+    //   ->whereDate('date_time', today())
     //   ->first();
+
     $existShiftAssign = StaffTimeshift::select('staff_timeshifts.*')
       ->join('time_shifts', function ($join) {
         $now = now()->format('H:i');
-        $earlyCheckMinutes = 60; // allow 60 mins early check-in
+        $earlyCheckMinutes = 60;
 
         $join->on('staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
           ->where(function ($q) use ($now, $earlyCheckMinutes) {
-            // Normal shift: from_time < to_time
             $q->where(function ($q1) use ($now, $earlyCheckMinutes) {
               $q1->whereRaw("
-                    TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME(? * 60))
-                    AND TIME(?) <= time_shifts.to_time
-                ", [$now, $earlyCheckMinutes, $now]);
+                        TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME($earlyCheckMinutes * 60))
+                        AND TIME(?) <= time_shifts.to_time
+                    ", [$now, $now]);
             })
-              // Overnight shift: from_time > to_time
               ->orWhere(function ($q1) use ($now, $earlyCheckMinutes) {
-                $q1->where('time_shifts.from_time', '>', 'time_shifts.to_time')
+                $q1->whereRaw("time_shifts.from_time > time_shifts.to_time")
                   ->where(function ($q2) use ($now, $earlyCheckMinutes) {
                     $q2->whereRaw("
-                            TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME(? * 60))
-                            AND TIME(?) <= '23:59:59'
-                        ", [$now, $earlyCheckMinutes, $now])
+                                TIME(?) >= SUBTIME(time_shifts.from_time, SEC_TO_TIME($earlyCheckMinutes * 60))
+                                AND TIME(?) <= '23:59:59'
+                            ", [$now, $now])
                       ->orWhereRaw("
-                            TIME(?) >= '00:00:00' AND TIME(?) <= time_shifts.to_time
-                        ", [$now, $now]);
+                                TIME(?) BETWEEN '00:00:00' AND time_shifts.to_time
+                            ", [$now]);
                   });
               });
           })
           ->where('time_shifts.is_active', 1);
       })
-      ->where('staff_id', $staffId)
-      ->where('status', 'confirmed')
-      ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
-      ->whereDate('date_time', today())
+
+      // FIX: ensure earliest valid shift is picked
+      ->orderBy('time_shifts.from_time', 'ASC')
+      ->where('staff_timeshifts.staff_id', $staffId)
+      ->where('staff_timeshifts.status', 'confirmed')
+      ->whereDate('staff_timeshifts.date_time', today())
       ->first();
-    // dd($existShiftAssign);
+      // dd($existShiftAssign);
+
     if (!$existShiftAssign) {
       ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
     }
@@ -178,8 +189,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     if (isset($staffId)) {
 
       if ($currentTimeShift) {
+        $currentDate = now()->format('Y-m-d');
         $checkIn = CheckIn::where('staff_id', $staffId)
           ->where('time_shift_id', $currentTimeShift->id)
+        ->whereDate('check_in_date_time', $currentDate)
           ->orderBy('check_in_date_time', 'desc')
           ->first();
         //if checkin not exist,need to checkin for this timeshift
@@ -267,7 +280,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function adminPostedcheckIn(array $requestData)
   {
-    
+    // dd($requestData);
     try {
       if (!isset($requestData['id'])) {
         $requestData['id'] = null;
@@ -276,7 +289,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if(isset($requestData['id']) && !empty($requestData['id'])){
         self::validateCheckInEdit($requestData['time_shift_id'], $requestData['check_in_date_time']);
       }
-      $requestData['is_current_checked_in']=true;
+      $requestData['is_current_checked_in']=false;
       DB::beginTransaction();
       $checkIn = CheckIn::updateOrCreate([
         'id'=>$requestData['id']
@@ -326,18 +339,18 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
     try {
       $staffId = $requestData['staff_id'];
       $timeShiftId = $requestData['time_shift_id'];
+      $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
       $currentDate = now()->format('Y-m-d');
 
       $existingCheckIn = CheckIn::where('staff_id', $staffId)
         ->whereDate('check_in_date_time', $currentDate)
+        ->where('time_shift_id',$timeShiftId)
         ->where('is_current_checked_in', true)
         ->first();
 
-      $existShiftAssign = StaffTimeshift::where("staff_id", $staffId)
-        ->where('timeshift_id', $timeShiftId)
-        ->whereDate('date_time', $today)
-        ->first();
+      // $now = now()->format('H:i');
+      $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -349,16 +362,39 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           ResponseMessage('Check-in is invalid ,your shift assignment has been cancelled', 419);
         }
       }
+
+      $earlyCheckMinutes = 30;
+      $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
+      $shiftEnd   = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->to_time);
+      $nowTime    = Carbon::now();
+
+      // EARLY CHECK — cannot check in before allowed time
+      $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
+
+      if ($nowTime->lt($earlyAllowedTime)) {
+        ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.", 400);
+      }
+
+      // LATE CHECK 
+      if ($nowTime->gt($shiftEnd)) {
+        ResponseMessage("You cannot check in after your shift end time.", 400);
+      }
+
+      // VALID TIME RANGE
+      if (!($nowTime->between($earlyAllowedTime, $shiftEnd))) {
+        ResponseMessage("Check-in time is not valid for this shift.", 400);
+      }
+      
+   
+      
       if ($existingCheckIn) {
         return ResponseData('You have already checked in today', 422);
       }
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
 
-      // $officeGps = Gps::where('name', 'GPS Point')->first();
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
-      // dd($officeGps);
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
       }
@@ -387,9 +423,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         'check_in_photo_url' => $imageUrl ?? null,
         'is_current_checked_in' => true,
       ]);
-
+      $checkIn->check_in_status= 'check_out';
       DB::commit();
       return $checkIn;
+
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred during check-in.");
@@ -419,7 +456,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           'is_current_checked_in' => false,
           'is_self_checkout' => true
         ]);
-
+        $checkIn->check_in_status = 'already_checked_in';
         DB::commit();
         return $checkIn;
       }

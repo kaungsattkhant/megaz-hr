@@ -80,4 +80,10 @@ class ReportController extends Controller
         $data = $this->reportRepo->getTargetActualMenuSales($request);
         ResponseData($data);
     }
+
+    public function getBudgetAccountsCashflow(Request $request)
+    {
+        $data = $this->reportRepo->getBudgetAccountsCashflow($request);
+        ResponseData($data);
+    }
 }

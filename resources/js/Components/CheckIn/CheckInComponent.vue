@@ -349,8 +349,8 @@ export default {
             let formData = new FormData();
             formData.append('staff_id', this.createCheckinStaff.id);
             formData.append('time_shift_id', this.selectedTimeshift.id);
-            formData.append('chek_in_date_time', this.checkInDateTime);
-            formData.append('chek_out_date_time', this.checkOutDateTime);
+            formData.append('check_in_date_time', this.checkInDateTime);
+            formData.append('check_out_date_time', this.checkOutDateTime);
             postApiData({url: `/api/check_ins/admin_post`, form_data: formData, token: this.getToken()})
             .then((response)=>{
                 this.checkInCreateBtnLoading = false;
