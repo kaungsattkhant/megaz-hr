@@ -59,7 +59,8 @@ class DatabaseSeeder extends Seeder
             GpsSeeder::class,
             DepartmentFeatureSeeder::class,
             NrcTownshipSeeder::class,
-            ExtraTagSeeder::class
+            ExtraTagSeeder::class,
+            OffDaySettingSeeder::class,
         ]);
     }
 }
