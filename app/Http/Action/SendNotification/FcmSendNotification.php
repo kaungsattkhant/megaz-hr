@@ -54,7 +54,6 @@ trait FcmSendNotification
         // dd($people);
         // Log::info('notification', $data);
         foreach ($people as $person) {
-            // dd($person->routeNotificationForFcm());
             $personMorphMapName = RelationMorphName($person);
             $notificationPersons[] = [
                 'notification_id' => $notification->id,
