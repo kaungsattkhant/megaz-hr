@@ -54,7 +54,6 @@ trait FcmSendNotification
         // dd($people);
         // Log::info('notification', $data);
         foreach ($people as $person) {
-            // dd($person->routeNotificationForFcm());
             $personMorphMapName = RelationMorphName($person);
             $notificationPersons[] = [
                 'notification_id' => $notification->id,
@@ -72,7 +71,7 @@ trait FcmSendNotification
         // Batch send notifications (uses ShouldQueue)
         Log::info('Reach Notifcation Queue');
         // NotificationQueue::send($people, new Notifying($data));
-        // LaravelNotification::send($people, new Notifying($data));
+        LaravelNotification::send($people, new Notifying($data));
         // dispatch(new Notifying($data));
         Log::info('Complete Notifcation Queue');
 
