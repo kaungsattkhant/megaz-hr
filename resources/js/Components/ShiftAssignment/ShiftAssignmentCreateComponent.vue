@@ -172,7 +172,7 @@
                             </td>
                         </tr>
                         <tr class=" !text-center" v-if="selectedAssignList.length < 1">
-                            <td class="" colspan="3">
+                            <td class="" colspan="6">
                                 No Data Here
                             </td>
                         </tr>
@@ -217,6 +217,7 @@ export default {
             selectedAssignList: [],
 
             selectedDates: [],
+            fpInstance: null
         };
     },
 
@@ -321,7 +322,7 @@ export default {
                 })
             });
             
-            
+
             
             // this.selectedDate = null;
             this.selectedDepartment = null;
@@ -334,6 +335,7 @@ export default {
             this.staffList = [];
             this.areaList = [];
             this.selectedDates = [];
+            this.fpInstance.clear();
         },
         removeItem(index){
             this.selectedAssignList.splice(index, 1);
@@ -389,7 +391,7 @@ export default {
         this.getDepartmentList();
         this.getTimeShiftList();
         initTE({ Modal, Select, Tab, Ripple });
-        flatpickr(this.$refs.picker,{
+        this.fpInstance = flatpickr(this.$refs.picker,{
           mode: "multiple",
           dateFormat: "Y-m-d",
           onChange: (dates,dateStr) => {
