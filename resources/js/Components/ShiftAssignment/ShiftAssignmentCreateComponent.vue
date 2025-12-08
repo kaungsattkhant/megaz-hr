@@ -322,6 +322,7 @@ export default {
             });
             
             
+            
             // this.selectedDate = null;
             this.selectedDepartment = null;
             this.selectedRole = null;
@@ -332,6 +333,7 @@ export default {
             this.roleList = [];
             this.staffList = [];
             this.areaList = [];
+            this.selectedDates = [];
         },
         removeItem(index){
             this.selectedAssignList.splice(index, 1);
@@ -399,9 +401,7 @@ export default {
             // this.selectedDate = dates.map(d => d.toISOString().slice(0,10))
             this.selectedDate = dateStr.split(", ").map(d => d.trim()); // just testing
             // this.selectedDate = dates;
-            this.selectedDates = dates.map(d => // selectedDates is used
-                d.toISOString().slice(0, 10)       // Output → 2025-12-01
-            );;
+            this.selectedDates = dateStr.split(", ");
           }
         })
     }

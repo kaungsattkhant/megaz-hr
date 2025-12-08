@@ -350,7 +350,9 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->first();
 
       // $now = now()->format('H:i');
-      $existShiftAssign=StaffTimeShift::find($staffTimeShiftId);
+      $existShiftAssign=StaffTimeShift::
+         whereDate('date_time', $currentDate)
+        ->find($staffTimeShiftId);
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
