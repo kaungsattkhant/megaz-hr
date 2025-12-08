@@ -322,6 +322,7 @@ export default {
             });
             
             
+            
             // this.selectedDate = null;
             this.selectedDepartment = null;
             this.selectedRole = null;
