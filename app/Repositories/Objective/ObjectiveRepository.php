@@ -315,7 +315,6 @@ class ObjectiveRepository implements ObjectiveInterface
             // ->whereDate('start_date', $currentDate);
         };
         // $objectiveDateFilter = function ($query) use ($currentDate) {
-        //     // $query->where('staff_id', $staffId);
         //     $query->whereDatewhere('start_date', $currentDate);
         // };
         $objectiveDateFilter = fn($q) => $q->whereDate('start_date', $currentDate);
