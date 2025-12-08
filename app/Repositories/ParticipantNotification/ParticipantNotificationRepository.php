@@ -1296,9 +1296,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     // }
     $assignedShifts = StaffTimeshift::join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
       ->leftJoin('check_ins', function ($join) use ($currentDate) {
-        $join->on('staff_timeshifts.staff_id', '=', 'check_ins.staff_id')
-          ->on('staff_timeshifts.timeshift_id', '=', 'check_ins.time_shift_id')
-          ->whereDate('check_ins.check_in_date_time', '=', $currentDate);
+        $join
+        // ->on('staff_timeshifts.staff_id', '=', 'check_ins.staff_id')
+          ->on('staff_timeshifts.id', '=', 'check_ins.staff_timeshift_id');
+          // ->on('staff_timeshifts.timeshift_id', '=', 'check_ins.time_shift_id')
+          // ->whereDate('check_ins.check_in_date_time', '=', $currentDate);
       })
       ->with(['staff', 'timeshift.shift', 'area'])
       ->where('staff_timeshifts.staff_id', $staffId)
@@ -1315,32 +1317,33 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       )
       ->get()
       ->map(function ($shift) {
-      $checkIn = null;
-      if ($shift->check_in_id) {
-        $checkIn = new CheckIn();
-        $checkIn->id = $shift->check_in_id;
-        $checkIn->is_current_checked_in = $shift->is_current_checked_in;
-        $checkIn->is_self_checkout = $shift->is_self_checkout;
-        $checkIn->check_in_date_time = $shift->check_in_date_time;
-      }
-      if (!$checkIn) {
+        $checkIn = null;
+        if ($shift->check_in_id) {
+          $checkIn = new CheckIn();
+          $checkIn->id = $shift->check_in_id;
+          $checkIn->is_current_checked_in = $shift->is_current_checked_in;
+          $checkIn->is_self_checkout = $shift->is_self_checkout;
+          $checkIn->check_in_date_time = $shift->check_in_date_time;
+        }
         $shift->check_in_status = 'check_in';
-        $shift->check_in = 'check_in';
-      } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
-        $shift->check_in_status = 'already_checked_in';
-        $shift->check_in = $checkIn;
-      } else {
-        $shift->check_in_status = 'check_out';
-        $shift->check_in = $checkIn;
-      }
+        if (!$checkIn) {
+          $shift->check_in_status = 'check_in';
+          $shift->check_in = 'check_in';
+        } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+          $shift->check_in_status = 'already_checked_in';
+          $shift->check_in = $checkIn;
+        } else {
+          $shift->check_in_status = 'check_out';
+          $shift->check_in = $checkIn;
+        }
         return $shift;
       });
-      // dd($assignedShifts);
-      foreach($assignedShifts as $assignedShift){
-        if($assignedShift->id==263){
-          // dd($assignedShift->timeshift);
-        }
+    // dd($assignedShifts);
+    foreach ($assignedShifts as $assignedShift) {
+      if ($assignedShift->id == 263) {
+        // dd($assignedShift->timeshift);
       }
+    }
     return StaffTimeShiftResource::collection($assignedShifts);
   }
 
