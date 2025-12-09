@@ -315,13 +315,15 @@ class ObjectiveRepository implements ObjectiveInterface
             // ->whereDate('start_date', $currentDate);
         };
         // $objectiveDateFilter = function ($query) use ($currentDate) {
-        //     // $query->where('staff_id', $staffId);
         //     $query->whereDatewhere('start_date', $currentDate);
         // };
         $objectiveDateFilter = fn($q) => $q->whereDate('start_date', $currentDate);
 
         $objectives = Objective::with([
             'objectiveAssigns' => $objectiveStaffFilter,
+            'accountable:id,name',
+            'consulted:id,name',
+            'informed:id,name',
             'objectiveKeys'
         ])
             // ->whereHas('objectiveAssigns', $objectiveStaffFilter)
@@ -338,6 +340,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
         $objectives = ObjectiveStaff::with([
             'objective.objectiveKeys',
+            
             'objStaffImg'
         ])
             ->where('staff_id', UserData()->id)
@@ -358,6 +361,9 @@ class ObjectiveRepository implements ObjectiveInterface
         $currentDate = now()->toDateString();
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
+            'objective.accountable:id,name',
+            'objective.consulted:id,name',
+            'objective.informed:id,name',
             // 'objectiveStaff' =>function($query) use ($currentDate){
             //     $query->whereDate('start_date', $currentDate);
             //     // ->orderBy('repetition_count', 'asc');

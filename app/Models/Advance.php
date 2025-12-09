@@ -24,4 +24,7 @@ class Advance extends Model
     public function staff()  {
       return $this->belongsTo(Staff::class);
     }
+    public function advance_payment(){
+        return $this->hasMany(AdvancePayment::class);
+    }
 }

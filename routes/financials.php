@@ -49,6 +49,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('advance_payment_detail/{advance_id}', 'getAdvancePaymentDetailByAdvance');
         Route::post('/create_advance_payments', 'createAdvancePayment');
     });
+    //mobile
+    Route::prefix('staff/advances')->controller(AdvanceController::class)->group(function () {
+        Route::get('/', 'getStaffAdvanceHistory');
+    });
 });
 
 Route::controller(FinancialReportController::class)->group(function () {
