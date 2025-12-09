@@ -1004,4 +1004,8 @@ class SalaryRepository implements SalaryRepositoryInterface
       throw $e;
     }
   }
+
+  public function getStaffPaySlip($data){
+    dd('reach');
+  }
 }
