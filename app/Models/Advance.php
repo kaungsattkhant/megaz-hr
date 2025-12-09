@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Advance extends Model
 {
     //
-    protected $fillable = ['advance_ref_no','staff_id','advance_amount','total_months','remaining_amount','remaining_months','current_deduction_amount'];
+    protected $fillable = ['date_time','advance_ref_no','staff_id','advance_amount','total_months','remaining_amount','remaining_months','current_deduction_amount'];
     protected static function boot()
     {
         parent::boot();
