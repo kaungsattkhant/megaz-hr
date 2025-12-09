@@ -25,6 +25,7 @@ class AdvanceRepository implements AdvanceInterface
         DB::beginTransaction(); // start transaction
 
         try {
+            $data['date_time']=now();
             $advance= Advance::create($data);
             DB::commit();
            return $advance;
