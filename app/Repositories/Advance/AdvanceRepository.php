@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Advance;
 
+use App\Http\Resources\Mobile\StaffAdvanceResource;
 use Carbon\Carbon;
 use App\Models\Advance;
 use Illuminate\Http\Request;
@@ -88,5 +89,15 @@ class AdvanceRepository implements AdvanceInterface
             throw $e;
         }
         
+    }
+
+    public function getStaffAdvanceHistory($data){
+        $staffId=\UserData()->id;
+        $advances = Advance::with(['advance_payment','staff:id,name'])
+        ->orderBy('id', 'desc')
+        ->where('staff_id',$staffId)
+        ->get();
+        // return $advances;    
+        return StaffAdvanceResource::collection($advances);
     }
 }

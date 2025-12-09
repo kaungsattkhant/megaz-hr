@@ -36,4 +36,9 @@ class AdvanceController extends Controller
         $data = $this->advanceRepo->createAdvancePayment($request->all());
         \ResponseMessage($data);
     }
+
+    public function getStaffAdvanceHistory(Request $request){
+        $data = $this->advanceRepo->getStaffAdvanceHistory($request->all());
+        \ResponseMessage($data);
+    }
 }
