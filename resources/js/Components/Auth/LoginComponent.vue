@@ -168,6 +168,11 @@
                     let features = [];
                     features = JSON.parse(JSON.stringify(response.data.features));
                     this.setFeature(features);
+
+                    let off_day_setting = null;
+                    off_day_setting = JSON.parse(JSON.stringify(response.data.features));
+                    this.setOffDaySetting(off_day_setting);
+
                     notify('Login successful','success');
                     this.$refs.signinForm.submit();
 
