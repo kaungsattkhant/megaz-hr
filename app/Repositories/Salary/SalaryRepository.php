@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Salary;
 
+use App\Http\Resources\Mobile\PaySlipResource;
 use App\Models\Staff;
 use App\Models\Salary;
 use App\Models\CheckIn;
@@ -925,6 +926,7 @@ class SalaryRepository implements SalaryRepositoryInterface
             'salary_id' => $pay_slip['salary_id'],
             'basic_salary' => $pay_slip['basic_salary'],
             'allowance' => $pay_slip['allowance'],
+            'deduction' => $pay_slip['deduction'],
             'added_allowance' => $pay_slip['added_allowance_amount'] ?? 0,
             'added_deduction' => $pay_slip['added_deduction_amount'] ?? 0,
             'total_allowance' => $pay_slip['total_allowance'],
@@ -1005,7 +1007,40 @@ class SalaryRepository implements SalaryRepositoryInterface
     }
   }
 
+  public function confirmPaySlip($id){
+    $paySlip=PaySlip::find($id);
+    if(!$paySlip){
+      \ResponseMessage('PaySlip is Empty',419);
+    }
+    if($paySlip->is_confirm){
+      \ResponseMessage('PaySlip is already confirmed', 419);
+    }
+    $paySlip->is_confirm=true;
+    $paySlip->confirmed_at=now();
+    $paySlip->confirmed_by = \UserData()->id ?? null;
+    $paySlip->save();
+    return $paySlip;
+  }
+
   public function getStaffPaySlip($data){
-    dd('reach');
+    $staffId = \UserData()->id;
+    $salary=Salary::where('staff_id',$staffId)->latest()->first();
+    $salarySetupId=$salary->salary_setup_id ?? null;
+    $salaryAllowance=SalaryAllowance::where('salary_setup_id',$salarySetupId)
+    ->join('allowances','salary_allowances.allowance_id','allowances.id')
+    ->where('allowances.type','allowance')
+    ->select(DB::raw('SUM(salary_allowances.amount) as total_allowances'))
+    ->first();
+    $paySlips=PaySlip::orderBy('id','desc')
+    ->where('staff_id',$staffId)
+    ->get();
+    $paySlipResource=PaySlipResource::collection($paySlips);
+    return[
+      'salay'=>[
+        'basic_salay'=>$salary->basic_salary ?? 0,
+        'allowance_amount'=>  $salaryAllowance->total_allowances ?? 0,
+      ],
+      'pay_slips'=> $paySlipResource,
+    ];
   }
 }
