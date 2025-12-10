@@ -926,7 +926,7 @@ class SalaryRepository implements SalaryRepositoryInterface
             'salary_id' => $pay_slip['salary_id'],
             'basic_salary' => $pay_slip['basic_salary'],
             'allowance' => $pay_slip['allowance'],
-            'deduction' => $pay_slip['deduction'],
+            // 'deduction' => $pay_slip['deduction'],
             'added_allowance' => $pay_slip['added_allowance_amount'] ?? 0,
             'added_deduction' => $pay_slip['added_deduction_amount'] ?? 0,
             'total_allowance' => $pay_slip['total_allowance'],
