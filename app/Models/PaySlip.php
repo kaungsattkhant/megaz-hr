@@ -21,6 +21,7 @@ class PaySlip extends Model
         'added_allowance',
         'added_deduction',
         'total_allowance',
+        'total_deduction',
         'overtime',
         'net_salary',
         'confirmed_at',
