@@ -167,6 +167,7 @@ import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.v
 import AdvancedCrudComponent from './Components/Advanced/AdvancedCrudComponent.vue';
 import AdvancedDetailComponent from './Components/Advanced/AdvancedDetailComponent.vue';
 import AdvancesCrudComponent from './Components/Advances/AdvancesCrudComponent.vue';
+import AdvancesDetailComponent from './Components/Advances/AdvancesDetailComponent.vue';
 import PrepaidCrudComponent from './Components/Prepaid/PrepaidCrudComponent.vue';
 import CashFlowStatementComponent from './Components/CashFlowStatement/CashFlowStatementComponent.vue';
 import IndirectCashFlowStatementComponent from './Components/CashFlowStatement/IndirectCashFlowStatementComponent.vue';
@@ -427,6 +428,7 @@ app.component('JournalsCrudComponent',JournalsCrudComponent);
 app.component('AdvancedCrudComponent',AdvancedCrudComponent);
 app.component('AdvancedDetailComponent',AdvancedDetailComponent);
 app.component('AdvancesCrudComponent',AdvancesCrudComponent);
+app.component('AdvancesDetailComponent',AdvancesDetailComponent);
 app.component('PrepaidCrudComponent',PrepaidCrudComponent);
 app.component('CashFlowStatementComponent',CashFlowStatementComponent);
 app.component('IndirectCashFlowStatementComponent',IndirectCashFlowStatementComponent);

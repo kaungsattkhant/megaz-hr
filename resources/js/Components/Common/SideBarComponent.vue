@@ -438,6 +438,12 @@
                                     Complaints
                                 </a>
                             </li>
+                            <li>
+                                <a href="/advances" class="flex items-center @yield('advances') sidebar-gap-x">
+                                    <i class="fal fa-envelope-open-text"></i>
+                                    Advances
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content" id="tab-salary">

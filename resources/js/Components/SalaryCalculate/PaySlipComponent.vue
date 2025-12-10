@@ -70,6 +70,10 @@
                                 <th scope="col" class="">
                                     Net Salary
                                 </th>
+
+                                <th scope="col" class="">
+                                    Status
+                                </th>
                                 <th scope="col" class="">
 
                                 </th>
@@ -113,6 +117,9 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ salary.net_salary }}
+                                    </td>
+                                    <td>
+                                        <i class="far fa-check-double" :class="salary.is_confirm === '1' ? 'text-green-600' : 'text-gray-500'"></i>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
