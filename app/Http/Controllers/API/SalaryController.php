@@ -206,4 +206,9 @@ class SalaryController extends Controller
         }
         return Excel::download(new SalaryExport($salaryData), 'salary_export.xlsx');
     }
+
+    public function getStaffPaySlip(Request $request){
+        $data = $this->salaryRepository->getStaffPaySlip($request->all());
+        ResponseData($data);
+    }
 }

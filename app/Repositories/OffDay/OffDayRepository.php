@@ -6,8 +6,10 @@ use Exception;
 use App\Models\OffDay;
 use App\Models\DayInOffDay;
 use App\Models\OffDayAssignment;
+use App\Models\OffDaySetting;
 use App\Models\PublicHoliday;
 use Illuminate\Support\Facades\DB;
+use ParagonIE\Sodium\Core\Curve25519\Ge\P2;
 
 class OffDayRepository implements OffDayRepositoryInterface
 {
@@ -94,6 +96,20 @@ class OffDayRepository implements OffDayRepositoryInterface
       }
       DB::commit();
       ResponseData($offDay);
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  public function toggleOffDaySetting($data){
+    DB::beginTransaction();
+    try {
+     $offDaySetting= OffDaySetting::find($data['id']);
+     $offDaySetting->type=$data['type'];
+     $offDaySetting->save();
+      DB::commit();
+      ResponseData($offDaySetting);
     } catch (Exception $e) {
       DB::rollBack();
       throw $e;

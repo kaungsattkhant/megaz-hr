@@ -523,9 +523,6 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->with(['exitCategory'])
       ->orderByDesc('id')
       ->paginate(config('common.list_count'));
-    if ($exitPasses->isEmpty()) {
-      ResponseMessage('ExitPasses not found.', 404);
-    }
     ResponseData($exitPasses);
   }
   public function getStaffListByRoleAndDepartment($roleId, $departmentId)

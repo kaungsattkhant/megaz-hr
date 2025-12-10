@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Advance extends Model
 {
     //
-    protected $fillable = ['advance_ref_no','staff_id','advance_amount','total_months','remaining_amount','remaining_months','current_deduction_amount'];
+    protected $fillable = ['date_time','advance_ref_no','staff_id','advance_amount','total_months','remaining_amount','remaining_months','current_deduction_amount'];
     protected static function boot()
     {
         parent::boot();
@@ -23,5 +23,8 @@ class Advance extends Model
     }
     public function staff()  {
       return $this->belongsTo(Staff::class);
+    }
+    public function advance_payment(){
+        return $this->hasMany(AdvancePayment::class);
     }
 }

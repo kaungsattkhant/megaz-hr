@@ -13,4 +13,6 @@ interface AdvanceInterface
     public function getAdvancePaymentDetailByAdvance($advanceId);
 
     public function createAdvancePayment($data);
+
+    public function getStaffAdvanceHistory($data);
 }

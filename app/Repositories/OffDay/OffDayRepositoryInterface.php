@@ -9,4 +9,5 @@ interface OffDayRepositoryInterface
   public function deleteOffDay($id);
 
   public function createPublicHoliday($data);
+  public function toggleOffDaySetting($data);
 }

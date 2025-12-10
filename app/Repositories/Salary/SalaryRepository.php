@@ -499,10 +499,6 @@ class SalaryRepository implements SalaryRepositoryInterface
     $data = Overtime::with(['overtimeCategory', 'timeShift.shift'])
       ->where('staff_id', $staffId)->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
-
-    if ($data->isEmpty()) {
-      ResponseMessage('Overtime not found.', 404);
-    }
     ResponseData($data);
   }
 
@@ -1007,5 +1003,9 @@ class SalaryRepository implements SalaryRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+
+  public function getStaffPaySlip($data){
+    dd('reach');
   }
 }

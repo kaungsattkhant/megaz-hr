@@ -2,6 +2,7 @@
 
 namespace App\Actions\Auth;
 
+use App\Models\OffDaySetting;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -84,7 +85,7 @@ class APILoginAction
         $login_response["code"] = 200;
         $login_response["success"] = true;
         $login_response["message"] = 'Authenticated';
-
+        $login_response["off_day_setting"]=OffDaySetting::first()->type ?? 'default';
         return $login_response;
     }
 }

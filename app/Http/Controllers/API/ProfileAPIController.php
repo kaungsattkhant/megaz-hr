@@ -17,7 +17,6 @@ class ProfileAPIController extends Controller
     public function getProfile(Request $request)
     {
         $staff = Staff::with(['department','gender', 'roles'])->find($request->user()->id);
-
         ResponseData($staff);
     }
 

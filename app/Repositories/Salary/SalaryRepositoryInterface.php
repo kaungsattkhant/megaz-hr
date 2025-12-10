@@ -65,4 +65,6 @@ interface SalaryRepositoryInterface
   public function getPaySlips($request);
 
   public function deletePaySlip($id);
+
+  public function getStaffPaySlip($data);
 }
