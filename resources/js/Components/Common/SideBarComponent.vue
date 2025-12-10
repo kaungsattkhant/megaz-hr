@@ -547,6 +547,12 @@
                                     Off Day
                                 </a>
                             </li>
+                            <li>
+                                <a href="/off_day_setting" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-calendar-minus"></i>
+                                    Off Day Setting
+                                </a>
+                            </li>
                             <li v-show="checkFeaturePermission('leave-allowance')">
                                 <a href="/leave_allowance" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-wallet"></i>

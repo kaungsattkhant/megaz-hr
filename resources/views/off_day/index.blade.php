@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('page_title', 'Holidays')
+@section('page_title', 'Off Day')
 
 @section('off_day', 'active-link')
 @section('content')

@@ -779,6 +779,7 @@ Route::view('/ktv_menu_sale', 'kitchen_menu_sale.ktv_menu_sale');
 Route::view('/sky_menu_sale', 'kitchen_menu_sale.sky_menu_sale');
 Route::view('/budget_accounts', 'budget_accounts.index');
 Route::view('/cashflow_report', 'cashflow_report.index');
+Route::view('/off_day_setting', 'off_day_setting.index');
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');

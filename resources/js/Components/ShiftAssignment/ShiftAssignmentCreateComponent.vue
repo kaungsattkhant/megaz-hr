@@ -113,6 +113,9 @@
                 <button class="add-btn py-[9px]" @click="btnClickedAddShift()">
                     Add
                 </button>
+                <a href="/off_day" class="add-btn py-[9px]" v-show="offDaySetting === 'default'">
+                    Add
+                </a>
             </div>
         </div>
 
@@ -217,12 +220,14 @@ export default {
             selectedAssignList: [],
 
             selectedDates: [],
-            fpInstance: null
+            fpInstance: null,
+
+            offDaySetting: this.getOffDaySetting(),
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken' ,'getOffDaySetting']),
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {

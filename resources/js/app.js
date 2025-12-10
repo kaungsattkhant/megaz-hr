@@ -208,6 +208,7 @@ import WarningCreateComponent from './Components/Warning/WarningCreateComponent.
 import WarningEditComponent from './Components/Warning/WarningEditComponent.vue';
 import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
 import OffDayCrudComponent from './Components/OffDay/OffDayCrudComponent.vue';
+import OffDaySettingComponent from './Components/OffDaySetting/OffDaySettingComponent.vue';
 import HolidayCrudComponent from './Components/Holiday/HolidayCrudComponent.vue';
 import LeaveAllowanceComponent from './Components/LeaveAllowance/LeaveAllowanceComponent.vue';
 import LeaveAllowanceCreateComponent from './Components/LeaveAllowance/LeaveAllowanceCreateComponent.vue';
@@ -469,6 +470,7 @@ app.component('WarningCreateComponent',WarningCreateComponent);
 app.component('WarningEditComponent',WarningEditComponent);
 app.component('MenuAreaComponent',MenuAreaComponent);
 app.component('OffDayCrudComponent',OffDayCrudComponent);
+app.component('OffDaySettingComponent',OffDaySettingComponent);
 app.component('HolidayCrudComponent',HolidayCrudComponent);
 app.component('LeaveAllowanceComponent',LeaveAllowanceComponent);
 app.component('LeaveAllowanceCreateComponent',LeaveAllowanceCreateComponent);

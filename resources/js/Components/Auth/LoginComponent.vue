@@ -139,7 +139,7 @@
         },
 
         methods: {
-            ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles', 'setFeature']),
+            ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles', 'setFeature', 'setOffDaySetting']),
 
             async login(){
                 let url = '/api/login';
@@ -170,7 +170,7 @@
                     this.setFeature(features);
 
                     let off_day_setting = null;
-                    off_day_setting = JSON.parse(JSON.stringify(response.data.features));
+                    off_day_setting = JSON.parse(JSON.stringify(response.data.off_day_setting));
                     this.setOffDaySetting(off_day_setting);
 
                     notify('Login successful','success');
