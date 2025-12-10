@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\OffDaySettingToggleRequest;
+use App\Models\OffDaySetting;
 use App\Repositories\OffDay\OffDayRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -42,5 +43,10 @@ class OffDayHrController extends Controller
     public function toggleOffDaySetting(OffDaySettingToggleRequest $request){
         $data = $this->offDayRepository->toggleOffDaySetting($request->all());
         ResponseData($data);
+    }
+
+    public function getOffDaySetting(){
+        $data=OffDaySetting::get();
+        \ResponseData($data);
     }
 }
