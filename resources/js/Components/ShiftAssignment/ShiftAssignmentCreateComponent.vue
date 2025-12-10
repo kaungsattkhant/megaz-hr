@@ -106,16 +106,34 @@
                 </div>
             </div>
             
-            <div class="col-span-4">
-                <label for="" class="label-form mb-3">
-                    &nbsp;
-                </label>
-                <button class="add-btn py-[9px]" @click="btnClickedAddShift()">
-                    Add
-                </button>
-                <a href="/off_day" class="add-btn py-[9px]" v-show="offDaySetting === 'default'">
-                    Add
-                </a>
+            <div class="col-span-4 flex gap-x-4">
+                <div>
+                    <label for="" class="label-form mb-3">
+                        &nbsp;
+                    </label>
+                    <button class="add-btn py-[9px]" @click="btnClickedAddShift()">
+                        Add
+                    </button>
+                </div>
+                <div v-show="offDaySetting === 'default'">
+                    <label for="" class="label-form mb-3">
+                        &nbsp;
+                    </label>
+                    <a href="/off_day" class="add-btn py-[9px] block text-center">
+                        Off Day
+                    </a>
+                </div>
+                <div v-show="offDaySetting === 'custom'">
+                    <label for="" class="label-form mb-3">
+                        &nbsp;
+                    </label>
+                    <button class="add-btn py-[9px]">
+                        Off Day
+                    </button>
+                </div>
+            </div>
+            <div class="col-span-2">
+                
             </div>
         </div>
 
@@ -411,6 +429,8 @@ export default {
             this.selectedDates = dateStr.split(", ");
           }
         })
+
+        this.offDaySetting = this.getOffDaySetting();
     }
 }
 </script>

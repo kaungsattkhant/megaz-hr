@@ -261,6 +261,14 @@ export default {
             if (response.success) {
                 this.loading = false;
                 this.getPaySlipList();
+                document.getElementById('close_confirm_modal').click();
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
             }
         },
         async getDepartmentList(){
