@@ -347,6 +347,7 @@ Route::middleware(['departments:staff-balance'])->group(function () {
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 
 Route::view('/advances', 'advances.index')->name('advances');
+Route::view('/advances/{id}/detail', 'advances.detail')->name('advances');
 // Route::middleware(['departments:prepaid'])->group(function () {
 Route::view('/prepaid', 'prepaid.index')->name('prepaid');
 // });
