@@ -22,6 +22,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
     Route::post('/public_holidays', 'createPublicHoliday');
     Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
+    Route::get('off_day_settings','getOffDaySetting');
   });
   Route::prefix('hr')->controller(LeaveController::class)->group(function () {
     Route::get('/leave_categories', 'getLeaveCategoryLists');
@@ -79,8 +80,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
+    Route::get('pay_slips/confirm/{id}','confirmPaySlip');
 
     Route::get('/export-salary', 'exportSalary');
+    //mobile
     Route::get('/staff_pay_slips', 'getStaffPaySlip');
   });
   Route::prefix('hr')->controller(ResignationController::class)->group(function () {
