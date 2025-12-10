@@ -118,7 +118,8 @@
                                     <td class="whitespace-nowrap">
                                         {{ salary.net_salary }}
                                     </td>
-                                    <td>
+                                    
+                                    <td class="whitespace-nowrap">
                                         <i class="far fa-check-double" :class="salary.is_confirm === 1 ? 'text-green-600' : 'text-gray-500'"></i>
                                     </td>
                                     <td class="whitespace-nowrap">
