@@ -1032,6 +1032,7 @@ class SalaryRepository implements SalaryRepositoryInterface
     ->select(DB::raw('SUM(salary_allowances.amount) as total_allowances'))
     ->first();
     $paySlips=PaySlip::orderBy('id','desc')
+    ->where('is_confirm',true)
     ->where('staff_id',$staffId)
     ->get();
     $paySlipResource=PaySlipResource::collection($paySlips);
