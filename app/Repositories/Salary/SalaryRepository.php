@@ -919,7 +919,6 @@ class SalaryRepository implements SalaryRepositoryInterface
         $pay_slips = json_decode($data['pay_slips'], true);
         $paySlipIds = [];
         foreach ($pay_slips as $pay_slip) {
-
           $paySlip = PaySlip::create([
             'staff_id' => $pay_slip['staff_id'],
             'salary_batch_id' => $pay_slip['salary_batch_id'],

@@ -36,6 +36,9 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
+                                    Advance Ref No
+                                </th>
+                                <th scope="col" class="">
                                     Staff Name
                                 </th>
                                 <th scope="col" class="">
@@ -59,28 +62,37 @@
                         />
                         <tbody>
                             <div class="contents" v-for="(advance, index) in primaryList" :key="index">
-                                <a :href="'/advanced/' + advance.staff_id + '/detail'" class="contents">
+                                
                                     <tr class="">
                                         <td class=" ">
                                             {{ perPage * (currentPage - 1) + (++index) }}
                                         </td>
                                         <td class="whitespace-nowrap">
-                                            {{ advance.staff_name }}
+                                            <a :href="'/advances/' + advance.id + '/detail'" class=" underline underline-offset-2 text-blue-600 text-sm">
+                                                {{ advance.advance_ref_no }}
+                                            </a>
                                         </td>
                                         <td class="whitespace-nowrap">
-                                            {{ advance.opening_balance }}
+                                            {{ advance.staff.name }}
                                         </td>
                                         <td class="whitespace-nowrap">
-                                            {{ advance.addition }}
+                                            {{ advance.remaining_months }}
                                         </td>
                                         <td class="whitespace-nowrap">
-                                            {{ advance.settlement }}
+                                            {{ advance.current_deduction_amount }}
+                                        </td>
+                                        
+                                        <td class="whitespace-nowrap">
+                                            {{ advance.remaining_amount }}
                                         </td>
                                         <td class="whitespace-nowrap">
-                                            {{ advance.closing_balance }}
+                                            <!-- <button data-te-toggle="modal" data-te-target="#advance_payment_modal" id="edit-btn"
+                                                class="pr-3" @click="btnClickedAddMonthlyAmount(advance, index)">
+                                                <i class="fal fa-pen"></i>
+                                            </button> -->
+                                        
                                         </td>
                                     </tr>
-                                </a>
 
                             </div>
                             <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
@@ -193,6 +205,56 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="advance_payment_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="create_modalLabel">
+                                Add Monthly Amount
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close" id="close_monthly_amount_modal">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Month
+                                </label>
+                                <input type="date" class="input-ui  mr-2 h-8" v-model="selected_month"> 
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Monthly Amount
+                                </label>
+                                <input type="number" placeholder="Monthly Amount" v-model="advance_monthly_amount" class="input-ui">
+                            </div>
+                            
+
+                        </div>
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button type="button" @click="btnClickedAddAdvancePayment()"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Create
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -240,6 +302,9 @@
 
                 feature: this.getFeature(),
                 loading: false,
+
+                advance_id: null,
+                advance_monthly_amount: null,
             };
         },
 
@@ -253,13 +318,13 @@
             async getAdvanceList(pageNumber){
                 this.loading = true;
                 const response = await getApiData({ url: '/api/advances' + '?page='+pageNumber, token: this.getToken() });
-                if(response.data){
+                if(response.message.data){
                     this.loading = false;
-                    this.primaryList = response.data.data;
-                    this.lastPage = response.data.last_page;
+                    this.primaryList = response.message.data;
+                    this.lastPage = response.message.last_page;
                     this.currentPage = pageNumber;
-                    this.perPage = response.data.per_page;
-                    this.totalData = response.data.total;
+                    this.perPage = response.message.per_page;
+                    this.totalData = response.message.total;
                 }
             },
             async getDepartmentList(){
@@ -287,7 +352,7 @@
                 const month = Number(this.month)
 
                 if (!month || month === 0) {
-                    this.monthly_amount = 0      // prevent Infinity
+                    this.monthly_amount = 0 
                 } else {
                     this.monthly_amount = loan / month
                 }
@@ -296,7 +361,7 @@
             btnClickedCreateAdvance(){
                 this.createAdvance();
             },
-
+            
             async createAdvance()
             {
                 this.monthly_amount = this.loan / this.month
@@ -307,7 +372,7 @@
                 formData.append('remaining_amount', this.loan);
                 formData.append('remaining_months', this.month);
                 formData.append('current_deduction_amount', this.monthly_amount);
-                let response = await postApiData({url: '/api/www', form_data: formData, token: this.getToken()});
+                let response = await postApiData({url: '/api/advances', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getAdvanceList(1);
                     this.closeAndClearModal();
@@ -321,6 +386,37 @@
                 }
             },
 
+            btnClickedAddMonthlyAmount(advance){
+                this.advance_id = advance;
+                this.advance_monthly_amount = null;
+            },
+            btnClickedAddAdvancePayment(){
+                if(!this.advance_monthly_amount){
+                    this.alertValidationMessage(`Amount`);
+                    return 1;
+                }
+                else{
+                    this.addAdvancePayment();
+                }
+            },
+            async addAdvancePayment(){
+                let formData = new FormData();
+                formData.append('paid_amount', this.advance_monthly_amount);
+                formData.append('advance_id', this.advance_id.id);
+                formData.append('payment_month', this.selected_month);
+                let response = await postApiData({url: '/api/advances/create_advance_payments', form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.getAdvanceList(1);
+                    document.getElementById('close_monthly_amount_modal').click();
+                }
+                else{
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            } ,
             closeAndClearModal(){
                 this.selectedDepartment = null;
                 this.amounts = null;
@@ -338,7 +434,7 @@
         },
         created(){
             this.getStaffList();
-            // this.getAdvanceList(1);
+            this.getAdvanceList(1);
             this.getDepartmentList();
 
 

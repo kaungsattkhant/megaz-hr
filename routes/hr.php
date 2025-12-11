@@ -22,6 +22,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
     Route::post('/public_holidays', 'createPublicHoliday');
     Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
+    Route::get('off_day_settings','getOffDaySetting');
   });
   Route::prefix('hr')->controller(LeaveController::class)->group(function () {
     Route::get('/leave_categories', 'getLeaveCategoryLists');
