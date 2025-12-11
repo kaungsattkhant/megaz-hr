@@ -18,7 +18,7 @@ class BenefitRequestResourceList extends JsonResource
         return [
             'id'=>$this->id,
             'name'=> $this->benefit->type=='menu' ? $this->benefit->menu->name : $this->benefit->name,
-            'date_time'=>Carbon::parse($this->date_time)->format('Y-F-d'),
+            'date_time'=>Carbon::parse($this->date_time)->format('Y F d'),
             'status'=>$this->status
         ];
     }

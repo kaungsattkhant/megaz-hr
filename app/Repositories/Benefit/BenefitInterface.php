@@ -14,7 +14,7 @@ interface BenefitInterface
 
     public function requestBenefit($data);
 
-    public function updateStatusBenefit($data);
+    public function updateStatusBenefitRequest($data);
 
     public function getBenefitByType($type);
 

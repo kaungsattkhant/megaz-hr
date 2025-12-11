@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Benefit\BenefitInterface;
 use App\Http\Requests\Admin\BenefitCreateRequest;
+use App\Http\Requests\Admin\BenefitRequestStatusUpdateCheck;
 use App\Http\Requests\Mobile\StaffBenefitRequestCreate;
 
 class BenefitController extends Controller
@@ -40,9 +41,9 @@ class BenefitController extends Controller
         \ResponseData($data);
     }
 
-    public function updateStatusBenefit(Request $request)
+    public function updateStatusBenefitRequest(BenefitRequestStatusUpdateCheck $request)
     {
-        $data = $this->benefitRepo->updateStatusBenefit($request->all());
+        $data = $this->benefitRepo->updateStatusBenefitRequest($request->all());
         \ResponseData($data);
     }
 

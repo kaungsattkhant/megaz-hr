@@ -524,7 +524,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/', 'updateOrCreateBenefit');
         Route::get('/{id}', 'detailBenefit');
         Route::post('/request','requestBenefit');
-        Route::post('/update_status', 'updateStatusBenefit');
+        Route::post('/benefit_requests/update_status', 'updateStatusBenefitRequest');
     });
 });
 

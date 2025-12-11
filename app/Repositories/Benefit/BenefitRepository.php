@@ -50,7 +50,30 @@ class BenefitRepository implements BenefitInterface
 
     public function requestBenefit($data) {}
 
-    public function updateStatusBenefit($data) {}
+    public function updateStatusBenefitRequest($data) {
+        DB::beginTransaction(); // start transaction
+        try {
+            $benefitRequest = BenefitRequest::find($data['id']);
+            $benefitRequest->status = $data['status'];
+            if ($data['status'] == 'confirmed') {
+                $benefitRequest->confirmed_at = now();
+                $benefitRequest->confirmed_by = \UserData()->id;
+            }
+            if ($data['status'] == 'cancelled') {
+                $benefitRequest->cancelled_at = now();
+                $benefitRequest->cancelled_by = \UserData()->id;
+            }
+            dd($benefitRequest);
+            $benefitRequest->save();
+            DB::commit();
+            return $benefitRequest;
+        } catch (\Exception $e) {
+            DB::rollBack(); // rollback all queries if any error occurs
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+       
+    }
 
     public function getBenefitByType($type)
     {
