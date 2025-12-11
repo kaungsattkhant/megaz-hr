@@ -2,16 +2,17 @@
 
 namespace App\Repositories\Benefit;
 
-use App\Http\Resources\Admin\BenefitListResource;
-use App\Http\Resources\Mobile\BenefitRequestResourceList;
 use Carbon\Carbon;
 use App\Models\Advance;
 use App\Models\Benefit;
 use Illuminate\Http\Request;
 use App\Models\AdvancePayment;
-use Illuminate\Support\Facades\DB;
-use App\Http\Resources\Mobile\StaffAdvanceResource;
 use App\Models\BenefitRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\Admin\BenefitListResource;
+use App\Http\Resources\Mobile\StaffAdvanceResource;
+use App\Http\Resources\Mobile\BenefitRequestResourceList;
 
 class BenefitRepository implements BenefitInterface
 {
@@ -28,7 +29,7 @@ class BenefitRepository implements BenefitInterface
         return $benefits;
     }
 
-    public function updateOrCreateBenefit($data)
+    public function updateOrCreateBenefit($request)
     {
         DB::beginTransaction(); // start transaction
         try {
@@ -36,6 +37,7 @@ class BenefitRepository implements BenefitInterface
                 $data['id'] = null;
             }
             $data['created_by'] = \UserData()->id;
+            
             $benefit = Benefit::updateOrCreate(['id' => $data['id']], $data);
             DB::commit();
             return $benefit;
@@ -50,7 +52,8 @@ class BenefitRepository implements BenefitInterface
 
     public function requestBenefit($data) {}
 
-    public function updateStatusBenefitRequest($data) {
+    public function updateStatusBenefitRequest($data)
+    {
         DB::beginTransaction(); // start transaction
         try {
             $benefitRequest = BenefitRequest::find($data['id']);
@@ -63,7 +66,6 @@ class BenefitRepository implements BenefitInterface
                 $benefitRequest->cancelled_at = now();
                 $benefitRequest->cancelled_by = \UserData()->id;
             }
-            dd($benefitRequest);
             $benefitRequest->save();
             DB::commit();
             return $benefitRequest;
@@ -72,7 +74,6 @@ class BenefitRepository implements BenefitInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
-       
     }
 
     public function getBenefitByType($type)
@@ -82,9 +83,16 @@ class BenefitRepository implements BenefitInterface
         return BenefitListResource::collection($benefit);
     }
 
-    public function createBenefitRequest($data) {
+    public function createBenefitRequest($request)
+    {
+        $data=$request->all();
         DB::beginTransaction(); // start transaction
         try {
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('public/staff_images');
+                $imageUrl = Storage::url($path);
+                $data['image'] = $imageUrl;
+            }
             $benefitRequest = BenefitRequest::create($data);
             DB::commit();
             return $benefitRequest;
@@ -94,8 +102,9 @@ class BenefitRepository implements BenefitInterface
             throw $e;
         }
     }
-    public function listBenefitRequest($data){
-        $benefitRequest=BenefitRequest::with(['benefit.menu'])->orderBy('id','desc')->get();
+    public function listBenefitRequest($data)
+    {
+        $benefitRequest = BenefitRequest::with(['benefit.menu'])->orderBy('id', 'desc')->get();
         return BenefitRequestResourceList::collection($benefitRequest);
     }
 }
