@@ -20,20 +20,25 @@ class AdvanceController extends Controller
 
     public function index(Request $request){
         $data = $this->advanceRepo->list($request->all());
-        \ResponseMessage($data);
+        \ResponseData($data);
     }
     public function create(AdvanceStoreRequest $request){
         $data=$this->advanceRepo->create($request->all());
-        \ResponseMessage($data);
+        \ResponseData($data);
     }
 
     public function getAdvancePaymentDetailByAdvance($advanceId){
         $data = $this->advanceRepo->getAdvancePaymentDetailByAdvance($advanceId);
-        \ResponseMessage($data);
+        \ResponseData($data);
     }
 
     public function createAdvancePayment(AdvancePaymentCreateRequest $request){
         $data = $this->advanceRepo->createAdvancePayment($request->all());
-        \ResponseMessage($data);
+        \ResponseData($data);
+    }
+
+    public function getStaffAdvanceHistory(Request $request){
+        $data = $this->advanceRepo->getStaffAdvanceHistory($request->all());
+        \ResponseData($data);
     }
 }

@@ -21,6 +21,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/off_days', 'createOffDay');
     Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
     Route::post('/public_holidays', 'createPublicHoliday');
+    Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
+    Route::get('off_day_settings','getOffDaySetting');
   });
   Route::prefix('hr')->controller(LeaveController::class)->group(function () {
     Route::get('/leave_categories', 'getLeaveCategoryLists');
@@ -54,7 +56,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/salary_setup/salary_allowances/{salaryAllowanceId}', 'deleteSalaryAllowance');
     Route::get('/salary-setup-by-role/{roleId}', 'getSalarySetupByRoleId');
     Route::get('/salaries', 'getSalaries');
-    Route::post('/salaries','createSalary');
+    Route::post('/salaries', 'createSalary');
     Route::post('/salaries/{id}', 'updateBasicSalary');
     Route::get('/overtime_fees', 'getOvertimeFee');
     Route::post('/overtime_fees', 'createOvertimeFee');
@@ -78,8 +80,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
+    Route::get('pay_slips/confirm/{id}','confirmPaySlip');
 
     Route::get('/export-salary', 'exportSalary');
+    //mobile
+    Route::get('/staff_pay_slips', 'getStaffPaySlip');
   });
   Route::prefix('hr')->controller(ResignationController::class)->group(function () {
     Route::get('/resignation_categories', 'getResignationCategoryLists');
@@ -160,6 +165,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/ready-to-sale-menu-item-import', 'readyToSaleMenuItemImport');
     Route::post('/raw-item-import', 'rawItemImport');
   });
+ 
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
   Route::post('/cvs', 'createCv');

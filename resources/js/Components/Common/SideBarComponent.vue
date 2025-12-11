@@ -438,6 +438,12 @@
                                     Complaints
                                 </a>
                             </li>
+                            <li>
+                                <a href="/advances" class="flex items-center @yield('advances') sidebar-gap-x">
+                                    <i class="fal fa-envelope-open-text"></i>
+                                    Advances
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content" id="tab-salary">
@@ -539,6 +545,12 @@
                                 <a href="/off_day" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-calendar-minus"></i>
                                     Off Day
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/off_day_setting" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-calendar-minus"></i>
+                                    Off Day Setting
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('leave-allowance')">

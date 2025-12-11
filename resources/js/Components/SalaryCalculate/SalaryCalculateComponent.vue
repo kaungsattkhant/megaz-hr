@@ -452,6 +452,7 @@ export default {
                     total_allowance: item.total_allowance,
                     overtime: item.overtime,
                     net_salary: item.net_salary,
+                    deduction: item.deduction,
                 })
             )
             this.test = pay_slip
