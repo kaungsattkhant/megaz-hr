@@ -81,6 +81,7 @@ use App\Http\Controllers\API\SaleTargetMenuAPIController;
 use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
+use App\Http\Controllers\API\BenefitController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
@@ -517,6 +518,15 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/gps', 'getGPS');
         Route::get('/gps/{id}', 'getGPSById');
         // Route::post('/gps/{id}', 'updateGPSById');
+    });
+    Route::prefix('benefits')->controller(BenefitController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'updateOrCreateBenefit');
+        Route::get('/{id}', 'detailBenefit');
+    });
+    Route::prefix('admin/benefit_requests')->controller(BenefitController::class)->group(function () {
+        Route::get('/', 'listBenefitRequest');
+        Route::post('/update_status', 'updateStatusBenefitRequest');
     });
 });
 
