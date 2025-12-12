@@ -57,8 +57,11 @@ class BenefitRepository implements BenefitInterface
         DB::beginTransaction(); // start transaction
         try {
             $benefitRequest = BenefitRequest::find($data['id']);
-            $benefitRequest->status = $data['status'];
-            if ($data['status'] == 'confirmed') {
+            if($benefitRequest->status=='confirmed' || $benefitRequest->status == 'cancelled'){
+                \ResponseMessage('Status updated fail!',419); //status already updated 
+            }
+                $benefitRequest->status = $data['status'];
+            if ($data['status'] == 'confirmed') { 
                 $benefitRequest->confirmed_at = now();
                 $benefitRequest->confirmed_by = \UserData()->id;
             }
@@ -105,6 +108,11 @@ class BenefitRepository implements BenefitInterface
     public function listBenefitRequest($data)
     {
         $benefitRequest = BenefitRequest::with(['benefit.menu'])->orderBy('id', 'desc')->get();
+        if (isset($data['page'])) {
+            $perPage = $data['perPage'] ?? config('common.list_count');
+
+            return paginateCollection(BenefitRequestResourceList::collection($benefitRequest), $perPage);
+        }
         return BenefitRequestResourceList::collection($benefitRequest);
     }
 }
