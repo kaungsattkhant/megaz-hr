@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('benefit_id');
             $table->unsignedInteger('staff_id');
             $table->string('image')->nullable();
+            $table->longText('detailg')->nullable();
             $table->enum('status', ['received','confirmed','cancelled']);
             $table->unsignedInteger('confirmed_by')->nullable();
             $table->dateTime('confirmed_at')->nullable();

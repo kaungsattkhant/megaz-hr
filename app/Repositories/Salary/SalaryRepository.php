@@ -1036,7 +1036,7 @@ class SalaryRepository implements SalaryRepositoryInterface
     ->get();
     $paySlipResource=PaySlipResource::collection($paySlips);
     return[
-      'salay'=>[
+      'salary'=>[
         'basic_salay'=>$salary->basic_salary ?? 0,
         'allowance_amount'=>  $salaryAllowance->total_allowances ?? 0,
       ],

@@ -53,7 +53,7 @@ class BenefitController extends Controller
     }
 
     public function createBenefitRequest(StaffBenefitRequestCreate $request){
-        $data = $this->benefitRepo->createBenefitRequest($request->all());
+        $data = $this->benefitRepo->createBenefitRequest($request);
         \ResponseData($data);
     }
 

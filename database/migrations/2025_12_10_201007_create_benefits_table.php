@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('type',['menu','cost']);
             $table->unsignedInteger('menu_id')->nullable();
             $table->double('cost')->default(0);
+            $table->unsignedInteger('created_by');
             $table->timestamps();
         });
     }
