@@ -80,8 +80,8 @@
                             <div class="contents" v-for="(salary, index) in salaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
-                                        <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        <!-- {{ index+1 }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ salary.staff.name }}
@@ -298,11 +298,15 @@ export default {
 
         async getSalaryList(pageNumber) {
             this.loading = true;
-            let url = this.url + this.url_search + this.url_department + this.url_role;
+            let url = this.url + '?page=' + pageNumber + this.url_search + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
                 this.salaryList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         async getDepartmentList(){
@@ -337,7 +341,7 @@ export default {
             formData.append('basic_salary', this.amount);
             let response = await postApiData({url:`/api/hr/salaries/${this.editId}`, form_data:formData, token:this.getToken()})
             if(response.success){
-                this.getSalaryList();
+                this.getSalaryList(1);
                 document.getElementById("close_edit_modal").click();
             }
         },
