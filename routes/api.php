@@ -520,11 +520,13 @@ Route::middleware('auth:api')->group(function () {
         // Route::post('/gps/{id}', 'updateGPSById');
     });
     Route::prefix('benefits')->controller(BenefitController::class)->group(function () {
-        Route::get('/','index');
+        Route::get('/', 'index');
         Route::post('/', 'updateOrCreateBenefit');
         Route::get('/{id}', 'detailBenefit');
-        Route::post('/request','requestBenefit');
-        Route::post('/benefit_requests/update_status', 'updateStatusBenefitRequest');
+    });
+    Route::prefix('admin/benefit_requests')->controller(BenefitController::class)->group(function () {
+        Route::get('/', 'listBenefitRequest');
+        Route::post('/update_status', 'updateStatusBenefitRequest');
     });
 });
 

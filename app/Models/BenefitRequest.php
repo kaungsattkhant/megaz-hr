@@ -13,4 +13,8 @@ class BenefitRequest extends Model
     public function benefit(){
         return $this->belongsTo(Benefit::class);
     }
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }
 }
