@@ -17,8 +17,8 @@ class BenefitListResource extends JsonResource
         return [
             'id'=>$this->id,
             'type'=>$this->type,
-            'name'=>$this->type=='menu' ? $this->menu->name : $this->name,
-            'cost'=>$this->type=='menu'  ? $this->menu->prices[0]->price : $this->cost
+            'name'=>$this->type=='menu' ? ($this->menu->name ?? null ): $this->name,
+            'cost'=>$this->type=='menu'  ? ($this->menu->prices[0]->price ?? 0) : $this->cost
         ];
     }
 }
