@@ -4,10 +4,12 @@ namespace App\Repositories\StaffTimeShift;
 
 use Carbon\Carbon;
 use App\Models\Staff;
+use App\Models\OffDay;
 use App\Models\StaffTimeshift;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
 use App\Http\Action\SendNotification\FcmSendNotification;
+use App\Models\DayInOffDay;
 
 class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 {
@@ -61,82 +63,29 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 
       // }
       if (!isset($data['staff_time_shifts'])) {
-         ResponseMessage('staff_time_shifts is required.', 400);
+        ResponseMessage('staff_time_shifts is required.', 400);
       }
 
-      $staff_time_shifts = json_decode($data['staff_time_shifts'], true);
-
-      if (json_last_error() !== JSON_ERROR_NONE) {
-         ResponseMessage('Invalid JSON data provided for staff_time_shifts.', 400);
+      $payloadData = json_decode($data['staff_time_shifts'], true);
+      if (!is_array($payloadData)) {
+        ResponseMessage('Invalid staff_time_shifts format.', 400);
       }
 
-      // Convert all date_time to Carbon for consistency
-      foreach ($staff_time_shifts as &$sts) {
-        $sts['date_time'] = Carbon::parse($sts['date_time'])->format('Y-m-d H:i:s');
+      $staff_time_shifts = array_values(array_filter($payloadData, function ($item) {
+        return isset($item['type']) && $item['type'] === 'shift';
+      }));
+
+      $offDays = array_values(array_filter($payloadData, function ($item) {
+        return isset($item['type']) && $item['type'] === 'off_day';
+      }));
+
+      //for off day 
+      if(!empty($offDays)){
+        $this->createOffDayofStaff($offDays);
       }
-      unset($sts);
-
-      // Extract combinations for duplicate detection
-      $checkTuples = collect($staff_time_shifts)->map(function ($row) {
-        return [
-          'date_time'     => $row['date_time'],
-          'staff_id'      => $row['staff_id'],
-          'timeshift_id'  => $row['timeshift_id'],
-        ];
-      });
-
-      // Query in ONE shot
-      $existing = StaffTimeshift::where(function ($q) use ($checkTuples) {
-        foreach ($checkTuples as $t) {
-          $q->orWhere(function ($x) use ($t) {
-            $x->where('date_time', $t['date_time'])
-              ->where('staff_id', $t['staff_id'])
-              ->where('timeshift_id', $t['timeshift_id']);
-          });
-        }
-      })->get();
-
-      // If duplicates exist → return error
-      if ($existing->count() > 0) {
-        $duplicate = $existing->first();
-        $staff = Staff::find($duplicate->staff_id);
-
-        return ResponseMessage(
-          "Shift already assigned for {$staff->name} at {$duplicate->date_time}.",
-          422
-        );
-      }
-
-      // Add created_by + status to all rows
-      $insertData = collect($staff_time_shifts)->map(function ($row) {
-        return [
-          'date_time'     => $row['date_time'],
-          'staff_id'      => $row['staff_id'],
-          'timeshift_id'  => $row['timeshift_id'],
-          'area_id'       => $row['area_id'] ?? null,
-          'status'        => 'pending',
-          'created_by'    => UserData()->id,
-          'created_at'    => now(),
-          'updated_at'    => now(),
-        ];
-      });
-
-      // Bulk Insert
-      StaffTimeshift::insert($insertData->toArray());
-
-      // Send notifications for each created shift
-      foreach ($insertData as $row) {
-        $shift = StaffTimeshift::where('date_time', $row['date_time'])
-          ->where('staff_id', $row['staff_id'])
-          ->where('timeshift_id', $row['timeshift_id'])
-          ->first();
-
-        $notiData = [
-          'title'     => 'Shift Assigned',
-          'date_time' => $row['date_time'],
-          'preview'   => "Shift {$shift->timeshift->shift->name} has been assigned to {$shift->staff->name} for {$row['date_time']}",
-        ];
-        $this->sendFcmNotification($shift, $shift->staff, $notiData);
+      //for staff assign
+      if (!empty($staff_time_shifts)) {
+        $this->assignStaffTimeShift($staff_time_shifts);
       }
       DB::commit();
       ResponseMessage('Shifts assigned successfully', 200);
@@ -145,6 +94,100 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+
+  public function createOffDayofStaff($offDayData)
+  {
+    $offDay=OffDay::create([
+      'repetition'=>'Custom',
+      'created_by'=>\UserData()->id
+    ]);
+    foreach($offDayData as $data){
+      $dayInOffDay=DayInOffDay::create([
+        'day'=>'custom',
+        'off_day_id'=>$offDay->id,
+        'date'=>$data['date_time'],
+        'staff_id'=>$data['staff_id'],
+      ]);
+    }
+    return $offDay;
+  }
+
+  public function assignStaffTimeShift($staff_time_shifts)
+  {
+    if (json_last_error() !== JSON_ERROR_NONE) {
+      ResponseMessage('Invalid JSON data provided for staff_time_shifts.', 400);
+    }
+
+    // Convert all date_time to Carbon for consistency
+    foreach ($staff_time_shifts as $sts) {
+      $sts['date_time'] = Carbon::parse($sts['date_time'])->format('Y-m-d');
+    }
+    unset($sts);
+
+    // Extract combinations for duplicate detection
+    $checkTuples = collect($staff_time_shifts)->map(function ($row) {
+      return [
+        'date_time'     => $row['date_time'],
+        'staff_id'      => $row['staff_id'],
+        'timeshift_id'  => $row['timeshift_id'],
+      ];
+    });
+
+    // Query in ONE shot
+    $existing = StaffTimeshift::where(function ($q) use ($checkTuples) {
+      foreach ($checkTuples as $t) {
+        $q->orWhere(function ($x) use ($t) {
+          $x->where('date_time', $t['date_time'])
+            ->where('staff_id', $t['staff_id'])
+            ->where('timeshift_id', $t['timeshift_id']);
+        });
+      }
+    })->get();
+
+    // If duplicates exist → return error
+    if ($existing->count() > 0) {
+      $duplicate = $existing->first();
+      $staff = Staff::find($duplicate->staff_id);
+
+      return ResponseMessage(
+        "Shift already assigned for {$staff->name} at {$duplicate->date_time}.",
+        422
+      );
+    }
+
+    // Add created_by + status to all rows
+    $insertData = collect($staff_time_shifts)->map(function ($row) {
+      return [
+        'date_time'     => $row['date_time'],
+        'staff_id'      => $row['staff_id'],
+        'timeshift_id'  => $row['timeshift_id'],
+        'area_id'       => $row['area_id'] ?? null,
+        'status'        => 'pending',
+        'created_by'    => UserData()->id,
+        'created_at'    => now(),
+        'updated_at'    => now(),
+      ];
+    });
+
+    // Bulk Insert
+    StaffTimeshift::insert($insertData->toArray());
+
+    // Send notifications for each created shift
+    foreach ($insertData as $row) {
+      $shift = StaffTimeshift::where('date_time', $row['date_time'])
+        ->where('staff_id', $row['staff_id'])
+        ->where('timeshift_id', $row['timeshift_id'])
+        ->first();
+
+      $notiData = [
+        'title'     => 'Shift Assigned',
+        'date_time' => $row['date_time'],
+        'preview'   => "Shift {$shift->timeshift->shift->name} has been assigned to {$shift->staff->name} for {$row['date_time']}",
+      ];
+      $this->sendFcmNotification($shift, $shift->staff, $notiData);
+    }
+    return true;
   }
 
   public function updateStaffTimeShiftStatus($id, $data)
