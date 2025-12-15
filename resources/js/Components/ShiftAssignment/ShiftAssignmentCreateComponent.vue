@@ -404,6 +404,7 @@ export default {
             this.selectedDates = [];
             this.selectedType = null;
             this.fpInstance.clear();
+            
         },
         removeItem(index){
             this.selectedAssignList.splice(index, 1);
