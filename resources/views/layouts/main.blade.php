@@ -7,7 +7,7 @@
         <div class="main-content" id="content_collapse">
             @include('layouts.navbar')
 
-            <main class="inner-container bg-[#f0f1f700] py-3">
+            <main class="inner-container py-3">
                 @yield('content')
             </main>
         </div>

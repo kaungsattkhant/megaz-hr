@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -67,6 +67,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
@@ -107,6 +112,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="itemList.length < 1 && !loading">
+                                <td class="" colspan="8">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -190,8 +200,12 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, putApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             itemList: [],
@@ -201,6 +215,8 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+
+            loading: true,
         };
     },
 
@@ -208,10 +224,11 @@ export default {
         ...mapGetters(['getToken']),
 
         async getItemList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/used_defected_items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.itemList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

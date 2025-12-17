@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-4 bg-white" v-show="!isShow">
+    <div class="margin-bg" v-show="!isShow">
         <div class="card-shadow">
             <div>
                 <p class="page-title">
@@ -23,7 +23,7 @@
                 </div>
             </div>
         </div>
-        <div class="box-container-table">
+        <div class="box-container-table mb-2">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
                 <div class="table-container">
@@ -42,6 +42,11 @@
                                 <th v-show="feature.includes('department.edit')"></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(department, index) in departmentList" :key="index">
                                 <tr class="">
@@ -100,6 +105,11 @@
 
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="departmentList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -182,10 +192,16 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="confirmCreateBtnClicked"
+                        <!-- <button type="button" @click="confirmCreateBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
-                        </button>
+                        </button> -->
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Create"
+                            loadingText="Creating..."
+                            @click="confirmCreateBtnClicked"
+                        />
                     </div>
                 </div>
             </div>
@@ -295,10 +311,16 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="confirmEditBtnClicked"
+                        <!-- <button type="button" @click="confirmEditBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
-                        </button>
+                        </button> -->
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Edit"
+                            loadingText="Editing..."
+                            @click="confirmEditBtnClicked"
+                        />
                     </div>
                 </div>
             </div>
@@ -316,10 +338,37 @@
                         Create Department
                     </p>
                     <div>
-                        <button type="button" class="add-btn focus:shadow-none focus:outline-none"
+                        <button type="button" class="add-btn focus:shadow-none focus:outline-none flex"
                             @click="btnClickedDone">
-                            Done
+                            <svg
+                                v-show="buttonLoading"
+                                class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                />
+                                <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                />
+                            </svg>
+                            <span>{{ buttonLoading ? 'Processing...' : 'done' }}</span>
                         </button>
+                        <!-- <LoadingButton
+                            :loading="buttonLoading"
+                            text="Done"
+                            loadingText="Done..."
+                            @click="btnClickedDone"
+                        /> -->
                     </div>
                 </div>
                 <div>
@@ -334,12 +383,20 @@
                             {{ module.module }}
                         </p>
                         <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                            <label v-show="module.features.length > 1" class="block items-center space-x-2 cursor-pointer" @click="toggleGroup(module)">
+                                <span class="text-black break-all capitalize block mb-2"> All </span>
+                                <input
+                                type="checkbox" :checked="isAllSelected(module)"
+                                class="form-checkbox !ml-0.5 h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                                />
+    
+                            </label>
                             <div v-for="feature in module.features" class="">
 
                                 <label class="block items-center space-x-2 cursor-pointer">
                                     <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
                                     <input type="checkbox" :value="feature.id" v-model="selectedFeatures"
-                                        class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer" />
+                                        class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer !ml-0.5"  />
 
                                 </label>
                             </div>
@@ -347,10 +404,41 @@
                     </div>
                 </div>
                 <div class="flex justify-end">
-                    <button type="button" class="add-btn focus:shadow-none focus:outline-none"
+                    <button type="button" class="add-btn focus:shadow-none focus:outline-none flex"
+                        @click="btnClickedDone">
+                        <svg
+                            v-show="buttonLoading"
+                            class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                            />
+                            <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
+                        </svg>
+                        <span>{{ buttonLoading ? 'Processing...' : 'done' }}</span>
+                    </button>
+                    <!-- <button type="button" class="add-btn focus:shadow-none focus:outline-none"
                         @click="btnClickedDone">
                         Done
                     </button>
+                    <LoadingButton
+                            :loading="buttonLoading"
+                            text="Done"
+                            loadingText="Done..."
+                            @click="btnClickedDone"
+                        /> -->
                 </div>
             </div>
         </div>
@@ -363,10 +451,14 @@
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
+    import TableSkeleton from "../Common/TableSkeleton.vue";
+    import LoadingButton from "../Common/LoadingButton.vue";
 
     export default {
         components: {
-            Multiselect
+            Multiselect,
+            TableSkeleton,
+            LoadingButton
         },
         data() {
             return {
@@ -393,6 +485,8 @@
                 feature: this.getFeature(),
 
                 isShow:false,
+                loading: true,
+                buttonLoading: false,
             };
         },
 
@@ -400,13 +494,17 @@
             ...mapGetters(['getToken', 'getFeature']),
 
             async getDepartmentList(pageNumber){
+                this.loading = true;
+                console.log('loading');
                 const response = await getApiData({ url: '/api/departments?page=${pageNumber}', token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.departmentList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;
                     this.perPage = response.data.per_page;
                     this.totalData = response.data.total;
+                    console.log('loading done');
                 }
             },
 
@@ -492,6 +590,8 @@
                 //         featureIds.push(selectedFeature.id);
                 //     });
                 // }
+
+                this.buttonLoading = true;
                 let formData = new FormData();
                 // formData.append('name', this.editName);
                 formData.append('name', this.name);
@@ -502,6 +602,7 @@
                 let url = `/api/departments/${this.editId}`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
+                    this.buttonLoading = false;
                     this.getDepartmentList(1);
                     this.name = null;
                     this.editId = null;
@@ -536,6 +637,7 @@
 
             async createDepartment()
             {
+                this.buttonLoading = true;
                 let featureIds = [];
                 this.selectedFeatures.forEach((selectedFeature)=>{
                     featureIds.push(selectedFeature.id);
@@ -546,6 +648,7 @@
 
                 let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
+                    this.buttonLoading = false;
                     this.getDepartmentList(1);
                     this.selectedFeatures = [];
                     this.btnClickedChangeFeature();
@@ -588,6 +691,36 @@
             collapseRow(rowIndex) {
                 this.expandedRows = this.expandedRows.filter((index) => index !== rowIndex);
             },
+            toggleGroup(items) {
+                const allSelectedd = items.features.every(i => this.selectedFeatures.includes(i.id));
+                console.log('All fruit items selected?', allSelectedd); // true
+
+                items.features.forEach(item => {
+                    // const allSelected = items.features.every(i => this.selectedFeatures.includes(i.id));
+                    // console.log(`All items in  selected?`, allSelected);
+                    // const exists = this.selectedFeatures.some(i => i === item.id);
+
+
+                    if(allSelectedd){
+                        this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                    }
+                    else{
+                        this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                        this.selectedFeatures.push(item.id);
+                    }
+                    
+                });
+                
+            },
+            handleEscape(event) {
+                if (event.key === "Escape") {
+                    this.isShow = false
+                }
+            },
+            isAllSelected(module) {
+                const featureIds = module.features.map(f => f.id)
+                return featureIds.every(id => this.selectedFeatures.includes(id))
+            },
             // seeMore(event){
             //     console.log("hello")
             //     const button = $(event.target);
@@ -613,6 +746,8 @@
             this.getDepartmentList(1);
             this.getFeatureList();
             initTE({ Modal,Select, Ripple });
+            window.addEventListener("keydown", this.handleEscape);
+
         }
     }
 </script>

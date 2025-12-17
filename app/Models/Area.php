@@ -20,6 +20,7 @@ class Area extends BaseModel
         'area_category_id',
         'department_id',
         'is_pos',
+        'type',
     ];
 
 
@@ -65,7 +66,7 @@ class Area extends BaseModel
 
     public function menuCategories()
     {
-        return $this->belongsToMany(MenuCategory::class, 'menu_category_areas', 'selling_area_id', 'menu_category_id');
+        return $this->belongsToMany(MenuCategory::class, 'menu_category_areas', 'selling_area_id', 'menu_category_id')->withPivot('id');
     }
 
     public function staffTimeshifts()

@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -47,8 +47,8 @@
                         </select>
                     </div>
                     <a href="/OKR/create" v-if="feature.includes('okr.create')"
-                        class="add-btn  h-8 whitespace-nowrap">
-                        Add New
+                        class="add-btn  h-8 whitespace-nowrap text-center">
+                        Add
                     </a>
                 </div>
             </div>
@@ -77,6 +77,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(okr, index) in okrList" :key="index">
@@ -106,6 +111,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="okrList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -185,8 +195,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             okrList: [],
@@ -217,6 +231,7 @@ export default {
 
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -243,6 +258,7 @@ export default {
         },
 
         async getPrimaryList(pageNumber) {
+            this.loading = true;
             let url = null;
             if(pageNumber){
                 url = this.url + '?page=' + pageNumber;
@@ -264,6 +280,7 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if(response.data.data){
                     this.okrList = response.data.data;
                     this.lastPage = response.data.last_page;

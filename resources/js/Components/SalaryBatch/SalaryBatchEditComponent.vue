@@ -1,13 +1,11 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Create Salary Batch
-            </p>
-        </div>
-
-
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Edit Salary Batch
+                </p>
+            </div>
             <div class="mb-8 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Batch Name
@@ -121,9 +119,15 @@
         </div>
 
         <div>
-            <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
+            <!-- <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
                 Edit Salary Batch
-            </button>
+            </button> -->
+            <LoadingButton
+                :loading="buttonLoading"
+                text="Edit Salary Batch"
+                loadingText="Editing..."
+                @click="btnClickedCreateSalaryBatch()"
+            />
         </div>
     </div>
 </template>
@@ -134,10 +138,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     props: ["salaryBatchId"],
     data() {
@@ -155,6 +161,7 @@ export default {
             salaryBatchList: [],
 
             detail:null,
+            buttonLoading: false,
         };
     },
 
@@ -287,6 +294,7 @@ export default {
                 
             });
             console.log(staff_ids)
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name',this.batch_name);
             formData.append('day_of_monthly',this.date);
@@ -295,6 +303,16 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/salary_batch`);
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
+            }
+            else {
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 

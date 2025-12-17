@@ -379,9 +379,15 @@
 
 
         <div>
-            <button class="add-btn" @click="btnClickedCreateItem()">
+            <!-- <button class="add-btn" @click="btnClickedCreateItem()">
                 Create Item
-            </button>
+            </button> -->
+            <LoadingButton
+                :loading="buttonLoading"
+                text="Create item" 
+                loadingText="Creating..."
+                @click="btnClickedCreateItem"
+            />
         </div>
 
 
@@ -634,6 +640,7 @@
                         <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createUomBtnClicked">
                             Create
                         </button>
+                        
                     </div>
                 </div>
             </div>
@@ -654,12 +661,14 @@ import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
 import SupplierCreateComponent from '../Supplier/SupplierCreateComponent.vue'
+import LoadingButton from "../Common/LoadingButton.vue";
 
 
 export default {
     components: {
         Multiselect,
-        SupplierCreateComponent
+        SupplierCreateComponent,
+        LoadingButton,
     },
     data() {
         return {
@@ -710,6 +719,7 @@ export default {
             selectedItemPriceList: [],
 
             isSupplier: false,
+            buttonLoading: false,
         };
     },
 
@@ -1178,6 +1188,7 @@ export default {
             // if (this.isLengthValid(this.selectedItemPriceList,'Price List')) return;
 
 
+            this.buttonLoading = true;
             let url = `/api/items`;
             let formData = new FormData();
             formData.append('name', this.name);
@@ -1210,8 +1221,12 @@ export default {
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace("/items");
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                     title: `Error Message`,
                     text: response.message.code,

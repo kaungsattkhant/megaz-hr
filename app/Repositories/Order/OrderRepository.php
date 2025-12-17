@@ -121,7 +121,7 @@ class OrderRepository implements OrderRepositoryInterface
                     // $entity = $latestRoomSession->entitySession->entity;
                     // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                     if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
-                        // $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')
+                        // $packs = Pack::where(column: 'menu_id', $orderItem->menu_id)->where('status', 'ready')
                         //     ->where('expired_at', '>', CurrentTime())
                         //     ->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                         // if (count($packs) < $orderItem->quantity) {
@@ -140,8 +140,8 @@ class OrderRepository implements OrderRepositoryInterface
                     elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                         $orderItem->progressed_at = now();
                         $orderItem->progressed_by = UserData()->id;
+                        $this->orderService->actionPackMenu($orderItem->menu_id,$orderItem->quantity,$orderItem->inventory_id);
                         $sellingExtraIds=$orderItem->extras->pluck('selling_extra_id')->toArray();
-                        // $sellingExtraIds=[];
                         $this->orderService->actionInventoryItem($orderItem, 'order_item', 'out',$sellingExtraIds);
                     } elseif ($data['status'] == 'cancelled') {
                         $orderItem->cancelled_at = now();
@@ -174,7 +174,7 @@ class OrderRepository implements OrderRepositoryInterface
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
-                    ->where('type', 'ready_to_sale');
+                    ->where('type','!=','ready_to_sale');
             })
             ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
@@ -190,7 +190,7 @@ class OrderRepository implements OrderRepositoryInterface
             ")
                 ->where('inventory_ledgers.inventory_id', $inventoryId)
                 ->first();
-            dd($itemInventory);
+            // dd($itemInventory);
             // $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($orderItem, $morphMapName, $action);
         }
 

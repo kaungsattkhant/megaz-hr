@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class="page-title mb-4">
@@ -23,7 +23,17 @@
                                 <th></th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="3"
+                        />
+                        <tr class=" !text-center" v-else-if="brandsList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(brand, index) in brandsList" :key="index">
                                 <tr class="">
@@ -198,10 +208,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { convertToFriendlyDateTime } from "../../utilities/datetime-helpers";
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     props: ["supplierId","itemId"],
     data() {
@@ -215,6 +227,8 @@ export default {
             supplierItemId: null,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -230,12 +244,14 @@ export default {
         },
 
         async getSupplierBrands(pageNumber){
+            this.loading = true;
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
             let url = `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.supplierId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.success){
+                this.loading = false;
                 this.brandsList = response.data;
             }
         },

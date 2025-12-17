@@ -5,12 +5,15 @@ use App\Http\Controllers\API\CvController;
 use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
+use App\Http\Controllers\API\BenefitController;
 use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\MenuItemImportController;
 use App\Http\Controllers\API\StaffTimeShiftController;
+use App\Http\Controllers\API\StaffEquipmentHandoverController;
 use App\Http\Controllers\API\AssetItemEquipmentAssignController;
 
 Route::middleware('auth:api')->group(function () {
@@ -19,6 +22,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/off_days', 'createOffDay');
     Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
     Route::post('/public_holidays', 'createPublicHoliday');
+    Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
+    Route::get('off_day_settings','getOffDaySetting');
   });
   Route::prefix('hr')->controller(LeaveController::class)->group(function () {
     Route::get('/leave_categories', 'getLeaveCategoryLists');
@@ -52,7 +57,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/salary_setup/salary_allowances/{salaryAllowanceId}', 'deleteSalaryAllowance');
     Route::get('/salary-setup-by-role/{roleId}', 'getSalarySetupByRoleId');
     Route::get('/salaries', 'getSalaries');
-    Route::post('/salaries','createSalary');
+    Route::post('/salaries', 'createSalary');
     Route::post('/salaries/{id}', 'updateBasicSalary');
     Route::get('/overtime_fees', 'getOvertimeFee');
     Route::post('/overtime_fees', 'createOvertimeFee');
@@ -76,8 +81,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
+    Route::get('pay_slips/confirm/{id}','confirmPaySlip');
 
     Route::get('/export-salary', 'exportSalary');
+    //mobile
+    Route::get('/staff_pay_slips', 'getStaffPaySlip');
   });
   Route::prefix('hr')->controller(ResignationController::class)->group(function () {
     Route::get('/resignation_categories', 'getResignationCategoryLists');
@@ -144,6 +152,27 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/hand-books/{id}', 'deleteHandBook');
     Route::get('/handbooks', 'getHandBooks');
   });
+
+  Route::controller(StaffEquipmentHandoverController::class)->group(function () {
+    Route::post('/staff-equipment-handovers', 'createStaffEquipmentHandover');
+    Route::post('/staff-equipment-handovers/{id}/confirm', 'confirmHandover');
+    Route::post('/staff-equipment-handovers/{id}/cancel', 'cancelHandover');
+    Route::get('/staff-timeshifts/{staffId}', 'getStaffTimeshift');
+    Route::get('/handover-staffs', 'getHandoverStaffs');
+    Route::get('/staff-equipment-handovers/{id}', 'getStaffEquipmentHandoverById');
+    Route::get('/lost-items', 'getLostItems'); //admin panel
+  });
+  Route::controller(MenuItemImportController::class)->group(function () {
+    Route::post('/ready-to-sale-menu-item-import', 'readyToSaleMenuItemImport');
+    Route::post('/raw-item-import', 'rawItemImport');
+  });
+
+  Route::prefix('benefit_requests')->controller(BenefitController::class)->group(function () {
+    Route::post('/', 'createBenefitRequest');
+    Route::get('/', 'listBenefitRequest');
+    Route::get('/benefit_by_type/{type}', 'getBenefitByType');
+  });
+ 
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
   Route::post('/cvs', 'createCv');

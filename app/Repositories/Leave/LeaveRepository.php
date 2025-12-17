@@ -4,17 +4,21 @@ namespace App\Repositories\Leave;
 
 use App\Models\Leave;
 use App\Models\Staff;
+use App\Models\ExitPass;
 use App\Models\ExitCategory;
 use App\Models\LeaveCategory;
 use App\Models\LeaveAllowance;
+use App\Services\LeaveService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Events\SendDepartmentNotification;
 use App\Events\LeaveUpdateNotificationRequest;
-use App\Models\ExitPass;
-use App\Services\LeaveService;
+use App\Http\Action\SendNotification\SendNotification;
 
 class LeaveRepository implements LeaveRepositoryInterface
 {
+  use SendNotification;
+
   private LeaveService $leaveService;
   public function __construct(LeaveService $leaveService)
   {
@@ -215,9 +219,8 @@ class LeaveRepository implements LeaveRepositoryInterface
         'is_unpaid_leave' => $data['is_unpaid_leave'] ?? null,
       ]);
       if ($wasConfirmed || $wasCancelled) {
-        broadcast(new LeaveUpdateNotificationRequest($leave, $leave->staff_id));
+        $this->LeaveUpdateNotificationRequest($leave, $leave->staff_id);
       }
-
       DB::commit();
       ResponseData($leave);
     } catch (\Exception $e) {
@@ -520,9 +523,6 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->with(['exitCategory'])
       ->orderByDesc('id')
       ->paginate(config('common.list_count'));
-    if ($exitPasses->isEmpty()) {
-      ResponseMessage('ExitPasses not found.', 404);
-    }
     ResponseData($exitPasses);
   }
   public function getStaffListByRoleAndDepartment($roleId, $departmentId)
@@ -534,6 +534,7 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->with(['department', 'roles'])
       ->orderByDesc('id')
       ->where('is_cv', 0)
+      ->where('is_active', 1)
       ->paginate(config('common.list_count'));
     ResponseData($staffs);
   }

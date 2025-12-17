@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\Type;
 use App\Models\Staff;
 use App\Models\OrgNew;
+use App\Models\CheckIn;
 use App\Models\Meeting;
 use App\Models\Warning;
 use App\Models\Training;
@@ -18,13 +19,16 @@ use App\Models\NotificationUser;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\MeetingResource;
 use Illuminate\Support\Facades\Request;
+use App\Http\Resources\mobileCheckInResource;
 use App\Http\Resources\StaffTimeShiftResource;
 use App\Http\Resources\NotificationUserResource;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
-  use SendNotification;
+  use SendNotification, FcmSendNotification;
 
   public function getStaffByDepartmentRole($depId, $roleId)
   {
@@ -45,6 +49,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $meeting = Meeting::create($data);
 
       if (isset($data['meeting_type'])) {
+        // $this->sendFcmNotification($staffTimeshift, $staffTimeshift->staff, $notiData);
+
         $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
       }
 
@@ -52,7 +58,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData($meeting, 201, true, "Meeting created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false,  $e->getMessage());
+      return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
 
@@ -103,7 +109,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     DB::beginTransaction();
 
     try {
-      $users = collect();
       $data = $request->all();
       $meeting = Meeting::find($meetingId);
 
@@ -115,7 +120,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
       if (isset($data['previous_meeting_type']) && isset($data['meeting_type'])) {
         if ($data['previous_meeting_type'] === $data['meeting_type']) { //for checking the same dep_type update or not 
-
+          $allUsers = collect();
           if ($data['meeting_type'] === "dep_type" && isset($data['department'])) {
 
             if (isset($data['deleted_department_ids'])) {
@@ -138,7 +143,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $meeting->id,
+                'participantable_id' => $meeting->id,
                 'participantable_type' => 'meeting',
                 'department_id' => $dep
               ];
@@ -148,13 +153,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
 
               $staffIds = Staff::where('department_id', $dep)->pluck('id');
-              $users = Staff::whereIn('id', $staffIds)->get();
-
-              $notificationData = [
-                'title' => 'Department Update for Meeting',
-                'body' => 'A participant’s department has been updated for the meeting. Please check the details.',
-              ];
-              $this->sendParticipantNoti($meeting, $users, $notificationData, 'dep_type');
+              $departmentStaff = Staff::whereIn('id', $staffIds)->get();
+              $allUsers = $allUsers->merge($departmentStaff);
+              // $staffIds = Staff::where('department_id', $dep)->pluck('id');
+              // $users = Staff::whereIn('id', $staffIds)->get();
+              // $notificationData = [
+              //   'title' => 'Department Update for Meeting',
+              //   'body' => 'A participant’s department has been updated for the meeting. Please check the details.',
+              // ];
+              // $this->sendParticipantNoti($meeting, $users, $notificationData, 'dep_type');
             }
           }
           if ($data['meeting_type'] === "role_type" && isset($data['role'])) {
@@ -177,7 +184,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $meeting->id,
+                'participantable_id' => $meeting->id,
                 'participantable_type' => 'meeting',
                 'role_id' => $role
               ];
@@ -189,13 +196,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
                 $query->where('id', $role);
               })->get();
-              $users = $users->merge($roleStaff);
-
-              $notificationData = [
-                'title' => 'Role Update for Meeting',
-                'body' => 'A participant’s role has been updated for the meeting. Please check the details.',
-              ];
-              $this->sendParticipantNoti($meeting, $users, $notificationData, 'role_type');
+              $allUsers = $allUsers->merge($roleStaff);
             }
           }
           if ($data['meeting_type'] === "staff_type" && isset($data['staff'])) {
@@ -216,7 +217,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $meeting->id,
+                'participantable_id' => $meeting->id,
                 'participantable_type' => 'meeting',
                 'staff_id' => $staff
               ];
@@ -226,27 +227,21 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
               $staffMember = Staff::find($staff);
               if ($staffMember) {
-                $users->push($staffMember);
+                $allUsers->push($staffMember);
               }
-
-              $notificationData = [
-                'title' => 'Staff Update for Meeting',
-                'body' => 'A participant’s department has been updated for the meeting. Please check the details.',
-              ];
-              $this->sendParticipantNoti($meeting, $users, $notificationData, 'staff_type');
             }
+          }
+          if ($allUsers->isNotEmpty()) {
+            $notificationData = [
+              'title' => 'Meeting Update',
+              'preview' => 'A meeting has been updated. Please check the details.',
+            ];
+            $this->sendFcmNotification($meeting, $allUsers, $notificationData);
+            // $this->sendParticipantNoti($meeting, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($meeting, 'meeting');
-          // $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
-
-          // $existingNotification =    $meeting->notification()->where('notificationable_id',    $meeting->id)
-          //   ->where('notificationable_type',  'meeting')
-          //   ->first();
-          // $existingNotification->notificationUsers()->delete();
-          // $existingNotification->delete();
           if (isset($data['meeting_type'])) {
-
             $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
           }
         }
@@ -296,7 +291,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData($training, 201, true, "Training created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false,  $e->getMessage());
+      return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
 
@@ -351,7 +346,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     DB::beginTransaction();
 
     try {
-      $users = collect();
 
       $training = Training::find($trainingId);
       if (!$training) {
@@ -364,7 +358,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $training->update($data);
       if (isset($data['previous_training_type']) && isset($data['training_type'])) {
         if ($data['previous_training_type'] === $data['training_type']) { //for checking the same dep_type update or not 
-
+          $allUsers = collect();
           if ($data['training_type'] === "dep_type" && isset($data['department'])) {
 
             if (isset($data['deleted_department_ids'])) {
@@ -387,7 +381,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $training->id,
+                'participantable_id' => $training->id,
                 'participantable_type' => 'training',
                 'department_id' => $dep
               ];
@@ -397,13 +391,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
 
               $staffIds = Staff::where('department_id', $dep)->pluck('id');
-              $users = Staff::whereIn('id', $staffIds)->get();
-
-              $notificationData = [
-                'title' => 'Department Update for Training',
-                'body' => 'A participant’s department has been updated for the training. Please check the details.',
-              ];
-              $this->sendParticipantNoti($training, $users, $notificationData, 'dep_type');
+              $departmentStaff = Staff::whereIn('id', $staffIds)->get();
+              $allUsers = $allUsers->merge($departmentStaff);
+              // $notificationData = [
+              //   'title' => 'Department Update for Training',
+              //   'body' => 'A participant’s department has been updated for the training. Please check the details.',
+              // ];
+              // $this->sendParticipantNoti($training, $users, $notificationData, 'dep_type');
             }
           }
           if ($data['training_type'] === "role_type" && isset($data['role'])) {
@@ -426,7 +420,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $training->id,
+                'participantable_id' => $training->id,
                 'participantable_type' => 'training',
                 'role_id' => $role
               ];
@@ -438,13 +432,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
                 $query->where('id', $role);
               })->get();
-              $users = $users->merge($roleStaff);
+              $allUsers = $allUsers->merge($roleStaff);
 
-              $notificationData = [
-                'title' => 'Role Update for training',
-                'body' => 'A participant’s role has been updated for the training. Please check the details.',
-              ];
-              $this->sendParticipantNoti($training, $users, $notificationData, 'role_type');
+              // $notificationData = [
+              //   'title' => 'Role Update for training',
+              //   'body' => 'A participant’s role has been updated for the training. Please check the details.',
+              // ];
+              // $this->sendParticipantNoti($training, $users, $notificationData, 'role_type');
             }
           }
           if ($data['training_type'] === "staff_type" && isset($data['staff'])) {
@@ -465,7 +459,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $training->id,
+                'participantable_id' => $training->id,
                 'participantable_type' => 'training',
                 'staff_id' => $staff
               ];
@@ -475,25 +469,25 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
               $staffMember = Staff::find($staff);
               if ($staffMember) {
-                $users->push($staffMember);
+                $allUsers->push($staffMember);
               }
 
-              $notificationData = [
-                'title' => 'Staff Update for training',
-                'body' => 'A participant’s department has been updated for the training. Please check the details.',
-              ];
-              $this->sendParticipantNoti($training, $users, $notificationData, 'staff_type');
+              // $notificationData = [
+              //   'title' => 'Staff Update for training',
+              //   'body' => 'A participant’s department has been updated for the training. Please check the details.',
+              // ];
+              // $this->sendParticipantNoti($training, $users, $notificationData, 'staff_type');
             }
           }
+          if ($allUsers->isNotEmpty()) {
+            $notificationData = [
+              'title' => 'Training Update',
+              'preview' => 'A training has been updated. Please check the details.',
+            ];
+            $this->sendFcmNotification($training, $allUsers, $notificationData);
+            // $this->sendParticipantNoti($training, $allUsers, $notificationData);
+          }
         } else {
-
-          // $training->participants()->where('participantable_type', 'training')->where('participantable_id', $training->id)->delete();
-
-          // $existingNotification =    $training->notification()->where('notificationable_id',    $training->id)
-          //   ->where('notificationable_type',  'training')
-          //   ->first();
-          // $existingNotification->notificationUsers()->delete();
-          // $existingNotification->delete();
           $this->deleteParticipantsAndNotifications($training, 'training');
           if (isset($data['training_type'])) {
 
@@ -573,7 +567,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role.department',
       'participants.role.staffs',
     ])->orderBy('id', 'desc')->get();
-    return  $orgNew;
+    return $orgNew;
   }
   public function getOrgNewsById($orgNewsId)
   {
@@ -615,11 +609,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
-  public function  updateOrgNews($orgNewsId, $data)
+  public function updateOrgNews($orgNewsId, $data)
   {
     DB::beginTransaction();
     try {
-      $users = collect();
+      $allUsers = collect();
       $orgNew = OrgNew::find($orgNewsId);
       if (!$orgNew) {
         return ResponseData(null, 404, false, 'orgNew not found.');
@@ -652,7 +646,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $orgNew->id,
+                'participantable_id' => $orgNew->id,
                 'participantable_type' => 'orgNew',
                 'department_id' => $dep
               ];
@@ -662,13 +656,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
 
               $staffIds = Staff::where('department_id', $dep)->pluck('id');
-              $users = Staff::whereIn('id', $staffIds)->get();
+              $departmentStaff = Staff::whereIn('id', $staffIds)->get();
+              $allUsers = $allUsers->merge($departmentStaff);
 
-              $notificationData = [
-                'title' => 'Department Update for orgNew',
-                'body' => 'A participant’s department has been updated for the orgNew. Please check the details.',
-              ];
-              $this->sendParticipantNoti($orgNew, $users, $notificationData, 'dep_type');
+              // $notificationData = [
+              //   'title' => 'Department Update for orgNew',
+              //   'body' => 'A participant’s department has been updated for the orgNew. Please check the details.',
+              // ];
+              // $this->sendParticipantNoti($orgNew, $users, $notificationData, 'dep_type');
             }
           }
           if ($data['org_news_type'] === "role_type" && isset($data['role'])) {
@@ -692,7 +687,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $orgNew->id,
+                'participantable_id' => $orgNew->id,
                 'participantable_type' => 'orgNew',
                 'role_id' => $role
               ];
@@ -704,13 +699,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
                 $query->where('id', $role);
               })->get();
-              $users = $users->merge($roleStaff);
-
-              $notificationData = [
-                'title' => 'Role Update for orgNew',
-                'body' => 'A participant’s role has been updated for the orgNew. Please check the details.',
-              ];
-              $this->sendParticipantNoti($orgNew, $users, $notificationData, 'role_type');
+              $allUsers = $allUsers->merge($roleStaff);
             }
           }
           if ($data['org_news_type'] === "staff_type" && isset($data['staff'])) {
@@ -731,7 +720,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $orgNew->id,
+                'participantable_id' => $orgNew->id,
                 'participantable_type' => 'orgNew',
                 'staff_id' => $staff
               ];
@@ -741,15 +730,17 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
               $staffMember = Staff::find($staff);
               if ($staffMember) {
-                $users->push($staffMember);
+                $allUsers->push($staffMember);
               }
-
-              $notificationData = [
-                'title' => 'Staff Update for orgNews',
-                'body' => 'A participant’s department has been updated for the orgNews. Please check the details.',
-              ];
-              $this->sendParticipantNoti($orgNew, $users, $notificationData, 'staff_type');
             }
+          }
+          if ($allUsers->isNotEmpty()) {
+            $notificationData = [
+              'title' => 'orgNew Update',
+              'preview' => 'A orgNew has been updated. Please check the details.Please check the details.',
+            ];
+            $this->sendFcmNotification($orgNew, $allUsers, $notificationData);
+            // $this->sendParticipantNoti($orgNew, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($orgNew, 'orgNew');
@@ -814,7 +805,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $query->whereBetween('date_time', [$fromDate, $toDate]);
     }
 
-    $warning =  $query->get();
+    $warning = $query->get();
 
     return ResponseData($warning, 200, true, 'Warning retrieved successfully.');
   }
@@ -866,7 +857,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     DB::beginTransaction();
 
     try {
-      $users = collect();
+      $allUsers = collect();
       $warning = Warning::find($warningId);
       if (!$warning) {
         return ResponseData(null, 404, false, 'Warning not found.');
@@ -875,7 +866,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $warning->update($data);
 
       if (isset($data['previous_warning_type']) && isset($data['warning_type'])) {
-        if ($data['previous_warning_type'] ===  $data['warning_type']) {
+        if ($data['previous_warning_type'] === $data['warning_type']) {
 
           if ($data['warning_type'] === "dep_type" && isset($data['department'])) {
 
@@ -898,7 +889,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['department'] as $dep) {
               $participantData = [
-                'participantable_id' =>   $warning->id,
+                'participantable_id' => $warning->id,
                 'participantable_type' => 'warning',
                 'department_id' => $dep
               ];
@@ -909,12 +900,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
               $staffIds = Staff::where('department_id', $dep)->pluck('id');
               $users = Staff::whereIn('id', $staffIds)->get();
-
-              $notificationData = [
-                'title' => 'Department Update for warning',
-                'body' => 'A participant’s department has been updated for the warning. Please check the details.',
-              ];
-              $this->sendParticipantNoti($warning, $users, $notificationData, 'dep_type');
+              $allUsers = $allUsers->merge($users);
             }
           }
           if ($data['warning_type'] === "role_type" && isset($data['role'])) {
@@ -937,7 +923,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['role'] as $role) {
               $participantData = [
-                'participantable_id' =>   $warning->id,
+                'participantable_id' => $warning->id,
                 'participantable_type' => 'warning',
                 'role_id' => $role
               ];
@@ -949,13 +935,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
                 $query->where('id', $role);
               })->get();
-              $users = $users->merge($roleStaff);
-
-              $notificationData = [
-                'title' => 'Role Update for warning',
-                'body' => 'A participant’s role has been updated for the warning. Please check the details.',
-              ];
-              $this->sendParticipantNoti($warning, $users, $notificationData, 'role_type');
+              $allUsers = $allUsers->merge($roleStaff);
             }
           }
           if ($data['warning_type'] === "staff_type" && isset($data['staff'])) {
@@ -976,7 +956,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
             }
             foreach ($data['staff'] as $staff) {
               $participantData = [
-                'participantable_id' =>   $warning->id,
+                'participantable_id' => $warning->id,
                 'participantable_type' => 'warning',
                 'staff_id' => $staff
               ];
@@ -986,15 +966,17 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
               );
               $staffMember = Staff::find($staff);
               if ($staffMember) {
-                $users->push($staffMember);
+                $allUsers->push($staffMember);
               }
-
-              $notificationData = [
-                'title' => 'Staff Update for warning',
-                'body' => 'A participant’s department has been updated for the warning. Please check the details.',
-              ];
-              $this->sendParticipantNoti($warning, $users, $notificationData, 'staff_type');
             }
+          }
+          if ($allUsers->isNotEmpty()) {
+            $notificationData = [
+              'title' => 'Warning Update',
+              'preview' => 'A warning has been updated. Please check the details.',
+            ];
+            $this->sendFcmNotification($warning, $users, $notificationData);
+            // $this->sendParticipantNoti($warning, $allUsers, $notificationData);
           }
         } else {
           $this->deleteParticipantsAndNotifications($warning, 'warning');
@@ -1003,15 +985,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           }
         }
       }
-
-      // $warning->participants()->where('participantable_type', 'warning')->where('participantable_id', $warning->id)->delete();
-
-      // $existingNotification = $warning->notification()->where('notificationable_id',  $warning->id)
-      //   ->where('notificationable_type',  'warning')
-      //   ->first();
-      // $existingNotification->notificationUsers()->delete();
-      // $existingNotification->delete();
-
       DB::commit();
       return ResponseData($warning, 200, true, 'Warning updated successfully.');
     } catch (\Exception $e) {
@@ -1028,8 +1001,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       if (!$warning) {
         return ResponseData(null, 404, false, 'Warning not found.');
       }
-      $existingNotification = $warning->notification()->where('notificationable_id',  $warning->id)
-        ->where('notificationable_type',  'warning')
+      $existingNotification = $warning->notification()->where('notificationable_id', $warning->id)
+        ->where('notificationable_type', 'warning')
         ->first();
       $existingNotification->notificationUsers()->delete();
       $existingNotification->delete();
@@ -1116,10 +1089,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     if ($users->isNotEmpty()) {
       $notificationData = [
         'title' => $typeName,
-        'body' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
+        'preview' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
+      $this->sendFcmNotification($object, $users, $notificationData);
 
-      $this->sendParticipantNoti($object, $users, $notificationData, $type);
+      // $this->sendParticipantNoti($object, $users, $notificationData);
     }
   }
 
@@ -1130,85 +1104,89 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getallNoties($request, $staffId)
   {
-
-    // $type = $request->query('type');
-    // $notifications = NotificationUser::with([
-    //   'notification.notificationable',
-    //   'notification.notificationable.participants',
-    //   'notification.notificationable.participants.department.roles',
-    //   'notification.notificationable.participants.role.department',
-    //   'notification.notificationable.participants.staff.department',
-    //   'notification.notificationable.participants.staff.roles',
-    // ])
-    //   ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
-    //   ->where('notification_users.staff_id', '=', $staffId)
-    //   ->when($type, function ($query) use ($type) {
-    //     return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew'])
-    //       ->where('notifications.notificationable_type', $type);
-    //   }, function ($query) {
-    //     return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew']);
-    //   })->orderBy('notifications.created_at', 'desc')
-    //   ->get();
-    // foreach ($notifications as $notification) {
-    //   $notificationable = $notification->notification->notificationable;
-    //   if ($notificationable) {
-    //     switch ($notification->notification->notificationable_type) {
-    //       case 'meeting':
-    //         $notificationable->load('chairedBy');
-    //         break;
-    //       case 'training':
-    //         $notificationable->load('trainedBy');
-    //         break;
-    //     }
-    //   }
-    // }
-    // return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
-
     $type = $request->query('type');
-    $notificationUsers = NotificationUser::with(['notification' => function($query) use ($type) {
-      $query->with('notificationable');
-      if ($type) {
-          $query->where('notificationable_type', $type)
-                ->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
-      } else {
-          $query->whereIn('notificationable_type', ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift']);
+
+    $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift', 'staff_equipment_handover'];
+    $notificationUsers = NotificationUser::with([
+      'notification' => function ($query) {
+        $query->with('notificationable');
       }
-    }])
+    ])
       ->where('staff_id', $staffId)
+      // ->whereHas('notification', function ($query) use ($type, $validTypes) {
+      //   if ($type && in_array($type, $validTypes)) {
+      //     $query->where('notificationable_type', $type);
+      //   } else {
+      //     $query->whereIn('notificationable_type', $validTypes);
+      //   }
+      // })
+      ->whereHas('notification', function ($query) use ($type, $validTypes, $staffId) {
+
+        $query->whereIn('notificationable_type', $validTypes);
+
+        // Apply staff-based filter only for models that have staff_id
+        $query->where(function ($q) use ($staffId) {
+          $q->whereHasMorph(
+            'notificationable',
+            ['staff_timeshift', 'staff_equipment_handover'],
+            function ($q2) use ($staffId) {
+              $q2->where('staff_id', $staffId);
+            }
+          )
+            ->orWhereDoesntHaveMorph(
+              'notificationable',
+              ['staff_timeshift', 'staff_equipment_handover']
+            );
+        });
+      })
       ->orderBy('id', 'desc')
-      ->get();
-    foreach ($notificationUsers as $notificationUser) {
+      ->paginate(config('common.list_count'));
+
+    $filteredNotifications = $notificationUsers->getCollection()->filter(function ($notificationUser) {
+      return $notificationUser->notification && $notificationUser->notification->notificationable;
+    });
+
+    foreach ($filteredNotifications as $notificationUser) {
       $notificationType = $notificationUser->notification->notificationable_type;
-      $notificationUser->notification->load(['notificationable']);
-      if ($notificationType === 'staff_timeshift') {
-        $notificationUser->notification->load([
-          'notificationable.timeshift.shift',
-          'notificationable.area'
+
+      if (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
+        $notificationUser->notification->notificationable->load([
+          'participants',
+          'participants.department.roles',
+          'participants.role.department',
+          'participants.staff.department',
+          'participants.staff.roles'
         ]);
-      } elseif (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
-        $notificationUser->notification->load([
-          'notificationable.participants',
-          'notificationable.participants.department.roles',
-          'notificationable.participants.role.department',
-          'notificationable.participants.staff.department',
-          'notificationable.participants.staff.roles'
-        ]);
-        
-        if ($notificationType === 'meeting') {
-          $notificationUser->notification->load('notificationable.chairedBy');
-        } elseif ($notificationType === 'training') {
-          $notificationUser->notification->load('notificationable.trainedBy');
+
+        if ($notificationType === Relation::getMorphedModel('meeting') || $notificationType === 'meeting') {
+          $notificationUser->notification->notificationable->load('chairedBy');
+        } elseif ($notificationType === Relation::getMorphedModel('training') || $notificationType === 'training') {
+          $notificationUser->notification->notificationable->load('trainedBy');
         }
+      } elseif ($notificationType === Relation::getMorphedModel('staff_timeshift') || $notificationType === 'staff_timeshift') {
+        $notificationUser->notification->notificationable->load([
+          'timeshift.shift',
+          'area'
+        ]);
+      } elseif ($notificationType === Relation::getMorphedModel('staff_equipment_handover') || $notificationType === 'staff_equipment_handover') {
+        $notificationUser->notification->notificationable->load([
+          'fromStaff',
+          'toStaff',
+          'staffTimeshift',
+          'staffTimeshift.timeshift',
+          'staffTimeshift.timeshift.shift',
+          'staffTimeshift.area'
+        ]);
       }
     }
-    return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
+    return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
   }
 
-  public function getMeetingsByStaffId($staffId,$request)
+  public function getMeetingsByStaffId($staffId, $request)
   {
-    $staff = Staff::with('department','roles')->find($staffId);
-    if(!$staff){
-      return ResponseData(null, 404, false, 'Staff not found.');
+    $staff = Staff::with('department', 'roles')->find($staffId);
+    if (!$staff) {
+      return ResponseData(null, 400, false, 'Staff not found.');
     }
 
     $departmentId = $staff->department_id;
@@ -1223,29 +1201,29 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role',
       'participants.role.department',
     ])
-    ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
-      $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
-        $subQuery->where('staff_id', $staffId)
-          ->orWhere('department_id', $departmentId)
-          ->orWhereIn('role_id', $roleIds);
-      });
-    })
-    ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '>=', $currentDateTime);
-    })
-    ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '<', $currentDateTime);
-    })
-    ->orderBy('id', 'desc')
-    ->get();
+      ->whereHas('participants', function ($query) use ($staffId, $departmentId, $roleIds) {
+        $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+          $subQuery->where('staff_id', $staffId)
+            ->orWhere('department_id', $departmentId)
+            ->orWhereIn('role_id', $roleIds);
+        });
+      })
+      ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '>=', $currentDateTime);
+      })
+      ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '<', $currentDateTime);
+      })
+      ->orderBy('id', 'desc')
+      ->get();
     return ResponseData(MeetingResource::collection($meetings), 200, true, 'Meetings retrieved successfully.');
   }
 
-  public function getTrainingsByStaffId($staffId,$request)
+  public function getTrainingsByStaffId($staffId, $request)
   {
-    $staff = Staff::with('department','roles')->find($staffId);
-    if(!$staff){
-      return ResponseData(null, 404, false, 'Staff not found.');
+    $staff = Staff::with('department', 'roles')->find($staffId);
+    if (!$staff) {
+      return ResponseData(null, 400, false, 'Staff not found.');
     }
 
     $departmentId = $staff->department_id;
@@ -1260,43 +1238,137 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role',
       'participants.role.department',
     ])
-    ->whereHas('participants',function ($query) use ($staffId,$departmentId,$roleIds){
-      $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
-        $subQuery->where('staff_id', $staffId)
-          ->orWhere('department_id', $departmentId)
-          ->orWhereIn('role_id', $roleIds);
-      });
-    })
-    ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '>=', $currentDateTime);
-    })
-    ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
-      return $query->where('date_time', '<', $currentDateTime);
-    })
-    ->orderBy('id', 'desc')
-    ->get();
+      ->whereHas('participants', function ($query) use ($staffId, $departmentId, $roleIds) {
+        $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+          $subQuery->where('staff_id', $staffId)
+            ->orWhere('department_id', $departmentId)
+            ->orWhereIn('role_id', $roleIds);
+        });
+      })
+      ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '>=', $currentDateTime);
+      })
+      ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
+        return $query->where('date_time', '<', $currentDateTime);
+      })
+      ->orderBy('id', 'desc')
+      ->get();
     return ResponseData(MeetingResource::collection($trainings), 200, true, 'Trainings retrieved successfully.');
   }
 
-  public function getShiftsByStaffId($staffId,$request)
+  public function getShiftsByStaffId($staffId, $request)
   {
-    $shifts = StaffTimeshift::with('staff','timeshift.shift','area')->where('staff_id',$staffId)
-    ->where('status','confirmed')->orderBy('id','desc')->paginate(config('common.list_count'));
-    if($shifts->isEmpty()){
-      return [];
+    // $shifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
+    //   ->where('staff_id', $staffId)
+    //   ->where('status', 'confirmed')
+    //   ->orderBy('id', 'desc')
+    //   ->get();
+    $currentDate = now()->format('Y-m-d');
+    // $assignedShifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
+    //   ->join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+    //   ->where('staff_timeshifts.staff_id', $staffId)
+    //   ->where('staff_timeshifts.status', 'confirmed')
+    //   ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
+    //   ->orderBy('staff_timeshifts.date_time')  // Then order by assigned date
+    //   ->orderBy('time_shifts.from_time')       // First order by shift start time
+    //   ->select('staff_timeshifts.*')           // Important: avoid column conflicts
+    //   ->get();
+    // foreach ($assignedShifts as $assignedShift) {
+    //   // dd($assignedShift);
+    //   $currentDate = now()->format('Y-m-d');
+    //   $checkIn = CheckIn::where('staff_id', $staffId)
+    //     ->where('time_shift_id', $assignedShift->timeshift_id)
+    //     ->whereDate('check_in_date_time', $currentDate)
+    //     ->orderBy('check_in_date_time', 'desc')
+    //     ->first();
+    //   $assignedShift->check_in = 'check_in';
+    //   $assignedShift->check_in_status = 'check_in';
+
+    //   if (!$checkIn) {
+    //     $assignedShift->check_in_status= 'check_in';
+    //   } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+    //     $assignedShift->check_in_status = 'already_checked_in';
+    //     $assignedShift->check_in = new mobileCheckInResource($checkIn);
+    //   } else {
+    //     $assignedShift->check_in_status = 'check_out';
+    //     $assignedShift->check_in = new mobileCheckInResource($checkIn);
+    //   }
+    // }
+    $assignedShifts = StaffTimeshift::join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
+      ->leftJoin('check_ins', function ($join) use ($currentDate) {
+        $join
+        // ->on('staff_timeshifts.staff_id', '=', 'check_ins.staff_id')
+          ->on('staff_timeshifts.id', '=', 'check_ins.staff_timeshift_id');
+          // ->on('staff_timeshifts.timeshift_id', '=', 'check_ins.time_shift_id')
+          // ->whereDate('check_ins.check_in_date_time', '=', $currentDate);
+      })
+      ->with(['staff', 'timeshift.shift', 'area'])
+      ->where('staff_timeshifts.staff_id', $staffId)
+      ->where('staff_timeshifts.status', 'confirmed')
+      ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
+      ->orderBy('staff_timeshifts.date_time')
+      ->orderBy('time_shifts.from_time')
+      ->select(
+        'staff_timeshifts.*',
+        'check_ins.id as check_in_id',
+        'check_ins.is_current_checked_in',
+        'check_ins.is_self_checkout',
+        'check_ins.check_in_date_time'
+      )
+      ->get()
+      ->map(function ($shift) {
+        $checkIn = null;
+        if ($shift->check_in_id) {
+          $checkIn = new CheckIn();
+          $checkIn->id = $shift->check_in_id;
+          $checkIn->is_current_checked_in = $shift->is_current_checked_in;
+          $checkIn->is_self_checkout = $shift->is_self_checkout;
+          $checkIn->check_in_date_time = $shift->check_in_date_time;
+        }
+        $shift->check_in_status = 'check_in';
+        if (!$checkIn) {
+          $shift->check_in_status = 'check_in';
+          $shift->check_in = 'check_in';
+        } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+          $shift->check_in_status = 'already_checked_in';
+          $shift->check_in = $checkIn;
+        } else {
+          $shift->check_in_status = 'check_out';
+          $shift->check_in = $checkIn;
+        }
+        return $shift;
+      });
+    // dd($assignedShifts);
+    foreach ($assignedShifts as $assignedShift) {
+      if ($assignedShift->id == 263) {
+        // dd($assignedShift->timeshift);
+      }
     }
-    return StaffTimeShiftResource::collection($shifts);
+    return StaffTimeShiftResource::collection($assignedShifts);
   }
 
-  public function getConfirmedShiftsByStaffIdTimeShiftId($staffId,$staffTimeshiftId){
-    $shift = StaffTimeshift::with('staff','timeshift.shift','area')
-    ->where('staff_id',$staffId)
-    ->where('id',$staffTimeshiftId)
-    ->where('status','confirmed')->get();
-    if($shift->isEmpty()){
+  private function resolveCheckInStatus($checkIn)
+  {
+    if (!$checkIn) {
+      return 'check_in';
+    }
+
+    if (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+      return 'already_checked_in';
+    }
+
+    return 'check_out';
+  }
+
+  public function getConfirmedShiftsByStaffIdTimeShiftId($staffId, $staffTimeshiftId)
+  {
+    $shift = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
+      ->where('staff_id', $staffId)
+      ->where('id', $staffTimeshiftId)
+      ->where('status', 'confirmed')->get();
+    if ($shift->isEmpty()) {
       return [];
     }
     return StaffTimeShiftResource::collection($shift);
   }
-
 }

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Salary;
 
+use App\Http\Resources\Mobile\PaySlipResource;
 use App\Models\Staff;
 use App\Models\Salary;
 use App\Models\CheckIn;
@@ -81,22 +82,22 @@ class SalaryRepository implements SalaryRepositoryInterface
       $staffIds = Staff::whereHas('roles', function ($query) use ($data) {
         $query->where('id', $data['role_id'])->where('is_cv', 0);
       })->pluck('id');
-      if($staffIds->isNotEmpty()){
+      if ($staffIds->isNotEmpty()) {
         foreach ($staffIds as $staffId) {
-        Salary::createOrUpdate(
-          [
-            'staff_id' => $staffId,
-            'salary_setup_id' => $salarySetup->id,
-          ],
-          [
-            'basic_salary' => $data['basic_salary'],
-            'staff_id' => $staffId,
-            'salary_setup_id' => $salarySetup->id,
-            'created_by' => UserData()->id,
-          ]
-        );
+          Salary::updateOrCreate(
+            [
+              'staff_id' => $staffId,
+              'salary_setup_id' => $salarySetup->id,
+            ],
+            [
+              'basic_salary' => $data['basic_salary'],
+              'staff_id' => $staffId,
+              'salary_setup_id' => $salarySetup->id,
+              'created_by' => UserData()->id,
+            ]
+          );
+        }
       }
-    }
       DB::commit();
       ResponseData($salarySetup);
     } catch (\Exception $e) {
@@ -254,7 +255,8 @@ class SalaryRepository implements SalaryRepositoryInterface
     });
     ResponseData($data);
   }
-  public function getSalarySetupByRoleId($roleId){
+  public function getSalarySetupByRoleId($roleId)
+  {
     $salarySetup = SalarySetup::with('salaryAllowances.allowance')->where('role_id', $roleId)->first();
     if (!$salarySetup) {
       ResponseMessage('Salary setup not found', 404);
@@ -266,23 +268,20 @@ class SalaryRepository implements SalaryRepositoryInterface
   {
     DB::beginTransaction();
     try {
-      $salarySetup = SalarySetup::find($data['salary_setup_id']);
-      if (!$salarySetup) {
-          ResponseMessage('Salary setup not found', 404);
-      }
+      $salarySetup = SalarySetup::findOrFail($data['salary_setup_id']);
       $existing = Salary::where('staff_id', $data['staff_id'])
-      ->where('salary_setup_id', $data['salary_setup_id'])
-      ->first();
-    if ($existing) {
+        ->where('salary_setup_id', $data['salary_setup_id'])
+        ->first();
+      if ($existing) {
         ResponseMessage('Salary already exists for this staff with this setup', 409);
-    }
+      }
 
-    $salary = Salary::create([
-      'basic_salary'    => $data['basic_salary'] ?? $salarySetup->basic_salary,
-      'staff_id'        => $data['staff_id'],
-      'salary_setup_id' => $data['salary_setup_id'],
-      'created_by'      => UserData()->id,
-  ]);
+      $salary = Salary::create([
+        'basic_salary'    => $data['basic_salary'] ?? $salarySetup->basic_salary,
+        'staff_id'        => $data['staff_id'],
+        'salary_setup_id' => $data['salary_setup_id'],
+        'created_by'      => UserData()->id,
+      ]);
       DB::commit();
       ResponseData($salary, 201);
     } catch (\Exception $e) {
@@ -296,10 +295,7 @@ class SalaryRepository implements SalaryRepositoryInterface
   {
     DB::beginTransaction();
     try {
-      $salary = Salary::find($id);
-      if (!$salary) {
-        ResponseMessage('Salary not found.', 404);
-      }
+      $salary = Salary::findOrFail($id);
       $salary->basic_salary = $request['basic_salary'];
       $salary->save();
       DB::commit();
@@ -504,10 +500,6 @@ class SalaryRepository implements SalaryRepositoryInterface
     $data = Overtime::with(['overtimeCategory', 'timeShift.shift'])
       ->where('staff_id', $staffId)->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
-
-    if ($data->isEmpty()) {
-      ResponseMessage('Overtime not found.', 404);
-    }
     ResponseData($data);
   }
 
@@ -927,13 +919,13 @@ class SalaryRepository implements SalaryRepositoryInterface
         $pay_slips = json_decode($data['pay_slips'], true);
         $paySlipIds = [];
         foreach ($pay_slips as $pay_slip) {
-
           $paySlip = PaySlip::create([
             'staff_id' => $pay_slip['staff_id'],
             'salary_batch_id' => $pay_slip['salary_batch_id'],
             'salary_id' => $pay_slip['salary_id'],
             'basic_salary' => $pay_slip['basic_salary'],
             'allowance' => $pay_slip['allowance'],
+            'deduction' => $pay_slip['deduction'] ?? 0,
             'added_allowance' => $pay_slip['added_allowance_amount'] ?? 0,
             'added_deduction' => $pay_slip['added_deduction_amount'] ?? 0,
             'total_allowance' => $pay_slip['total_allowance'],
@@ -1012,5 +1004,43 @@ class SalaryRepository implements SalaryRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+
+  public function confirmPaySlip($id){
+    $paySlip=PaySlip::find($id);
+    if(!$paySlip){
+      \ResponseMessage('PaySlip is Empty',419);
+    }
+    if($paySlip->is_confirm){
+      \ResponseMessage('PaySlip is already confirmed', 419);
+    }
+    $paySlip->is_confirm=true;
+    $paySlip->confirmed_at=now();
+    $paySlip->confirmed_by = \UserData()->id ?? null;
+    $paySlip->save();
+    return $paySlip;
+  }
+
+  public function getStaffPaySlip($data){
+    $staffId = \UserData()->id;
+    $salary=Salary::where('staff_id',$staffId)->latest()->first();
+    $salarySetupId=$salary->salary_setup_id ?? null;
+    $salaryAllowance=SalaryAllowance::where('salary_setup_id',$salarySetupId)
+    ->join('allowances','salary_allowances.allowance_id','allowances.id')
+    ->where('allowances.type','allowance')
+    ->select(DB::raw('SUM(salary_allowances.amount) as total_allowances'))
+    ->first();
+    $paySlips=PaySlip::orderBy('id','desc')
+    ->where('is_confirm',true)
+    ->where('staff_id',$staffId)
+    ->get();
+    $paySlipResource=PaySlipResource::collection($paySlips);
+    return[
+      'salary'=>[
+        'basic_salary'=>$salary->basic_salary ?? 0,
+        'allowance_amount'=>  $salaryAllowance->total_allowances ?? 0,
+      ],
+      'pay_slips'=> $paySlipResource,
+    ];
   }
 }

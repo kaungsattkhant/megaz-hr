@@ -1,12 +1,13 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Edit MRP
-            </p>
-        </div>
+        
 
         <div class="grid !grid-cols-12 gap-x-8 gap-y-2 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Edit MRP
+                </p>
+            </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Menu Name
@@ -23,7 +24,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Cooking Places
                 </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] multi-select"
                     data-te-select-wrapper-ref>
                     <multiselect v-model="selectedCookingArea" :options="cookingAreaList" :multiple="true" :close-on-select="false" :clear-on-select="false"
                     :preserve-search="true" placeholder="Select Cooking Place" label="name" track-by="id" :preselect-first="true">
@@ -411,6 +412,11 @@
                             </th>
                         </tr>
                     </thead>
+                    <TableSkeleton
+                        v-if="loading"
+                        :rows="4"
+                        :cols="6"
+                    />
                     <tbody v-if="menuLevel">
                         <tr v-if="menuLevel.item_menu.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item_menu"
                             :key="menuIndex">
@@ -427,6 +433,11 @@
                                 <button @click="removeMenuLevel(menuIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
+                            </td>
+                        </tr>
+                        <tr class=" !text-center" v-if="menuLevel.item_menu.length < 1 && !loading">
+                            <td class="" colspan="4">
+                                No Data Here
                             </td>
                         </tr>
                     </tbody>
@@ -466,6 +477,11 @@
                             </th>
                         </tr>
                     </thead>
+                    <TableSkeleton
+                        v-if="loading"
+                        :rows="4"
+                        :cols="6"
+                    />
                     <tbody>
                         <div class="contents" v-for="(level, levelIndex) in levelTable" :key="levelIndex">
                             <tr class="" @click="isShowToggle(level)">
@@ -510,6 +526,12 @@
                                 </button>
                             </td>
                         </tr>
+
+                        <tr class=" !text-center" v-if="levelTable.length < 1 && !loading">
+                            <td class="" colspan="4">
+                                No Data Here
+                            </td>
+                        </tr>
                     </tbody>
 
                 </table>
@@ -534,10 +556,12 @@ import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
 import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     props: ["mrpId"],
     data() {
@@ -624,6 +648,7 @@ export default {
             is_show:false,
             isReadyToSale:false,
 
+            loading: true,
         };
     },
 
@@ -634,8 +659,10 @@ export default {
             level.isShow = !level.isShow;
         },
         async getMrpDetail() {
+            this.loading = true;
             let response = await getApiData({ url: `/api/mrp/${this.mrpId}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.mrpDetail = response.data[0];
                 if(response.data[0]){
                     this.addDetail(response.data[0])

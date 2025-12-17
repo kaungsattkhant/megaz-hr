@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class="page-title">
@@ -26,7 +26,7 @@
         </div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
-                <button type="button" class="mt-4 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                <button type="button" class="mt-4 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ml-8 mb-2"
                 data-te-toggle="modal" data-te-target="#confirm_modal">
                     Close Cash Book
                 </button>
@@ -181,7 +181,7 @@
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
                     <div class="relative flex justify-between py-2 px-6 border-b">
-                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter" id="create_modalLabel">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal" id="create_modalLabel">
                             Add New Cashbook
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -436,7 +436,7 @@
     import { mapGetters } from "vuex";
 
     export default {
-        props: ["cashAccountId", "cashAccountName"],
+        props: ["cashAccountId", "cashAccountName", "cashAccountCode"],
         data() {
             return {
                 openingBalance: 0,
@@ -563,6 +563,7 @@
                 formData.append('account_id', this.selectedAccount.id);
                 formData.append('value', this.amount);
                 formData.append('cash_account_id', this.cashAccountId);
+                formData.append('cash_account_code', '2-' + this.cashAccountCode);
                 formData.append('action', this.action);
                 formData.append('is_confirmed', 1);
 

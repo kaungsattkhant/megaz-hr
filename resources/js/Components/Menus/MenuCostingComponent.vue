@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -66,6 +66,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -103,6 +108,11 @@
                                     
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="menuCostingList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                             <!-- looping end -->
                         </tbody>
                     </table>
@@ -142,8 +152,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 
 import { getCurrentDate } from '../../utilities/datetime-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             menuCostingList: [],
@@ -163,19 +177,23 @@ export default {
             lastPage:null,
             totalData:null,
             
+            loading: false,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
         async getMenuCostingList(pageNumber) {
+            this.loading = true;
             let url = this.url + pageNumber + this.url_search + this.url_category + this.url_month;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.menuCostingList = response.data.data;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.lastPage = response.data.last_page;
+                this.totalData = response.data.total;
             }
         },
         async searchBtnClicked() {

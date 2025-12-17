@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(service, index) in serviceList" :key="index">
@@ -94,7 +99,11 @@
                                     </td>
                                 </tr>
                             </div>
-
+                            <tr class=" !text-center" v-if="serviceList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                             <!-- looping end -->
                         </tbody>
                     </table>
@@ -200,10 +209,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createBtnClicked"
+                            <!-- <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @click="createBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -221,7 +236,7 @@
                         <div class="relative flex justify-between py-2 px-6 border-b">
                             <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                                 id="create_modalLabel">
-                                Create Service
+                                Edit Service
                             </h5>
                             <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="closeEditModal"
                                 data-te-modal-dismiss aria-label="Close">
@@ -292,6 +307,12 @@
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Update
                             </button>
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Update"
+                                loadingText="Updating..."
+                                @click="editService"
+                            />
                         </div>
                     </div>
                 </div>
@@ -358,8 +379,14 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
+    components: {
+        TableSkeleton,
+        LoadingButton
+    },
     data() {
         return {
             serviceList: [],
@@ -396,6 +423,8 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -403,6 +432,7 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getServiceList(pageNumber) {
+            this.loading = true;
             let url = `/api/services?page=${pageNumber}`;
             if (this.searchInput) {
                 url = `/api/services?search_input=${this.searchInput}&page=${pageNumber}`;
@@ -410,6 +440,7 @@ export default {
             // let url = `/api/services`;
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.serviceList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
@@ -444,6 +475,7 @@ export default {
         },
 
         async createService() {
+            this.buttonLoading = true;
             let formData = new FormData();
             if(this.selectedServiceCategory.name == 'DJ'){
                 formData.append('name', this.djName);
@@ -461,8 +493,12 @@ export default {
                 console.log("success")
                 this.closeModal('closeCreateModal');
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                         title: `Input validation`,
                         text: response.message,
@@ -484,6 +520,7 @@ export default {
             }
         },
         async editService() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('id', this.editId);
             if(this.selectedServiceCategoryEdit.name == 'DJ'){
@@ -503,8 +540,12 @@ export default {
                 this.editId = null;
                 this.closeModal('closeEditModal');
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                         title: `Input validation`,
                         text: response.message,

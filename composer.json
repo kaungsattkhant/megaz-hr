@@ -6,16 +6,18 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "code-lts/laravel-fcm": "^1.8",
         "guzzlehttp/guzzle": "^7.2",
+        "kreait/laravel-firebase": "^6.1",
+        "laravel-notification-channels/fcm": "^5.1",
         "laravel/framework": "^11.0",
         "laravel/reverb": "1.0.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
         "mrlinnth/mm-regions-cities": "^0.1.1",
+        "owen-it/laravel-auditing": "^14.0",
         "reinbier/laravel-holiday": "^2.2"
-    },
+    }, 
     "require-dev": {
         "fakerphp/faker": "^1.23",
         "laravel/pint": "^1.0",
@@ -67,6 +69,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": ["PKSA-h3yd-snth-x1dh"]
         }
     },
     "minimum-stability": "stable",

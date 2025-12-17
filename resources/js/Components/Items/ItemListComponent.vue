@@ -1,11 +1,13 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div class="flex justify-between">
                 <p class=" page-title">
                     Items
                 </p>
-                <div class="flex gap-x-4 pt-4 pr-4">
+                
+                
+                <!-- <div class="flex gap-x-4 pt-4 pr-4">
                     <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
                         Import Type
                         <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
@@ -22,9 +24,9 @@
                         Import Price
                         <input type="file" placeholder="Excel" id="excel_import_price" class="opacity-0 w-0 h-0 hidden"  @change="handleItemPriceFileChange">
                     </label>
-                </div>
+                </div> -->
             </div>
-            <div class="btn-container">
+            <div class="btn-container mb-0">
                 <div class=" flex gap-x-4 ">
                     <label for="search" class="search-input">
                         <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
@@ -54,7 +56,7 @@
 
                 </div>
                 <div class="flex justify-end gap-x-4">
-                    
+
                     <!-- <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#import_modal">
@@ -65,6 +67,43 @@
                         data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                         Add New
                     </button> -->
+                    <div class="relative" data-te-dropdown-ref>
+                        <button
+                            class="add-btn h-8 cursor-pointer w-full block mb-3"
+                            type="button" id="test1" data-te-dropdown-toggle-ref aria-expanded="false"
+                            data-te-ripple-init data-te-ripple-color="light" @click="sidebarNotificationTrayExpanded">
+                            Import
+                            <i class="fal fa-file-import"></i>
+                            
+                        </button>
+                        <ul class="absolute z-[1000] float-left m-0 hidden min-w-max list-none pt-6 pb-3 px-6 overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-base shadow-lg data-[te-dropdown-show]:block "
+                            aria-labelledby="test1" data-te-dropdown-menu-ref>
+                            <li>
+                                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item-type.import')">
+                                    Import Type
+                                    <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
+                                </label>
+                            </li>
+                            <li>
+                                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item-category.import')">
+                                    Import Category
+                                    <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
+                                </label>
+                            </li>
+                            <li>
+                                <label for="excel_import" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item.import')">
+                                    Import Item
+                                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                                </label>
+                            </li>
+                            <li>
+                                <label for="excel_import_price" class="add-btn h-8 cursor-pointer w-full block mb-3" v-if="feature.includes('item.import')">
+                                    Import Price
+                                    <input type="file" placeholder="Excel" id="excel_import_price" class="opacity-0 w-0 h-0 hidden"  @change="handleItemPriceFileChange">
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
                     <a href="/items/create"
                         class="add-btn  h-8 whitespace-nowrap">
                         Add New
@@ -87,7 +126,19 @@
                                 <!-- <th></th> -->
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="itemList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+
+                        <tbody v-else-if="!loading && itemList.length > 0">
                             <!-- looping start -->
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                                 <tr class="">
@@ -135,6 +186,11 @@
                                 </tr>
                             </div>
 
+                            <tr class=" !text-center" v-if="itemList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -670,10 +726,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { ref } from 'vue';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -733,6 +791,8 @@ export default {
             conversion: null,
 
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -807,9 +867,11 @@ export default {
             }
         },
         async getItemList(pageNumber) {
+            this.loading = true;
             let url = `/api/items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.itemList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
@@ -941,6 +1003,7 @@ export default {
         },
 
         async searchBtnClicked() {
+            this.loading = true;
             let url = `/api/items?page=1`;
             if(this.searchInput){
                 url = `${url}&search_input=${this.searchInput}`;
@@ -962,6 +1025,7 @@ export default {
             // }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.itemList = response.data.data;
             }
         },
@@ -980,7 +1044,7 @@ export default {
                 this.importBtnClicked();
             }
         },
-        
+
         async importBtnClicked() {
             let formData = new FormData();
             formData.append('item_import', this.selectedFile);
@@ -1060,7 +1124,7 @@ export default {
             }
         },
 
-        
+
         handleItemPriceFileChange(event) {
             console.log("Event object:", event);
             const selectedItemPriceFile = event.target.files[0];
@@ -1088,8 +1152,6 @@ export default {
                 });
             }
         },
-
-
     },
 
     created() {

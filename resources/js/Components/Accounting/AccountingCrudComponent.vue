@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -50,7 +50,12 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+                        <tbody v-else>
                             <div class="contents" v-for="(account, index) in accountList" :key="index">
                                 <tr class="">
                                     <td class="">
@@ -92,6 +97,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="accountList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -367,8 +377,12 @@
     import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
                 accountList: [],
@@ -400,6 +414,7 @@
                 isLastGroup: false,
 
                 feature: this.getFeature(),
+                loading: false,
             };
         },
 
@@ -436,12 +451,14 @@
             },
 
             async getAccountList(pageNumber){
+                this.loading = true;
                 if(pageNumber){
                     this.currentPage = pageNumber;
                 }
                 let url = `/api/accounts?page=${this.currentPage}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
+                    this.loading = false;
                     this.accountList = response.data.data;
                     this.per_page = response.data.per_page;
 

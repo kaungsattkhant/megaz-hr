@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -32,8 +32,8 @@
                         </select>
                     </div>
                     <a href="/SOP/create" v-show="feature.includes('sop.create')"
-                        class="add-btn  h-8 whitespace-nowrap">
-                        Add New
+                        class="add-btn  h-8 whitespace-nowrap text-center">
+                        Add
                     </a>
                 </div>
             </div>
@@ -64,6 +64,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
@@ -71,18 +76,18 @@
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left">
+                                    <td class=" text-left">
                                         <!-- {{ item.sop }} -->
                                         <span class="font-inter after-coma pr-1" v-for="sop in item.sops">{{ sop.sop }}</span>
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ item.job_description.job_description }}
+                                    <td class="">
+                                        {{ item.job_description?.job_description }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.job_description.role.department.name }}
+                                        {{ item.job_description?.role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.job_description.role.name }}
+                                        {{ item.job_description?.role.name }}
                                     </td>
                                     
                                     <td class="whitespace-nowrap" >
@@ -97,6 +102,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -179,10 +189,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -210,6 +222,7 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -217,10 +230,12 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
+            this.loading = true;
             // let url = this.url + this.url_search + this.url_department + this.url_role;
             let url = this.url + this.url_role
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if(response.data.data){
                     this.primaryList = response.data.data;
                 }

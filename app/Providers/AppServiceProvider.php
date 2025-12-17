@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'menu_category' => 'App\Models\MenuCategory',
             'menu' => 'App\Models\Menu',
             'sub_account' => 'App\Models\SubAccount',
+            'head_account' => 'App\Models\HeadAccount',
             'task' => 'App\Models\Task',
             'uom' => 'App\Models\UOM',
             'invoice' => 'App\Models\Invoice',
@@ -66,6 +67,11 @@ class AppServiceProvider extends ServiceProvider
             'staff_equipment' => 'App\Models\StaffEquipment',
             'staff_equipment_assign' => 'App\Models\StaffEquipmentAssign',
             'accrued' => 'App\Models\Accrued',
+            'leave' => 'App\Models\Leave',
+            'staff_equipment_handover' => 'App\Models\StaffEquipmentHandover',
+            'staff_equipment_handover_item' => 'App\Models\StaffEquipmentHandoverItem',
+            'lost_item' => 'App\Models\LostItem',
+            'pack' => 'App\Models\Pack',
         ]);
     }
 }

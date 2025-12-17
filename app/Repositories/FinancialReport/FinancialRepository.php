@@ -456,7 +456,6 @@ class FinancialRepository implements FinancialInterface
 
         // Total consumption 
         $totalConsumption = $this->inventoryFinancialService->inventoryScheduleTotalWithTotalByMonth($categoryIds, $currentMonth);
-
         // Total sale revenue for RT and KTV
         $rtTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($rt_sale, 'credit', $current, 'sale'));
         $ktvTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale'));
@@ -464,11 +463,10 @@ class FinancialRepository implements FinancialInterface
 
         $rt_cos = $ktv_cos = 0;
         if ($totalRevenue > 0) {
-            $ratio = ($totalConsumption->total_consumption / $totalRevenue) * 100;
+            $ratio = ($totalConsumption / $totalRevenue) * 100;
             $rt_cos = ($rtTotalSale * $ratio) / 100;
             $ktv_cos = ($ktvTotalSale * $ratio) / 100;
         }
-
         // $rt_expense = (22850612.93 * 9.71898444) / 100;
         // return $rt_expense;
         // Cash Sale Processing
@@ -483,7 +481,8 @@ class FinancialRepository implements FinancialInterface
         //other income
         $otherIncome = $this->trialBalanceService->getTotalResultBySubAccountCode($incomeCode, 'credit', $current, 'cash_sale');
         $otherIncomeTotalAmount = $otherIncome[0]->total_amount;
-        $otherIncomePL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $otherIncomeTotalAmount, $totalRevenue);
+        // $otherIncomePL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $otherIncomeTotalAmount, $totalRevenue);
+        $otherIncomePL = $this->calDefaultRation( $otherIncomeTotalAmount);
 
         $total_rt_operating_income = $rtGP + $otherIncomePL[0];
         $total_ktv_operating_income = $ktvGP + $otherIncomePL[1];
@@ -529,14 +528,15 @@ class FinancialRepository implements FinancialInterface
         $year = Carbon::parse($request->date)->format('Y');
         $fix_asset_tangiable = $this->depreciationService->depreciationBalanceQuery($fix_asset_tangiable, $month, $year);
         $fix_asset_untangible = $this->depreciationService->depreciationBalanceQuery($fix_asset_untangible, $month, $year);
-        $total_fix_asset_tangiable = $fix_asset_tangiable->sum('current_month_depreciation');
-        $total_fix_asset_untangiable = $fix_asset_untangible->sum('current_month_depreciation');
+        $total_fix_asset_tangiable = $fix_asset_tangiable->sum('book_value');
+        $total_fix_asset_untangiable = $fix_asset_untangible->sum('book_value');
         $total_fix_asset = $total_fix_asset_tangiable + $total_fix_asset_untangiable;
-        $fixAssetPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total_fix_asset, $totalRevenue);
-
+        // $fixAssetPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total_fix_asset, $totalRevenue);
+        $fixAssetPL = $this->calAsset($total_fix_asset);
         $current_asset = $this->depreciationService->depreciationBalanceQuery($inventory_held, $month, $year);
         $total_current_asset = $current_asset->sum('current_month_depreciation');
-        $currentAssetPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total_current_asset, $totalRevenue);
+        $currentAssetPL = $this->calAsset($total_current_asset);
+        // $currentAssetPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total_current_asset, $totalRevenue);
 
         $total_rt_fix_cost = $rentalPL[0] + $fixAssetPL[0] + $currentAssetPL[0];
         $total_ktv_fix_cost = $rentalPL[1] + $fixAssetPL[1] + $currentAssetPL[1];
@@ -656,18 +656,46 @@ class FinancialRepository implements FinancialInterface
             $ratio = ($total / $totalRevenue) * 100;
             $rt_pl = ($rtTotalSale * $ratio) / 100;
             $ktv_pl = ($ktvTotalSale * $ratio) / 100;
+        } else {
+            // default ratio = 2 when total revenue is 0
+            $ratio = 2;
+            $rt_pl = ($rtTotalSale * $ratio) / 100;
+            $ktv_pl = ($ktvTotalSale * $ratio) / 100;
         }
         return [$rt_pl, $ktv_pl];
     }
 
+    public function calDefaultRation($totalValue)
+    {
+
+        $rt_pl = $ktv_pl = 0;
+        if ($totalValue > 0) {
+            $rt_pl = $totalValue * 50 / 100;
+            $ktv_pl = $totalValue * 50 / 100;
+        }
+        return [$rt_pl, $ktv_pl];
+
+    }
+
+    public function calAsset($totalValue)
+    {
+
+        $rt_pl = $ktv_pl = 0;
+        if ($totalValue > 0) {
+            $rt_pl = $totalValue * 25 / 100;
+            $ktv_pl = $totalValue * 75 / 100;
+        }
+        return [$rt_pl, $ktv_pl];
+
+    }
     public function getInventorySchedule($request)
     {
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
-        $currentMonth=$current->month;
-        $currentYear=$current->year;
+        $currentMonth = $current->month;
+        $currentYear = $current->year;
         // $currentMonth = Carbon::now()->month;
         // return $this->inventoryFinancialService->inventoryScheduleWithTypeByMonth($currentMonth);
-        return $this->inventoryFinancialService->inventoryScheduleWithCategoryByMonth($currentYear,$currentMonth);
+        return $this->inventoryFinancialService->inventoryScheduleWithCategoryByMonth($currentYear, $currentMonth);
         // $purchaseOrder = PurchaseOrderItem::
         //     join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
         //     ->join('purchase_orders', 'purchase_order_items.purchase_order_id', 'purchase_orders.id')
@@ -780,7 +808,7 @@ class FinancialRepository implements FinancialInterface
         $receivable_debtor_balances = $this->financialService->getReceivableBalances($receivable_debtor, $year, $month);
 
         // $closing_stocks = $this->financialService->getClosingStockBalance($year,$currentMonth);
-       
+
         $data['inventory_held'] = $inventoryHeldBalances;
         $data['cashbook'] = $cashBookBalances;
         $data['prepaid'] = $prepaidBalances;
@@ -791,16 +819,16 @@ class FinancialRepository implements FinancialInterface
         $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
         $creditorBalances = $this->financialService->getCreditorBalances($year, $month);
         $depositBalances = $this->financialService->getCustomerDepositBalances($year, $month);
-        $current_liabilities['other_payable']=$otherPayableBalances;
-        $current_liabilities['creditor']=$creditorBalances;
-        $current_liabilities['deposit']=$depositBalances;
+        $current_liabilities['other_payable'] = $otherPayableBalances;
+        $current_liabilities['creditor'] = $creditorBalances;
+        $current_liabilities['deposit'] = $depositBalances;
         return [
-            'current_asset'=>$data,
-            'current_liabilities'=>$current_liabilities
+            'current_asset' => $data,
+            'current_liabilities' => $current_liabilities
         ];
     }
 
-  
+
 
 
 

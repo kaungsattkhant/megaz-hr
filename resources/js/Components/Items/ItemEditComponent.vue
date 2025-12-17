@@ -340,9 +340,15 @@
 
 
         <div>
-            <button class="add-btn" @click="btnClickedCreateItem()">
+            <!-- <button class="add-btn" @click="btnClickedCreateItem()">
                 Edit Item
-            </button>
+            </button> -->
+            <LoadingButton
+                :loading="buttonLoading"
+                text="Edit item" 
+                loadingText="Editing..."
+                @click="btnClickedCreateItem"
+            />
         </div>
 
 
@@ -616,13 +622,15 @@ import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
 import SupplierCreateComponent from '../Supplier/SupplierCreateComponent.vue'
+import LoadingButton from "../Common/LoadingButton.vue";
 
 
 export default {
     props: ["itemId"],
     components: {
         Multiselect,
-        SupplierCreateComponent
+        SupplierCreateComponent,
+        LoadingButton,
     },
     data() {
         return {
@@ -678,6 +686,7 @@ export default {
             selectedEditUom: null,
             editIndex: null,
             // editId: null,
+            buttonLoading: false,
         };
     },
 
@@ -694,7 +703,8 @@ export default {
             this.name = detail.name;
             this.selectedCategory = this.itemCategoryList.find(cat => cat.id === detail.category_id);
             this.selectedItemType = this.itemTypeList.find(type => type.id === detail.item_type_id);
-            this.selectedTag = this.tagList.find(tag => tag.id = detail.tag_id);
+            let tag = this.tagList.find(tag => tag.id === detail.tag_id);
+            this.selectedTag = tag;
             this.selectedCode = detail.code;
             this.selectedLimitType = this.limitTypeList.find(limit => limit.value === detail.limitation_type);
             
@@ -1143,6 +1153,7 @@ export default {
             
         },
         async createItem() {
+            this.buttonLoading = true;
             let url = `/api/items`;
             let formData = new FormData();
             formData.append('name', this.name);
@@ -1175,8 +1186,12 @@ export default {
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace("/items");
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                     title: `Error Message`,
                     text: response.message.code,

@@ -1,13 +1,14 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Create Salary Batch
-            </p>
-        </div>
+        
 
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Create Salary Batch
+                </p>
+            </div>
             <div class="mb-8 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Batch Name
@@ -121,9 +122,15 @@
         </div>
 
         <div>
-            <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
+            <!-- <button class="add-btn" @click="btnClickedCreateSalaryBatch()">
                 Create Salary Batch
-            </button>
+            </button> -->
+            <LoadingButton
+                :loading="buttonLoading"
+                text="Create Salary Batch"
+                loadingText="Creating..."
+                @click="btnClickedCreateSalaryBatch()"
+            />
         </div>
     </div>
 </template>
@@ -134,10 +141,12 @@ import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     data() {
         return {
@@ -152,6 +161,7 @@ export default {
             selectedStaff: null,
 
             salaryBatchList: [],
+            buttonLoading: false,
         };
     },
 
@@ -226,6 +236,7 @@ export default {
             }
         },
         async createSalaryBatch(){
+            this.buttonLoading = true;
             let staff_ids = [];
             this.salaryBatchList.forEach(batch => {
                 staff_ids.push(String(batch.staff_id))
@@ -239,6 +250,16 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/salary_batch`);
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
+            }
+            else {
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 

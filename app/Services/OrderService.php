@@ -4,14 +4,18 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\Menu;
+use App\Models\Pack;
 use App\Models\Order;
 use App\Models\Entity;
 use App\Models\Invoice;
 use App\Models\MenuArea;
+use App\Models\Inventory;
 use App\Models\OrderItem;
 use App\Models\RoomSession;
 use App\Models\MenuStepItem;
+use App\Models\SellingExtra;
 use GuzzleHttp\Psr7\Response;
+use App\Models\OrderItemExtra;
 use App\Models\InventoryLedger;
 use App\Models\InvoiceAccessory;
 use App\Models\MenuCategoryArea;
@@ -22,9 +26,6 @@ use App\Events\KitchenNotificationRequest;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
-use App\Models\Inventory;
-use App\Models\OrderItemExtra;
-use App\Models\SellingExtra;
 
 class OrderService
 {
@@ -59,7 +60,7 @@ class OrderService
                 ResponseMessage('Menu Area not found', 404);
             }
             $cookingAreaId = $menuArea->cooking_area_id;
-
+            $inventoryId = $this->getInventoryIdByCookingArea($cookingAreaId);
             if (!$menu) {
                 ResponseMessage('Menu not found', 404);
             }
@@ -117,7 +118,8 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
 
                 $insertData = [];
-                $this->checkInventoryEnough($data['menu_id'], $quantityCount);
+                $this->checkPackEnough($data['menu_id'], $quantityCount,$inventoryId);
+                $this->checkInventoryEnough($data['menu_id'], $inventoryId, $quantityCount);
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
@@ -177,10 +179,10 @@ class OrderService
                 $orderItemData['price'] = $data['original_price']; //after  
                 $insertData = [];
                 //check inventory
-                $this->checkInventoryEnough($data['menu_id'], $quantityCount);
+                $this->checkInventoryEnough($data['menu_id'], $inventoryId, $quantityCount);
                 if (isset($data['selling_extra_id']) && !empty($data['selling_extra_id'])) {
                     // $this->createOrderItemExtra($createdOrderItem, $sellingExtraIds);
-                    $this->checkSellingExtraInventoryIsEnough($sellingExtraIds);
+                    $this->checkSellingExtraInventoryIsEnough($sellingExtraIds, $inventoryId);
                 }
                 //end check inventory
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
@@ -218,6 +220,7 @@ class OrderService
 
     public function createMultipleOrder(array $data)
     {
+        // dd($data);
         DB::beginTransaction();
         try {
             $invoiceId = $data['invoice_id'];
@@ -241,7 +244,10 @@ class OrderService
 
             $orderItemsArray = [];
             $focTotal = 0;
-            $data['menuArray'] = json_decode($data['menuArray'], true);
+            if (is_string($data['menuArray'])) {
+                $data['menuArray'] = json_decode($data['menuArray'], true);
+            }
+            // $data['menuArray'] = json_decode($data['menuArray'], true);
             if ($invoice->invoice_type == 'package') {
                 $filteredMenu = array_filter($data['menuArray'], function ($menu) {
                     return isset($menu['is_package']) && in_array($menu['is_package'], [0, 1]);
@@ -256,13 +262,18 @@ class OrderService
             $cookingAreaIds = [];
             foreach ($filteredMenu as $menuData) {
                 $totalExtraPrice = 0;
-                $this->checkInventoryEnough($menuData['menu_id'], $menuData['quantity']);
+                $menuData['area_id'] = $menuData['cooking_area_id'];
+                $cookingAreaId = $menuData['cooking_area_id'];
+                $inventoryId = $this->getInventoryIdByCookingArea($cookingAreaId);
+                $cookingAreaIds[] = $cookingAreaId;
+                $this->checkPackEnough($menuData['menu_id'], $menuData['quantity'],$inventoryId);
+                $this->checkInventoryEnough($menuData['menu_id'], $inventoryId, $menuData['quantity']);
                 if (isset($menuData['selling_extra_id']) && !empty($menuData['selling_extra_id'])) {
                     foreach ($menuData['selling_extra_id'] as $sellingExtraId) {
                         $sellingExtra = SellingExtra::find($sellingExtraId);
                         $totalExtraPrice += $sellingExtra->price;
                     }
-                    $this->checkSellingExtraInventoryIsEnough($menuData['selling_extra_id']);
+                    $this->checkSellingExtraInventoryIsEnough($menuData['selling_extra_id'], $inventoryId, );
                 }
                 // if($invoice->invoice_type=='package' && $menuData['is_package']=-1){}
                 $menu = Menu::find($menuData['menu_id']);
@@ -277,10 +288,7 @@ class OrderService
                 if (!$menu) {
                     ResponseMessage('Menu is invalid', 419);
                 }
-                $menuData['area_id'] = $menuData['cooking_area_id'];
-                $cookingAreaId = $menuData['cooking_area_id'];
-                $inventoryId = $this->getInventoryIdByCookingArea($cookingAreaId);
-                $cookingAreaIds[] = $cookingAreaId;
+
                 // $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
                 //     ->where('selling_area_id', $sellingAreaId)
                 //     ->first();
@@ -336,18 +344,20 @@ class OrderService
                     // $order->order_sub_total += $menuData['original_price'] * $menuData['quantity'];
                     // $order->update($menuData);
                     // if ($invoice->type != 'package') {
+                    $actionOrder=isset($menuData['is_foc']) && $menuData['is_foc'] ? 'foc' : 'add';
+                    // dd($actionOrder);
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
-                        $order = $this->updateOrderItemAmountToOrder('add', $order, ($menuData['original_price']), $menuData['quantity'], $discountAmount);
+                        $order = $this->updateOrderItemAmountToOrder($actionOrder, $order, ($menuData['original_price']), $menuData['quantity'], $discountAmount);
                     }
 
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
-                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                        $invoice = $this->updateOrderItemAmountToInvoice($actionOrder, $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     if (($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time' || ($invoice->entity && $invoice->entity->entity_type == 'table'))) {
-                        $order = $this->updateOrderItemAmountToOrder('add', $order, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
+                        $order = $this->updateOrderItemAmountToOrder($actionOrder, $order, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
                     }
                     if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time' || ($invoice->entity && $invoice->entity->entity_type == 'table')) {
-                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
+                        $invoice = $this->updateOrderItemAmountToInvoice($actionOrder, $invoice, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
                     }
                     // }
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
@@ -359,8 +369,8 @@ class OrderService
                     // $menuData['price'] = $menuData['original_price'];
                     $menuData['status'] = 'pos_confirmed';
                     $menuData['area_id'] = $cookingAreaId;
-                    $menuData['inventory_id']=$inventoryId;
-                    $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $menuData['inventory_id'] = $inventoryId;
+                    $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc']) && $menuData['is_foc'])
                         ? 0
                         : ($menuData['original_price'] + $totalExtraPrice) - $defaultDiscountAmont; //after  
                     $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package'])
@@ -377,10 +387,10 @@ class OrderService
                     // dd($menuData);
                     $orderData['invoice_id'] = $invoiceId;
                     $orderData['date'] = CurrentTime();
-                    $orderData['total'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $orderData['total'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc']) && $menuData['is_foc'])
                         ? 0
                         : ($menuData['original_price'] + $totalExtraPrice) * $menuData['quantity'];
-                    $orderData['order_sub_total'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $orderData['order_sub_total'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc']) && $menuData['is_foc'])
                         ? 0
                         : (($menuData['original_price'] + $totalExtraPrice) * $menuData['quantity']) - $discountAmount;
                     $orderData['total_quantity'] = $menuData['quantity'];
@@ -388,29 +398,31 @@ class OrderService
                     $orderData['total_extra_price'] = $totalExtraPrice;
                     $order = Order::create($orderData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
+                    $actionOrder = isset($menuData['is_foc']) && $menuData['is_foc'] ? 'foc' : 'add';
+
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
-                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                        $invoice = $this->updateOrderItemAmountToInvoice($actionOrder, $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time' || ($invoice->entity && $invoice->entity->entity_type == 'table')) {
-                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
+                        $invoice = $this->updateOrderItemAmountToInvoice($actionOrder, $invoice, ($menuData['original_price'] + $totalExtraPrice), $menuData['quantity'], $discountAmount);
                     }
                     $menuData['order_id'] = $order->id;
                     $menuData['date'] = now();
                     $menuData['quantity'] = $defaultQuantity;
                     $menuData['status'] = 'pos_confirmed';
-                    $menuData['inventory_id']=$inventoryId;
+                    $menuData['inventory_id'] = $inventoryId;
                     // $menuData['remark'] = $menuData['remark'];
                     // $menuData['original_price'] = $data['original_price'];
                     // $menuData['menu_id'] = $data['menu_id'];
                     $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                     $menuData['discount_value'] = $defaultDiscountAmont;
                     $menuData['area_id'] = $cookingAreaId;
-                    $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $menuData['sub_total_price'] = (isset($menuData['is_package']) && $menuData['is_package']) || (isset($menuData['is_foc'])&& $menuData['is_foc'])
                         ? 0
                         : ($menuData['original_price'] + $totalExtraPrice) - $defaultDiscountAmont; //after  
-                    $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package'])
+                    $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package']) 
                         ? 0
-                        : $menuData['original_price']; //after  
+                        : $menuData['original_price']; //after  //original price
 
                     // $menuData['order_id'] = $order->id;
                     // $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
@@ -482,7 +494,7 @@ class OrderService
             ->value('inventory_id');
 
         if (!$inventoryId) {
-            ResponseMessage('Inventory and Area are not related', 419);
+            ResponseMessage('Inventory and Area are not related,pls check', 419);
         }
 
         return $inventoryId;
@@ -510,18 +522,17 @@ class OrderService
 
     }
 
-    public function checkInventoryEnough($menuId, $quantity)
+    public function checkInventoryEnough($menuId, $inventoryId, $quantity)
     {
         // $inventoryId = UserData()->department->inventory->inventory_id;
-        $inventory = Inventory::where('name', 'Kitchen Inventory')->first();
-        if (!$inventory) {
-            ResponseMessage('Kitchen Inv not found', 404);
-        }
-        $inventoryId = $inventory->id;
+        // $inventory = Inventory::where('name', 'Kitchen Inventory')->first();
+        // if (!$inventory) {
+        //     ResponseMessage('Kitchen Inv not found', 404);
+        // }
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
-                    ->where('type', 'ready_to_sale');
+                    ->where('type','!=','ready_to_sale');
             })
             ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
@@ -540,19 +551,20 @@ class OrderService
             $stockInInventory = $itemInventory->in_stock_quantity ?? 0;
             $menuCostQuantity = $item->total_quantity * $quantity;
             if ((float) $stockInInventory < $menuCostQuantity) {
+                // dd($stockInInventory,$menuCostQuantity);
                 return ResponseMessage("Stock is not enough for item ,{$item->name}", 422);
             }
         }
 
     }
 
-    public function checkSellingExtraInventoryIsEnough($sellingExtraIds)
+    public function checkSellingExtraInventoryIsEnough($sellingExtraIds, $inventoryId)
     {
-        $inventory = Inventory::where('name', 'Kitchen Inventory')->first();
-        if (!$inventory) {
-            ResponseMessage('Kitchen Inv not found', 404);
-        }
-        $inventoryId = $inventory->id;
+        // $inventory = Inventory::where('name', 'Kitchen Inventory')->first();
+        // if (!$inventory) {
+        //     ResponseMessage('Kitchen Inv not found', 404);
+        // }
+        // $inventoryId = $inventory->id;
         foreach ($sellingExtraIds as $extraId) {
             $sellingExtra = SellingExtra::with('item')
                 ->find($extraId);
@@ -580,15 +592,50 @@ class OrderService
 
     }
 
+    public function checkPackEnough($menuId, $quantity,$inventoryId)
+    {
+        $totalPacks = Pack::where('menu_id', $menuId)
+            ->where('status', 'ready')
+            ->where('inventory_id',$inventoryId)
+            ->where('expired_at', '>', now())
+            ->count();
+
+        if ($totalPacks == 0) {
+            $menu=Menu::find($menuId);
+            $msg='No packs found for  '.$menu->name.'. Inventoy Id is '.$inventoryId.'. Total pack is '.$totalPacks;
+            ResponseMessage($msg, 404);
+        }
+
+        if ($totalPacks < $quantity) {
+            ResponseMessage('Not enough packs to sell', 402);
+        }
+    }
+
+    public function actionPackMenu($menuId, $quantity,$inventoryId)
+    {
+        $packs = Pack::where('menu_id', $menuId)
+            ->where('status', 'ready')
+            ->where('expired_at', '>', now())
+            ->where('inventory_id',$inventoryId)
+            ->orderBy('expired_at', 'asc')
+            ->limit($quantity)
+            ->get();
+        if ($packs->count() < $quantity) {
+            ResponseMessage('Not enough packs to sell', 402);
+        }
+        Pack::whereIn('id', $packs->pluck('id'))->update(['status' => 'sold']);
+        return true;
+    }
+
     public function actionInventoryItem($orderItem, $morphMapName, $action, $sellingExtraIds)
     {
-        $inventoryId = UserData()->department->inventory->inventory_id;
-        // $inventoryId=6; //fix kitchen
+        // $inventoryId = UserData()->department->inventory->inventory_id;
+        $inventoryId = $orderItem->inventory_id;
         $menuId = $orderItem->menu_id;
         $menuStepItemByMenu = MenuStepItem::join('items', 'menu_step_items.item_id', 'items.id')
             ->whereHas('menuStep', function ($q) use ($menuId) {
                 $q->where('menu_id', $menuId)
-                    ->where('type', 'ready_to_sale');
+                    ->where('type', '!=', 'ready_to_sale');
             })
             ->select('items.uom_id', 'items.name', DB::raw('COALESCE(SUM(menu_step_items.quantity), 0) as total_quantity'), 'menu_step_items.item_id')
             ->groupBy('menu_step_items.item_id', 'items.uom_id', 'items.name')
@@ -710,7 +757,7 @@ class OrderService
                     'batch_no' => $inventory_item->batch_no,
                     'date' => now(),
                     'ledgerable_id' => $orderItem->id,
-                    'ledgerable_type' => 'order_item',
+                    'ledgerable_type' => $morphMapName,
                     'inventory_id' => $inventoryId,
                     'action' => $action,//out
                 ]);
@@ -721,7 +768,6 @@ class OrderService
                     'inventory_ledger_id' => $inventoryLedger->id,
                 ]);
                 $remainingQuantity -= $quantityToTake;
-                $array[] = $quantityToTake;
             }
         }
 
@@ -931,6 +977,8 @@ class OrderService
             $orderModel->total_discount_price -= $discountAmount;
             $orderModel->total -= $originalPrice * $quantity;
             $orderModel->order_sub_total -= ($originalPrice * $quantity) - $discountAmount;
+        } else if ($action == 'foc') {
+            $orderModel->total += $originalPrice * $quantity;
         } else {
             ResponseMessage('Action is invalid', 419);
         }
@@ -953,7 +1001,10 @@ class OrderService
             $invoiceModel->sub_total -= ($originalPrice * $quantity) - $discountAmount;
             $invoiceModel->order_discount_value -= $discountAmount;
             $invoiceModel->total_discount -= $discountAmount;
-        } else {
+        } else if ($action == 'foc') {
+            $invoiceModel->total += $originalPrice * $quantity;
+        }
+         else {
             ResponseMessage('Action is invalid', 419);
         }
         $invoiceModel->save();
@@ -980,7 +1031,7 @@ class OrderService
             });
         } else {
             $filterAccessory = $accessories;
-        }
+        }   
 
         $cancelledAccessory = array_filter($accessories, function ($accessory) {
             return isset($accessory['is_package']) && in_array($accessory['is_package'], [-1]);

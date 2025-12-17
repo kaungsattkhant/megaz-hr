@@ -2,6 +2,232 @@
     <div class="">
         <notifications position="top center" />
         <div class="mb-6">
+            <transition
+                        enter-active-class="fade-out duration-[200ms]"
+                        enter-from-class="opacity-0"
+                        enter-to-class="opacity-100"
+                        leave-active-class="fade-in duration-[300ms]"
+                        leave-from-class="opacity-100"
+                        leave-to-class="opacity-0"
+                        >
+                    <div v-show="foodOrderPanelShown"
+                    class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008]">
+                        <div
+                            class="relative container-card p-6 m-4 z-0 overflow-hidden bg-white rounded-lg max-w-6xl"
+                            @click.stop>
+                            <button
+                            @click.stop="foodOrderPanelShown = false"
+                            aria-label="Close panel"
+                            class="absolute top-3 right-3 z-60 text-gray-500 hover:text-gray-800 text-2xl font-bold"
+                            >
+                            &times;
+                            </button>
+
+                            <div class=" p-2 mt-2 z-0 bg-white overflow-hidden">
+                                <div class="mb-6 flex justify-between">
+                                    <p class="text-2xl font-semibold font-inter">
+                                        Order
+                                    </p>
+                                </div>
+                                <div class="flex space-x-4">
+                                    <div class="w-4/5 flex-1">
+                                        <div class="flex w-full px-6 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+                                            <ul class="flex flex-nowrap gap-x-3 mb-5 list-none border-b-0 pl-0" role="tablist" data-te-nav-ref>
+                                                <li v-for="(category, index) in menuCategoryList" :key="index" role="presentation" class="shrink-0">
+                                                    <button class="my-2 mr-3 text-white block px-7 pb-2.5 pt-3 text-xs rounded-full hover:isolate focus:isolate whitespace-nowrap"
+                                                        @click="menuCategorySelectChanged(category)"
+                                                        :class="category?.id === this.selectedMenuCategory.id ? 'bg-[#D45E5E]' : 'bg-[#c4c4c4]'">
+                                                        {{ category.name }}
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto max-h-[60vh] pr-2">
+                                            <div
+                                                v-for="menu in menuList"
+                                                :key="menu.id"
+                                                class="bg-white rounded-lg shadow hover:shadow-md transition-all duration-300 cursor-pointer"
+                                            >
+                                                <img
+                                                :src="menu.image_url"
+                                                alt="menu"
+                                                class="h-32 w-full object-cover rounded-t-lg"
+                                                />
+                                                <div class="p-3">
+                                                    <h3 class="text-gray-800 font-medium truncate">{{ menu.name }}</h3>
+                                                    <p class="text-gray-600 text-sm mt-1"> {{ menu.prices[0].price.toLocaleString() }} </p>
+                                                    <button
+                                                        class="mt-2 w-full bg-blue-600 text-white text-sm py-1.5 rounded hover:bg-blue-700 transition"
+                                                        @click="addToOrderBtnClicked(menu)"
+                                                    >
+                                                        Add to Order
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <!-- 🌀 Spinner while loading -->
+                                            <div v-if="menuList.length < 1 && menuLoading" class="flex justify-center items-center h-40 text-gray-600">
+                                                <svg
+                                                    class="animate-spin h-8 w-8 text-[#D45E5E]"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24">
+                                                    <circle
+                                                    class="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    stroke-width="4"
+                                                    ></circle>
+                                                    <path
+                                                    class="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                                    ></path>
+                                                </svg>
+                                                <span class="ml-3">Loading menus...</span>
+                                            </div>
+
+                                            <!-- ❌ No Menus Available -->
+                                            <div
+                                            v-else-if="menuList.length === 0 && !menuLoading"
+                                            class="flex flex-col justify-center items-center text-gray-500 h-40"
+                                            >
+                                            <svg
+                                                class="h-10 w-10 text-gray-400 mb-2"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2"
+                                            >
+                                                <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M3 12a9 9 0 1118 0A9 9 0 013 12z"
+                                                />
+                                            </svg>
+                                            <p class="text-center text-sm">No menus available in this category.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-1/5 flex-1">
+                                        Cart Menus
+
+                                        <div class="padding-section text-sm">
+                                            <div class=" grid grid-cols-10 gap-x-6 gap-y-5">
+                                                <p class="text-black font-semibold col-span-5">
+                                                    Menu
+                                                </p>
+                                                <p class="text-black font-semibold col-span-4 text-right">
+                                                    Price
+                                                </p>
+                                                <div class="col-span-1"></div>
+                                                <div v-for="(menu,index) in cartMenus" class="contents" :key="menu">
+                                                    <button class=" col-span-4 text-sm text-left">
+                                                        {{ menu.name }}
+                                                    </button>
+                                                    <div class=" col-span-3 text-center text-sm flex justify-between items-center">
+                                                        <p>
+                                                            {{ menu.quantity }}
+                                                        </p>
+                                                        <div>
+                                                            <input class="input-check-pos" type="checkbox"
+                                                            @change="updateCartMenusPriceTotal()"
+                                                            v-model="cartMenus[index].foc_applied" value="" id="foc" />
+                                                            <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="foc">
+                                                                FOC
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <p class=" col-span-2 text-sm text-right">
+                                                        <div v-if="cartMenus[index].foc_applied"><s>{{ (menu.price).toLocaleString() }}</s></div>
+                                                        <div v-else>{{ (menu.price).toLocaleString() }}</div>
+                                                    </p>
+                                                    <button @click="removeMenuFromCart(menu, index)">
+                                                        <i class="fal fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <hr class="my-2"></hr>
+                                            <div class=" grid grid-cols-10 gap-x-6 gap-y-5 mt-2">
+                                                <p class="text-black font-semibold col-span-4">
+                                                    Sub Total
+                                                </p>
+                                                <div class="col-span-2"></div>
+                                                <p class="text-black font-semibold col-span-3 text-right">
+                                                    {{ (cartMenusPriceTotal + cartMenusFocTotal).toLocaleString() }}
+                                                </p>
+                                            </div>
+                                            <hr class="my-2"></hr>
+                                            <div class=" grid grid-cols-10 gap-x-6 gap-y-5 mt-2">
+                                                <p class="text-black font-semibold col-span-4">
+                                                    FOC
+                                                </p>
+                                                <div class="col-span-2"></div>
+                                                <p class="text-black font-semibold col-span-3 text-right">
+                                                    {{ cartMenusFocTotal.toLocaleString() }}
+                                                </p>
+                                            </div>
+                                            <hr class="my-2"></hr>
+                                            <div class=" grid grid-cols-10 gap-x-6 gap-y-5 mt-2">
+                                                <p class="text-black font-semibold col-span-4">
+                                                    Total
+                                                </p>
+                                                <div class="col-span-2"></div>
+                                                <p class="text-black font-semibold col-span-3 text-right">
+                                                    {{ (cartMenusPriceTotal).toLocaleString() }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <button type="button" class="border rounded mx-1 p-1 w-16 bg-white text-black focus:shadow-none focus:outline-none"
+                                    @click="cancelMenuOrder()">
+                                        Cancel
+                                    </button>
+                                    <pos-loading-btn
+                                    text="Order"
+                                    loading-text="Ordering..."
+                                    :loading="menuOrderBtnLoading"
+                                    :explicitDisable="cartMenus.length < 1"
+                                    @click="confirmMenuOrder()"
+                                    />
+                                    <!-- <button type="button" class="add-btn mx-1 focus:shadow-none focus:outline-none"
+                                    @click="confirmMenuOrder()"
+                                    :disabled="menuOrderBtnLoading || cartMenus.length < 1">
+                                        <svg
+                                            v-if="menuOrderBtnLoading"
+                                            class="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            >
+                                            <circle
+                                                class="opacity-25"
+                                                cx="12"
+                                                cy="12"
+                                                r="10"
+                                                stroke="currentColor"
+                                                stroke-width="4"
+                                            />
+                                            <path
+                                                class="opacity-75"
+                                                fill="currentColor"
+                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                            />
+                                            </svg>
+                                            <span>{{ menuOrderBtnLoading ? "Ordering..." : "Order" }}</span>
+                                    </button> -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </transition>
+
             <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
@@ -224,7 +450,11 @@
                                     data-te-toggle="modal" data-te-target="#add_menu_modal">
                                     <i class="far fa-cocktail"></i>
                                 </button> -->
-                                <a :href="'/pos/pos_order/'+selectedRoom?.id"><i class="far fa-cocktail"></i></a>
+                                <!-- <a :href="'/pos/pos_order/'+selectedRoom?.id"><i class="far fa-cocktail"></i></a> -->
+                                 <button @click="btnClickAddMenu()"
+                                    class="transition duration-150 ease-in-out focus:outline-none focus:ring-0">
+                                    <i class="far fa-cocktail"></i>
+                                </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_hour_modal">
                                     <i class="far fa-hourglass-half"></i>
@@ -283,11 +513,12 @@
                                         Menu Total
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }}
+                                        <!-- {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} -->
+                                        {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].order_sub_total.toLocaleString() : '0' }}
                                         MMks
                                     </p>
                                 </div>
-                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                <div class=" grid grid-cols-11 gap-x-2 gap-y-3">
                                     <div v-for="(menu, index) in purchaseMenuList" class="contents" :key="index">
                                         <div v-for="menu2 in combinedMenuList" class="contents" :key="menu2">
                                             <p class=" col-span-4 text-sm">
@@ -305,8 +536,11 @@
                                                 class=" col-span-2 text-center text-xs pt-0.5">
                                                 {{ menu2.status }}
                                             </p>
-                                            <p class=" col-span-3 text-sm text-right">
-                                                {{ menu2.price.toLocaleString() }} MMKs
+                                            <p class=" col-span-4 text-sm text-right">
+                                                <!-- {{ menu2.price.toLocaleString() }} MMKs -->
+                                                {{ menu2.sub_total_price.toLocaleString() }} 
+                                                <!-- {{ menu2.discount_value ? '(-' + menu2.discount_value + ')': '' }}  -->
+                                                <!-- MMKs -->
                                             </p>
                                         </div>
 
@@ -495,12 +729,12 @@
                                     {{  (printInvoiceData.total ? printInvoiceData.total : 0).toLocaleString() }} MMKs
                                 </p>
                             </div>
-                            <div class="">
+                            <!-- <div class="">
                                 <button data-te-toggle="modal" data-te-target="#end_room_modal"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Print Invoice
                                 </button>
-                            </div>
+                            </div> -->
 
                             <!-- <div class=" text-right pr-3 mb-3">
                                 <p class="">
@@ -531,12 +765,12 @@
                                         MMKs
                                 </p>
                             </div> -->
-                            <!-- <div class="" >
+                            <div class="" >
                                 <button @click="btnClickedDoneSession()"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Done Session
                                 </button>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                     <!-- invoice right sidebar -->
@@ -634,6 +868,9 @@
                                             Tax
                                         </label>
                                     </div>
+                                    <input type="number" v-show="printInvoiceData.isTax" placeholder="Tax" v-model="selectedTaxPercent"
+                                    @input="btnClickedTax()"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0 mt-2">
                                 </div>
                                 <div class="mb-4">
                                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
@@ -788,7 +1025,7 @@
                                                             Price
                                                         </th>
                                                         <th scope="col" class="text-left   py-4">
-        
+
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -826,10 +1063,10 @@
                                                 </tbody>
                                             </table>
                                         </div>
-        
+
                                     </div>
                                     <div class="absolute bottom-0 left-0 right-0 border-b border-gray-200 mb-10">
-                                        <button class="w-full text-center mb-4 font-semibold text-sm focus:outline-none focus:ring-0" 
+                                        <button class="w-full text-center mb-4 font-semibold text-sm focus:outline-none focus:ring-0"
                                         data-te-toggle="modal" data-te-target="#add_package_menu_modal" @click="btnClickAddPackageMenuModal">
                                             Add More Menu
                                         </button>
@@ -861,7 +1098,7 @@
                                                             Price
                                                         </th>
                                                         <th scope="col" class="text-left   py-4">
-        
+
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -896,11 +1133,11 @@
                                                             </td>
                                                         </tr>
                                                     </div>
-        
+
                                                 </tbody>
                                             </table>
                                         </div>
-        
+
                                     </div>
                                     <div class="absolute bottom-0 left-0 right-0 border-b border-gray-200 focus:outline-none focus:ring-0 ">
                                         <button class="w-full text-center mb-4 font-semibold text-sm"
@@ -910,7 +1147,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
 
                             <!-- <div class="flex justify-center padding-section ">
 
@@ -980,10 +1217,10 @@
                                 </div>
                             </div> -->
 
-                            
+
                         </div>
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3 bg-white">
-                            
+
                             <div class="">
                                 <button @click="createRoomForPackage()"
                                     class="bg-[#55EFC4] text-gray-700 text-center text-sm font-semibold w-full py-3">
@@ -1052,7 +1289,8 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnAddHour()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnAddHour()" class="pos-add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                             Add Hours
                         </button>
                     </div>
@@ -1148,7 +1386,7 @@
                         <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage" @change="selectedPackageMenuChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }} ( {{ menu.prices[0].price }} Ks 
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }} ( {{ menu.prices[0].price }} Ks
                                 )</option>
                             </select>
                         </div>
@@ -1211,7 +1449,8 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                             Change
                         </button>
                     </div>
@@ -1506,8 +1745,8 @@
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
     import moment from "moment";
-    import flatpickr from "flatpickr";
     import "flatpickr/dist/flatpickr.min.css";
+    import PosLoadingBtn from "../Common/PosLoadingBtn.vue";
 
     export default {
         name:'PosRoomComponent',
@@ -1522,7 +1761,8 @@
             }
         },
         components:{
-            Multiselect
+            Multiselect,
+            PosLoadingBtn
         },
         // props: ['roomAreaId'],
         data() {
@@ -1653,6 +1893,7 @@
                 isShowSidebar:false,
                 testbro:null,
 
+                selectedTaxPercent: 5,
 
                 // add service
                 serviceCategoryList:[],
@@ -1688,6 +1929,17 @@
 
                 total_room_price:0,
                 entityType: null,
+
+                foodOrderPanelShown: false,
+                menuCategoryList: [],
+                selectedMenuCategory: null,
+                menuList: [],
+                menuLoading: false,
+                cartMenus: [],
+                cartMenusPriceTotal: 0,
+                entityDetails: null,
+                menuOrderBtnLoading: false,
+                cartMenusFocTotal: 0,
             };
         },
 
@@ -1707,7 +1959,7 @@
                         }
                     }
                 }
-                
+
             },
             async btnClickedSession(time, timeIndex, room , roomIndex) {
                 this.isShowSidebar = true;
@@ -1720,6 +1972,7 @@
                     this.getPurchaseMenuList(); // why is this called
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
+                        this.entityDetails = response.data;
                         if(response.data.deposit_balance > 0){
                             this.depositBalance = response.data.deposit_balance;
                         }
@@ -1732,7 +1985,7 @@
                         this.printInvoiceData.room = response.data.total_session_price
                         this.printInvoiceData.food = response.data.total_order_value
                         this.printInvoiceData.total = response.data.invoice_total - response.data.total_order_discount_price
-
+                        this.getMenuCategoryList();
                     }
                 }
                 else {
@@ -1740,7 +1993,7 @@
                     this.isOpenRoomStep('open_1');
                     console.log('open 1')
                 };
-                this.getPackageList(this.currentTimeForPackage);                
+                this.getPackageList(this.currentTimeForPackage);
             },
 
             btnClickedOpenRoom() {
@@ -1847,7 +2100,7 @@
                 }
             },
             btnClickAddPackageMenuModal(){
-                this.getMenuList();
+                // this.getMenuList();
                 this.selectedMenuForPackage = null;
                 this.menuQuantityForPackage = null;
             },
@@ -1900,7 +2153,7 @@
                     this.packageMenuList[index].is_package = -1
                 }
             },
-            
+
             btnConfirmAddPackageAccessory() {
                 this.packageAccessoriesList.push({
                     quantity: this.selectedAccessoryQuantity,
@@ -2001,8 +2254,8 @@
                     this.getRoomList();
                     this.getSelectedRoom();
                     this.isOpenRoomStep('detail');
-                    
-                    
+
+
                     // if (this.selectedRoom.room_sessions.length > 0) {
                     //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
                     //         this.getPurchaseMenuList();
@@ -2014,7 +2267,7 @@
                     //     }
                     // }
                     this.food_total_package = 0
-                    // this.uiInShow = 
+                    // this.uiInShow =
 
                     // (selectedRoom ?
                     //     ((purchaseMenuList.length > 0 ?
@@ -2031,8 +2284,8 @@
                     //     ) + selectedRoom.total_service_value + selectedRoom.total_accessory_value).toLocaleString()
                     //     : 0
                     // )
-                    
-                    
+
+
                     // console.log("success")
                     // window.location.reload()
                 }
@@ -2047,6 +2300,7 @@
             async getPurchaseMenuList() {
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() }); // and why is this api also called
                 if (response.data) {
+                    this.entityDetails = response.data;
                     if(response.data.deposit_balance > 0){
                         this.depositBalance = response.data.deposit_balance;
                     }
@@ -2063,7 +2317,11 @@
                         if (response.data.invoice.orders.length > 0) {
                             this.foodDiscount = response.data.invoice.orders[0].total_discount_price
                         }
+                        else{
+                            this.foodDiscount = 0;
+                        }
                     }
+                    this.getMenuCategoryList();
                     this.getTotal(response.data)
                     console.log('get purchase menu')
                 }
@@ -2071,6 +2329,7 @@
             async getSelectedRoom(){
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
+                        this.entityDetails = response.data;
                         if(response.data.deposit_balance > 0){
                             this.depositBalance = response.data.deposit_balance;
                             // alert(this.depositBalance);
@@ -2084,7 +2343,7 @@
                         this.printInvoiceData.room = this.selectedRoom.total_session_price
                         this.printInvoiceData.food = this.selectedRoom.total_order_value
                         this.printInvoiceData.total = this.selectedRoom.invoice_total - this.selectedRoom.total_order_discount_price
-                        
+
                     }
             },
             getTotal(roomData){
@@ -2193,7 +2452,7 @@
                 }
                 if (this.isTax = true) {
                     // this.printInvoiceData.tax = this.printInvoiceData.food * 0.05 used before
-                    this.printInvoiceData.tax = this.printInvoiceData.total * 0.05
+                    this.printInvoiceData.tax = this.printInvoiceData.total * (this.selectedTaxPercent * 0.01);
                 }
 
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
@@ -2211,7 +2470,8 @@
             },
             btnClickedTax(){
                 if (this.isTax = true) {
-                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
+                    let tax = this.selectedTaxPercent * 0.01
+                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * tax;
                 }
             },
             roomDiscountSelectChanged() {
@@ -2529,12 +2789,12 @@
 
 
             // add menu
-            async getMenuList() {
-                const response = await getApiData({ url: '/api/menus?selling_area_id=' + this.area.id, token: this.getToken() });
-                if (response.data) {
-                    this.menuList = response.data;
-                }
-            },
+            // async getMenuList() {
+            //     const response = await getApiData({ url: '/api/menus?selling_area_id=' + this.area.id, token: this.getToken() });
+            //     if (response.data) {
+            //         this.menuList = response.data;
+            //     }
+            // },
             async selectedMenuChange() {
                 // const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
                 // if (response.data) {
@@ -2544,12 +2804,13 @@
                 this.menuQuantity = 1;
             },
             btnClickAddMenu() {
+                this.foodOrderPanelShown = true;
                 this.invoiceId = this.selectedRoom.invoice.id;
                 console.log('invoice id ' + this.invoiceId)
                 this.menuQuantity = null;
                 this.selectedMenu = null;
                 this.remark = null;
-                this.getMenuList();
+                // this.getMenuList();
             },
             btnConfirmAddMenu() {
                 this.addMenu();
@@ -2920,7 +3181,114 @@
             },
             nameWithPrice ({name, prices}) {
                 return `${name} (${prices[0].price}Ks)`
-            }
+            },
+
+            getMenuCategoryList() {
+                getApiData({ url: '/api/menu_categories', token: this.getToken() })
+                .then((response)=>{
+                    if(response.success){
+                        this.menuCategoryList = response.data;
+                        this.selectedMenuCategory = this.menuCategoryList[0];
+                        if(this.entityDetails){
+                            this.getMenuList(this.entityDetails.area_id);
+                        }
+                    }
+                })
+            },
+
+            getMenuList(sellingAreaId){
+                const url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus?selling_area_id=${sellingAreaId}`;
+                getApiData({url: url, token: this.getToken()})
+                .then((response)=>{
+                    this.menuLoading = false;
+                    if(response.success){
+                        this.menuList = response.data;
+                    }
+                });
+            },
+
+            menuCategorySelectChanged(category){
+                this.menuList = [];
+                this.selectedMenuCategory = category;
+                this.menuLoading = true;
+                if(this.entityDetails){
+                    this.getMenuList(this.entityDetails.area_id);
+                }
+            },
+
+            addToOrderBtnClicked(menu){
+                let existingMenu = this.cartMenus.find((eachMenu)=>eachMenu.menu_id === menu.id);
+                if(existingMenu){
+                    const index = this.cartMenus.findIndex(menu => menu.menu_id === existingMenu.menu_id);
+                    this.cartMenus[index].quantity += 1;
+                    this.cartMenus[index].price = this.cartMenus[index].quantity * this.cartMenus[index].unit_price;
+                }else{
+                    this.cartMenus.push({
+                        menu_id: menu.id,
+                        name: menu.name,
+                        code: menu.code,
+                        quantity: 1,
+                        price: menu.prices[0].price,
+                        unit_price: menu.prices[0].price,
+                        original_price: menu.prices[0].price,
+                        menu_category_id: this.selectedMenuCategory,
+                        cooking_area_id: menu.cooking_area_id,
+                        is_package: 0,
+                        is_foc: 0,
+                        foc_applied: false,
+                    });
+                }
+
+                this.updateCartMenusPriceTotal();
+            },
+
+            removeMenuFromCart(menu, index){
+                this.cartMenus.splice(index, 1);
+                this.updateCartMenusPriceTotal();
+            },
+
+            updateCartMenusPriceTotal(){
+                this.cartMenusPriceTotal = this.cartMenus.reduce((total, menu) => {
+                    // If foc_applied is true, amount is 0; otherwise, use the parsed price
+                    const amount = menu.foc_applied ? 0 : (Number(menu.price) || 0);
+                    menu.is_foc = (menu.foc_applied)? 1:0;
+                    return total + amount;
+                }, 0);
+                this.cartMenusFocTotal = this.cartMenus.reduce((total, menu) => {
+                    // If foc_applied is false, amount is 0; otherwise, use the parsed price
+                    const amount = (!menu.foc_applied) ? 0 : (Number(menu.price) || 0);
+                    return total + amount;
+                }, 0);
+            },
+
+            confirmMenuOrder(){
+                this.menuOrderBtnLoading = true;
+                let formData = new FormData();
+                formData.append('menuArray', JSON.stringify(this.cartMenus))
+                formData.append('invoice_id', this.entityDetails.invoice.id);
+                formData.append('selling_area_id', this.entityDetails.area_id);
+                postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() })
+                .then((response)=>{
+                    this.menuOrderBtnLoading = false;
+                    if(response.success){
+                        this.getPurchaseMenuList();
+                        this.cartMenus = [];
+                        this.cartMenusPriceTotal = 0;
+                        this.foodOrderPanelShown = false;
+                    }else{
+                        this.$notify({
+                            text: response.message,
+                            type: "error"
+                        });
+                    }
+                })
+            },
+
+            cancelMenuOrder(){
+                this.cartMenus = [];
+                this.cartMenusPriceTotal = 0;
+                this.foodOrderPanelShown = false;
+            },
         },
 
         watch: {
@@ -2948,7 +3316,7 @@
                     const key = item.menu_id + '-' + item.status;
                     if (!map[key]) {
                         map[key] = { ...item };
-                    } 
+                    }
                     else {
                         map[key].quantity += item.quantity;
                         map[key].price += item.price;
@@ -2969,11 +3337,12 @@
             // this.getAccessoryCategoryList();
             // this.testtime();
             this.getCashAccounts();
+            this.getMenuCategoryList();
         },
         mounted()
         {
             // Date picker
-            
+
             // if (this.roomAreaId) {
             //     this.getRoomList(this.roomAreaId);
             // }

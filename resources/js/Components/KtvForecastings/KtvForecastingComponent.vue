@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(roomForecasting, index) in roomForecastingTable" :key="index">
@@ -77,6 +82,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="roomForecastingTable.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -156,8 +166,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             roomForecastingList: [],
@@ -182,6 +196,7 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -189,6 +204,7 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getMenuForecastingList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url;
             // let url = `/api/objectives?page=${pageNumber}`;
@@ -204,6 +220,7 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.roomForecastingList = response.data;
                 this.roomForecastingList.forEach(forecasting => {
                     let total_amount = 0;

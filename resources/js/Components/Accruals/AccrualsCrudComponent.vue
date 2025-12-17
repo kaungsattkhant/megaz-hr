@@ -1,7 +1,7 @@
 <template>
     
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -57,7 +57,12 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
@@ -76,11 +81,10 @@
                                     <td class="whitespace-nowrap">
                                         {{ item.balance }}
                                     </td>
-                                    
                                 </tr>
                             </div>
-                            <tr class=" !text-center" v-if="primaryList.length < 1">
-                                <td class="" colspan="3">
+                            <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
+                                <td class="" colspan="5">
                                     No Data Here
                                 </td>
                             </tr>
@@ -184,7 +188,7 @@
                         </label>
                         <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                             data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Type"
+                            <select data-te-select-init data-te-select-placeholder="Select Type" @change="getApAccountList"
                                 data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black">
                                 <option :value="type" v-for="(type, index) in typeList"
                                     :key="index"> {{ type.name }} </option>
@@ -213,6 +217,21 @@
                                     :key="index"> {{ category.name }} </option>
                             </select>
                         </div>
+                    </div>
+                    <div class="mb-6 col-span-3" v-if="selectedType?.value === 'addition' && selectedCategory?.value === 'other_payable'">
+                        <label for="" class="label-form mb-3">
+                            AP Account
+                        </label>
+                        <multiselect
+                        v-model="selectedApAccount"
+                        :options="apAccountList"
+                        :close-on-select="true"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Account"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="false" ></multiselect>
                     </div>
                     <div class="mb-6 col-span-3">
                         <label for="" class="label-form mb-3">
@@ -290,10 +309,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     props: ["accrualsId"],
     data() {
@@ -308,10 +329,12 @@ export default {
                 {name : 'Other_payable', value: 'other_payable'},
             ],
             cashbookList: [],
+            apAccountList: [],
             accountList: [],
 
             selectedType: null,
             selectedCategory: null,
+            selectedApAccount: null,
             selectedAccount: null,
             amount: null,
             selectedCashbook: null,
@@ -330,12 +353,15 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
         async getPrimaryList() {
+
+            this.loading = true;
             let url = this.url + '/' + this.accrualsId
             let response = await getApiData({ url: url, token: this.getToken() })
 
@@ -345,13 +371,30 @@ export default {
             //     this.primaryList = response.data ? response.data : response;
             // }
             if (response.data) {
+                this.loading = false;
                 this.primaryList = response.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = response.pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
-                this.selectedCategory = this.categoryList.find(item => item.value = this.primaryList[0].category);
+                this.selectedCategory = this.categoryList.find(item => item.value === this.primaryList[0].category);
                 this.selectedAccount = this.accountList.find(item => item.value = this.primaryList[0].category);
+            }
+        },
+        async getApAccountList(){
+            if(this.selectedType && this.selectedCategory){
+                let url = `/api/other-payable-accounts`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.apAccountList = response.data;
+                }
+                else{
+                    this.$notify({
+                        title: 'Input validation',
+                        text: response.error,
+                        type: 'warn'
+                    });
+                }
             }
         },
         async getExpenseAccountList() {
@@ -420,6 +463,10 @@ export default {
             let formData = new FormData();
             formData.append('type', this.selectedType.value);
             formData.append('category', this.selectedCategory.value);
+            if(this.selectedType.value === 'addition' && this.selectedCategory.value === 'other_payable'){
+                formData.append('other_payable_account_id',this.selectedApAccount.id);
+                formData.append('other_payable_account_code',this.selectedApAccount.account_code);
+            }
             formData.append('expense_account_id', this.selectedAccount.id);
             formData.append('expense_account_code', this.selectedAccount.account_code);
             formData.append('amount',this.amount);

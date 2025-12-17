@@ -56,10 +56,9 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
             $brand = Brand::where('id', $row['brand_id'])->first();
             $supplier = Supplier::where('supplier_code', $row['supplier_code'])->first();
             if (!$supplier) {
-                // DB::rollback();
-                // return null;
+                DB::rollback();
+                return null;
             }
-            $uom = Uom::where('uom_code', $row['uom_code'])->first();
             if (!$item) {
                 ResponseMessage('Item Code is invalid', 419);
             }
@@ -67,7 +66,11 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
                 ResponseMessage('Brand Id is invalid', 419);
             }
             if (!$supplier) {
-                ResponseMessage('Supplier Id is invalid', 419);
+            }
+            $uom = Uom::where('id', $item->base_uom_id)->first();
+            if(!$uom){
+                $sg=$row['uom_code'].' - Uom Id is invalid '.$row['item_code'];
+                ResponseMessage($sg, 419);
             }
             $supplierItem = SupplierItem::create([
                 'supplier_id' => $supplier->id,
@@ -83,7 +86,8 @@ class ItemPriceImport implements ToModel, WithHeadingRow, WithValidation, SkipsO
                 $type = 'uom';
                 $price = $item->uom_conversion * (float)$row['price'];
             } else {
-                ResponseMessage('Uom does not match with item uom', 419);
+                $msgs=$item->name.' - Uom does not match with item uom'.'Base  must be '.$item->base_uom->name .' and ' . 'Uom  must be ' . $item->uom->name;
+                ResponseMessage($msgs, 419);
             }
             if (!$type) {
                 ResponseMessage('Uom Type is invalid', 419);

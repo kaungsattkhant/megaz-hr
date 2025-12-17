@@ -15,7 +15,7 @@ return [
     'brand' => 'brands',
     'uom-conversion' => 'uom_conversions',
     'uom' => 'uoms',
-    'menu' => 'MRP.index',
+    'menu' => 'MRP',
     'menu-area' => 'menu_area.index',
     'menu-costing' => 'menu_costing.index',
     'menu-sale-report' => 'menu_sale_report.index',
@@ -34,39 +34,39 @@ return [
     'package' => 'packages.index',
     'menu-service-discount' => 'menu_service_discount.index',
 
-    'skill' => 'skill.index',
-    'cooking-place' => 'cookingPlace.index',
-    'custom-task' => 'tasks.customtask',
+    'skill' => 'skill',
+    'cooking-place' => 'cookingPlace',
+    'custom-task' => 'custom_tasks',
     'report-task' => 'task_report',
-    'accessory' => 'accessories.index',
-    'okr' => 'OKR.index',
-    'duty' => 'duty.index',
-    'ktv-product-tree' => 'product_tree.index',
+    'accessory' => 'accessories.index', //  require route name  at web.php
+    'okr' => 'OKR',
+    'duty' => 'duty',
+    'ktv-product-tree' => 'ktv_product_tree',
     //procurement
-    'po-order' => 'procurement_order_items.index',   //procurement order-item
-    'arrival-item' => 'procurement_order_arrival.index',
+    'po-order' => 'procurement_order_items',   //procurement order-item
+    'arrival-item' => 'arrival_items',
     'po-order-invoice' => 'purchase_order_invoices',   //purchase order invoice listc
     //end procurement
 
     //added
-    'menu-category' => 'menu_categories.index',
+    'menu-category' => 'menu_categories',
     'account' => 'accounting.index',// chart of account (COA)
     // 'financial-transaction'=> 'financial_transaction.index',
     'asset-item' => 'assetItemList',
     'okr-duty' => 'okr_duty',
-    'okr-dashboard' => 'okr_dashboard.index',
-    'menu-forecasting' => 'menu_forecastings.index',
-    'ktv-forecasting' => 'ktv_forecastings.index',
+    'okr-dashboard' => 'okr_dashboard',
+    'menu-forecasting' => 'menu_forecasting',
+    'ktv-forecasting' => 'ktv_forecasting',
     'sale-target-menu' => 'sale_target_menu',
     'sale-target-position' => 'sale_target_position',
-    'time-shift' => 'time_shift.index',
-    'check-in' => 'check_in.index',
-    'gps' => 'GPS.index',
+    'time-shift' => 'time_shift',
+    'check-in' => 'check_in',
+    'gps' => 'gps',
     'contact' => 'contact',
-    'meeting' => 'meeting.index',
-    'training' => 'training.index',
-    'org-new' => 'org_news.index',
-    'warning' => 'warning.index',
+    'meeting' => 'meeting',
+    'training' => 'training',
+    'org-new' => 'org_news',
+    'warning' => 'warning',
     'off-day' => 'off_day.index',
     'leave-allowance' => 'leave_allowance.index',
     'leave' => 'leave.index',
@@ -84,7 +84,17 @@ return [
     'customer-birthday' => 'CRM.customers.birthdays',
     'birthday-promotion' => 'CRM.birthday_discounts.index',
     'used-defected-item' => 'used_defected_items.index',
-    'event'=>'',
+    'jd'=>'job_description.index',
+    'js'=>'job_specifications.index',
+    'sop'=>'SOP.index',
+    'cv'=>'CV.index',
+    'shift-assignment'=>'shift_assignment.index',
+    'equipment-assignment'=>'equipment_assignment.index',
+    'asset-assignment'=>'asset_assignment.index',
+    'handbook'=>'handbooks.index',
+
+    
+    
     
     //financial
     'chartofaccount' => 'accounting',
@@ -98,6 +108,8 @@ return [
     'prepaid' => 'prepaid.index',
     'ar' => 'AR.index',
     'cashbook' => 'cashbook',
+    'accrual'=>'accruals.index',
+    'loan'=>'loans.index',
     //end financial
 
     //pos
@@ -109,5 +121,6 @@ return [
     'pos-booking' => 'pos.booking.index',
     'pos-food-order' => 'pos.menu_order.index',
     'pos-ar' => 'pos.ar',
+    'pos-menu-sale-report'=>'pos.sale_reports',
 
 ];

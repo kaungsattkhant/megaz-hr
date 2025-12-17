@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -77,14 +77,20 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+                        <tbody v-else>
                             <!-- <tr>
                                 {{ balanceFormat(2010, 1000, 'kg', 'g') }}
                             </tr> -->
                             <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
                                 <tr>
                                     <td>
-                                        {{ ++index }}
+                                        <!-- {{ ++index }} -->
+                                        {{ perPage ? (currentPage - 1) * perPage + index + 1 : index+1 }}
                                     </td>
                                     <td @click="isShowToggle(ledger)">
                                         {{ ledger.name }}
@@ -114,7 +120,7 @@
                                         {{ ledger.base_balance }} {{ ledger.conversion_balance }}
                                     </td>
                                     <td>
-                                        {{ (ledger.total_value).toLocaleString() }}
+                                        {{ (ledger?.total_value)?.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <!-- <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
@@ -153,7 +159,7 @@
                                         <!-- {{ ledger.base_balance }} {{ ledger.conversion_balance }} -->
                                     </td>
                                     <td>
-                                        {{ (batch.total_value).toLocaleString() }}
+                                        {{ (batch?.total_value)?.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <button id="edit-btn" class="pr-1" @click="transferBtnClicked(batch, index-1, batchIndex)"
@@ -172,6 +178,11 @@
                                 </tr>
                             </div>
 
+                            <tr class=" !text-center" v-if="inventoryLegderList.length < 1 && !loading">
+                                <td class="" colspan="10">
+                                    No Data Here
+                                </td>
+                            </tr>
                             <!-- <div class="contents" > -->
                                 <!-- <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                     <td colspan="7" class=" px-6 py-4 font-medium ">
@@ -189,6 +200,23 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1" @click="getInventoryLegderList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                        lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getInventoryLegderList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -501,8 +529,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import 'tw-elements';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             inventoryLegderList: [],
@@ -536,15 +568,20 @@ export default {
             base_min_amount:0,
             min_amount:0,
 
-            per_page: 20,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            // per_page: 20,
+            // pageNumbers: [],
+            // currentPage: 1,
+            // paginationGroupsCount: 1,
+            // per_group: 10,
+            // groupedPageNumbers: [],
+            // currentGroup: 0,
+            // isFirstGroup: true,
+            // isLastGroup: false,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
 
             searchInventoryList:[],
             searchInventory:null,
@@ -554,7 +591,8 @@ export default {
             typeList: [
                 { name: 'Defect', value: 'defect'},
                 { name: 'Used', value: 'used'}
-            ]
+            ],
+            loading: true,
         };
     },
     // props: ['inventory_id'],
@@ -572,10 +610,11 @@ export default {
         },
 
         async getInventoryLegderList(pageNumber) {
+            this.loading = true;
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            let url = `/api/inventory_ledger_list?`;
+            let url = `/api/inventory_ledger_list?page=` + pageNumber + `&`;
             if(this.fromDate && this.toDate){
                 url = `${url}from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
@@ -584,8 +623,9 @@ export default {
             }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.totalValuation = 0;
-                this.inventoryLegderList = response.data;
+                this.inventoryLegderList = response.data.data;
                 this.inventoryLegderList.forEach(ledger => {
                     ledger.base_balance = Math.floor(ledger.closing_balance / ledger.conversion) + ' ' + ledger.base_uom_name;
                     ledger.conversion_balance = null;
@@ -601,6 +641,11 @@ export default {
                     ...item,
                     isShow: false
                 }));
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         isShowToggle(item) {
@@ -646,7 +691,7 @@ export default {
                     text: `Success`,
                     type: 'info'
                 });
-                this.getInventoryLegderList();
+                this.getInventoryLegderList(1);
                 document.getElementById('close_add_minimum_modal').click();
                 this.base_min_amount = 0;
                 this.min_amount = 0;
@@ -802,7 +847,7 @@ export default {
 
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
             if (response.success) {
-                // this.getInventoryLegderList(null);
+                // this.getInventoryLegderList(1);
                 this.closeModal();
                 this.clearForm();
                 this.$notify({
@@ -830,25 +875,25 @@ export default {
                     this.url_inventory = 'inventory_id=' + this.searchInventory.id
                 }
                 
-                this.getInventoryLegderList();
+                this.getInventoryLegderList(1);
             }
         },
         selectedInventoryChanged(){
             this.url_inventory = 'inventory_id=' + this.searchInventory.id
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryLegderList();
+            this.getInventoryLegderList(1);
         },
         searchBtnClicked(){
             this.searchInventory = null;
             this.url_inventory = '';
-            this.getInventoryLegderList();
+            this.getInventoryLegderList(1);
         },
 
         clearSearchBtnClicked(){
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryLegderList();
+            this.getInventoryLegderList(1);
             
         },
 
@@ -881,7 +926,7 @@ export default {
     },
 
     created() {
-        // this.getInventoryLegderList(null);
+        // this.getInventoryLegderList(1);
         this.getInventoryList();
         this.getUomList();
         this.getSearchInventoryList();

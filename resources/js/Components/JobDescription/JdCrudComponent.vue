@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -66,8 +66,14 @@
                                 <th scope="col" class="">
                                     Role
                                 </th>
+                                <th></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(jd, index) in primaryList" :key="index">
                                 <tr class="">
@@ -75,7 +81,7 @@
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
-                                    <td class="">
+                                    <td class=" text-left">
                                         {{ jd.job_description }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
@@ -99,6 +105,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="primaryList.length < 1">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -250,10 +261,12 @@ import Multiselect from 'vue-multiselect';
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -296,6 +309,7 @@ export default {
             createEditUrl: null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -303,9 +317,11 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
+            this.loading = true;
             let url = this.url + this.url_search + this.url_department + '?page=' + pageNumber + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.primaryList = response.data.data;
 
                 this.lastPage = response.data.last_page;

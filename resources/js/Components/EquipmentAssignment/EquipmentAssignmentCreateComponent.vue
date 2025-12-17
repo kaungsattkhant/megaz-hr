@@ -71,6 +71,20 @@
                     </select>
                 </div>
             </div>
+            <!-- <div class="mb-4 col-span-3 pb-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Uom Type
+                </label>
+
+                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Uom Type"
+                        data-te-select-filter="true" name="" id="" v-model="selectedUomType" class="input-ui !text-black text-sm">
+                        <option value="base_uom">Base Uom</option>
+                        <option value="uom">Uom</option>
+                    </select>
+                </div>
+            </div> -->
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Amount
@@ -78,7 +92,7 @@
                 <input type="number" placeholder="Amount" v-model="amount" class="input-ui">
             </div>
             
-            <div class="col-span-4">
+            <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
@@ -160,6 +174,7 @@ export default {
             selectedStaff: null,
             selectedEquipment: null,
             amount: null,
+            selectedUomType: null,
             
             selectedEquipmentList: [],
         };
@@ -206,23 +221,28 @@ export default {
                 this.alertValidationMessage(`Amount`);
                 return 1;
             }
+            // else if(!this.selectedUomType){
+            //     this.alertValidationMessage(`Uom Type`);
+            //     return 1;
+            // }
             else{
                 this.addEquipment();
             }
         },
         async addEquipment(){
-            
+            // uom = select box change yan
             this.selectedEquipmentList.push({
                 item_id: this.selectedEquipment.id,
                 item_name: this.selectedEquipment.name,
-                uom_id: this.selectedEquipment.uom_id,
-                uom_name: this.selectedEquipment.item_uom,
                 quantity: this.amount,
                 uom_conversion: this.selectedEquipment.uom_conversion,
-                uom_type: 'uom_type',
+                uom_id: this.selectedEquipment.uom_id,  
+                uom_name: this.selectedEquipment.item_uom,
+                uom_type: 'uom',
             })
             this.selectedEquipment = null;
             this.amount = null;
+            this.selectedUomType = null;
         },
         removeItem(index){
             this.selectedEquipmentList.splice(index, 1);
@@ -249,7 +269,7 @@ export default {
             let response = await postApiData({url:`/api/hr/equipment-assignments`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/equipment_assignment`);
+                window.location.replace(`/equipment_assignment`);
             }else {
                 this.$notify({
                     title: `Input validation`,

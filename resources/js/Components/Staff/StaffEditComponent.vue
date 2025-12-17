@@ -336,25 +336,52 @@
                     <span class="px-1 text-red-600 text-sm">{{ addressInputError }} *</span>
                 </div>
             </div>
-            <div class="col-span-6"></div>
+
+            <div class="contents">
+                <div class="contents">
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
+                        <label for="nrc-front" class="label-form mb-3">
+                            Profile Picture
+                        </label>
+                        <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-front" ref="nrc_front_image"
+                        class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                        border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                        @change="onProfilePicFileChange">
+                        <img v-if="profilePicPreview" :src="profilePicPreview" alt="NRC Front Preview" class="mt-2 h-24" />
+                        <div class="mt-1" v-if="profilePicFileError">
+                            <span class="px-1 text-red-600 text-sm">{{ profilePicFileError }} *</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-span-3"></div>
 
             <div v-if="staff" class="contents">
                 <div class="contents">
-                    <div class="col-span-4 rounded-md mb-4 pb-6">
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
+                        <label for="" class="label-form mb-3">
+                            Profile Image
+                        </label>
+                        <img v-if="staff.profile_image_url" :src="staff.profile_image_url" alt="Profile Image" class="mx-4 mt-2 h-24" />
+                    </div>
+
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
                         <label for="" class="label-form mb-3">
                             NRC Front
                         </label>
                         <img v-if="staff.nrc_front_url" :src="staff.nrc_front_url" alt="NRC Front Image" class="mx-4 mt-2 h-24" />
                     </div>
 
-                    <div class="col-span-4 rounded-md mb-4 pb-6">
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
                         <label for="" class="label-form mb-3">
                             NRC Back
                         </label>
                         <img v-if="staff.nrc_back_url" :src="staff.nrc_back_url" alt="NRC Back Image" class="mx-4 mt-2 h-24" />
                     </div>
 
-                    <div class="col-span-4 rounded-md mb-4 pb-6">
+                    <div class="col-span-3 rounded-md mb-4 pb-6">
                         <label for="" class="label-form mb-3">
                             Household Registration
                         </label>
@@ -365,7 +392,7 @@
 
             <div v-if="staff" class="contents">
                 <div class="contents" v-if="staff.staff_certifications.length > 0">
-                    <div class="col-span-11 rounded-md mb-4 pb-6">
+                    <div class="col-span-12 rounded-md mb-4 pb-6">
                         <label for="" class="label-form mb-3">
                             Certification Images
                         </label>
@@ -376,10 +403,8 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-span-1"></div>
             </div>
-
+            <div class="col-span-12"></div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="nrc-front" class="label-form mb-3">
                     NRC Front
@@ -443,6 +468,13 @@
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
+                    Bank Account Number
+                </label>
+                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
                     Bank Name
                 </label>
                 <multiselect v-model="selectedBank"
@@ -468,12 +500,7 @@
                 <button data-te-toggle="modal" data-te-target="#add_bank_modal" > <i class="fas fa-plus"></i> </button>
             </div>
 
-            <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="label-form mb-3">
-                    Bank Account Number
-                </label>
-                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
-            </div>
+
 
             <div class="col-span-5"></div>
 
@@ -696,17 +723,25 @@
             </div>
             <div>
                 <div v-for="(module,index) in featureList" class="mb-4 pb-6 px-2 border-b border-gray-200 flex">
-                    <p class=" capitalize mb-4 font-semibold w-[20%]">
+                    <p class=" capitalize mb-4 font-semibold w-[20%] cursor-pointer" @click="toggleGroup(module)">
                         {{ module.module }}
                     </p>
                     <div class="w-[80%] grid grid-cols-4 text-sm text-gray-600 flex-wrap gap-x-4 gap-y-6">
+                        <label v-show="module.features.length > 1" class="block items-center space-x-2 cursor-pointer" @click="toggleGroup(module)">
+                            <span class="text-black break-all capitalize block mb-2"> All </span>
+                            <input
+                            type="checkbox" :checked="isAllSelected(module)"
+                            class="form-checkbox !ml-0.5 h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                            />
+
+                        </label>
                         <div v-for="feature in module.features" class="">
 
                             <label class="block items-center space-x-2 cursor-pointer">
                                 <span class="text-black break-all capitalize block mb-2">{{ feature.slug }}</span>
                                 <input
                                 type="checkbox" :value="feature.id" v-model="selectedFeatures"
-                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer"
+                                class="form-checkbox h-4 w-4 text-[#845adf] rounded focus:shadow-none focus:ring-0 cursor-pointer !ml-0.5"
                                 />
 
                             </label>
@@ -794,6 +829,10 @@ export default {
             houseHoldRegistrationFile: null,
             houseHoldRegistrationPreview: null,
 
+            profilePicFile: null,
+            profilePicPreview: null,
+            profilePicFileError: null,
+
             nrcFrontFileError: null,
             nrcBackFileError: null,
             houseHoldRegistrationFileError: null,
@@ -874,6 +913,11 @@ export default {
             const file = e.target.files[0];
             this.houseHoldRegistrationFile = file;
             this.houseHoldRegistrationPreview = file ? URL.createObjectURL(file) : null;
+        },
+        onProfilePicFileChange(e) {
+            const file = e.target.files[0];
+            this.profilePicFile = file;
+            this.profilePicPreview = file ? URL.createObjectURL(file) : null;
         },
 
         certificationFilesChange(e){
@@ -1211,12 +1255,12 @@ export default {
                 // return 1;
                 this.creatable = false;
             }
-            if (this.selectedFeatures.length < 1) {
-                this.alertValiationMessage('authorized features');
-                this.featuresInputError = "At least one feature must be authroized";
-                // return 1;
-                this.creatable = false;
-            }
+            // if (this.selectedFeatures.length < 1) {
+            //     this.alertValiationMessage('authorized features');
+            //     this.featuresInputError = "At least one feature must be authroized";
+            //     // return 1;
+            //     this.creatable = false;
+            // }
             if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
                 this.alertValiationMessage('inventories');
                 this.inventoryInputError = "Inventory staff must select at least one inventory";
@@ -1312,7 +1356,9 @@ export default {
             formData.append('role_id', this.selectedRole.id);
             formData.append('skill_ids',JSON.stringify(this.skillIds));
             // formData.append('feature_ids', JSON.stringify(this.featureIds));
-            formData.append('feature_ids', JSON.stringify(this.selectedFeatures));
+            if(this.selectedFeatures.length > 0){
+                formData.append('feature_ids', JSON.stringify(this.selectedFeatures));
+            }
             if (this.inventoryIds.length > 0) {
                 formData.append('inventory_ids', JSON.stringify(this.inventoryIds));
             }
@@ -1355,6 +1401,9 @@ export default {
 
             formData.append('joined_date', this.formatDate(this.joinedDate, '/', 'yyyy-mm-dd', '-', ['day','month','year']));
 
+            if(this.profilePicFile){
+                formData.append('profile_image', this.profilePicFile);
+            }
             if (this.nrcFrontFile) {
                 formData.append('nrc_front_image', this.nrcFrontFile);
             }
@@ -1441,6 +1490,36 @@ export default {
                 }
             });
         },
+        toggleGroup(items) {
+            const allSelectedd = items.features.every(i => this.selectedFeatures.includes(i.id));
+            console.log('All fruit items selected?', allSelectedd); // true
+
+            items.features.forEach(item => {
+                // const allSelected = items.features.every(i => this.selectedFeatures.includes(i.id));
+                // console.log(`All items in  selected?`, allSelected);
+                // const exists = this.selectedFeatures.some(i => i === item.id);
+
+
+                if(allSelectedd){
+                    this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                }
+                else{
+                    this.selectedFeatures = this.selectedFeatures.filter(i => i !== item.id);
+                    this.selectedFeatures.push(item.id);
+                }
+
+            });
+
+        },
+        handleEscape(event) {
+            if (event.key === "Escape") {
+                this.isFeature = false
+            }
+        },
+        isAllSelected(module) {
+                const featureIds = module.features.map(f => f.id)
+                return featureIds.every(id => this.selectedFeatures.includes(id))
+            },
     },
 
     created() {
@@ -1452,6 +1531,7 @@ export default {
     },
 
     mounted() {
+        window.addEventListener("keydown", this.handleEscape);
         initTE({ Modal, Select, Ripple });
     }
 }

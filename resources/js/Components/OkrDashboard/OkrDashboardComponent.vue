@@ -1,7 +1,7 @@
 <template>
     
 
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -97,6 +97,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(okr, index) in okrList" :key="index">
@@ -142,6 +147,11 @@
                                     </td> -->
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="okrList.length < 1 && !loading">
+                                <td class="" colspan="9">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -170,8 +180,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             okrList: [],
@@ -207,8 +221,9 @@ export default {
                 { value: "assigned",name: "Assigned" },
                 { value: "in_progress",name: "In Progress" },
                 { value: "cancelled",name: "Cancelled" },
-            ]
+            ],
 
+            loading: true,
         };
     },
 
@@ -217,10 +232,12 @@ export default {
         
         
         async getOkrList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
             let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department + this.url_role + this.url_status;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.okrList = response.data.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

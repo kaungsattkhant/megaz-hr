@@ -24,7 +24,7 @@ return new class extends Migration
             $table->dateTime('financial_check_time')->nullable();
             $table->dateTime('md_check_time')->nullable();
             $table->boolean('is_md_checked')->default(0);
-            $table->boolean(column: 'purchased_date_time')->nullable();
+            $table->boolean( 'purchased_date_time')->nullable();
             $table->unsignedBigInteger('procurement_manager_check_id')->nullable();
             $table->dateTime('procurement_manager_check_time')->nullable();
             $table->enum('status', ['created', 'manager_checked', 'financial_checked', 'md_checked', 'procurement_manager_checked'])->default('created');

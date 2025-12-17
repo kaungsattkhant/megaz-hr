@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -46,6 +46,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(ar,index) in arList" :key="index">
@@ -68,6 +73,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="arList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -100,7 +110,7 @@
                 <div
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
-                    <div class="relative  p-4">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
                             Add New
                         </h5>
@@ -113,7 +123,7 @@
                         </button>
                     </div>
                     <form @submit.prevent="btnClickedCreateAr()">
-                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
 
 
                             <div class="mb-4">
@@ -155,7 +165,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="flex justify-center px-12 mb-6">
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="submit"
                             class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
@@ -176,7 +186,7 @@
                 <div
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
-                    <div class="relative  p-4">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="paid_modalLabel">
                             Payment
                         </h5>
@@ -189,7 +199,7 @@
                         </button>
                     </div>
                     <form @submit.prevent="btnClickedCreatePaid()">
-                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Amount
@@ -208,7 +218,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="flex justify-center px-12 mb-6">
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="submit"
                             class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
@@ -230,8 +240,12 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
                 arList:[],
@@ -254,6 +268,7 @@
                 totalData:0,
 
                 feature: this.getFeature(),
+                loading: false,
             };
         },
 
@@ -261,8 +276,10 @@
             ...mapGetters(['getToken', 'getFeature']),
 
             async getArList(pageNumber){
+                this.loading = true;
                 const response = await getApiData({ url: '/api/account_receivable_lists?page='+pageNumber, token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.arList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;

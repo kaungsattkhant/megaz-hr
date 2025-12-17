@@ -1,9 +1,9 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
-                <p class=" text-lg font-semibold font-inter">
+                <p class=" text-lg font-semibold font-inter p-4">
                     Fixed Assets
                 </p>
             </div>
@@ -79,6 +79,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(fixedAsset, fixedAssetIndex) in fixedAssetPurchases"
                                 :key="fixedAssetIndex">
@@ -140,9 +145,12 @@
                                         </button>
                                     </td>
                                 </tr>
-    
-                                
                             </div>
+                            <tr class=" !text-center" v-if="fixedAssetPurchases.length < 1 && !loading">
+                                <td class="" colspan="12">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
     
@@ -368,9 +376,12 @@ import { Modal, initTE } from "tw-elements";
 import { mapGetters } from 'vuex';
 import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
-
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             fixedAssetPurchases: [],
@@ -399,6 +410,7 @@ export default {
             buyFixedAssetId: null,
             cashAccountList: [],
             selectedCashAccount: null,
+            loading: false,
 
         };
     },
@@ -415,6 +427,7 @@ export default {
         },
 
         async getFixedAssetPurchases(pageNumber) {
+            this.loading = true;
             let url = `/api/fixed_asset_purchases?page=${pageNumber}`;
             if(this.searchInput){
                 url = '/api/fixed_asset_purchases?page=' + pageNumber + '&search=' + this.searchInput;
@@ -422,6 +435,7 @@ export default {
             let response = await getApiData({ url: url, token: this.getToken() });
             // let response = await getApiData({ url: `/api/fixed_asset_purchases?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.fixedAssetPurchases = response.data.data;
 
                 this.lastPage = response.data.last_page;

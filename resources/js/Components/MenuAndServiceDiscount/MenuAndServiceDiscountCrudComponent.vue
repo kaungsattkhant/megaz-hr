@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -51,6 +51,11 @@
                                 <th></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(discount, index) in discountList" :key="index">
                                 <tr class="">
@@ -90,6 +95,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="discountList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <!-- pagination -->
@@ -301,10 +311,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { getCurrentDate } from '../../utilities/datetime-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton
     },
     data() {
         return {
@@ -334,6 +346,7 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+            loading: false,
         }
 
     },
@@ -350,10 +363,11 @@ export default {
         },
 
         async getDiscountList(pageNumber) {
-
+            this.loading = true;
             let url = `/api/menu_service_discounts?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.discountList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;

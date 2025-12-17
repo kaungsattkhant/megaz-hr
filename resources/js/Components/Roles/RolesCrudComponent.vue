@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -51,8 +51,12 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
-
+                        <TableSkeleton
+                            v-if="loading"
+                            :rows="20"
+                            :cols="6"
+                            />
+                        <tbody v-else>
                             <!-- looping start -->
                             <div class="contents" v-for="(role, index) in roleList" :key="index">
                                 <tr class="">
@@ -92,6 +96,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="roleList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -132,7 +141,7 @@
                                 id="create_modalLabel">
                                 Create Role
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_create_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -164,10 +173,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createRolesBtnClicked"
+                            <!-- <button type="button" @click="createRolesBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @onClick="createRolesBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -186,7 +201,7 @@
                                 id="edit_modalLabel">
                                 Update Role
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_edit_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -218,10 +233,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="editRole"
+                            <!-- <button type="button" @click="editRole"
                                 class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Edit"
+                                loadingText="Editing..."
+                                @onClick="editRole"
+                            />
                         </div>
                     </div>
                 </div>
@@ -290,7 +311,14 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
+
 export default {
+    components: {
+        TableSkeleton,
+        LoadingButton
+    },
     data() {
         return {
 
@@ -314,6 +342,9 @@ export default {
 
             department_url:'',
             feature: this.getFeature(),
+
+            loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -335,14 +366,18 @@ export default {
             this.getRolesList(1);
         },
         async getRolesList(pageNumber) {
+            this.loading = true;
+            console.log('loading');
             const response = await getApiData({ url: `/api/roles?${this.department_url}page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.roleList = response.data.data;
 
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
+                console.log('loading done');
             }
         },
 
@@ -351,6 +386,7 @@ export default {
         },
 
         async createRole() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('department_id', this.selectedDepartment);
@@ -363,8 +399,13 @@ export default {
                     this.getRolesList(1);
                 }
                 console.log("success")
+                document.getElementById('close_create_modal').click();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                     text: message,
                     type: "error"
@@ -379,6 +420,7 @@ export default {
         },
 
         async editRole() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.nameEdit);
             formData.append('department_id', this.selectedDepartmentEdit);
@@ -391,9 +433,17 @@ export default {
                     this.getRolesList(1);
                 }
                 console.log("success")
+                document.getElementById('close_edit_modal').click();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 

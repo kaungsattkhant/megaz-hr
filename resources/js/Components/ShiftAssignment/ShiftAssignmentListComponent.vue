@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -74,8 +74,8 @@
                             <div class="contents" v-for="(item, index) in primaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
-                                        <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        <!-- {{ index+1 }} -->
                                     </td>
                                     <td class="whitespace-nowrap text-left">
                                         {{ item.date_time.split(' ')[0] }}
@@ -230,16 +230,20 @@ export default {
             // let url = this.url + this.url_search + this.url_department + this.url_role;
             let url = this.url + '?page=' + pageNumber
             let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                if(response.data.data){
-                    this.primaryList = response.data.data;
+            if (response.message) {
+                if(response.message.data){
+                    this.primaryList = response.message.data;
+                    this.lastPage = response.message.last_page;
+                    this.currentPage = response.message.current_page;
+                    this.perPage = response.message.per_page;
+                    this.totalData = response.message.total;
+                }
+                else{
+                    this.primaryList = response.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;
                     this.perPage = response.data.per_page;
                     this.totalData = response.data.total;
-                }
-                else{
-                    this.primaryList = response.data;
                 }
             }
         },

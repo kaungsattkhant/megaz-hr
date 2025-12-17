@@ -81,6 +81,7 @@ use App\Http\Controllers\API\SaleTargetMenuAPIController;
 use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
+use App\Http\Controllers\API\BenefitController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
@@ -94,6 +95,8 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\ReportController;
+use App\Http\Controllers\GpsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -152,7 +155,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('accruals', 'createAccrued');
         Route::get('accruals', 'getAccrued');
         Route::get('accruals/{accountId}', 'detailAccrued');
-        Route::get('other-payables', 'getOtherPayable');
+        Route::get('other-payable-accounts', 'getOtherPayable');
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     // Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
@@ -274,7 +277,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(CommonController::class)->group(function () {
         Route::post('is_active', 'toggleIsActive');
     });
-    
+
 
     Route::controller(FixedAssetPurchaseAPIController::class)->group(function () {
         Route::get('/fixed_asset_purchases', 'getFixedAssetPurchaseData');
@@ -283,8 +286,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases/bought', 'boughtFixedAsset');
     });
 
-    Route::post('/packs', [PackAPIController::class, 'createPack']);
-    Route::get('/packs', [PackAPIController::class, 'getPacksData']);
+
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(SupplierController::class)->group(function () {
         Route::post('/create_supplier_account', 'createSupplierAccount');
@@ -324,6 +326,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(InventoryAPIController::class)->group(function () {
         Route::get('inventory_ledger_list', 'getInventoryLedgerList');
         Route::post('inventory_item', 'createInventoryItem');
+        Route::get('inventory-closing-items', 'getInventoryClosingItems');
     });
 
     Route::get('/uoms', [UomAPIController::class, 'getUomData']);
@@ -488,14 +491,50 @@ Route::middleware('auth:api')->group(function () {
     //invoice transaction
     Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
     Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
+
+    Route::prefix('report')->controller(ReportController::class)->group(function () {
+
+        Route::get('get_bar_for_sky', 'getBarForSky');
+        Route::get('get-total-ktv-customers', 'getTotalKTVCustomers');
+        Route::get('get-total-ktv-sessions', 'getTotalKTVSessions');
+        Route::get('get-total-ktv-room-charges', 'getTotalKTVRoomCharges');
+        Route::get('get-total-ktv-sales', 'getTotalKTVSales');
+        Route::get('get_waiter_sale', 'getWaiterSale');
+
+        // Route::get('ktv/trainings', 'getKTVTraining');
+        Route::get('bar/total-expenses', 'getBarTotalExpense');
+        Route::get('kitchen-for-sky-and-ktv', 'getKitchenForSktyAndKtv');
+        Route::get('kitchen/total-expenses', 'getKitchenTotalExpense');
+        Route::get('monthly-kitchen-menu-total', 'getMonthlyKitchenMenuTotal'); //lists
+
+        Route::get('catering/target_actual_menu_sales', 'getMenuSales');
+        Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
+        Route::get('cashflows', 'getBudgetAccountsCashflow');
+    });
+    Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
+
+    Route::controller(GpsController::class)->group(function () {
+        Route::post('gps', 'updateOrCreateGps');
+        Route::get('/gps', 'getGPS');
+        Route::get('/gps/{id}', 'getGPSById');
+        // Route::post('/gps/{id}', 'updateGPSById');
+    });
+    Route::prefix('benefits')->controller(BenefitController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'updateOrCreateBenefit');
+        Route::get('/{id}', 'detailBenefit');
+    });
+    Route::prefix('admin/benefit_requests')->controller(BenefitController::class)->group(function () {
+        Route::get('/', 'listBenefitRequest');
+        Route::post('/update_status', 'updateStatusBenefitRequest');
+    });
 });
 
 Route::controller(FeatureAPIController::class)->group(function () {
     Route::get('/features', 'getFeatureData');
     Route::post('/feature_import', 'featureImport');
-    Route::get('feature_by_department/{department_id}','getFeatureByDepartment');
-    Route::get('feature_by_module','getFeatureByModule');
-
+    Route::get('feature_by_department/{department_id}', 'getFeatureByDepartment');
+    Route::get('feature_by_module', 'getFeatureByModule');
 });
 Route::controller(AdsAPIController::class)->group(function () {
     Route::get('/ads', 'getAds');
@@ -709,3 +748,5 @@ Route::controller(TagController::class)->group(function () {
     Route::get('/tags', 'getTags');
     Route::post('/tags', 'createTag');
 });
+
+Route::get("/test-notification", [TestController::class, "testNotification"]);

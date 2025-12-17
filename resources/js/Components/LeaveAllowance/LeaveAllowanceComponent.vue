@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -72,6 +72,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(leave, index) in leaveAllowanceList" :key="index">
@@ -109,6 +114,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="leaveAllowanceList.length < 1 && !loading">
+                                <td class="" colspan="8">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -116,13 +126,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="leaveAllowanceList(currentPage - 1)">«</button>
+                                @click="getLeaveAllowanceList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="leaveAllowanceList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getLeaveAllowanceList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -188,8 +198,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             leaveAllowanceList: [],
@@ -213,6 +227,7 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -220,10 +235,16 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getLeaveAllowanceList(pageNumber) {
-            let url = this.url + this.url_department + this.url_role;
+            this.loading = true;
+            let url = this.url + '?page=' + pageNumber + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.leaveAllowanceList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         async getDepartmentList(){
@@ -233,13 +254,13 @@ export default {
             }
         },
         selectedDepartmentChange(){
-            this.url_department = '?department_id='+this.selectedDepartment.id;
+            this.url_department = '&department_id='+this.selectedDepartment.id;
             this.roleList = this.selectedDepartment.roles;
-            this.getLeaveAllowanceList();
+            this.getLeaveAllowanceList(1);
         },
         selectedRoleChange(){
             this.url_role = '&role_id='+this.selectedRole.id;
-            this.getLeaveAllowanceList();
+            this.getLeaveAllowanceList(1);
         },
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput

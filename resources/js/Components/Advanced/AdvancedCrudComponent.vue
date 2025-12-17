@@ -1,6 +1,6 @@
 <template>
    
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <div class="contents" v-for="(advance, index) in advancedList" :key="index">
                                 <a :href="'/advanced/' + advance.staff_id + '/detail'" class="contents">
@@ -78,6 +83,11 @@
                                 </a>
 
                             </div>
+                            <tr class=" !text-center" v-if="advancedList.length < 1 && !loading">
+                                <td class="" colspan="6">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -203,8 +213,12 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import TableSkeleton from "../Common/TableSkeleton.vue";
 
     export default {
+        components: {
+            TableSkeleton
+        },
         data() {
             return {
 
@@ -230,6 +244,7 @@
                 totalData:0,
 
                 feature: this.getFeature(),
+                loading: false,
             };
         },
 
@@ -241,8 +256,10 @@
                 this.getAdvanceList(selectedNewMonth);
             },
             async getAdvanceList(pageNumber){
+                this.loading = true;
                 const response = await getApiData({ url: '/api/staff_balances?month='+this.selectedNewMonth + '&page='+pageNumber, token: this.getToken() });
                 if(response.data){
+                    this.loading = false;
                     this.advancedList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;

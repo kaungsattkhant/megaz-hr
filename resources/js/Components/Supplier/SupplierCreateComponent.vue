@@ -1,11 +1,12 @@
 <template>
     <div class="px-0">
-        <div class="mb-4">
-            <p class="text-lg font-semibold font-inter">
-                Add New Supplier
-            </p>
-        </div>
+        
         <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md card-shadow">
+            <div class="mb-4 col-span-12">
+                <p class="text-lg font-semibold font-poppins">
+                    Add New Supplier
+                </p>
+            </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Supplier Name
@@ -104,7 +105,7 @@
                         <i class="fal fa-plus"></i>
                     </button>
                 </div>
-                <div>
+                <div class="font-poppins">
                     <p class="mb-3 text-sm">
                         AP Account - {{ selectedAccount ? selectedAccount.name : '' }}
                     </p>
@@ -381,13 +382,14 @@
                     </table>
                 </div>
             </div>
+            <div class="col-span-12 mt-4">
+                <button type="button" class="cancel-btn focus:shadow-none focus:outline-none mr-4" @click="btnClickCancel"> Cancel </button>
+                <button class="add-btn" @click="createBtnClicked">
+                    Create Supplier
+                </button>
+            </div>
         </div>
-        <div>
-            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none mr-4" @click="btnClickCancel"> Cancel </button>
-            <button class="add-btn" @click="createBtnClicked">
-                Create Supplier
-            </button>
-        </div>
+        
     </div>
 
     <!-- Modal -->

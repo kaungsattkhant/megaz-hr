@@ -37,6 +37,7 @@ interface ObjectiveInterface
   public function deleteObjKeystaffImage($imgId);
   public function getdailyObjectivesByStaffId(Request $request, $staffId);
   public function getCompletedObjKeysByStaffId($objectiveId,$staffId);
+  public function rejectObjectKeyByObjectiveStaffId($data);
 
   //ktvobjtree
   public function getKtvRoom(Request $request);

@@ -19,7 +19,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Item"
+                        <select data-te-select-init data-te-select-placeholder="Select Type"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                             <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
                                 {{ type.name }}
@@ -82,15 +82,15 @@
                     </select>
 
                 </div>
-                <div class="col-span-8 grid grid-cols-2 gap-y-8 gap-x-8">
-                    <div class="col-span-1">
+                <div class="col-span-4 grid grid-rows-2 gap-y-8 gap-x-8">
+                    <div class="row-span-1 col-span-2">
                         <label for="" class="label-form mb-3">
                             Base Qty
                         </label>
                         <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Base Qty">
                     </div>
         
-                    <div class="col-span-1">
+                    <div class="row-span-1 col-span-2">
                         <label for="" class="block text-sm text-black mb-3">
                             Base UOM Qty
                         </label>
@@ -111,7 +111,7 @@
                         </div> -->
                     </div>
         
-                    <div class="col-span-1">
+                    <!-- <div class="col-span-1">
                         <label for="" class="label-form mb-3">
                             Qty    
                         </label>
@@ -127,17 +127,7 @@
                                 {{ uom.name }}
                             </option>
                         </select>
-                        <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
-                                name="" id="" v-model="selectedBaseUom"
-                                class="">
-                                <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
-                                    {{ uom.name }}
-                                </option>
-                            </select>
-                        </div> -->
-                    </div>
+                    </div> -->
                 </div>
                 <div class="col-span-4 row-span-2">
                     <label for="" class="block text-sm text-black mb-3">
@@ -146,7 +136,7 @@
                     <textarea v-model="remark" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                          name="" id="" cols="30" rows="6"></textarea>
                 </div>
-                <div class="col-span-12 justify-end flex">
+                <div class="col-span-4 flex items-end">
                     <label for="" class="block text-sm text-black mb-3">
                         &nbsp;
                     </label>
@@ -447,6 +437,7 @@
                 typeList:[
                     {'name': 'KTV', 'value': 'ktv'},
                     {'name': 'Restaurant', 'value': 'restaurant'},
+                    {'name': 'Bar', 'value': 'bar'},
                     {'name': 'Event', 'value': 'event'},
                 ],
                 selectedType: null,
@@ -562,7 +553,7 @@
                     this.alertValidationMessage('a uom');
                     return 1;
                 }
-                if(this.quantity < 1 && this.baseQuantity < 1){
+                if(this.baseQuantity < 1){
                     this.alertValidationMessage('quantity');
                     return 1;
                 }

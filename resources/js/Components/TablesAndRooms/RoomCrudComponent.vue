@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
 
         <div class="card-shadow">
             <div>
@@ -20,7 +20,7 @@
                 </div>
                 <div class="flex justify-end flex-col">
 
-                    <button type="button" v-if="feature.includes('room.create')"
+                    <button type="button" v-if="feature.includes('room.create')" @click="btnClickedCreateModal"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
                         Add New
@@ -41,9 +41,9 @@
                                 <th scope="col" class="  ">
                                     Room
                                 </th>
-                                <!-- <th scope="col" class="">
-                                    Category
-                                </th> -->
+                                <th scope="col" class="  ">
+                                    Area
+                                </th>
                                 <th scope="col" class="">
                                     Price Per Hour
                                 </th>
@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -62,6 +67,9 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ room.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ room.area.name }}
                                     </td>
                                     <!-- <td class="whitespace-nowrap  ">
                                         <div v-if="room.service_category"> {{ room.service_category.name }} </div>
@@ -89,6 +97,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="roomList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -159,7 +172,7 @@
                                 <label for="" class="label-form mb-3">
                                     Price Per Hour
                                 </label>
-                                <input type="text" placeholder="Price Per Hour" v-model="pricePerHour" class="input-ui">
+                                <input type="number" placeholder="Price Per Hour" v-model="pricePerHour" class="input-ui">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
@@ -175,10 +188,12 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createBtnClicked"
-                                class="add-btn focus:outline-none focus:ring-0 ">
-                                Create
-                            </button>
+                            <LoadingButton
+                            :loading="buttonLoading"
+                            text="Create"
+                            loadingText="Creating..."
+                            @click="createBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -242,8 +257,14 @@
 import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
+    components: {
+        TableSkeleton,
+        LoadingButton
+    },
     data() {
         return {
             roomList: [],
@@ -265,6 +286,10 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+
+            loading: true,
+
+            buttonLoading: false,
         };
     },
 
@@ -273,12 +298,15 @@ export default {
 
         async getRoomList(pageNumber) {
 
+            this.loading = true;
+            console.log('loading');
             let url = `/api/entities?type=room&page=${pageNumber}`;
             if (this.searchInput) {
                 url = `/api/entities?type=room&search_input=${this.searchInput}&page=${pageNumber}`;
             }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.roomList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
@@ -288,7 +316,7 @@ export default {
         },
 
         async getAreaList() {
-            const response = await getApiData({ url: '/api/areas', token: this.getToken() });
+            const response = await getApiData({ url: '/api/areas?area_type_id=2', token: this.getToken() });
             if (response.data) {
                 // this.areaList = response.data;
                 response.data.forEach(area => {
@@ -314,11 +342,17 @@ export default {
         //     }
         // },
 
+        btnClickedCreateModal(){
+            this.name = null;
+            this.pricePerHour = null;
+            this.area_id = null;
+        },
         createBtnClicked() {
             this.createTableAndRoom();
         },
 
         async createTableAndRoom() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('price_per_hour', this.pricePerHour);
@@ -326,6 +360,7 @@ export default {
             formData.append('area_id', this.area_id);
             // formData.append('service_category_id', this.service_category_id);
             let response = await postApiData({ url: '/api/entities', form_data: formData, token: this.getToken() });
+            this.buttonLoading = false;
             if (response.success) {
                 this.getRoomList(1);
                 this.closeModal();
@@ -343,9 +378,9 @@ export default {
         },
 
         clearForm() {
-            this.name = null,
-            this.pricePerHour = null,
-            this.area_id = null,
+            this.name = null;
+            this.pricePerHour = null;
+            this.area_id = null;
             this.typeList = []
         },
 

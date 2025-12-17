@@ -4,7 +4,7 @@
             Supplier: {{ supplier.name }}
         </p>
     </div>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="btn-container">
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
@@ -43,7 +43,18 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="leadTimes.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else>
                             <tr v-if="leadTimes.length < 1 && errorMessage">
                                 <td colspan="3">
                                     {{ errorMessage }}
@@ -74,8 +85,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     props: ['supplier'],
     data() {
         return {
@@ -92,6 +107,8 @@ export default {
 
             totalAvgLeadTime: null,
             averageOrderTime: null,
+
+            loading: true,
         };
     },
 
@@ -108,8 +125,11 @@ export default {
         },
 
         async getLeadTimes(){
+            this.loading = true;
             let response = await getApiData({ url: `/api/supplier_lead_time/${this.supplier.id}`, token: this.getToken() });
-            if (response.data) {
+            if (response.success) {
+                this.loading = false;
+                console.log('loading top');
                 this.totalAvgLeadTime = response.data.total_average_lead_time;
                 this.leadTimes = response.data.details;
             }

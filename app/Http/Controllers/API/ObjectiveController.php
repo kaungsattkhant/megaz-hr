@@ -9,6 +9,7 @@ use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\Objective\ObjectiveRequest;
 use App\Repositories\Objective\ObjectiveInterface;
 use App\Http\Requests\Objective\KtvProductTreeRequest;
+use App\Http\Requests\StaffMobile\RejectObjectiveKeyRequest;
 use App\Http\Resources\CompleteObjectivesResource;
 
 class ObjectiveController extends Controller
@@ -158,6 +159,11 @@ class ObjectiveController extends Controller
     public function updateDailyObjective(Request $request, $objKeyStaffId)
     {
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
+        ResponseData($data);
+    }
+
+    public function rejectObjectKeyByObjectiveStaffId(RejectObjectiveKeyRequest $request){
+        $data = $this->objectiveRepository->rejectObjectKeyByObjectiveStaffId($request->all());
         ResponseData($data);
     }
 

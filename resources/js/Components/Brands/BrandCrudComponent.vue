@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -42,6 +42,11 @@
                                 <th v-show="feature.includes('brand.edit')"></th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                              <div class="contents" v-for="(brand, index) in brandsList" :key="index" >
@@ -60,6 +65,11 @@
                                     </td>
                                 </tr>
                              </div>
+                             <tr class=" !text-center" v-if="brandsList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="flex justify-center">
@@ -145,9 +155,15 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBrand" >
+                    <LoadingButton
+                        :loading="buttonLoading"
+                        text="Confirm"
+                        loadingText="Confirming..."
+                        @click="createBrand"
+                    />
+                    <!-- <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBrand" >
                         Confirm
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -205,10 +221,14 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -236,6 +256,9 @@ export default {
 
             selectedImportItem: null,
             feature: this.getFeature(),
+
+            loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -251,6 +274,7 @@ export default {
         },
 
         async getBrandList(pageNumber) {
+            this.loading = true;
             let url = `/api/brands?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -259,6 +283,7 @@ export default {
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
+                this.loading = false;
             }
         },
         createBtnClicked(){
@@ -267,6 +292,7 @@ export default {
             this.selectedItem = []
         },
         async createBrand() {
+            this.buttonLoading = true;
             if (!this.name) {
                 this.alertValiationMessage('required Brand Name');
                 return false;
@@ -299,6 +325,16 @@ export default {
                 this.name = null;
                 this.editId = null;
                 this.getBrandList(1);
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
+            }
+            else {
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 

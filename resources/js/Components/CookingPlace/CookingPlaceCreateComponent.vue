@@ -204,9 +204,15 @@
 
 
         <div>
-            <button class="add-btn" @click="btnclickedCreateCookingPlace()">
+            <!-- <button class="add-btn" @click="btnclickedCreateCookingPlace()">
                 Create Menu
-            </button>
+            </button> -->
+            <LoadingButton
+                :loading="buttonLoading"
+                text="Create"
+                loadingText="Creating..."
+                @click="btnclickedCreateCookingPlace"
+            />
         </div>
 
     </div>
@@ -217,10 +223,12 @@ import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
 import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     data() {
         return {
@@ -245,6 +253,7 @@ export default {
 
             cookingPlaceMenuList:[],
             cookingPlaceSkillList:[],
+            buttonLoading: false,
         };
     },
 
@@ -334,17 +343,27 @@ export default {
             this.createCookingPlace(availableCookingPlaces)
         },
         async createCookingPlace(availableCookingPlaces){
-                let formData = new FormData();
-                formData.append('availableCookingPlaces', JSON.stringify(availableCookingPlaces));
-                formData.append('name', this.name);
-                formData.append('area_id', this.selectedArea.id);
-                let response = await postApiData({ url: '/api/cooking_places', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    window.location.replace('/cooking_places');
-                    console.log('success')
-                }
-
-            },
+            this.buttonLoading = true;
+            let formData = new FormData();
+            formData.append('availableCookingPlaces', JSON.stringify(availableCookingPlaces));
+            formData.append('name', this.name);
+            formData.append('area_id', this.selectedArea.id);
+            let response = await postApiData({ url: '/api/cooking_places', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                window.location.replace('/cooking_places');
+                console.log('success')
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
+            }
+            else {
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
+            }
+        },
 
 
 

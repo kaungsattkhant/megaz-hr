@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -55,6 +55,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -66,8 +71,9 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <td class="whitespace-nowrap capitalize ">
                                         {{ area.area_type ? area.area_type.name : '' }}
+                                        {{ area.type ? area.type : '' }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_category.name }}
@@ -92,6 +98,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="departmentList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -181,6 +192,24 @@
                                     </option>
                                 </select> -->
                             </div>
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Selling Area'">
+                                <label for="" class="label-form mb-3">Menu Category</label>
+                                <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="false"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Menu Category"
+                                    :multiple="true" label="name" track-by="id" :preselect-first="false"></multiselect>
+                            </div>
+                            <div class="mb-4" v-if="selectedCategory" v-show="selectedCategory.name === 'Cooking Area'">
+                                <label for="" class="label-form mb-3">Type</label>
+                                <multiselect v-model="selectedCookingAreaType" :options="cookingAreaTypeList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Type"
+                                    label="name" track-by="value" :preselect-first="false"></multiselect>
+                                <!-- <select name="" id="" v-model="selectedCookingAreaType"
+                                    class="input-ui">
+                                    <option :value="type.value" v-for="(type, index) in cookingAreaTypeList" :key="index">
+                                        {{ type.name }}
+                                    </option>
+                                </select> -->
+                            </div>
 
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -188,10 +217,16 @@
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="createAreasBtnClicked"
+                            <!-- <button type="button" @click="createAreasBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Create"
+                                loadingText="Creating..."
+                                @click="createAreasBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -226,16 +261,41 @@
                                 </label>
                                 <input type="text" placeholder="Area Name" v-model="editName" class="input-ui">
                             </div>
+                            <div class="mb-4" v-show="editDetail?.area_category?.name === 'Cooking Area'">
+                                <label for="" class="label-form mb-3">Type</label>
+                                <multiselect v-model="selectedCookingAreaType" :options="cookingAreaTypeList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Type"
+                                    label="name" track-by="value" :preselect-first="false"></multiselect>
+                                <!-- <select name="" id="" v-model="selectedCookingAreaType"
+                                    class="input-ui">
+                                    <option :value="type.value" v-for="(type, index) in cookingAreaTypeList" :key="index">
+                                        {{ type.name }}
+                                    </option>
+                                </select> -->
+                            </div>
+
+                            <div class="mb-4" v-show="editDetail?.area_category?.name === 'Selling Area'">
+                                <label for="" class="label-form mb-3">Area Type</label>
+                                <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="false"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Menu Category"
+                                    :multiple="true" label="name" track-by="id" :preselect-first="false"></multiselect>
+                            </div>
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                                 data-te-modal-dismiss aria-label="Close">
                                 Cancel
                             </button>
-                            <button type="button" @click="editAreasBtnClicked"
+                            <!-- <button type="button" @click="editAreasBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Edit
-                            </button>
+                            </button> -->
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                text="Edit"
+                                loadingText="Editing..."
+                                @click="editAreasBtnClicked"
+                            />
                         </div>
                     </div>
                 </div>
@@ -304,10 +364,14 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -315,12 +379,17 @@ export default {
             departmentList: [],
             areaList: [],
             typeList: [],
+            menuCategoryList: [],
+            cookingAreaTypeList: [{ name: 'Bar', value: 'bar'},{ name: 'Restaurant', value: 'restaurant'}],
             categoryList: [],
             name: null,
             selectedType: null,
+            selectedCookingAreaType: null,
             selectedCategory: null,
             selectedDepartment: null,
+            selectedMenuCategory: [],
 
+            editDetail: null,
             selectedId: null,
             editName: null,
             editSelectedType: null,
@@ -336,6 +405,9 @@ export default {
             filterCategory:null,
             category_url:'',
             feature: this.getFeature(),
+
+            loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -346,9 +418,12 @@ export default {
             this.getAreasList(1);
         },
         async getAreasList(pageNumber) {
+                this.loading = true;
+                console.log('loading');
             let url = `/api/areas?${this.category_url}page=${pageNumber}`
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if(response.data.data){
                     this.areaList = response.data.data;
                 }
@@ -362,6 +437,15 @@ export default {
             }
         },
 
+        async getMenuCategoryList() {
+            let response = await getApiData({
+                url: `/api/menu_categories`,
+                token: this.getToken(),
+            });
+            if (response.data) {
+                this.menuCategoryList = response.data;
+            }
+        },
         async getDepartmentList() {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -387,6 +471,8 @@ export default {
             this.selectedCategory = null;
             this.selectedDepartment = null;
             this.name = null;
+            this.selectedCookingAreaType = null;
+            this.selectedMenuCategory = [];
         },
         createAreasBtnClicked() {
             if(!this.name){
@@ -398,6 +484,14 @@ export default {
                 return 1;
             }
             else if(this.selectedCategory.name === 'Selling Area' && !this.selectedType){
+                this.alertValidationMessage(`Area Type`);
+                return 1;
+            }
+            else if(this.selectedCategory.name === 'Selling Area' && this.selectedMenuCategory.length < 1){
+                this.alertValidationMessage(`Menu Category`);
+                return 1;
+            }
+            else if(this.selectedCategory.name === 'Cooking Area' && !this.selectedCookingAreaType){
                 this.alertValidationMessage(`Type`);
                 return 1;
             }
@@ -407,10 +501,19 @@ export default {
         },
 
         async createArea() {
+            this.buttonLoading = true;
+            let menuCategoryIds = [];
+            this.selectedMenuCategory.forEach(menu => {
+                menuCategoryIds.push(menu.id);
+            });
             let formData = new FormData();
             formData.append('name', this.name);
             if(this.selectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.selectedType.id);
+                formData.append('menu_category_ids', JSON.stringify(menuCategoryIds));
+            }
+            if(this.selectedCategory.name === 'Cooking Area'){
+                formData.append('type', this.selectedCookingAreaType.value);
             }
             formData.append('area_category_id', this.selectedCategory.id);
             // formData.append('department_id', this.selectedDepartment.id);
@@ -428,24 +531,36 @@ export default {
                 this.selectedDepartment = null;
                 this.name = null;
                 document.getElementById('close_create_modal').click();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500);
             }
             else {
                 this.$notify({
-                    text: `Menu create failed`,
+                    text: `Area create failed`,
                     type: "error"
                 });
+
+                this.buttonLoading = false;
             }
         },
 
 
         editBtnClicked(item){
+            this.selectedMenuCategory = [];
+            this.editDetail = item;
             this.selectedId = item.id;
             this.selectedType = null;
             // this.selectedCategory = null;
             this.editName = item.name;
             this.editSelectedCategory = this.categoryList.find(cat => cat.id === item.area_category_id);
             if(this.editSelectedCategory.name === 'Selling Area'){
-                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id)
+                this.editSelectedType = this.typeList.find(type => type.id === item.area_type_id);
+                this.selectedMenuCategory = item.menu_categories
+            }
+
+            if(item.area_category.name === 'Cooking Area'){
+                this.selectedCookingAreaType = this.cookingAreaTypeList.find(type => type.value === item.type)
             }
         },
         editAreasBtnClicked() {
@@ -467,11 +582,20 @@ export default {
         },
 
         async editArea() {
+            this.LoadingButton = true;
+            let menuCategoryIds = [];
+            this.selectedMenuCategory.forEach(menu => {
+                menuCategoryIds.push(menu.id);
+            });
             let formData = new FormData();
             formData.append('id', this.selectedId);
             formData.append('name', this.editName);
             if(this.editSelectedCategory.name === 'Selling Area'){
                 formData.append('area_type_id', this.editSelectedType.id);
+                formData.append('menu_category_ids', JSON.stringify(menuCategoryIds));
+            }
+            if(this.editSelectedCategory.name === 'Cooking Area'){
+                formData.append('type', this.selectedCookingAreaType.value);
             }
             formData.append('area_category_id', this.editSelectedCategory.id);
             // formData.append('department_id', this.selectedDepartment.id);
@@ -488,8 +612,13 @@ export default {
                 this.editSelectedCategory = null;
                 this.editName = null;
                 document.getElementById('close_edit_modal').click();
+
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500);
             }
             else {
+                this.buttonLoading = false;
                 this.$notify({
                     text: response.message,
                     type: "error"
@@ -543,6 +672,7 @@ export default {
         this.getAreasList(1);
         this.getDepartmentList();
         this.getTypeList();
+        this.getMenuCategoryList();
         initTE({ Modal, Select, Ripple });
     }
 }

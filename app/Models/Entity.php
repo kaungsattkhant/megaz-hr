@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Area;
 use App\Models\ServiceCategory;
+
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Entity extends BaseModel
 {
@@ -100,5 +101,10 @@ class Entity extends BaseModel
     public function targetMrpForecasts()
     {
         return $this->morphMany(TargetMrpForecast::class, 'mrp_forecastable');
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
     }
 }

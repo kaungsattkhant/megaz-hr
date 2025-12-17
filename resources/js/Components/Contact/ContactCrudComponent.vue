@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -49,6 +49,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(contact, index) in contactList" :key="index">
@@ -72,6 +77,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="contactList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -165,7 +175,7 @@
                         <label for="" class="label-form mb-3">
                             Phone Number
                         </label>
-                        <input type="tel" placeholder="Phone Number" v-model="ph_number" class="input-ui">
+                        <input type="number" placeholder="Phone Number" v-model="ph_number" class="input-ui no-arrow">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -208,7 +218,7 @@
                         <label for="" class="label-form mb-3">
                             Phone Number
                         </label>
-                        <input type="tel" placeholder="Phone Number" v-model="ph_number_edit" class="input-ui">
+                        <input type="number" placeholder="Phone Number" v-model="ph_number_edit" class="input-ui no-arrow">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -238,8 +248,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             contactList: [],
@@ -260,15 +274,18 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
         async getContactList(pageNumber) {
+            this.loading = true;
             let url = this.url;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.contactList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

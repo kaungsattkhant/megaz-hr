@@ -28,6 +28,7 @@
                                     <th scope="col" class="px-6 py-4">Room Charges</th>
                                     <th scope="col" class="px-6 py-4">Food</th>
                                     <!-- <th scope="col" class="px-6 py-4">Services</th> -->
+                                     <!-- <th scope="col" class="px-6 py-4">Discount</th> -->
                                     <th scope="col" class="px-6 py-4">Amount</th>
                                     <th scope="col" class="px-6 py-4">Status</th>
                                     <th scope="col" class="px-6 py-4">Action</th>
@@ -39,7 +40,7 @@
                                         {{ invoice.invoice_id }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.invoice_date }}
+                                        {{ friendlyDateTime(invoice.invoice_date) }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ invoice.customer ? invoice.customer.name : 'Default' }}
@@ -48,16 +49,19 @@
                                         <span v-if="invoice.entity">{{ invoice.entity.name }}</span>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.total_session_price}}
+                                        {{ invoice.total_session_price.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.sub_total - invoice.total_session_price }}
+                                        {{ (invoice.total - invoice.total_session_price).toLocaleString() }}
                                     </td>
+                                    <!-- <td class="whitespace-nowrap px-6 py-4">
+                                        {{ (invoice.total_discount).toLocaleString() }}
+                                    </td> -->
                                     <!-- <td class="whitespace-nowrap px-6 py-4">
                                         Service?
                                     </td> -->
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ invoice.sub_total }}
+                                        {{ invoice.sub_total.toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         <span :class="invoice.payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800 '" class="px-2 py-1 rounded capitalize font-semibold text-sm">
@@ -77,8 +81,8 @@
                                             Confirm
                                         </button> -->
 
-                                        <button :disabled="invoice.payment_status === 'paid'" 
-                                            :class="invoice.payment_status === 'paid' ? 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-60' : 'bg-blue-500 text-white hover:bg-blue-600'"  
+                                        <button :disabled="invoice.payment_status === 'paid'"
+                                            :class="invoice.payment_status === 'paid' ? 'bg-gray-300 text-gray-600 cursor-not-allowed opacity-60' : 'bg-blue-500 text-white hover:bg-blue-600'"
                                             class=" px-4 py-1.5 text-sm rounded-lg"
                                             data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked(invoice)">
                                             <i class="far fa-check-double" :class="invoice.payment_status === 'paid' ? 'text-gray-500' : ''"></i>
@@ -148,7 +152,7 @@
                                         Food
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.sub_total - invoiceDetail.total_session_price }}
+                                        {{ (invoiceDetail.sub_total - invoiceDetail.total_session_price).toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -164,7 +168,7 @@
                                         Discount
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.discount_value }}
+                                        {{ invoiceDetail.discount_value.toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -172,7 +176,7 @@
                                         Service Charge
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.service_charge }}
+                                        {{ invoiceDetail.service_charge.toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -180,7 +184,7 @@
                                         Tax
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.tax }}
+                                        {{ invoiceDetail.tax.toLocaleString() }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -188,7 +192,7 @@
                                         Amount
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ invoiceDetail.total }}
+                                        {{ invoiceDetail.total.toLocaleString() }}
                                     </td>
                                 </tr>
 
@@ -228,35 +232,74 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Payment Type
                             </label>
-                            <select name="" id="" v-model="selectedPayment"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                >
-                                    <option disabled selected>Select Payment</option>
-                                    <option value="bank"> Bank </option>
-                                    <option value="cash" selected> Cash </option>
-                            </select>
+                            <multiselect v-model="selectedPayment"
+                            :options="['bank','cash','split']"
+                            :multiple="false"
+                            :close-on-select="true"
+                            :clear-on-select="false"
+                            :preserve-search="false"
+                            placeholder="Select Payment"
+                            :preselect-first="false">
+                            </multiselect>
                         </div>
-                        
+
                         <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Billed Amount
+                            </label>
+                            <!-- <output>{{ billedTotal }}</output> -->
+                            <input type="number" placeholder="Amount" v-model="billedTotal"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                readonly disabled>
+                        </div>
+
+                        <div class="mb-4" v-if="selectedPayment !== 'split'">
                             <label for="" class="block text-sm text-black mb-3">
                                 Paid Amount
                             </label>
                             <input type="number" placeholder="Amount" v-model="paidAmount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+
+                        <div class="contents" v-if="selectedPayment === 'split'">
+                            <div class="mb-4" >
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Paid Amount (Online Payment)
+                                </label>
+                                <input type="number" placeholder="Amount" v-model="bankPaidAmount"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    @input="onBankInput"
+                                    min="0"
+                                    :max="billedTotal">
+                            </div>
+
+                            <div class="mb-4" >
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Paid Amount (Cash)
+                                </label>
+                                <input type="number" placeholder="Amount" v-model="cashPaidAmount"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    @input="onCashInput"
+                                    min="0"
+                                    :max="billedTotal">
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="confirmInvoice" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
+                        <!-- <button @click="confirmInvoice" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
                             Create
-                        </button>
+                        </button> -->
+                        <pos-loading-btn
+                        text="Create"
+                        loading-text="Creating..."
+                        :loading="confirmBtnLoading"
+                        @click="confirmInvoice"></pos-loading-btn>
                     </div>
                 </div>
             </div>
         </div>
-
-
-        
     </div>
 
 </template>
@@ -264,8 +307,15 @@
     import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import PosLoadingBtn from "../Common/PosLoadingBtn.vue";
+    import Multiselect from "vue-multiselect";
+    import { convertToFriendlyDateTime } from "../../../utilities/datetime-helpers";
 
     export default {
+        components: {
+            PosLoadingBtn,
+            Multiselect
+        },
         data() {
             return {
                 invoiceList:[],
@@ -277,9 +327,14 @@
                 invoice_date:null,
 
                 selectedInvoice:null,
+                billedTotal: 0,
                 paidAmount: 0,
+                bankPaidAmount: 0,
+                cashPaidAmount: 0,
                 selectedPayment: null,
                 isCashier: false,
+
+                confirmBtnLoading: false,
             };
         },
 
@@ -292,30 +347,36 @@
                     this.customerList = response.data;
                 }
             },
+
             async getInvoiceList(){
                 const response = await getApiData({ url: '/api/pos/invoices' , token: this.getToken()});
                 if(response.data){
                     this.invoiceList = response.data;
                 }
             },
+
             // async getRoomList(){
             //     const response = await getApiData({ url: '/api/rooms' , token: this.getToken()});
             //     if(response.data){
             //         this.roomList = response.data;
             //     }
             // },
+
             btnClickedInvoice(invoice){
                 this.invoiceDetail = invoice
                 this.isList = false
                 this.isDetail = true
             },
+
             btnClickedBack(){
                 this.isList = true
                 this.isDetail = false
             },
+
             dateChange(){
                 this.getDateInvoiceList();
             },
+
             async getDateInvoiceList(){
                 const response = await getApiData({ url: '/api/pos/invoices?date='+ this.invoice_date , token: this.getToken()});
                 if(response.data){
@@ -335,24 +396,75 @@
                 else
                     return false;
             },
+
             confirmBtnClicked(invoice){
                 this.selectedInvoice = invoice;
+                this.billedTotal = this.selectedInvoice.sub_total;
                 this.selectedPayment = null;
-                this.paidAmount = invoice.total;
+                this.paidAmount = this.billedTotal;
             },
+
             async confirmInvoice(){
-                console.log('test confirm invoice')
+                if(!this.selectedPayment){
+                    this.showToastMessage("Payment method must be selected", "Warning", "warn");
+                    return;
+                }
                 let formData = new FormData();
                 formData.append('id', this.selectedInvoice.id);
-                formData.append('paid_amount', this.paidAmount);
+
+                if(this.selectedPayment === 'split'){
+                    if(!this.bankPaidAmount || !this.cashPaidAmount){
+                        this.showToastMessage("Both payment amount must be input", "Warning", "warn");
+                        return;
+                    }
+                    if((this.bankPaidAmount + this.cashPaidAmount) > this.selectedInvoice.total){
+                        this.showToastMessage("Payment is greater than billed amount", "Warning", "warn");
+                    }
+                    formData.append('bank_paid_amount', this.bankPaidAmount);
+                    formData.append('cash_paid_amount', this.cashPaidAmount);
+                }else{
+                    formData.append('paid_amount', this.paidAmount);
+                }
                 formData.append('payment_type', this.selectedPayment);
+                this.confirmBtnLoading = true;
                 let response = await postApiData({ url: '/api/pos/invoices', form_data: formData, token: this.getToken() });
+                this.confirmBtnLoading = false;
                 if (response.success) {
                     this.getInvoiceList();
                     document.getElementById("closeModal").click();
                 }
 
-            }
+            },
+
+            showToastMessage(body,title="Info",type="info") {
+                this.$notify({
+                    title: title,
+                    text: body,
+                    type: type
+                });
+            },
+
+            onBankInput() {
+                // Clamp the value to not exceed billedTotal
+                if (this.bankPaidAmount > this.billedTotal) {
+                    this.bankPaidAmount = this.billedTotal;
+                }
+                // Calculate remaining for cash
+                this.cashPaidAmount = this.billedTotal - this.bankPaidAmount;
+            },
+
+            onCashInput() {
+                // Clamp the value to not exceed billedTotal
+                if (this.cashPaidAmount > this.billedTotal) {
+                    this.cashPaidAmount = this.billedTotal;
+                }
+                // Calculate remaining for bank
+                this.bankPaidAmount = this.billedTotal - this.cashPaidAmount;
+            },
+
+            friendlyDateTime(dateTimeStr){
+                return convertToFriendlyDateTime(dateTimeStr, 'datetime');
+            },
         },
         mounted()
         {
@@ -364,3 +476,5 @@
         }
     }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -59,6 +59,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
 
                             <!-- looping start -->
@@ -106,6 +111,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="inventoryList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
 
                             <!-- looping end -->
                         </tbody>
@@ -113,7 +123,6 @@
 
                     <!-- pagination -->
                     <div class="flex justify-center">
-
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
                                 @click="getInventoryList(currentPage - 1)">«</button>
@@ -123,7 +132,6 @@
                                     class="text-gray-400">{{
                                         lastPage }}</span>
                             </button>
-
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
                                 :disabled="currentPage === lastPage" @click="getInventoryList(currentPage + 1)">
                                 »</button>
@@ -141,9 +149,8 @@
                     class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                     <div
                         class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-
-                        <div class="relative  p-4">
-                            <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                                 id="create_modalLabel">
                                 {{ modalType === 'create' ? 'Create' : 'Edit' }} Inventory
                             </h5>
@@ -156,7 +163,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="relative px-6 py-4" data-te-modal-body-ref>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Inventory Name
@@ -238,8 +245,8 @@
                             </button>
 
                         </div>
-                        <div class="px-12 mb-8">
-                            <table class="min-w-full text-left text-sm font-light border-l border-t border-b">
+                        <div class="relative px-6 py-4 border-b">
+                            <table class="min-w-full text-left text-sm font-light border-l border-t border-b mb-4">
                                 <thead class="border-b font-medium">
                                     <tr>
                                         <th scope="col" class="px-6 py-4 border-r">Type</th>
@@ -273,11 +280,17 @@
                             </table>
                         </div>
 
-                        <div class="flex justify-end px-12 mb-6">
-                            <button type="button" @click="createBtnClicked"
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-6">
+                            <LoadingButton
+                                :loading="buttonLoading"
+                                :text="modalType === 'create' ? 'Create' : 'Edit'"
+                                loadingText="Creating..."
+                                @click="createBtnClicked"
+                            />
+                            <!-- <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 {{ modalType === 'create' ? 'Create' : 'Edit' }}
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>
@@ -462,8 +475,14 @@
 import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
+    components: {
+        TableSkeleton,
+        LoadingButton
+    },
     data() {
         return {
             inventoryList: [],
@@ -506,6 +525,9 @@ export default {
             selectedArea: null,
 
             modalType: 'create',
+
+            loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -543,12 +565,15 @@ export default {
         },
 
         async getInventoryList(pageNumber) {
+                this.loading = true;
+                console.log('loading');
             let url_page = ''
             if (pageNumber) {
                 url_page = '&page=' + pageNumber
             }
             const response = await getApiData({ url: `/api/inventories?${this.url_inventory}${url_page}`, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 if (pageNumber) {
                     this.inventoryList = response.data.data;
                 }
@@ -628,6 +653,18 @@ export default {
             }
         },
         addSelectedItemBtnClicked() {
+            if(this.selectedDepartment.slug === 'kitchen' && !this.selectedArea){
+                this.alertValiationMessage('Area');
+                return 1;
+            }
+            if(this.selectedDepartment.slug === 'catering' && !this.selectedArea){
+                this.alertValiationMessage('Area');
+                return 1;
+            }
+            if(this.selectedDepartment.slug === 'bar' && !this.selectedArea){
+                this.alertValiationMessage('Area');
+                return 1;
+            }
             let selectedId = null;
             let selectedName = null;
             // if(this.selectedInventoryType === 'area'){
@@ -639,13 +676,21 @@ export default {
             //         }
             //     )
             // }
-            this.selectedItem.push(
-                {
-                    inventoryable_type: 'department',
-                    inventoryable_id: this.selectedDepartment.id,
-                    inventoryable_name: this.selectedDepartment.name
-                }
-            )
+
+
+            if(this.selectedItem.some(item => item.inventoryable_id === this.selectedDepartment.id)){
+                console.log('same dep')
+            }
+            else{
+                this.selectedItem.push(
+                    {
+                        inventoryable_type: 'department',
+                        inventoryable_id: this.selectedDepartment.id,
+                        inventoryable_name: this.selectedDepartment.name
+                    }
+                )
+            }
+            
             if (this.selectedDepartment.slug === 'kitchen') {
                 this.selectedItem.push(
                     {
@@ -694,6 +739,7 @@ export default {
             // this.areaList = [];
 
             this.modalType = 'create';
+            this.selectedItem = [];
         },
 
         createBtnClicked() {
@@ -705,6 +751,7 @@ export default {
         },
 
         async createInventory() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('inventoryable', JSON.stringify(this.selectedItem));
@@ -723,9 +770,16 @@ export default {
                 // window.location.reload();
                 this.closeModal();
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
@@ -805,6 +859,7 @@ export default {
         },
 
         async confirmEditBtnClicked() {
+            this.buttonLoading = true;
             let formData = new FormData();
             formData.append('id', this.editId);
             formData.append('name', this.nameEdit);
@@ -820,9 +875,16 @@ export default {
                 console.log("success")
                 this.closeModal();
                 this.clearForm();
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 500)
             }
             else {
-                alert('some errors occur');
+                this.buttonLoading = false;
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
             }
         },
 
@@ -884,6 +946,13 @@ export default {
             if (index != -1) {
                 list.splice(index, 1);
             }
+        },
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
     },
 

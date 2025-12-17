@@ -22,6 +22,8 @@ class StaffTimeShiftResource extends JsonResource
             "timeshift_id"=> $this->timeshift_id,
             "area_id"=> $this->area_id,
             "status"=> $this->status,
+            "check_in_status" => $this->check_in_status,
+            "check_in" => $this->check_in,
             "timeshift" => $this->timeshift ? [
                 "id"        => $this->timeshift->id,
                 "shift_id"  => $this->timeshift->shift_id,

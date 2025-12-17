@@ -1,6 +1,6 @@
 <template>
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -51,6 +51,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(menuArea, menuAreaIndex) in menuAreaList" :key="menuAreaIndex">
@@ -93,6 +98,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="menuAreaList.length < 1 && !loading">
+                                <td class="" colspan="4">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -173,8 +183,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData, postApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             sellingAreaList: [],
@@ -192,6 +206,8 @@ export default {
             lastPage: 0,
             totalData: 0,
 
+            loading: false,
+
         };
     },
 
@@ -199,9 +215,11 @@ export default {
         ...mapGetters(['getToken']),
 
         async getSellingArea(pageNumber) {
+            this.loading = true;
             let url = `/api/menu_selling_areas`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.sellingAreaList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

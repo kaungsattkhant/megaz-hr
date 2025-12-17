@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -27,56 +27,74 @@
                     </button>
                 </div>
             </div>
-            <div class="box-container-table">
-                <div class="overflow-x-auto">
-                    <div class="table-container">
-                        <table class="primary-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Item</th>
-                                    <th>Category</th>
-                                    <th>UOM</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th scope="col" class="">
+            
+        </div>
+        <div class="box-container-table mb-4">
+            <div class="overflow-x-auto">
+                <div class="table-container">
+                    <table class="primary-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>UOM</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th scope="col" class="">
 
-                                    </th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
+
+                        <tr class=" !text-center" v-else-if="sellingExtras.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+
+                        <tbody v-else>
+                            <div class="contents" v-for="(sellingExtra, index) in sellingExtras" :key="index">
+                                <tr class="">
+                                    <td class="">
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.item.name }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.category.name }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.uom.name }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.price }}
+                                    </td>
+                                    <td class="">
+                                        {{ sellingExtra.quantity }}
+                                    </td>
+                                    <td class="">
+                                        <button type="button" class="pr-3"
+                                            data-te-toggle="modal" data-te-target="#update_modal"
+                                            @click="editBtnClicked(sellingExtra, index)">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <div class="contents" v-for="(sellingExtra, index) in sellingExtras" :key="index">
-                                    <tr class="">
-                                        <td class="">
-                                            {{ index + 1 }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.item.name }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.category.name }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.uom.name }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.price }}
-                                        </td>
-                                        <td class="">
-                                            {{ sellingExtra.quantity }}
-                                        </td>
-                                        <td class="">
-                                            <button type="button" class="pr-3"
-                                                data-te-toggle="modal" data-te-target="#update_modal"
-                                                @click="editBtnClicked(sellingExtra, index)">
-                                                <i class="fas fa-pen"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </div>
-                            </tbody>
-                        </table>
-                    </div>
+                            </div>
+                            <tr class=" !text-center" v-if="sellingExtras.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -99,7 +117,7 @@
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
+                        aria-label="Close" id="close_create_modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -179,11 +197,17 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" @click="createBtnClicked"
+                    <!-- <button type="button" @click="createBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 " data-te-toggle="modal"
                         data-te-target="#create_modal">
                         Create
-                    </button>
+                    </button> -->
+                    <LoadingButton
+                        :loading="buttonLoading"
+                        text="Create"
+                        loadingText="Creating..."
+                        @click="createBtnClicked"
+                    />
                 </div>
             </div>
         </div>
@@ -204,7 +228,7 @@
                         Update Selling Extra
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" id="close_edit_modal" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -290,6 +314,12 @@
                         data-te-target="#update_modal">
                         Update
                     </button>
+                    <LoadingButton
+                        :loading="buttonLoading"
+                        text="Update"
+                        loadingText="Updating..."
+                        @click="confirmEditBtnClicked"
+                    />
                 </div>
             </div>
         </div>
@@ -351,10 +381,14 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        TableSkeleton,
+        LoadingButton,
     },
     data() {
         return {
@@ -381,6 +415,9 @@ export default {
             editIndex: null,
 
             categoryName: null,
+
+            loading: true,
+            buttonLoading: false,
         }
     },
 
@@ -467,6 +504,7 @@ export default {
             }
 
             if(this.creatable){
+                this.buttonLoading = true;
                 let formData = new FormData();
                 formData.append('selling_extra_category_id',this.selectedCategory.id);
                 formData.append('item_id',this.selectedItem.id);
@@ -495,6 +533,9 @@ export default {
                             this.sellingExtras.push(response.data);
                             // this.getSellingExtras();
                         }
+                        setTimeout(() => {
+                            this.buttonLoading = false
+                        }, 500)
                     }
                 });
             }
@@ -536,8 +577,10 @@ export default {
         },
 
         getSellingExtras(){
+            this.loading = true;
             getApiData({url: `/api/selling_extras`, token: this.getToken()}).then((response)=>{
                 if(response.data){
+                    this.loading = false;
                     this.sellingExtras = response.data;
                 }
             });

@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -52,6 +52,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(warning, warningIndex) in warningList" :key="warningIndex">
@@ -94,6 +99,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="warningList.length < 1 && !loading">
+                                <td class="" colspan="7">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -174,8 +184,12 @@
 import { Modal, Ripple, initTE, Input } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             warningList: [],
@@ -190,6 +204,7 @@ export default {
             totalData: 0,
 
             feature: this.getFeature(),
+            loading: true,
         };
     },
 
@@ -197,9 +212,11 @@ export default {
         ...mapGetters(['getToken', 'getFeature']),
 
         async getWarningList(pageNumber) {
+            this.loading = true;
             let url = `/api/warnings`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.warningList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;

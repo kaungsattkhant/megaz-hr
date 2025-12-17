@@ -1,7 +1,7 @@
 <template>
-    
-    <div class="mt-4 bg-white">
-        
+
+    <div class="margin-bg">
+
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -9,13 +9,13 @@
                 </p>
             </div>
             <div class="btn-container">
-                
+
                 <div class=" flex gap-x-4">
                     <label for="search" class="search-input">
                         <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                         <i class="fal fa-search"></i>
                     </label>
-    
+
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
                             data-te-select-filter="true" name="" id="" v-model="searchDepartment" class="input-ui">
@@ -30,7 +30,7 @@
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
-    
+
                     <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
                     <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
                 </div>
@@ -38,7 +38,7 @@
                     <a  v-if="feature.includes('staff.create')" href="/staff/create" class="add-btn text-[13px] font-inter">
                         Add New
                     </a>
-    
+
                 </div>
             </div>
         </div>
@@ -52,10 +52,10 @@
                                 <th scope="col" class="">
                                     #
                                 </th>
-                                <th scope="col" class=" text-left">
+                                <th scope="col" class=" ">
                                     Name
                                 </th>
-                                <th scope="col" class=" text-left">
+                                <th scope="col" class=" ">
                                     Phone Number
                                 </th>
                                 <th scope="col" class=" ">
@@ -73,33 +73,43 @@
 
                             </tr>
                         </thead>
-                        <tbody>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
 
+                        <tr class=" !text-center" v-else-if="staffList.length < 1">
+                            <td class="" colspan="5">
+                                No Data Here
+                            </td>
+                        </tr>
+                        <tbody v-else-if="!loading && staffList.length > 0">
                             <!-- looping start -->
                             <div class="contents" v-for="(staff, index) in staffList" :key="index">
                                 <tr class="">
                                     <td class=" ">
                                         {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left  ">
+                                    <td class="whitespace-nowrap  ">
                                         {{ staff.name }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left  ">
+                                    <td class="whitespace-nowrap ">
                                         {{ staff.phone_number }}
 
                                     </td>
-                                    <td class="   ">
+                                    <td lass="whitespace-nowrap text-left  ">
                                         {{ staff.address }}
                                     </td>
-                                    <td class="whitespace-nowrap   ">
+                                    <td lass="whitespace-nowrap text-left  ">
                                         <div v-for="role in staff.roles" :key="role.id">
                                             {{ role.name }}
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap   ">
+                                    <td lass="whitespace-nowrap text-left  ">
                                         {{ staff.department.name }}
                                     </td>
-                                    <td class="whitespace-nowrap   relative" v-show="['staff.toggle', 'staff.edit'].some(f => feature.includes(f))">
+                                    <td class="whitespace-nowrap text-left relative" v-show="['staff.toggle', 'staff.edit'].some(f => feature.includes(f))">
                                         <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a>
@@ -203,8 +213,12 @@
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             staffList: [],
@@ -236,6 +250,8 @@ export default {
 
             user: null,
             feature: this.getFeature(),
+
+            loading: true,
         };
     },
 
@@ -251,6 +267,8 @@ export default {
         },
 
         async getStaffsList(pageNumber) {
+            this.loading = true;
+            console.log('loading');
             let url_page_number = '';
             if(this.url_search || this.url_department || this.url_role){
                 url_page_number = '&page=' + pageNumber
@@ -269,15 +287,27 @@ export default {
             //     url = `/api/staffs?department_id=${this.searchCategory.id}&page=${pageNumber}`;
             // }
             let url = this.url + this.url_search + this.url_department + this.url_role + url_page_number;
-            const response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data != null) {
+            getApiData({url: url, token: this.getToken()})
+            .then((response)=>{
+                if(response.data){
+                    this.loading = false;
+                    this.staffList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
+                    console.log('loading done');
+                }
+            });
+            // const response = await getApiData({ url: url, token: this.getToken() });
+            // if (response.data != null) {
 
-                this.staffList = response.data.data;
-                this.lastPage = response.data.last_page;
-                this.currentPage = pageNumber;
-                this.perPage = response.data.per_page;
-                this.totalData = response.data.total;
-            }
+            //     this.staffList = response.data.data;
+            //     this.lastPage = response.data.last_page;
+            //     this.currentPage = pageNumber;
+            //     this.perPage = response.data.per_page;
+            //     this.totalData = response.data.total;
+            // }
         },
 
         isActiveToggled(id) {

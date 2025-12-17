@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Role;
+use App\Models\JdSop;
 use App\Models\JobSpecification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -30,5 +31,10 @@ class JobDescription extends Model
     public function jobSpecification()
     {
         return $this->hasMany(JobSpecification::class);
+    }
+
+    public function jdSops()
+    {
+        return $this->hasMany(JdSop::class);
     }
 }

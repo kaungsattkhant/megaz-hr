@@ -21,7 +21,8 @@ class DepartmentFeatureSeeder extends Seeder
         $inventory_features = config('common.inventory_feature_slug');
         $finance_features = config('common.finance_feature_slug');
         $catering_features = config('common.catering_feature_slug');
-        $departments = Department::whereIn('slug', ['hr','finance','inventory','catering','procurement','management'])->get();
+        // $departments = Department::whereIn('slug', ['hr','finance','inventory','catering','procurement','management'])->get();
+        $departments = Department::whereIn('slug', ['hr'])->get();
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('department_feature')->truncate();
         DB::table('feature_staff')->truncate();

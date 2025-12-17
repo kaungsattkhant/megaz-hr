@@ -1,7 +1,7 @@
 <template>
     
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -47,6 +47,9 @@
                                     Shift
                                 </th>
                                 <th scope="col" class="">
+                                    GPS
+                                </th>
+                                <th scope="col" class="">
                                     From
                                 </th>
                                 <th scope="col" class="">
@@ -57,6 +60,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                        v-if="loading"
+                        :rows="20"
+                        :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(shift, index) in timeShiftList" :key="index">
@@ -67,6 +75,9 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ shift.shift.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ shift.gps?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ shift.from_time }}
@@ -99,6 +110,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="timeShiftList.length < 1 && !loading">
+                                <td class="" colspan="5">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -180,7 +196,7 @@
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal"
                         id="create_modalLabel">
                         Create Time Shift
                     </h5>
@@ -209,6 +225,23 @@
                                         
                                     </div>
                                     <button @click="isShiftStep = true" class="px-2"><i class="fal fa-plus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div>
+                                <label class="block text-sm text-black mb-3">GPS</label>
+                                <div class="flex gap-x-2">
+                                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                                        data-te-select-wrapper-ref>
+                                        <select data-te-select-init data-te-select-placeholder="Select GPS"
+                                            data-te-select-filter="true" name="" id="" v-model="selectedGps" class="input-ui">
+                                            <option v-if="gpsList.length < 1" selected disabled> Not Found! </option>
+                                            <option :value="gps" v-for="(gps, index) in gpsList"
+                                                :key="index"> {{ gps.name }} </option>
+                                        </select>
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -265,7 +298,7 @@
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal "
                         id="edit_modalLabel">
                         Edit Time Shift
                     </h5>
@@ -295,6 +328,21 @@
                                     <button @click="isShiftStep = true" class="px-2">
                                         <i class="fal fa-plus"></i>
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-black mb-3">GPS</label>
+                            <div class="flex gap-x-2">
+                                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                                    data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select GPS"
+                                        data-te-select-filter="true" name="" id="" v-model="selectedGpsEdit" class="input-ui">
+                                        <option v-if="gpsList.length < 1" selected disabled> Not Found! </option>
+                                        <option :value="gps" v-for="(gps, index) in gpsList"
+                                            :key="index"> {{ gps.name }} </option>
+                                    </select>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -357,8 +405,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             timeShiftList: [],
@@ -373,12 +425,15 @@ export default {
             shiftName:null,
             isShiftStep:false,
             shiftList:[],
+            gpsList: [],
             selectedShift:null,
+            selectedGps: null,
             fromTime:null,
             toTime:null,
 
             editDetail:null,
             selectedShiftEdit:null,
+            selectedGpsEdit: null,
             fromTimeEdit:null,
             toTimeEdit:null,
 
@@ -389,6 +444,7 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
         };
     },
 
@@ -400,12 +456,19 @@ export default {
                 this.shiftList = response.data;
             }
         },
+        async getGpsList(){
+            let response = await getApiData({ url: '/api/gps', token: this.getToken() });
+            if (response.data) {
+                this.gpsList = response.data;
+            }
+        },
         addBtnClicked(){
             this.isShiftStep = false;
             this.shiftName = null;
             this.selectedShift = null;
             this.fromTime = null;
             this.toTime = null;
+            this.selectedGps = null;
         },
         btnClickedAddShift(){
             if(!this.shiftName){
@@ -442,6 +505,10 @@ export default {
                 this.alertValidationMessage(`To`);
                 return 1;
             }
+            else if(!this.selectedGps){
+                this.alertValidationMessage(`GPS`);
+                return 1;
+            }
             else{
                 this.createShift();
             }
@@ -451,6 +518,7 @@ export default {
             formData.append('shift_id',this.selectedShift.id);
             formData.append('from_time',this.fromTime);
             formData.append('to_time',this.toTime);
+            formData.append('gps_id',this.selectedGps.id);
             let response = await postApiData({url:`/api/time_shifts`, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getTimeShiftList();
@@ -465,6 +533,7 @@ export default {
                 this.editDetail = response.data;
             }
             this.selectedShiftEdit = this.shiftList.find(shift => shift.id == this.editDetail.shift_id);
+            this.selectedGpsEdit = this.gpsList.find(gps => gps.id == this.editDetail.gps_id);
             if(this.editDetail.from_time){
                 let from_time = this.editDetail.from_time;
                 let Ftime = from_time.split(':').slice(0, 2).join(':');
@@ -490,6 +559,10 @@ export default {
                 this.alertValidationMessage(`To`);
                 return 1;
             }
+            else if(!this.selectedGpsEdit){
+                this.alertValidationMessage(`GPS`);
+                return 1;
+            }
             else{
                 this.editShift();
             }
@@ -499,6 +572,7 @@ export default {
             formData.append('shift_id',this.selectedShiftEdit.id);
             formData.append('from_time',this.fromTimeEdit);
             formData.append('to_time',this.toTimeEdit);
+            formData.append('gps_id',this.selectedGpsEdit.id    );
             let response = await postApiData({url:`/api/time_shifts/`+this.editDetail.id, form_data:formData, token:this.getToken()})
             if(response.success){
                 this.getTimeShiftList();
@@ -507,6 +581,7 @@ export default {
         },
 
         async getTimeShiftList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url;
             // let url = `/api/objectives?page=${pageNumber}`;
@@ -522,6 +597,7 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.timeShiftList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
@@ -591,6 +667,7 @@ export default {
     created() {
 
         this.getShiftList();
+        this.getGpsList();
         this.getTimeShiftList(1);
     }
 }

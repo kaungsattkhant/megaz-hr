@@ -1,14 +1,14 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Okr Assign
-            </p>
-        </div>
+        
 
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-
+            <div class="mb-8 col-span-12">
+                <p class="text-lg font-semibold font-inter">
+                    Okr Assign
+                </p>
+            </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Date

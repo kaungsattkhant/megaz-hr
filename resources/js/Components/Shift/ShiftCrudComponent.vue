@@ -1,13 +1,17 @@
 <template>
     
     
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
                     Shift Management
                 </p>
             </div>
+
+            <!-- <input id="multiDate" class="border px-3 py-2 rounded w-64" />
+
+  <pre>{{ selectedDates }}</pre> -->
             <div class="btn-container">
                 <notifications position="top center" />
                 <div class=" flex gap-x-4">
@@ -51,6 +55,11 @@
                                 </th>
                             </tr>
                         </thead>
+                        <TableSkeleton
+                            v-if="loading"
+                            :rows="20"
+                            :cols="6"
+                        />
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(shift, index) in primaryList" :key="index">
@@ -87,6 +96,11 @@
                                     </td>
                                 </tr>
                             </div>
+                            <tr class=" !text-center" v-if="primaryList.length < 1 && !loading">
+                                <td class="" colspan="3">
+                                    No Data Here
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
 
@@ -94,13 +108,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getPrimaryList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getPrimaryList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -168,7 +182,7 @@
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal "
                         id="create_modalLabel">
                         Create Time Shift
                     </h5>
@@ -213,7 +227,7 @@
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                 <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal "
                         id="edit_modalLabel">
                         Edit Shift
                     </h5>
@@ -262,8 +276,12 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {
+    components: {
+        TableSkeleton
+    },
     data() {
         return {
             primaryList: [],
@@ -286,17 +304,21 @@ export default {
             deleteId:null,
 
             feature: this.getFeature(),
+            loading: false,
+
+            selectedDates: []
+
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
-        async getPrimaryList(){
-            let response = await getApiData({ url: '/api/shifts', token: this.getToken() });
-            if (response.data) {
-                this.shiftList = response.data;
-            }
-        },
+        // async getPrimaryList(){
+        //     let response = await getApiData({ url: '/api/shifts', token: this.getToken() });
+        //     if (response.data) {
+        //         this.shiftList = response.data;
+        //     }
+        // },
         addBtnClicked(){
             this.shiftName = null;
         },
@@ -345,8 +367,9 @@ export default {
         },
 
         async getPrimaryList(pageNumber) {
+            this.loading = true;
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url;
+            let url = this.url + '?page=' + pageNumber;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -360,10 +383,12 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.loading = false;
                 this.primaryList = response.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
         
@@ -410,6 +435,13 @@ export default {
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
+        flatpickr("#multiDate", {
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            onChange: (dates, strDates) => {
+                this.selectedDates = strDates.split(', ');
+            }
+        });
     },
     created() {
 

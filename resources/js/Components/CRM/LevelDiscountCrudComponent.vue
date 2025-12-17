@@ -1,25 +1,28 @@
 <template>
-    <div>
-        <p class=" text-lg font-semibold font-inter">
-            Customer Level Discounts
-        </p>
-    </div>
-    <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
-                    <i class="fal fa-search"></i>
-                </label>
+    
+    <div class="margin-bg">
+        <div class="card-shadow">
+            <div class="pt-4 pl-4">
+                <p class=" text-lg font-semibold font-inter">
+                    Customer Level Discounts
+                </p>
             </div>
-            <div class="flex justify-end flex-col">
+            <div class="btn-container">
+                <div class=" flex">
+                    <label for="search" class="search-input">
+                        <input type="text" class="input-search" placeholder="Search">
 
-                <button type="button" v-show="feature.includes('customer-level-discount.create')"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
+                        <i class="fal fa-search"></i>
+                    </label>
+                </div>
+                <div class="flex justify-end flex-col">
+
+                    <button type="button" v-show="feature.includes('customer-level-discount.create')"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
+                        Add New
+                    </button>
+                </div>
             </div>
         </div>
         <div class="box-container-table">

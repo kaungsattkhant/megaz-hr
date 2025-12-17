@@ -338,7 +338,7 @@
 
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create Package
+                Edit
             </button>
         </div>
     </div>

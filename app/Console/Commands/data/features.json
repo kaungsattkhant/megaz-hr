@@ -635,6 +635,11 @@
         "slug": "cashbook"
     },
     {
+        "module": "cashbook-closing-history",
+        "name": "Cashbook Closing History ",
+        "slug": "cashbook-closing-history"
+    },
+    {
         "module": "purchase-order",
         "name": "purchase-order create",
         "slug": "purchase-order.create"
@@ -715,9 +720,9 @@
         "slug": "fix-asset.create"
     },
     {
-        "module": "asset-depreciation-balance", 
+        "module": "asset-depreciation-balance",
         "name": "Asset Depreciation Balance",
-        "slug": "asset-depreciation-balance" 
+        "slug": "asset-depreciation-balance"
     },
     {
         "module": "fix-asset-depreciation-balance",
@@ -1319,6 +1324,11 @@
         "name": "pos-cashbook list ",
         "slug": "pos-cashbook"
     },
+      {
+        "module": "pos-cashbook-closing-history",
+        "name": "POS Cashbook Closing History ",
+        "slug": "pos-cashbook-closing-history"
+    },
     {
         "module": "pos-booking",
         "name": "pos booking list ",
@@ -1370,6 +1380,16 @@
         "slug": "jd.create"
     },
     {
+        "module": "jd",
+        "name": "jd edit",
+        "slug": "jd.edit"
+    },
+    {
+        "module": "jd",
+        "name": "jd delete",
+        "slug": "jd.delete"
+    },
+    {
         "module": "js",
         "name": "js list",
         "slug": "js"
@@ -1378,6 +1398,16 @@
         "module": "js",
         "name": "js create",
         "slug": "js.create"
+    },
+    {
+        "module": "js",
+        "name": "js edit",
+        "slug": "js.edit"
+    },
+    {
+        "module": "js",
+        "name": "js delete",
+        "slug": "js.delete"
     },
     {
         "module": "sop",
@@ -1428,5 +1458,75 @@
         "module": "accrual",
         "name": "accrual detail",
         "slug": "accrual.detail"
+    },
+    {
+        "module": "shift-assignment",
+        "name": "shift-assignment list",
+        "slug": "shift-assignment"
+    },
+    {
+        "module": "shift-assignment",
+        "name": "shift-assignment create",
+        "slug": "shift-assignment.create"
+    },
+    {
+        "module": "equipment-assignment",
+        "name": "equipment-assignment list",
+        "slug": "equipment-assignment"
+    },
+    {
+        "module": "equipment-assignment",
+        "name": "equipment-assignment create",
+        "slug": "equipment-assignment.create"
+    },
+    {
+        "module": "asset-assignment",
+        "name": "asset-assignment list",
+        "slug": "asset-assignment"
+    },
+    {
+        "module": "asset-assignment",
+        "name": "asset-assignment create",
+        "slug": "asset-assignment.create"
+    },
+    {
+        "module": "handbook",
+        "name": "handbook list",
+        "slug": "handbook"
+    },
+    {
+        "module": "handbook",
+        "name": "handbook create",
+        "slug": "handbook.create"
+    },
+    {
+        "module": "handbook",
+        "name": "handbook delete",
+        "slug": "handbook.delete"
+    },
+    {
+        "module": "loan-creditor-account",
+        "name": "loan-creditor-account list",
+        "slug": "loan-creditor-account"
+    },
+    {
+        "module": "loan-creditor-account",
+        "name": "loan-creditor-account create",
+        "slug": "loan-creditor-account.create"
+    },
+    {
+        "module": "loan",
+        "name": "loan list",
+        "slug": "loan"
+    },
+    {
+        "module": "loan",
+        "name": "loan create",
+        "slug": "loan.create"
+    },
+    {
+        "module": "loan",
+        "name": "loan detail",
+        "slug": "loan.detail"
     }
 ]

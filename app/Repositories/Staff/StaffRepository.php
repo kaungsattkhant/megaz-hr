@@ -132,7 +132,7 @@ class StaffRepository implements StaffRepositoryInterface
             }
 
             foreach ($data['feature_ids'] as $featureId) {
-                $staff->features()->attach($featureId);
+                $staff->features()->sync($featureId);
             }
 
             foreach ($data['inventory_ids'] as $inventoryId) {
@@ -282,9 +282,10 @@ class StaffRepository implements StaffRepositoryInterface
     public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null)
     {
 
-        $allowedRoles = $roles ? (in_array('Manager', $roles)
-            ? ['Supervisor', 'Staff']
-            : ['Staff']) : null;
+        $allowedRoles = $roles ? ((in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Chief Accountant', $roles) || in_array('Sous Chef', $roles) || in_array('Senior Receptionist', $roles))
+            ? ['Supervisor', 'Staff','Helper','Bartender','Demi Chef','Waiter','Receptionist','Accountant','Cashier','Driver','M&E','Security','Staff Cook']
+            : ['Staff','Helper','Demi Chef','Bartender','Waiter','Receptionist','Driver','M&E','Security','Staff Cook','Accountant','Cashier']) : null;
+            
         if ($request->per_page || $request->page) {
             // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             // $pageNumber = 1;

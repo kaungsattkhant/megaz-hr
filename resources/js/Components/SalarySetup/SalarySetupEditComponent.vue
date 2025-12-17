@@ -1,14 +1,14 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
-                Create Salary Setup
-            </p>
-        </div>
+        
 
 
         <div class="grid !grid-cols-10 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-
+            <div class="mb-4 col-span-10">
+                <p class="text-lg font-semibold ">
+                    Create Salary Setup
+                </p>
+            </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Department
@@ -121,13 +121,14 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-6">
+                <button class="add-btn" @click="btnClickedEditSalarySetup()">
+                    Edit
+                </button>
+            </div>
         </div>
 
-        <div>
-            <button class="add-btn" @click="btnClickedEditSalarySetup()">
-                Edit Salary Setup
-            </button>
-        </div>
+        
 
 
 
@@ -139,7 +140,7 @@
                 class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                 <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <div class="relative flex justify-between py-2 px-6 border-b">
-                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal"
                             id="add_allowance_type_modalLabel">
                             Create Allowance Type
                         </h5>

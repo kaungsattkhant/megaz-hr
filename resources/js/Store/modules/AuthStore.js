@@ -33,6 +33,10 @@ export default {
         setFeature(state, feature){
             state.feature = feature;
         },
+
+        setOffDaySetting(state, offDaySetting){
+            state.offDaySetting = offDaySetting;
+        },
     },
 
     actions: {},
@@ -60,6 +64,10 @@ export default {
 
         getFeature(state){
             return state.feature;
-        }
+        },
+
+        getOffDaySetting(state){
+            return state.offDaySetting;
+        },
     }
 };

@@ -27,6 +27,7 @@ return new class extends Migration
     {
         Schema::table('objectives', function (Blueprint $table) {
             //
+           
         });
     }
 };

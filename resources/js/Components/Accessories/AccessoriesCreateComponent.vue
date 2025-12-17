@@ -1,7 +1,7 @@
 <template>
     <div class="px-0">
         <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter pt-4 pl-1">
+            <p class="text-lg font-semibold pt-4 pl-1">
                 Add Accessories
             </p>
         </div>
@@ -166,7 +166,7 @@
             <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                 <li role="presentation">
                     <a href="#tabs-ingredients"
-                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-home" data-te-nav-active role="tab"
                         aria-controls="tabs-home" aria-selected="true">Ingredients</a>
                 </li>

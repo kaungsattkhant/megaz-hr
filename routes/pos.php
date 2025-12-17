@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\MenuAPIController;
+use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\AccessoryController;
 use App\Http\Controllers\API\EntityAPIController;
@@ -61,4 +62,11 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/selling_extra_categories', 'getSellingExtraCategories');
         Route::get('/selling_extras', 'getSellingExtrasFromPos');
     });
+    Route::controller(PackAPIController::class)->group(function () {
+        Route::get('/packs', 'getPacksData');
+        Route::post('/packs', 'createPack');
+        Route::post('change_pack','changePack');
+    });
+  
 });
+

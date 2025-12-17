@@ -6,7 +6,8 @@
     <div id="app">
         <cashbook-crud-component
         :cash-account-id={{ '30' }}
-        :cash-account-name={{ 'KBZ Old (GM)' }}>
+        :cash-account-name={{ 'KBZ Old (GM)' }}
+        :cash-account-code={{ '1008' }} >
         </cashbook-crud-component>
 
     </div>

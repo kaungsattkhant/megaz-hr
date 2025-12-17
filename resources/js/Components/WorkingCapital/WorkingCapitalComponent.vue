@@ -1,6 +1,6 @@
 <template>
 
-    <div class="mt-4 bg-white">
+    <div class="margin-bg">
         <div class="card-shadow">
             <div>
                 <p class=" page-title">
@@ -63,7 +63,7 @@
                             <!-- </tr>
                         </thead> -->
                         <tbody class="!rounded-none">
-                            <tr class="bg-blue-50 !rounded-none">
+                            <tr class="bg-gray-100 !rounded-none">
                                 <td scope="col" class=" !font-semibold !rounded-none">
                                     Current Asset
                                 </td>
@@ -135,7 +135,7 @@
 
 
 
-                            <tr class=" bg-blue-50 !rounded-none">
+                            <tr class=" bg-gray-100 !rounded-none">
                                 <td scope="col" class=" !font-semibold !rounded-none">
                                     Current Liabilities
                                 </td>

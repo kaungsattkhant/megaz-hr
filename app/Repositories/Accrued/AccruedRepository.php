@@ -5,23 +5,20 @@ namespace App\Repositories\Accrued;
 use App\Models\Account;
 use App\Models\Accrued;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class AccruedRepository implements AccruedRepositoryInterface
 {
     public function getExpenseAccount($request)
     {
-        return  Account::with('sub_account')->where(function ($query) {
-            $query->where('account_code', 'like', '6-2%')
-                ->orWhere('account_code', 'like', '6-3%')
-                ->orWhere('account_code', 'like', '6-4%')
-                ->orWhere('account_code', 'like', '6-5%')
-                ->orWhere('account_code', 'like', '6-6%')
-                ->orWhere('account_code', 'like', '6-7%')
-                ->orWhere('account_code', 'like', '6-8%')
-                ->orWhere('account_code', 'like', '6-9%');
-        })->orderBy('account_code', 'asc')
-            ->get();
+        $expenseAccountCodes = Config::get('common.expense_account_codes', []);
+        if (!empty($expenseAccountCodes)) {
+            $expenseAccounts = Account::whereIn('account_code', $expenseAccountCodes)
+                ->orderBy('account_code', 'asc')
+                ->get();
+        }
+        return $expenseAccounts;
     }
     public function createAccrued($request)
     {
@@ -29,8 +26,6 @@ class AccruedRepository implements AccruedRepositoryInterface
         try {
             $expenseAccount = Account::where('id', $request['expense_account_id'])->where('account_code', $request['expense_account_code'])->first();
             $accruedAccount = Account::where('link_account_id', $expenseAccount->id)->first();
-            $otherPayableAccount = Account::where('id', $request['other_payable_account_id'])->where('account_code', $request['other_payable_account_code'])->first();
-
             if($request['category'] === "accrued"){
                 $accrued = Accrued::create([
                     'date_time' => now(),
@@ -109,7 +104,7 @@ class AccruedRepository implements AccruedRepositoryInterface
             }
             }
             else if($request['category'] === "other_payable"){
-
+                $otherPayableAccount = Account::where('id', $request['other_payable_account_id'])->where('account_code', $request['other_payable_account_code'])->first();
             $accrued = Accrued::create([
                 'date_time' => now(),
                 'category' => $request['category'],
@@ -203,12 +198,15 @@ class AccruedRepository implements AccruedRepositoryInterface
             ->select(
                 'accrueds.account_id',
                 'accounts.name as account_name',
+                'accounts.account_code',
                 'accrueds.category',
                 // DB::raw('SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) as total_addition'),
                 // DB::raw('SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END) as total_settlement'),
-                DB::raw('(SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) - SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END)) as total_balance')
+                DB::raw('(SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) 
+                - 
+                SUM(CASE WHEN accrueds.type = "settlement" THEN accrueds.amount ELSE 0 END)) as total_balance')
             )
-            ->groupBy('accrueds.account_id', 'accounts.name')
+            ->groupBy('accrueds.account_id', 'accounts.name', 'accounts.account_code')
             ->paginate(config('common.list_count'));
         return $accrueds;
     }
@@ -222,6 +220,7 @@ class AccruedRepository implements AccruedRepositoryInterface
                 'accrueds.date_time AS date',
                 'accrueds.type',
                 'accrueds.category',
+                'accounts.account_code',
                 'accounts.name AS accrued_name',
                 'accrueds.amount',
                 DB::raw('SUM(CASE WHEN accrueds.type = "addition" THEN accrueds.amount ELSE 0 END) 
@@ -240,14 +239,11 @@ class AccruedRepository implements AccruedRepositoryInterface
 
     public function getOtherPayable($request)
     {
-        $account = Account::with('sub_account')
-        ->where('link_account_id', null)
-        ->where('account_code', 'like', '4-4%')
-        ->whereHas('sub_account', function ($query) {
-            $query->where('account_code', '4-4000');
-        })->orderBy('id', 'desc')
+        $otherPayableAccountCodes = Config::get('common.other_payable_account_codes', []);
+        $otherPayableAccounts = Account::with('sub_account')
+        ->whereIn('account_code', $otherPayableAccountCodes)
+        ->orderBy('id', 'desc')
         ->get();
-    
-    return $account;
+        return $otherPayableAccounts;
     }
 }

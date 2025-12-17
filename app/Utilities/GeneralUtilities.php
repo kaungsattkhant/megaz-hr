@@ -82,6 +82,14 @@ if (!function_exists('MonthStartEndDates')) {
     }
 }
 
+if (!function_exists('IsValidDateString')){
+    function IsValidDateString(string $date): bool
+    {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') === $date;
+    }
+}
+
 if (!function_exists('UploadFileToServer')) {
     function UploadFileToServer(Request $request, string $file_name, string $path): array
     {
@@ -139,7 +147,7 @@ if (!function_exists('SendApprovalSMS')) {
 }
 
 if (!function_exists('Pagination')) {
-    function Pagination(Collection $data, Request $request, string $data_shell_name = null): array
+    function Pagination(Collection $data, Request $request, ?string $data_shell_name = null): array
     {
         // Get current page form url e.x. &page=1
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -193,7 +201,7 @@ if (!function_exists('Pagination')) {
 }
 
 if (!function_exists('MakePaginationData')) {
-    function MakePaginationData(Request $request, int $totalCount, string $data_shell_name = null, $data = null)
+    function MakePaginationData(Request $request, int $totalCount, ?string $data_shell_name = null, $data = null)
     {
         $pageNumber = 1;
         $perPage = 20;
@@ -403,7 +411,7 @@ if (!function_exists('format_price')) {
      */
     function format_price($value)
     {
-        return number_format((float)$value, 2, '.', '');
+        return number_format((float) $value, 2, '.', '');
     }
 }
 
@@ -419,3 +427,21 @@ if (!function_exists('toggleColumn')) {
         return false;
     }
 }
+
+if (!function_exists('paginateCollection')) {
+    function paginateCollection($collection, $perPage = 15)
+    {
+        $page = request()->get('page', 1);
+        $path = request()->url();
+        $query = request()->query();
+
+        return new LengthAwarePaginator(
+            $collection->forPage($page, $perPage)->values(),
+            $collection->count(),
+            $perPage,
+            $page,
+            compact('path', 'query')
+        );
+    }
+}
+

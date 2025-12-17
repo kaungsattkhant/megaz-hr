@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdminCheckInRequest;
 use App\Http\Requests\TimeShift\ShiftRequest;
 use App\Http\Requests\TimeShift\CheckInRequest;
 use App\Http\Requests\TimeShift\CheckOutRequest;
@@ -17,24 +18,6 @@ class TimeShiftController extends Controller
     public function __construct(TimeShiftRepositoryInterface $TimeShiftRepository)
     {
         $this->TimeShiftRepository = $TimeShiftRepository;
-    }
-
-    public function getGPS(Request $request)
-    {
-        $data =  $this->TimeShiftRepository->getGPS($request->all());
-        ResponseData($data);
-    }
-
-    public function getGPSById(int $gpsId)
-    {
-        $data =  $this->TimeShiftRepository->getGPSById($gpsId);
-        ResponseData($data);
-    }
-
-    public function updateGPSById(Request $request, int $gpsId)
-    {
-        $data =  $this->TimeShiftRepository->updateGPSById($request->all(), $gpsId);
-        ResponseData($data);
     }
 
     public function getShifts(Request $request)
@@ -100,6 +83,16 @@ class TimeShiftController extends Controller
     public function checkIn(CheckInRequest $request)
     {
         $data =  $this->TimeShiftRepository->checkIn($request->all());
+        ResponseData($data);
+    }
+
+    public function adminPostedCheckIn(AdminCheckInRequest $request)
+    {
+        $this->TimeShiftRepository->adminPostedCheckIn($request->all());
+    }
+
+    public function getStaffTimeShfitByStaff($staffId){
+        $data=$this->TimeShiftRepository->getStaffTimeShfitByStaff($staffId);
         ResponseData($data);
     }
 
