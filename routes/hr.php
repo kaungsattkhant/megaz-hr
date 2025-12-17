@@ -5,6 +5,7 @@ use App\Http\Controllers\API\CvController;
 use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\SalaryController;
+use App\Http\Controllers\API\BenefitController;
 use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\HandBookeController;
@@ -164,6 +165,12 @@ Route::middleware('auth:api')->group(function () {
   Route::controller(MenuItemImportController::class)->group(function () {
     Route::post('/ready-to-sale-menu-item-import', 'readyToSaleMenuItemImport');
     Route::post('/raw-item-import', 'rawItemImport');
+  });
+
+  Route::prefix('benefit_requests')->controller(BenefitController::class)->group(function () {
+    Route::post('/', 'createBenefitRequest');
+    Route::get('/', 'listBenefitRequest');
+    Route::get('/benefit_by_type/{type}', 'getBenefitByType');
   });
  
 });
