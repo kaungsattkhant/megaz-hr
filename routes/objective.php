@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
     Route::get('/daily/objectives/{staffId}', 'getdailyObjectivesByStaffId');
+    Route::get('/daily/objective_by_accountable/{staffId}', 'getDailyObjectiveByAccountable');
     Route::post('/daily/objectives_key_staff/{objStaffId}', 'updateDailyObjective');
     Route::post('/objectives/key_staff/{objStaffId}/images', 'storeImages');
     Route::post('/objectives/key_staff/{objStaffId}/images/update', 'updateImages');
