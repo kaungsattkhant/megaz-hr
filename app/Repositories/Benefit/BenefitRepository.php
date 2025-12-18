@@ -31,13 +31,14 @@ class BenefitRepository implements BenefitInterface
 
     public function updateOrCreateBenefit($request)
     {
+        $data=$request;
         DB::beginTransaction(); // start transaction
         try {
             if (!isset($data['id'])) {
                 $data['id'] = null;
             }
             $data['created_by'] = \UserData()->id;
-            
+        
             $benefit = Benefit::updateOrCreate(['id' => $data['id']], $data);
             DB::commit();
             return $benefit;
