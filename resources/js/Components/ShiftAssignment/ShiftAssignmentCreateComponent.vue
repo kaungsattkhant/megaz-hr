@@ -9,14 +9,8 @@
             {{ value }}
         </p> -->
 
-        <div class="grid !grid-cols-10 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-6 col-span-3 pb-0 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Date
-                </label>
-                <input v-model="selectedDate" autocomplete="off" ref="picker"   
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div><div class="col-span-7"></div>
+        <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <!-- <div class="col-span-7"></div> -->
             <div class="mb-4 col-span-3 pb-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Department
@@ -49,17 +43,53 @@
                 <label for="" class="label-form mb-3">
                     Staff
                 </label>
-
-                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                <multiselect class="multi-select"
+                    v-model="selectedStaff"
+                    :options="staffList"
+                    :multiple="true"
+                    :close-on-select="false"
+                    :clear-on-select="false"
+                    :preserve-search="true"
+                    placeholder="Select Staff"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                        Staff selected</span>
+                    </template>
+                </multiselect>
+                <!-- <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Staff"
                         data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui !text-black text-sm">
                         <option :value="staff" v-for="(staff, index) in staffList"
                             :key="index"> {{ staff.name }} </option>
                     </select>
-                </div>
+                </div> -->
             </div>
             <div class="mb-4 col-span-3 pb-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Type
+                </label>
+
+                <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
+                        <option :value="type" v-for="(type, index) in typeList"
+                            :key="index"> {{ type.name }} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-6 col-span-3 pb-0 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Date
+                </label>
+                <input v-model="selectedDate" autocomplete="off" ref="picker"   
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div v-show="selectedType?.value === 'shift'" class="mb-4 col-span-3 pb-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Shift
                 </label>
@@ -123,14 +153,14 @@
                         Off Day
                     </a>
                 </div>
-                <div v-show="offDaySetting === 'custom'">
+                <!-- <div v-show="offDaySetting === 'custom'">
                     <label for="" class="label-form mb-3">
                         &nbsp;
                     </label>
                     <button class="add-btn py-[9px]">
                         Off Day
                     </button>
-                </div>
+                </div> -->
             </div>
             <div class="col-span-2">
                 
@@ -180,8 +210,9 @@
                             <td class="">
                                 {{ item.staff_name }}
                             </td>
-                            <td class="">
-                                {{ item.timeshift_name }}
+                            <td class="" :class="item.type === 'off_day' ? '!text-red-600' : ''">
+                                {{ item.type === 'off_day' ? 'Off Day' : item.timeshift_name }}
+                                <!-- {{ item.timeshift_name }} -->
                             </td>
                             <td class="">
                                 {{ item.area_name ? item.area_name : '-' }}
@@ -227,11 +258,16 @@ export default {
             staffList: [],
             timeShiftList: [],
             areaList: [],
+            typeList: [
+                {value: 'shift', name: 'Shift'},
+                {value: 'off_day', name: 'Off Day'}
+            ],
 
+            selectedType: null,
             selectedDate: [],
             selectedDepartment: null,
             selectedRole: null,
-            selectedStaff: null,
+            selectedStaff: [],
             selectedTimeShift: null,
             selectedArea: null,
             
@@ -261,8 +297,8 @@ export default {
         changeDepartment(){
             this.selectedRole = null;
             this.roleList = this.selectedDepartment.roles;
-            this.selectedStaff = null;
-            this.staffList = null;
+            this.selectedStaff = [];
+            this.staffList = [];
             this.selectedArea = null;
             if(this.selectedDepartment.slug === 'kitchen'){
                 this.getCookingArea();
@@ -314,11 +350,15 @@ export default {
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if(!this.selectedStaff){
+            else if(this.selectedStaff.length < 1){
                 this.alertValidationMessage(`Staff`);
                 return 1;
             }
-            else if(!this.selectedTimeShift){
+            else if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else if(this.selectedType?.value === 'shift' && !this.selectedTimeShift){
                 this.alertValidationMessage(`Shift`);
                 return 1;
             }
@@ -331,18 +371,22 @@ export default {
             }
         },
         async addShift(){
-            this.selectedDates.forEach(item => {
-                this.selectedAssignList.push({
-                    date_time: item,
-                    department_name: this.selectedDepartment.name,
-                    role_name: this.selectedRole.name,
-                    staff_name: this.selectedStaff.name,
-                    staff_id: this.selectedStaff.id,
-                    timeshift_name: this.selectedTimeShift.shift.name,
-                    timeshift_id: this.selectedTimeShift.id,
-                    area_name: this.selectedArea?.name,
-                    area_id: this.selectedArea?.id,
-                })
+            this.selectedStaff.forEach(staff => {
+                this.selectedDates.forEach(item => {
+                    this.selectedAssignList.push({
+                        date_time: item,
+                        department_name: this.selectedDepartment.name,
+                        role_name: this.selectedRole.name,
+                        staff_name: staff.name,
+                        staff_id: staff.id,
+                        timeshift_name: this.selectedTimeShift?.shift.name,
+                        timeshift_id: this.selectedTimeShift?.id,
+                        area_name: this.selectedArea?.name,
+                        area_id: this.selectedArea?.id,
+                        type: this.selectedType.value,
+                        type_name: this.selectedType.name
+                    })
+                });
             });
             
 
@@ -350,7 +394,7 @@ export default {
             // this.selectedDate = null;
             this.selectedDepartment = null;
             this.selectedRole = null;
-            this.selectedStaff = null;
+            this.selectedStaff = [];
             this.selectedTimeShift = null;
             this.selectedArea = null;
 
@@ -358,7 +402,9 @@ export default {
             this.staffList = [];
             this.areaList = [];
             this.selectedDates = [];
+            this.selectedType = null;
             this.fpInstance.clear();
+            
         },
         removeItem(index){
             this.selectedAssignList.splice(index, 1);
