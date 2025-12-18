@@ -20,6 +20,8 @@ class CheckInResource extends JsonResource
         return [
             'id' => $this->id,
             'staff_id' => $this->staff_id ?? null,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
             'staff_name' => $this->staff->name ?? null,
             'time_shift_id' => $this->time_shift_id ?? null,
             'check_in_date_time' => $this->check_in_date_time ?? null,
