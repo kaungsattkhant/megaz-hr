@@ -285,6 +285,8 @@ import KtvMenuSaleComponent from './Components/KitchenMenuSale/KtvMenuSaleCompon
 import SkyMenuSaleComponent from './Components/KitchenMenuSale/SkyMenuSaleComponent.vue';
 import BudgetAccountCrudComponent from './Components/BudgetAccounts/BudgetAccountCrudComponent.vue';
 import CashflowReportComponent from './Components/CashflowReport/CashflowReportComponent.vue';
+import BenefitsCrudComponent from './Components/Benefits/BenefitsCrudComponent.vue';
+import BenefitsRequestComponent from './Components/Benefits/BenefitsRequestComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -547,6 +549,8 @@ app.component('KtvMenuSaleComponent',KtvMenuSaleComponent);
 app.component('SkyMenuSaleComponent',SkyMenuSaleComponent);
 app.component('BudgetAccountCrudComponent',BudgetAccountCrudComponent);
 app.component('CashflowReportComponent',CashflowReportComponent);
+app.component('BenefitsCrudComponent',BenefitsCrudComponent);
+app.component('BenefitsRequestComponent',BenefitsRequestComponent);
 
 const toastificationOptions = {};
 app.use(store);

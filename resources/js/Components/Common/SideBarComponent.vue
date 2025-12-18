@@ -609,6 +609,13 @@
                                     Handbooks
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="/benefits" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-project-diagram "></i>
+                                    Benefit
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
