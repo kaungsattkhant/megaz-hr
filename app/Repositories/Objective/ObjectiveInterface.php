@@ -36,6 +36,7 @@ interface ObjectiveInterface
   public function getObjKeyStaffImage($objKeystaffId);
   public function deleteObjKeystaffImage($imgId);
   public function getdailyObjectivesByStaffId(Request $request, $staffId);
+  public function getDailyObjectiveByAccountable($staffId);
   public function getCompletedObjKeysByStaffId($objectiveId,$staffId);
   public function rejectObjectKeyByObjectiveStaffId($data);
 
