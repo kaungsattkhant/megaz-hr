@@ -72,6 +72,8 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    
+
     public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null)
     {
         $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request, $assignDutyId = null);
@@ -177,6 +179,11 @@ class ObjectiveController extends Controller
     public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
         $data = $this->objectiveRepository->getdailyObjectivesByStaffId($request, $staffId);
+        ResponseData($data);
+    }
+    public function getDailyObjectiveByAccountable($staffId)
+    {
+        $data = $this->objectiveRepository->getDailyObjectiveByAccountable($staffId);
         ResponseData($data);
     }
 
