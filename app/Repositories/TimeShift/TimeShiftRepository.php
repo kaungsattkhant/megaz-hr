@@ -400,13 +400,13 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       if (!$officeGps) {
         ResponseData('Office GPS coordinates not found.', 422);
       }
-      $officeLat = $officeGps->latitude;
-      $officeLng = $officeGps->longitude;
+      // $officeLat = $officeGps->latitude;
+      // $officeLng = $officeGps->longitude;
 
-      $distance = $this->haversineFormula($userLat, $userLng, $officeLat, $officeLng);
-      if ($distance > 500) {
-        return ResponseData($data = null, $status_code = 422, false, $extra_message = "You are not within the allowed range.");
-      }
+      // $distance = $this->haversineFormula($userLat, $userLng, $officeLat, $officeLng);
+      // if ($distance > 500) {
+      //   return ResponseData($data = null, $status_code = 422, false, $extra_message = "You are not within the allowed range.");
+      // }
 
       if (isset($requestData['check_in_photo'])) {
         $image = $requestData['check_in_photo'];
@@ -419,12 +419,15 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $checkIn = CheckIn::create([
         'staff_id' => $requestData['staff_id'],
         'time_shift_id' => $requestData['time_shift_id'],
+        'latitude' => $requestData['latitude'],
+        'longitude' => $requestData['longitude'],
         'staff_timeshift_id' => $requestData['staff_timeshift_id'] ?? null,
         'check_in_date_time' => now(),
         'check_in_photo_path' => $imagePath ?? null,
         'check_in_photo_url' => $imageUrl ?? null,
         'is_current_checked_in' => true,
       ]);
+      dd($checkIn);
       $checkIn->check_in_status= 'check_out';
       DB::commit();
       return $checkIn;
