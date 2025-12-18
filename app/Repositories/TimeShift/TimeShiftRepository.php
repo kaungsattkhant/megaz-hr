@@ -427,7 +427,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         'check_in_photo_url' => $imageUrl ?? null,
         'is_current_checked_in' => true,
       ]);
-      dd($checkIn);
       $checkIn->check_in_status= 'check_out';
       DB::commit();
       return $checkIn;
