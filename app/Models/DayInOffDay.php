@@ -14,7 +14,8 @@ class DayInOffDay extends Model
         'day',
         'off_day_id',
         'name',
-        'date'
+        'date',
+        'staff_id',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

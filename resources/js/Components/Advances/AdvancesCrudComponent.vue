@@ -318,13 +318,13 @@
             async getAdvanceList(pageNumber){
                 this.loading = true;
                 const response = await getApiData({ url: '/api/advances' + '?page='+pageNumber, token: this.getToken() });
-                if(response.message.data){
+                if(response.data.data){
                     this.loading = false;
-                    this.primaryList = response.message.data;
-                    this.lastPage = response.message.last_page;
+                    this.primaryList = response.data.data;
+                    this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;
-                    this.perPage = response.message.per_page;
-                    this.totalData = response.message.total;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
             async getDepartmentList(){
