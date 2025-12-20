@@ -169,7 +169,6 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
         'updated_at'    => now(),
       ];
     });
-
     // Bulk Insert
     StaffTimeshift::insert($insertData->toArray());
 
