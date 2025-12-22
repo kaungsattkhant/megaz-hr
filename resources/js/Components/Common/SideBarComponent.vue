@@ -438,7 +438,7 @@
                                     Complaints
                                 </a>
                             </li>
-                            <li>
+                            <li v-show="checkFeaturePermission('advance')">
                                 <a href="/advances" class="flex items-center @yield('advances') sidebar-gap-x">
                                     <i class="fal fa-envelope-open-text"></i>
                                     Advances
@@ -610,10 +610,16 @@
                                 </a>
                             </li>
 
-                            <li>
+                            <li v-show="checkFeaturePermission('benefit')">
                                 <a href="/benefits" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-project-diagram "></i>
                                     Benefit
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('benefit_request')">
+                                <a href="/benefits_request" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-project-diagram "></i>
+                                    Benefit Request
                                 </a>
                             </li>
                         </ul>

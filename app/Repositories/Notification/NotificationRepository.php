@@ -18,6 +18,7 @@ class NotificationRepository implements NotificationInterface
         ->whereHas('notificationUsers',function($query){
             $query->where('staff_id',UserData()->id);
         })
+        ->where('notificationable_type','purchase_order')
         ->get();
     }
 
@@ -25,6 +26,9 @@ class NotificationRepository implements NotificationInterface
     {
         $userNotifications = NotificationUser::where('staff_id', $staffId)
         ->whereIn('notification_id', $notificationIds)
+        ->whereHas('notification',function($q){
+            $q->where('notificationable_type','purchase_order');
+        })
         ->where('is_read_count', 0)
         ->get();
 
