@@ -178,7 +178,6 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
         ->where('staff_id', $row['staff_id'])
         ->where('timeshift_id', $row['timeshift_id'])
         ->first();
-
       $notiData = [
         'title'     => 'Shift Assigned',
         'date_time' => $row['date_time'],
