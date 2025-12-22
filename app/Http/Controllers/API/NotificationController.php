@@ -25,7 +25,7 @@ class NotificationController extends Controller
     public function setSeenNotifications(Request $request)
     {
         $notificationIds = json_decode($request->notification_ids, true);
-        if(!UserData()->id || !$notificationIds){
+        if(!UserData()->id){
             ResponseMessage('Setting notifications as seen failed', 400);
         }
 
