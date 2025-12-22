@@ -1550,6 +1550,11 @@
         "slug": "benefit_request"
     },
     {
+        "module": "benefit_request",
+        "name": "Benfit Confirmation List",
+        "slug": "benefit_request.confirmation"
+    },
+    {
         "module": "advance",
         "name": "Advance List",
         "slug": "advance"
@@ -1563,5 +1568,10 @@
         "module": "advance",
         "name": "Advance Detail",
         "slug": "advance.detail"
+    },
+    {
+        "module": "advance",
+        "name": "Advance Payment Create",
+        "slug": "advance.payment_create"
     }
 ]
