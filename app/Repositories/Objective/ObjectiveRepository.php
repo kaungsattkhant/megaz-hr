@@ -472,8 +472,9 @@ class ObjectiveRepository implements ObjectiveInterface
             //     // ->orderBy('repetition_count', 'asc');
             // }
         ])
-            ->whereHas('objective', function ($query) use ($staffId) {
-                $query->where('accountable_id', $staffId);
+            ->where('staff_id', $staffId)
+            ->whereHas('objective', function ($query) use ($authUser) {
+                $query->where('accountable_id', $authUser);
             })
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
