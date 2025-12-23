@@ -568,17 +568,13 @@ class ObjectiveRepository implements ObjectiveInterface
     public function getStaffByAccountable($staffId)
     {
         //$staffId is accountable
-        $staffIdByObjectiveAssign = ObjectiveAssign::with([
-            'objective.objectiveKeys',
-            'objective.accountable:id,name',
-            'objective.consulted:id,name',
-            'objective.informed:id,name',
-        ])
-            ->whereHas('objective', function ($q) use ($staffId) {
-                $q->where('accountable_id', $staffId);
-            })
-            ->pluck('staff_id')->unique('staff_id')->toArray();
-        $staff=Staff::whereIn('id', $staffIdByObjectiveAssign)->get();
+        $staffIds = ObjectiveAssign::whereHas('objective', function ($q) use ($staffId) {
+            $q->where('accountable_id', $staffId);
+        })
+            ->distinct()
+            ->pluck('staff_id');
+
+        $staff = Staff::whereIn('id', $staffIds)->get();
         return $staff;
     }
 
