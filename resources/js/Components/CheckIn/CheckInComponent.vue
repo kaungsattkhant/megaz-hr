@@ -61,6 +61,9 @@
                                     Shift
                                 </th>
                                 <th scope="col" class="">
+                                    View on Map
+                                </th>
+                                <th scope="col" class="">
                                     From
                                 </th>
                                 <th scope="col" class="">
@@ -92,6 +95,13 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ checkIn.time_shift.shift.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <a v-if="checkIn.latitude && checkIn.longitude" :href="getGoogleMapsLink(checkIn.latitude, checkIn.longitude)"
+                                        target="_blank" rel="noopener noreferrer">
+                                            <span class="text-blue-600 mx-1"><i class="fad fa-map"></i></span>
+                                            <span class="text-red-600 mx-1"><i class="fad fa-map-pin"></i></span>
+                                        </a>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <div class="flex w-full justify-center gap-x-4">
@@ -369,6 +379,12 @@ export default {
                 }
             });
         },
+
+        getGoogleMapsLink(lat, lng) {
+            if (!lat || !lng)
+                return "#";
+            return `https://www.google.com/maps?q=${lat},${lng}`;
+        }
     },
     mounted() {
         initTE({ Modal, Select, Ripple });

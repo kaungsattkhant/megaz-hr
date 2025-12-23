@@ -23,6 +23,8 @@ class CheckIn extends Model
         'check_out_photo_path',
         'is_current_checked_in',
         'is_self_checkout',
+        'latitude',
+        'longitude',
     ];
 
     public function staff()
