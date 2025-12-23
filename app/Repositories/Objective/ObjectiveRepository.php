@@ -574,7 +574,7 @@ class ObjectiveRepository implements ObjectiveInterface
             ->distinct()
             ->pluck('staff_id');
 
-        $staff = Staff::whereIn('id', $staffIds)->get();
+        $staff = Staff::with(['department', 'roles'])->whereIn('id', $staffIds)->get();
         return $staff;
     }
 
