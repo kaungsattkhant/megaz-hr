@@ -274,7 +274,7 @@
         },
         data() {
             return {
-
+                selected_month: null,
                 primaryList:[],
 
                 departmentList:[],
