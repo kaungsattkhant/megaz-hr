@@ -187,6 +187,11 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function getStaffByAccountable($staffId){
+        $data = $this->objectiveRepository->getStaffByAccountable($staffId);
+        ResponseData($data);
+    }
+
     public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
     {
         $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
