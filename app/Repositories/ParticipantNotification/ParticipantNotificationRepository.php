@@ -1209,10 +1209,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         });
       })
       ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
-        return $query->where('date_time', '>=', $currentDateTime);
+        return $query->where('from_date', '>=', $currentDateTime);
       })
       ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
-        return $query->where('date_time', '<', $currentDateTime);
+        return $query->where('to_date', '<', $currentDateTime);
       })
       ->orderBy('id', 'desc')
       ->get();
@@ -1246,10 +1246,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         });
       })
       ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
-        return $query->where('date_time', '>=', $currentDateTime);
+        return $query->where('from_date', '>=', $currentDateTime);
       })
       ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
-        return $query->where('date_time', '<', $currentDateTime);
+        return $query->where('to_date', '<', $currentDateTime);
       })
       ->orderBy('id', 'desc')
       ->get();
