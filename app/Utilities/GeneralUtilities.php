@@ -82,7 +82,7 @@ if (!function_exists('MonthStartEndDates')) {
     }
 }
 
-if (!function_exists('IsValidDateString')){
+if (!function_exists('IsValidDateString')) {
     function IsValidDateString(string $date): bool
     {
         $d = DateTime::createFromFormat('Y-m-d', $date);
@@ -316,6 +316,21 @@ if (!function_exists('convertDateFormat')) {
         return Carbon::parse($data)->format('Y-m-d');
     }
 }
+if (!function_exists('isTimeBetween')) {
+
+    function isTimeBetween(Carbon $now, Carbon $start, Carbon $end): bool
+    {
+        // crosses midnight
+        if ($start->gt($end)) {
+            return $now->gte($start) || $now->lte($end);
+        }
+
+        return $now->between($start, $end);
+    }
+}
+
+
+
 
 if (!function_exists('checkDepartmentPermission')) {
     function checkDepartmentPermission($permissions)
@@ -444,4 +459,3 @@ if (!function_exists('paginateCollection')) {
         );
     }
 }
-

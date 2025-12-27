@@ -12,6 +12,7 @@ use App\Models\TimeShift;
 use Illuminate\Http\Request;
 use App\Models\StaffTimeshift;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Resources\CheckInResource;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\mobileCheckInResource;
@@ -41,7 +42,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getTimeShift($request)
   {
-    return TimeShift::with(['gps', 'shift'])->orderBy('id', 'desc')->where('is_active',1)->get();
+    return TimeShift::with(['gps', 'shift'])->orderBy('id', 'desc')->where('is_active', 1)->get();
   }
 
   public function getTimeShiftById($timeShiftId)
@@ -159,7 +160,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ->where('staff_timeshifts.status', 'confirmed')
       ->whereDate('staff_timeshifts.date_time', today())
       ->first();
-      // dd($existShiftAssign);
+    // dd($existShiftAssign);
 
     if (!$existShiftAssign) {
       ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
@@ -192,7 +193,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         $currentDate = now()->format('Y-m-d');
         $checkIn = CheckIn::where('staff_id', $staffId)
           ->where('time_shift_id', $currentTimeShift->id)
-        ->whereDate('check_in_date_time', $currentDate)
+          ->whereDate('check_in_date_time', $currentDate)
           ->orderBy('check_in_date_time', 'desc')
           ->first();
         //if checkin not exist,need to checkin for this timeshift
@@ -286,14 +287,15 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         $requestData['id'] = null;
       }
       // dd($requestData);
-      if(isset($requestData['id']) && !empty($requestData['id'])){
+      if (isset($requestData['id']) && !empty($requestData['id'])) {
         self::validateCheckInEdit($requestData['time_shift_id'], $requestData['check_in_date_time']);
       }
-      $requestData['is_current_checked_in']=false;
+      $requestData['is_current_checked_in'] = false;
       DB::beginTransaction();
-      $checkIn = CheckIn::updateOrCreate([
-        'id'=>$requestData['id']
-      ],
+      $checkIn = CheckIn::updateOrCreate(
+        [
+          'id' => $requestData['id']
+        ],
         $requestData
       );
       DB::commit();
@@ -303,21 +305,23 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       ResponseMessage("Admin check-in posting failed: {$e->getMessage()}", 500);
     }
   }
-  public function getStaffTimeShfitByStaff($staffId){
-    $currentTime = now()->format('H:i'); 
+  public function getStaffTimeShfitByStaff($staffId)
+  {
+    $currentTime = now()->format('H:i');
     $existShiftAssigns = StaffTimeshift::with('timeshift.shift')->where('staff_id', $staffId)
       ->where('status', 'confirmed')
       // ->whereHas('timeshift', fn($q) => $q->where('is_active', 1))
       ->whereDate('date_time', today())
-      ->whereHas('timeshift',function($q)use($currentTime){
+      ->whereHas('timeshift', function ($q) use ($currentTime) {
         // $q->where('from_time','>',$currentTime)
         $q->where('is_active', 1);
       })
       ->get();
-      return StaffTimeShiftByStaffResource::collection($existShiftAssigns);
+    return StaffTimeShiftByStaffResource::collection($existShiftAssigns);
   }
 
-  public function validateCheckInEdit($timeShiftId, $checkInDateTime){
+  public function validateCheckInEdit($timeShiftId, $checkInDateTime)
+  {
     $timeShift = TimeShift::find($timeShiftId);
     // $checkInDate=Carbon::parse($checkInDateTime)->format('Y-m-d');
     // $compareDateTime = Carbon::parse($checkInDate.' '.$timeShift->from_time)->format('Y-m-d h:i');
@@ -329,7 +333,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       return true;
     }
 
-    \ResponseMessage("Permission doesn't allow to edit check-in",419);
+    \ResponseMessage("Permission doesn't allow to edit check-in", 419);
   }
 
   public function checkIn(array $requestData)
@@ -341,18 +345,20 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $timeShiftId = $requestData['time_shift_id'];
       $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
-      $currentDate = now()->format('Y-m-d');
+      $currentDate = Carbon::parse(now());
 
       $existingCheckIn = CheckIn::where('staff_id', $staffId)
         ->whereDate('check_in_date_time', $currentDate)
-        ->where('time_shift_id',$timeShiftId)
+        ->where('time_shift_id', $timeShiftId)
         ->where('is_current_checked_in', true)
         ->first();
 
       // $now = now()->format('H:i');
-      $existShiftAssign=StaffTimeShift::
-         whereDate('date_time', $currentDate)
+      $existShiftAssign = StaffTimeShift::whereDate('date_time', $currentDate)
         ->find($staffTimeShiftId);
+      Log::info('Exists Shift Assign', [
+        'exist_shift_assign' => $existShiftAssign,
+      ]);
       if (!$existShiftAssign) {
         ResponseMessage('Check-in is invalid, you do not have any assigned shift', 419);
       }
@@ -365,30 +371,34 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         }
       }
 
-      $earlyCheckMinutes = 30;
-      $shiftStart = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->from_time);
-      $shiftEnd   = Carbon::createFromFormat('H:i:s', $existShiftAssign->timeshift->to_time);
-      $nowTime    = Carbon::now();
 
-      // EARLY CHECK — cannot check in before allowed time
-      $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
+      // $fromTime = "22:30";
+      // $toTime = "06:00";
+      $earlyMinutes = 30;
+      $lateMinutes  = 30;
+      // dd($existShiftAssign->timeshift->from_time);
+      $fromTime = $existShiftAssign->timeshift->from_time; // "00:00" or "22:31"
+      $toTime   = $existShiftAssign->timeshift->to_time;   // "06:00" or whatever
+      $now      = Carbon::now();
+      // Create Carbon objects
+      $fromCarbon = Carbon::createFromFormat('H:i:s', $fromTime);
 
-      // if ($nowTime->lt($earlyAllowedTime)) {
-      //   ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.", 400);
-      // }
+      // Early / late check-in
+      $earlyAllowed = $fromCarbon->copy()->subMinutes($earlyMinutes);
+      $lateAllowed  = $fromCarbon->copy()->addMinutes($lateMinutes);
 
-      // LATE CHECK 
-      // if ($nowTime->gt($shiftEnd)) {
-      //   ResponseMessage("You cannot check in after your shift end time.", 400);
-      // }
+      // Display-friendly format
+      $fromShowTime = $earlyAllowed->format('g:i A'); // e.g., "11:30 PM"
+      $toShowTime   = $lateAllowed->format('g:i A');  // e.g., "12:30 AM"
 
-      // // VALID TIME RANGE
-      // if (!($nowTime->between($earlyAllowedTime, $shiftEnd))) {
-      //   ResponseMessage("Check-in time is not valid for this shift.", 400);
-      // }
-      
-   
-      
+      if (!isTimeBetween($now, $earlyAllowed, $lateAllowed)) {
+        ResponseMessage(
+          "Check-in time must be between $fromShowTime and $toShowTime",
+          400
+        );
+      }
+
+
       if ($existingCheckIn) {
         return ResponseData('You have already checked in today', 422);
       }
@@ -398,7 +408,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
       if (!$officeGps) {
-        ResponseData('Office GPS coordinates not found.', 422);
+        //   ResponseData('Office GPS coordinates not found.', 422);
       }
       // $officeLat = $officeGps->latitude;
       // $officeLng = $officeGps->longitude;
@@ -427,10 +437,9 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         'check_in_photo_url' => $imageUrl ?? null,
         'is_current_checked_in' => true,
       ]);
-      $checkIn->check_in_status= 'check_out';
+      $checkIn->check_in_status = 'check_out';
       DB::commit();
       return $checkIn;
-
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred during check-in.");
