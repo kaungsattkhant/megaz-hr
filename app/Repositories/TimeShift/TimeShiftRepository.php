@@ -373,19 +373,19 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       // EARLY CHECK — cannot check in before allowed time
       $earlyAllowedTime = $shiftStart->copy()->subMinutes($earlyCheckMinutes);
 
-      if ($nowTime->lt($earlyAllowedTime)) {
-        ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.", 400);
-      }
+      // if ($nowTime->lt($earlyAllowedTime)) {
+      //   ResponseMessage("You can check in only within $earlyCheckMinutes minutes before your shift.", 400);
+      // }
 
       // LATE CHECK 
-      if ($nowTime->gt($shiftEnd)) {
-        ResponseMessage("You cannot check in after your shift end time.", 400);
-      }
+      // if ($nowTime->gt($shiftEnd)) {
+      //   ResponseMessage("You cannot check in after your shift end time.", 400);
+      // }
 
-      // VALID TIME RANGE
-      if (!($nowTime->between($earlyAllowedTime, $shiftEnd))) {
-        ResponseMessage("Check-in time is not valid for this shift.", 400);
-      }
+      // // VALID TIME RANGE
+      // if (!($nowTime->between($earlyAllowedTime, $shiftEnd))) {
+      //   ResponseMessage("Check-in time is not valid for this shift.", 400);
+      // }
       
    
       

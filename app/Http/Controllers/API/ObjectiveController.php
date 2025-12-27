@@ -26,6 +26,11 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function okrAssignByStaff(Request $request){
+        $data = $this->objectiveRepository->okrAssignByStaff($request);
+        ResponseData($data);
+    }
+
     public function getObjectives(Request $request)
     {
         $data = $this->objectiveRepository->getObjectives($request);
