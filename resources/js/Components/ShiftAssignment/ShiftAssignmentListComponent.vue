@@ -9,6 +9,7 @@
             <div class="btn-container">
                 <notifications position="top center" />
                 <div class=" flex gap-x-4">
+                    <input type="date" class="input-ui  mr-2 h-8" v-model="selectedDate" @change="dateChange()"></input>
                     <label for="search" class="search-input">
                         <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                         <i class="fal fa-search"></i>
@@ -17,14 +18,14 @@
                     <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
                 </div>
                 <div class="flex pr-0 gap-x-4">
-                    <!-- <div class=" !text-sm" data-te-select-wrapper-ref>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department" @change="searchDepartmentChange()"
                             data-te-select-filter="true" name="" id="" v-model="selectedSearchDeparment" class="input-ui">
-                            <option :value="department" v-for="(department, departmentIndex) in searchDepartmentList"
+                            <option :value="department" v-for="(department, departmentIndex) in departmentList"
                                 :key="departmentIndex"> {{ department.name }} </option>
                         </select>
                     </div>
-                    <div class=" !text-sm" data-te-select-wrapper-ref>
+                    <!-- <div class=" !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange()"
                             data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
                             <option :value="role" v-for="(role, roleIndex) in roleList"
@@ -198,11 +199,12 @@ export default {
         return {
             primaryList: [],
             
-            searchDepartmentList: [],
+            departmentList: [],
             roleList: [],
             
             selectedSearchDeparment:null,
             selectedSearchRole:null,
+            selectedDate: null,
 
             currentPage: 0,
             perPage: 0,
@@ -216,7 +218,7 @@ export default {
             url:'/api/hr/staff_time_shifts',
             url_search:'',
             url_department:'',
-            url_role:'',
+            url_date:'',
             deleteId:null,
 
             feature: this.getFeature(),
@@ -227,8 +229,8 @@ export default {
         ...mapGetters(['getUser', 'getDepartment','getToken', 'getFeature']),
 
         async getPrimaryList(pageNumber) {
-            // let url = this.url + this.url_search + this.url_department + this.url_role;
-            let url = this.url + '?page=' + pageNumber
+            let url = this.url + '?page=' + pageNumber + this.url_search + this.url_department + this.url_date;
+            // let url = this.url + '?page=' + pageNumber
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.message) {
                 if(response.message.data){
@@ -249,16 +251,33 @@ export default {
         },
 
         
-        // async searchBtnClicked() {
-        //     this.url_search = '&search=' + this.searchInput
-        //     this.getPrimaryList(1);
-        // },
-        // clearSearchBtnClicked() {
-        //     this.searchInput = null;
-        //     this.url_search = '';
-        //     this.getPrimaryList(1);
-        // },
-
+        async searchBtnClicked() {
+            this.url_search = '&search=' + this.searchInput
+            this.getPrimaryList(1);
+        },
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.url_search = '';
+            this.url_date = '';
+            this.url_department = '';
+            this.selectedSearchDeparment = null;
+            this.selectedDate = null;
+            this.getPrimaryList(1);
+        },
+        async getDepartmentList() {
+            let response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.departmentList = response.data;
+            }
+        },
+        searchDepartmentChange(){
+            this.url_department = '&department_id=' + this.selectedSearchDeparment.id;
+            this.getPrimaryList(1)
+        },
+        dateChange(){
+            this.url_date = '&date=' + this.selectedDate;
+            this.getPrimaryList(1);
+        },
 
 
         deleteBtnClicked(id) {
@@ -295,6 +314,7 @@ export default {
     },
     created() {
         this.getPrimaryList(1);
+        this.getDepartmentList();
     }
 }
 </script>
