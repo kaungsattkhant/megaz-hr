@@ -15,6 +15,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/objectives/{id}', 'getObjectiveById');
     Route::delete('/objectives/{id}', 'deleteObjective');
     Route::get('dashboard-okr', 'dashboardOkr');
+    Route::get('okr_assign_by_staff', 'okrAssignByStaff');
 
     //okr assign duties by objective staff
     Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
@@ -34,6 +35,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
     Route::get('/daily/objectives/{staffId}', 'getdailyObjectivesByStaffId');
     Route::get('/daily/objective_by_accountable/{staffId}', 'getDailyObjectiveByAccountable');
+    Route::get('objectives/staff_by_accountable/{staffId}', 'getStaffByAccountable');
     Route::post('/daily/objectives_key_staff/{objStaffId}', 'updateDailyObjective');
     Route::post('/objectives/key_staff/{objStaffId}/images', 'storeImages');
     Route::post('/objectives/key_staff/{objStaffId}/images/update', 'updateImages');
