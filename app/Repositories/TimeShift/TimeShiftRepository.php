@@ -41,7 +41,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function getTimeShift($request)
   {
-    return TimeShift::with(['gps', 'shift'])->orderBy('id', 'desc')->get();
+    return TimeShift::with(['gps', 'shift'])->orderBy('id', 'desc')->where('is_active',1)->get();
   }
 
   public function getTimeShiftById($timeShiftId)
