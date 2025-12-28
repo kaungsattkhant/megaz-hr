@@ -1263,7 +1263,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     //   ->where('status', 'confirmed')
     //   ->orderBy('id', 'desc')
     //   ->get();
-    $currentDate = now()->format('Y-m-d');
+    // $currentDate = now()->format('Y-m-d');
     // $assignedShifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
     //   ->join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
     //   ->where('staff_timeshifts.staff_id', $staffId)
@@ -1294,6 +1294,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     //     $assignedShift->check_in = new mobileCheckInResource($checkIn);
     //   }
     // }
+    $currentDate = now()->subDay()->format('Y-m-d');
     $assignedShifts = StaffTimeshift::join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
       ->leftJoin('check_ins', function ($join) use ($currentDate) {
         $join
