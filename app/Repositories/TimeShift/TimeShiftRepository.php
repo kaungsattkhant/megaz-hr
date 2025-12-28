@@ -354,8 +354,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->first();
 
       // $now = now()->format('H:i');
-      $existShiftAssign = StaffTimeShift::whereDate('date_time', $currentDate)
-        ->find($staffTimeShiftId);
+      $existShiftAssign = StaffTimeShift::find($staffTimeShiftId);
       Log::info('Exists Shift Assign', [
         'exist_shift_assign' => $existShiftAssign,
       ]);
@@ -381,8 +380,11 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $toTime   = $existShiftAssign->timeshift->to_time;   // "06:00" or whatever
       $now      = Carbon::now();
       // Create Carbon objects
-      $fromCarbon = Carbon::createFromFormat('H:i:s', $fromTime);
 
+      $fromCarbon = Carbon::createFromFormat('H:i:s', $fromTime);
+      if ($fromCarbon->eq(Carbon::createFromTime(0, 0, 0))) {
+        $fromCarbon->addDay();
+      }
       // Early / late check-in
       $earlyAllowed = $fromCarbon->copy()->subMinutes($earlyMinutes);
       $lateAllowed  = $fromCarbon->copy()->addMinutes($lateMinutes);

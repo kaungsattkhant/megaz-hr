@@ -324,7 +324,6 @@ if (!function_exists('isTimeBetween')) {
         if ($start->gt($end)) {
             return $now->gte($start) || $now->lte($end);
         }
-
         return $now->between($start, $end);
     }
 }
