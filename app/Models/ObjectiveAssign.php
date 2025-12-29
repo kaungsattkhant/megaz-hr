@@ -25,6 +25,10 @@ class ObjectiveAssign extends Model
     {
         return $this->belongsTo(Objective::class, 'objective_id');
     }
+    public function objective_assign_staff()
+    {
+        return $this->hasOne(ObjectiveStaff::class);
+    }
 
     public function staff()
     {

@@ -252,7 +252,7 @@ export default {
 
         
         async searchBtnClicked() {
-            this.url_search = '&search=' + this.searchInput
+            this.url_search = '&search_input=' + this.searchInput
             this.getPrimaryList(1);
         },
         clearSearchBtnClicked() {

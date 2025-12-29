@@ -1263,7 +1263,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     //   ->where('status', 'confirmed')
     //   ->orderBy('id', 'desc')
     //   ->get();
-    $currentDate = now()->format('Y-m-d');
+    // $currentDate = now()->format('Y-m-d');
     // $assignedShifts = StaffTimeshift::with('staff', 'timeshift.shift', 'area')
     //   ->join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
     //   ->where('staff_timeshifts.staff_id', $staffId)
@@ -1294,18 +1294,58 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     //     $assignedShift->check_in = new mobileCheckInResource($checkIn);
     //   }
     // }
+    // Carbon::setTestNow(Carbon::parse('2025-12-29 23:10:00'));
+    $currentDate = now()->subDay()->format('Y-m-d');
+    $today = now()->toDateString();
+    $yesterday = now()->subDay()->toDateString();
+    // dd($yesterday);
     $assignedShifts = StaffTimeshift::join('time_shifts', 'staff_timeshifts.timeshift_id', '=', 'time_shifts.id')
       ->leftJoin('check_ins', function ($join) use ($currentDate) {
         $join
-        // ->on('staff_timeshifts.staff_id', '=', 'check_ins.staff_id')
+          // ->on('staff_timeshifts.staff_id', '=', 'check_ins.staff_id')
           ->on('staff_timeshifts.id', '=', 'check_ins.staff_timeshift_id');
-          // ->on('staff_timeshifts.timeshift_id', '=', 'check_ins.time_shift_id')
-          // ->whereDate('check_ins.check_in_date_time', '=', $currentDate);
+        // ->on('staff_timeshifts.timeshift_id', '=', 'check_ins.time_shift_id')
+        // ->whereDate('check_ins.check_in_date_time', '=', $currentDate);
       })
       ->with(['staff', 'timeshift.shift', 'area'])
       ->where('staff_timeshifts.staff_id', $staffId)
       ->where('staff_timeshifts.status', 'confirmed')
-      ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
+      // ->whereDate('staff_timeshifts.date_time', '>=', $currentDate)
+      // ->where(function ($q) use ($today, $yesterday) {
+
+      //   // Normal shifts today
+      //   $q->where(function ($q1) use ($today) {
+      //     $q1->whereDate('staff_timeshifts.date_time', $today)
+      //       ->whereColumn('time_shifts.from_time', '<', 'time_shifts.to_time');
+      //   })
+      //   ->orWhere(function ($q2) use ($yesterday) {
+      //     $q2->whereDate('staff_timeshifts.date_time', $yesterday)
+      //       ->whereColumn('time_shifts.from_time', '>=', 'time_shifts.to_time');
+      //   })
+      //     // Night shifts (from_time >= to_time)
+      //     ->orWhere(function ($q2) use ($today) {
+      //       $q2->whereDate('staff_timeshifts.date_time', $today)
+      //         ->whereColumn('time_shifts.from_time', '>=', 'time_shifts.to_time')
+      //         ->whereTime('time_shifts.from_time', '>=', '21:00:00'); // night-only
+      //     });
+      // }) //correct 
+      ->where(function ($q) use ($today, $yesterday) {
+
+        // 1️⃣ Normal shifts today
+        $q->where(function ($q1) use ($today) {
+          $q1->whereDate('staff_timeshifts.date_time', $today)
+            ->whereColumn('time_shifts.from_time', '<', 'time_shifts.to_time');
+        })
+
+          // 2️⃣ Night shifts today OR yesterday
+          ->orWhere(function ($q2) use ($today, $yesterday) {
+            $q2->whereColumn('time_shifts.from_time', '>=', 'time_shifts.to_time')
+              ->whereIn(
+                DB::raw('DATE(staff_timeshifts.date_time)'),
+                [$today, $yesterday]
+              );
+          });
+      })
       ->orderBy('staff_timeshifts.date_time')
       ->orderBy('time_shifts.from_time')
       ->select(
@@ -1338,12 +1378,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         }
         return $shift;
       });
-    // dd($assignedShifts);
-    foreach ($assignedShifts as $assignedShift) {
-      if ($assignedShift->id == 263) {
-        // dd($assignedShift->timeshift);
-      }
-    }
     return StaffTimeShiftResource::collection($assignedShifts);
   }
 
