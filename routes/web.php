@@ -755,6 +755,7 @@ Route::view('/cv/{id}/detail', 'CV.detail');
 Route::view('/okr_assign', 'okr_assign.index')->name('okr_assign.index');
 Route::view('/okr_assign/create', 'okr_assign.create')->name('okr_assign.create');
 Route::view('/okr_assign/{id}/edit', 'okr_assign.edit');
+Route::view('/okr_assign/{id}/detail', 'okr_assign.detail');
 Route::view('/handbooks', 'handbooks.index')->name('handbooks.index');
 Route::view('/handbooks/create', 'handbooks.create')->name('handbooks.create');
 
