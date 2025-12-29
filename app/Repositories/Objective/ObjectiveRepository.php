@@ -105,7 +105,6 @@ class ObjectiveRepository implements ObjectiveInterface
     {
         $objectiveAssignIds = str_replace('"', '', $request->objective_assign_ids);
         $objectiveAssignIds = explode(',', $objectiveAssignIds);
-        // $objectiveAssignIds =  explode(',', $request->objective_assign_ids);
         $objectiveAssigns = ObjectiveAssign::with(['objective', 'staff', 'objective_assign_staff'])->whereIn('id', $objectiveAssignIds)
             ->get();
         return OkrByStaffResource::collection($objectiveAssigns);
