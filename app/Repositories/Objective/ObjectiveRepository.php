@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Objective;
 
+use App\Http\Resources\Admin\Okr\OkrByStaffResource;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Item;
@@ -54,6 +55,7 @@ class ObjectiveRepository implements ObjectiveInterface
                 'staff.name as staff_name',
                 'departments.name as department_name',
                 'roles.name as role_name',
+                DB::raw('GROUP_CONCAT(DISTINCT objective_assigns.id) as objective_assign_ids'),
                 DB::raw('COUNT(*) as total_assigned_tasks'),
                 DB::raw('COUNT(CASE WHEN objective_staff.status = "completed" THEN 1 END) as completed_tasks'),
                 DB::raw('COUNT(CASE WHEN objective_staff.status = "approved" THEN 1 END) as approved_tasks'),
@@ -97,6 +99,15 @@ class ObjectiveRepository implements ObjectiveInterface
             )
             ->paginate(20);
         return $okrDashboard;
+    }
+
+    public function okrAssignByStaff($request)
+    {
+        $objectiveAssignIds = str_replace('"', '', $request->objective_assign_ids);
+        $objectiveAssignIds = explode(',', $objectiveAssignIds);
+        $objectiveAssigns = ObjectiveAssign::with(['objective', 'staff', 'objective_assign_staff'])->whereIn('id', $objectiveAssignIds)
+            ->get();
+        return OkrByStaffResource::collection($objectiveAssigns);
     }
 
     public function getObjectives(Request $request)
