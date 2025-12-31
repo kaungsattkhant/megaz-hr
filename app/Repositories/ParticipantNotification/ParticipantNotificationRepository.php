@@ -1092,7 +1092,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         'preview' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
       $this->sendFcmNotification($object, $users, $notificationData);
-
       // $this->sendParticipantNoti($object, $users, $notificationData);
     }
   }
@@ -1105,39 +1104,20 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getallNoties($request, $staffId)
   {
     $type = $request->query('type');
-
     $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift', 'staff_equipment_handover'];
+
+    $filterTypes = ($type && in_array($type, $validTypes))
+      ? [$type]              // filter by requested type
+      : $validTypes;       // fallback types
+    // $includedNoti = ['staff_timeshift', 'staff_equipment_handover', 'meeting', 'training'];
     $notificationUsers = NotificationUser::with([
       'notification' => function ($query) {
         $query->with('notificationable');
       }
     ])
       ->where('staff_id', $staffId)
-      // ->whereHas('notification', function ($query) use ($type, $validTypes) {
-      //   if ($type && in_array($type, $validTypes)) {
-      //     $query->where('notificationable_type', $type);
-      //   } else {
-      //     $query->whereIn('notificationable_type', $validTypes);
-      //   }
-      // })
-      ->whereHas('notification', function ($query) use ($type, $validTypes, $staffId) {
-
-        $query->whereIn('notificationable_type', $validTypes);
-
-        // Apply staff-based filter only for models that have staff_id
-        $query->where(function ($q) use ($staffId) {
-          $q->whereHasMorph(
-            'notificationable',
-            ['staff_timeshift', 'staff_equipment_handover'],
-            function ($q2) use ($staffId) {
-              $q2->where('staff_id', $staffId);
-            }
-          )
-            ->orWhereDoesntHaveMorph(
-              'notificationable',
-              ['staff_timeshift', 'staff_equipment_handover']
-            );
-        });
+      ->whereHas('notification', function ($query) use ($filterTypes) {
+        $query->whereIn('notificationable_type', $filterTypes);
       })
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
