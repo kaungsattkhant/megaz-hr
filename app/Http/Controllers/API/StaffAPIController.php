@@ -41,7 +41,7 @@ class StaffAPIController extends Controller
         ResponseData($staffs);
     }
 
-    public function createStaff(Request $request)
+    public function createStaff(StaffCreateRequest $request)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {

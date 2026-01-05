@@ -24,9 +24,9 @@ class StaffCreateRequest extends FormRequest
         return [
             //
             "name" => "required",
-            "phone_number" => "required",
-            "alt_phone_number" => "sometimes",
-            "email" => "sometimes",
+            "phone_number" => "required|unique:staff,phone_number",
+            "alt_phone_number" => "required|unique:staff,alt_phone_number",
+            "email" => "required|unique:staff,email",
             "birthdate" => "required",
             "fater_name" => "sometimes",
             "mother_name" => "sometimes",
@@ -39,8 +39,11 @@ class StaffCreateRequest extends FormRequest
             "gender_id" => "required",
             "department_id" => "required",
             "password" => "required",
-            "roles" => "required"
-
+            // "roles" => "required",
+            'off_day_count' => "required|numeric",
+            'gps_distance' => "required|numeric",
+            'check_in_late_min' => "required|numeric",
+            'check_out_early_min' => "required|numeric"
         ];
     }
 }
