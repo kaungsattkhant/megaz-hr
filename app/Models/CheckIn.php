@@ -37,6 +37,11 @@ class CheckIn extends Model
         return $this->belongsTo(TimeShift::class, 'time_shift_id');
     }
 
+    public function staff_time_shift()
+    {
+        return $this->belongsTo(StaffTimeshift::class, 'staff_timeshift_id');
+    }
+
     public function scopeCheckInFilter($query, $from_date = null, $to_date = null, $staff_id = null)
     {
         return $query

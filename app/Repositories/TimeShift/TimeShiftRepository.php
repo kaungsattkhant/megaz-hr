@@ -339,14 +339,17 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   public function checkIn(array $requestData)
   {
     DB::beginTransaction();
-
+    // Carbon::setTestNow(Carbon::parse('2026-01-05 20:10:00'));
     try {
       $staffId = $requestData['staff_id'];
       $timeShiftId = $requestData['time_shift_id'];
       $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
       $currentDate = Carbon::parse(now());
-
+      $authUser=UserData();
+      $checkInLateMin=$authUser->check_in_late_min;
+      $checkOutEarlyMin=$authUser->check_out_early_min;
+      $gpsAllowDistance=$authUser->gps_distance;
       $existingCheckIn = CheckIn::where('staff_id', $staffId)
         ->whereDate('check_in_date_time', $currentDate)
         ->where('time_shift_id', $timeShiftId)
@@ -374,7 +377,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       // $fromTime = "22:30";
       // $toTime = "06:00";
       $earlyMinutes = 30;
-      $lateMinutes  = 30;
+      $lateMinutes  = $checkInLateMin;
       // dd($existShiftAssign->timeshift->from_time);
       $fromTime = $existShiftAssign->timeshift->from_time; // "00:00" or "22:31"
       $toTime   = $existShiftAssign->timeshift->to_time;   // "06:00" or whatever
@@ -400,7 +403,6 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         );
       }
 
-
       if ($existingCheckIn) {
         return ResponseData('You have already checked in today', 422);
       }
@@ -410,16 +412,15 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
       if (!$officeGps) {
-        //   ResponseData('Office GPS coordinates not found.', 422);
+          ResponseData('Office GPS coordinates not found.', 422);
       }
-      // $officeLat = $officeGps->latitude;
-      // $officeLng = $officeGps->longitude;
-
-      // $distance = $this->haversineFormula($userLat, $userLng, $officeLat, $officeLng);
-      // if ($distance > 500) {
-      //   return ResponseData($data = null, $status_code = 422, false, $extra_message = "You are not within the allowed range.");
-      // }
-
+      $officeLat = $officeGps->latitude;
+      $officeLng = $officeGps->longitude;
+      // dd($userLat,$userLng,$officeLat,$officeLng);
+      $distance = $this->haversineFormula($userLat, $userLng, $officeLat, $officeLng);
+      if ($distance > $gpsAllowDistance) {
+        \ResponseMessage("Your are not within allow range in ($gpsAllowDistance) meter") ;
+      }
       if (isset($requestData['check_in_photo'])) {
         $image = $requestData['check_in_photo'];
         $extension = $image->getClientOriginalExtension();
@@ -451,10 +452,30 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   public function checkOut(array $validatedData, $checkInId)
   {
     DB::beginTransaction();
-
+    Carbon::setTestNow(Carbon::parse('2026-01-05 23:44:00'));
     try {
       $checkIn = CheckIn::find($checkInId);
+      $authUser = UserData();
+      $checkOutEarlyMin = $authUser->check_out_early_min;
+      $toTime   = $checkIn->timeShift->to_time;   // "06:00" or whatever
 
+      $shiftDate = Carbon::parse($checkIn->check_in_date_time)->startOfDay();
+
+      // Build shift end datetime
+      $toCarbon = Carbon::createFromFormat(
+        'Y-m-d H:i:s',
+        $shiftDate->format('Y-m-d') . ' ' . $toTime
+      );
+
+      // If shift end is before check-in, it means NEXT DAY
+      if ($toCarbon->lte($checkIn->check_in_date_time)) {
+        $toCarbon->addDay();
+      }
+      $earlyCheckOutAllowed = $toCarbon->copy()->subMinutes($checkOutEarlyMin);
+      $now      = Carbon::now();
+      if($now->lt($earlyCheckOutAllowed)){
+        \ResponseMessage("You cannot be checkout.Allow $earlyCheckOutAllowed");
+      }
       if ($checkIn && $checkIn->is_current_checked_in) {
         if (isset($validatedData['check_out_photo'])) {
           $image = $validatedData['check_out_photo'];
@@ -487,7 +508,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   /**
    * Calculate distance between two GPS points in meters.
    */
-  private function haversineFormula($lat1, $lon1, $lat2, $lon2)
+  private function haversineFormula(float $lat1, float $lon1, float $lat2, float $lon2): float
   {
     $earthRadius = 6371000; // in meters
     $lat1 = deg2rad($lat1);
