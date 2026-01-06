@@ -33,7 +33,6 @@ class AuthController extends Controller
             while ($i < $features->count()) {
                 $feature = $features[$i];
                 $routeName = config('feature_route.' . $feature->module);
-
                 if ($routeName && Route::has($routeName)) {
                     return redirect()->route($routeName);
                 }

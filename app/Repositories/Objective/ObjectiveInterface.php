@@ -8,6 +8,7 @@ interface ObjectiveInterface
 {
   //adminpanel
   public function dashboardOkr($request);
+  public function okrAssignByStaff($request);
   public function getObjectives(Request $request);
   public function getObjectiveById(Request $request, $objId);
   public function getRolesByDepartmentId(Request $request, int $departmentId);
@@ -37,6 +38,7 @@ interface ObjectiveInterface
   public function deleteObjKeystaffImage($imgId);
   public function getdailyObjectivesByStaffId(Request $request, $staffId);
   public function getDailyObjectiveByAccountable($staffId);
+  public function getStaffByAccountable($staffId);
   public function getCompletedObjKeysByStaffId($objectiveId,$staffId);
   public function rejectObjectKeyByObjectiveStaffId($data);
 

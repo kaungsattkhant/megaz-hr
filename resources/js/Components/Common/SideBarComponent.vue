@@ -28,19 +28,19 @@
                                 <i class="fal fa-hand-receiving"></i>
                             </button>
                             <button v-show="hasAnyPermission([
-                                'staff', 'okr-duty', 'meeting', 'training', 'org-new', 'warning',
+                                'okr-dashboard', 'salary-calculate', 'pay-slip', 'okr-duty', 'meeting', 'training', 'org-new', 'warning',
                                 'check-in', 'leave', 'exit-pass', 'resignation',
                                 'shift-assignment', 'equipment-assignment'
                               ])" data-tab="tab-hr" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Hr">
                                 <i class="far fa-user"></i>
                             </button>
-                            <button v-show="hasAnyPermission([
-                                'salary-batch', 'salary-calculate', 'pay-slip'
+                            <!-- <button v-show="hasAnyPermission([
+                                
                                 ])" data-tab="tab-salary" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Salary">
                                 <i class="fal fa-file-invoice-dollar"></i>
-                            </button>
+                            </button> -->
                             <button  v-show="hasAnyPermission([
-                                'jd','js','sop','cv','okr','time-shift','gps','contact','off-day','leave-allowance',
+                                'staff', 'salary-batch', 'jd','js','sop','cv','okr','time-shift','gps','contact','off-day','leave-allowance',
                                 'overtime-fee','salary-setup','salary','resignation-categories','skill','handbook',
                                 'overtime-confirmation','allowance'
                                 ])" data-tab="tab-hr-setup" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Hr Setup">
@@ -81,17 +81,17 @@
                                 <i class="fal fa-warehouse"></i>
                             </button>
                             <button  v-show="hasAnyPermission([
-                                'okr-dashboard','event','asset-assignment'
+                                'event','asset-assignment'
                                 ])" data-tab="tab-okr" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Okr">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </button>
-                            <button data-tab="tab-sample" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Sample">
+                            <!-- <button data-tab="tab-sample" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Sample">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>
@@ -350,7 +350,7 @@
                     </div>
                     <div class="tab-content" id="tab-hr">
                         <ul v-show="hasAnyPermission([
-                            'staff', 'okr-duty', 'meeting', 'training', 'org-new', 'warning',
+                            'okr-dashboard','salary-calculate', 'pay-slip', 'okr-duty', 'meeting', 'training', 'org-new', 'warning',
                             'check-in', 'leave', 'exit-pass', 'resignation',
                             'shift-assignment', 'equipment-assignment', 'complaint'
                           ])">
@@ -359,10 +359,22 @@
                                     HR
                                 </p>
                             </li>
-                            <li v-show="checkFeaturePermission('staff')">
-                                <a href="/staff" class="flex items-center sidebar-gap-x">
-                                    <i class="far fa-user"></i>
-                                    Staff
+                            <li v-show="checkFeaturePermission('okr-dashboard')">
+                                <a href="/okr_dashboard" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-poll"></i>
+                                    OKR Dashboard
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('salary-calculate')">
+                                <a href="/salary_calculate" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-calculator-alt"></i>
+                                    Salary Calculate
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('pay-slip')">
+                                <a href="/pay_slip" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-file-invoice-dollar"></i>
+                                    Pay Slip
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('okr-duty')">
@@ -438,7 +450,7 @@
                                     Complaints
                                 </a>
                             </li>
-                            <li>
+                            <li v-show="checkFeaturePermission('advance')">
                                 <a href="/advances" class="flex items-center @yield('advances') sidebar-gap-x">
                                     <i class="fal fa-envelope-open-text"></i>
                                     Advances
@@ -446,13 +458,29 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="tab-content" id="tab-salary">
+                    <!-- <div class="tab-content" id="tab-salary">
                         <ul v-show="hasAnyPermission([
-                            'salary-batch', 'salary-calculate', 'pay-slip'
+                            
                           ])">
                             <li>
                                 <p class="sidebar-tab-title">
                                     SALARY
+                                </p>
+                            </li>
+                            
+                            
+                        </ul>
+                    </div> -->
+
+                    <div class="tab-content" id="tab-hr-setup">
+                        <ul v-show="hasAnyPermission([
+                            'salary-batch', 'staff', 'jd','js','sop','cv','okr','time-shift','gps','contact','off-day','leave-allowance',
+                            'overtime-fee','salary-setup','salary','resignation-categories','skill','handbook',
+                            'overtime-confirmation','allowance'
+                          ])">
+                            <li>
+                                <p class="sidebar-tab-title">
+                                    HR SETUP
                                 </p>
                             </li>
                             <li v-show="checkFeaturePermission('salary-batch')">
@@ -461,31 +489,11 @@
                                     Salary Batch
                                 </a>
                             </li>
-                            <li v-show="checkFeaturePermission('salary-calculate')">
-                                <a href="/salary_calculate" class="flex items-center sidebar-gap-x">
-                                    <i class="fal fa-calculator-alt"></i>
-                                    Salary Calculate
+                            <li v-show="checkFeaturePermission('staff')">
+                                <a href="/staff" class="flex items-center sidebar-gap-x">
+                                    <i class="far fa-user"></i>
+                                    Staff
                                 </a>
-                            </li>
-                            <li v-show="checkFeaturePermission('pay-slip')">
-                                <a href="/pay_slip" class="flex items-center sidebar-gap-x">
-                                    <i class="fal fa-file-invoice-dollar"></i>
-                                    Pay Slip
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="tab-content" id="tab-hr-setup">
-                        <ul v-show="hasAnyPermission([
-                            'jd','js','sop','cv','okr','time-shift','gps','contact','off-day','leave-allowance',
-                            'overtime-fee','salary-setup','salary','resignation-categories','skill','handbook',
-                            'overtime-confirmation','allowance'
-                          ])">
-                            <li>
-                                <p class="sidebar-tab-title">
-                                    HR SETUP
-                                </p>
                             </li>
                             <li v-show="checkFeaturePermission('jd')">
                                 <a href="/JD" class="flex items-center sidebar-gap-x">
@@ -610,10 +618,16 @@
                                 </a>
                             </li>
 
-                            <li>
+                            <li v-show="checkFeaturePermission('benefit')">
                                 <a href="/benefits" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-project-diagram "></i>
                                     Benefit
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('benefit_request')">
+                                <a href="/benefits_request" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-project-diagram "></i>
+                                    Benefit Request
                                 </a>
                             </li>
                         </ul>
@@ -1080,19 +1094,14 @@
 
                     <div class="tab-content" id="tab-okr">
                         <ul v-show="hasAnyPermission([
-                            'okr-dashboard','event','asset-assignment'
+                            'event','asset-assignment'
                             ])">
                             <li>
                                 <p class="sidebar-tab-title">
                                     OKR
                                 </p>
                             </li>
-                            <li v-show="checkFeaturePermission('okr-dashboard')">
-                                <a href="/okr_dashboard" class="flex items-center sidebar-gap-x">
-                                    <i class="fal fa-poll"></i>
-                                    OKR Dashboard
-                                </a>
-                            </li>
+                            
                             <li v-show="checkFeaturePermission('event')">
                                 <a href="/events" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-door-open"></i>

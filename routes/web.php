@@ -37,7 +37,6 @@ Route::middleware(['departments:role'])->group(function () {
 // staff
 Route::middleware(['departments:staff'])->group(function () {
     Route::view('/staff', 'staff.index')->name('staff');
-
 });
 Route::middleware(['departments:staff.create'])->group(function () {
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
@@ -107,7 +106,7 @@ Route::middleware(['departments:used-defected-item'])->group(function () {
 Route::middleware(['departments:inventory-receive'])->group(function () {
     Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
 });
-Route::middleware(['departments:inventory-confirmation'])->group(function () { });
+Route::middleware(['departments:inventory-confirmation'])->group(function () {});
 #changed middleware
 
 Route::middleware(['departments:complaint'])->group(function () {
@@ -221,7 +220,6 @@ Route::middleware(['departments:account'])->group(function () {
 
 Route::middleware(['departments:fix-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
-
 });
 Route::middleware(['departments:asset'])->group(function () {
     Route::view('/assets/create', 'fixed_assets.assets')->name('fixed_assets.assets');
@@ -291,7 +289,6 @@ Route::view('/booking/create', 'pos.booking.create');
 Route::middleware(['departments:pos-food-order'])->group(function () {
     Route::view('/food_orders', 'pos.menu_order.index');
     Route::view('/food_orders/create', 'pos.menu_order.create');
-
 });
 Route::middleware(['departments:pos-ar'])->group(function () {
     Route::view('/ar', 'pos.AR.index')->name('pos.ar');
@@ -346,8 +343,14 @@ Route::middleware(['departments:staff-balance'])->group(function () {
 
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 
-Route::view('/advances', 'advances.index')->name('advances');
-Route::view('/advances/{id}/detail', 'advances.detail')->name('advances');
+Route::middleware(['departments:advance'])->group(
+    function () {
+        Route::view('/advances', 'advances.index')->name('advances');
+    }
+);
+Route::middleware(['departments:advance.detail'])->group(function () {
+    Route::view('/advances/{id}/detail', 'advances.detail')->name('advances');
+});
 // Route::middleware(['departments:prepaid'])->group(function () {
 Route::view('/prepaid', 'prepaid.index')->name('prepaid');
 // });
@@ -359,25 +362,20 @@ Route::middleware(['departments:ar'])->group(function () {
 Route::view('/account_receivable/{id}/detail', 'AR.detail');
 Route::middleware(['departments:cash-flow'])->group(function () {
     Route::view('/cash_flow_statement', 'cash_flow_statement.index');
-
 });
 Route::middleware(['departments:indirect-cash-flow'])->group(function () {
     Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
-
 });
 Route::middleware(['departments:working-capital'])->group(function () {
     Route::view('/working_capital', 'working_capital.index');
-
 });
 Route::view('/profit_and_loss', 'profit_and_loss.index');
 Route::view('/trial_balance', 'trial_balance.index');
 Route::middleware(['departments:ap-balance'])->group(function () {
     Route::view('/ap_balances', 'ap_balances.index');
-
 });
 Route::middleware(['departments:creditor-balance'])->group(function () {
     Route::view('/creditor_balances', 'creditor_balances.index');
-
 });
 
 
@@ -455,7 +453,6 @@ Route::middleware(['departments:accessory.show'])->group(function () {
 // okr duty
 Route::middleware(['departments:okr-duty'])->group(function () {
     Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
-
 });
 // Route::middleware(['departments:okr-duty.create'])->group(function () {
 Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
@@ -539,7 +536,7 @@ Route::view('/creditor', 'creditor.index')->name('creditor');
 Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
 
 // Route::middleware(['departments:gps'])->group(function () {
-    Route::view('/gps', 'GPS.index')->name('gps');
+Route::view('/gps', 'GPS.index')->name('gps');
 // });
 Route::middleware(['departments:check-in'])->group(function () {
     Route::view('/check_in', 'check_in.index')->name('check_in');
@@ -744,7 +741,12 @@ Route::middleware(['departments:shift-assignment'])->group(function () {
 });
 Route::middleware(['departments:shift-assignment.create'])->group(function () {
     Route::view('/shift_assignment/create', 'shift_assignment.create')->name('shift_assignment.create');
-
+});
+Route::middleware(['departments:benefit'])->group(function () {
+    Route::view('/benefits', 'benefits.index')->name('benefits.index');
+});
+Route::middleware(['departments:benefit_request'])->group(function () {
+    Route::view('/benefits_request', 'benefits.request');
 });
 
 
@@ -780,8 +782,7 @@ Route::view('/sky_menu_sale', 'kitchen_menu_sale.sky_menu_sale');
 Route::view('/budget_accounts', 'budget_accounts.index');
 Route::view('/cashflow_report', 'cashflow_report.index');
 Route::view('/off_day_setting', 'off_day_setting.index');
-Route::view('/benefits', 'benefits.index');
-Route::view('/benefits_request', 'benefits.request');
+
 // =======
 // Route::middleware(['departments:event'])->group(function () {
 //     Route::view('/events', 'event.index')->name('event.index');

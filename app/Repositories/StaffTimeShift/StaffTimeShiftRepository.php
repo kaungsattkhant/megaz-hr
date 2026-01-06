@@ -17,7 +17,24 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
   use SendNotification, FcmSendNotification;
   public function getStaffTimeShifts($request)
   {
-    $query = StaffTimeshift::with(['staff.department', 'staff.roles', 'timeshift', 'area'])->orderBy('id', 'desc');
+    $searchInput = $request->search_input;
+    $departmentId = $request->department_id;
+    $date = Carbon::parse($request->date);
+    $query = StaffTimeshift::with(['staff.department', 'staff.roles', 'timeshift', 'area'])
+      ->when($request->search_input, function ($query) use ($searchInput) {
+        $query->whereHas('staff', function ($q) use ($searchInput) {
+          $q->where('name', 'LIKE', '%' . $searchInput . '%');
+        });
+      })
+      ->when($request->department_id, function ($query) use ($departmentId) {
+        $query->whereHas('staff', function ($q) use ($departmentId) {
+          $q->where('department_id', $departmentId);
+        });
+      })
+      ->when($request->date, function ($query) use ($date) {
+        $query->whereDate('date_time', $date);
+      })
+      ->orderBy('id', 'desc');
     return (isset($request->per_page) || isset($request->page))
       ? $query->paginate(config('common.list_count'))
       : $query->get();
@@ -80,7 +97,7 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
       }));
 
       //for off day 
-      if(!empty($offDays)){
+      if (!empty($offDays)) {
         $this->createOffDayofStaff($offDays);
       }
       //for staff assign
@@ -98,16 +115,16 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 
   public function createOffDayofStaff($offDayData)
   {
-    $offDay=OffDay::create([
-      'repetition'=>'Custom',
-      'created_by'=>\UserData()->id
+    $offDay = OffDay::create([
+      'repetition' => 'Custom',
+      'created_by' => \UserData()->id
     ]);
-    foreach($offDayData as $data){
-      $dayInOffDay=DayInOffDay::create([
-        'day'=>'custom',
-        'off_day_id'=>$offDay->id,
-        'date'=>$data['date_time'],
-        'staff_id'=>$data['staff_id'],
+    foreach ($offDayData as $data) {
+      $dayInOffDay = DayInOffDay::create([
+        'day' => 'custom',
+        'off_day_id' => $offDay->id,
+        'date' => $data['date_time'],
+        'staff_id' => $data['staff_id'],
       ]);
     }
     return $offDay;
@@ -169,7 +186,6 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
         'updated_at'    => now(),
       ];
     });
-
     // Bulk Insert
     StaffTimeshift::insert($insertData->toArray());
 
@@ -179,7 +195,6 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
         ->where('staff_id', $row['staff_id'])
         ->where('timeshift_id', $row['timeshift_id'])
         ->first();
-
       $notiData = [
         'title'     => 'Shift Assigned',
         'date_time' => $row['date_time'],

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Objective;
 
+use App\Http\Resources\Admin\Okr\OkrByStaffResource;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Item;
@@ -54,6 +55,7 @@ class ObjectiveRepository implements ObjectiveInterface
                 'staff.name as staff_name',
                 'departments.name as department_name',
                 'roles.name as role_name',
+                DB::raw('GROUP_CONCAT(DISTINCT objective_assigns.id) as objective_assign_ids'),
                 DB::raw('COUNT(*) as total_assigned_tasks'),
                 DB::raw('COUNT(CASE WHEN objective_staff.status = "completed" THEN 1 END) as completed_tasks'),
                 DB::raw('COUNT(CASE WHEN objective_staff.status = "approved" THEN 1 END) as approved_tasks'),
@@ -99,13 +101,22 @@ class ObjectiveRepository implements ObjectiveInterface
         return $okrDashboard;
     }
 
+    public function okrAssignByStaff($request)
+    {
+        $objectiveAssignIds = str_replace('"', '', $request->objective_assign_ids);
+        $objectiveAssignIds = explode(',', $objectiveAssignIds);
+        $objectiveAssigns = ObjectiveAssign::with(['objective', 'staff', 'objective_assign_staff'])->whereIn('id', $objectiveAssignIds)
+            ->get();
+        return OkrByStaffResource::collection($objectiveAssigns);
+    }
+
     public function getObjectives(Request $request)
     {
         $search = $request->input('search');
         $roleId = $request->input('roleId');
         $type = $request->input('type');
 
-        $query = Objective::with(['role.department', 'sop', 'objectiveKeys','accountable','consulted','informed'])
+        $query = Objective::with(['role.department', 'sop', 'objectiveKeys', 'accountable', 'consulted', 'informed'])
             ->objectiveFilter($search, $roleId, $type)->orderBy('id', 'desc');
         if ($request->per_page || $request->page) {
             return $query->orderBy('id', 'desc')->paginate(config('common.list_count'));
@@ -120,8 +131,8 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectiveById(Request $request, $objId)
     {
-       
-        return Objective::with(['role.department', 'sop', 'objectiveKeys','accountable','consulted','informed'])->where('id', $objId)->get();
+
+        return Objective::with(['role.department', 'sop', 'objectiveKeys', 'accountable', 'consulted', 'informed'])->where('id', $objId)->get();
     }
 
     public function deleteObjective($objId)
@@ -216,7 +227,7 @@ class ObjectiveRepository implements ObjectiveInterface
                             'start_date' => $okrAssign['start_date'],
                             'end_date' => $okrAssign['end_date'],
                             'okr_point' => $objective->okr_point,
-                            'objective_assign_id'=>$objectiveAssign->id,
+                            'objective_assign_id' => $objectiveAssign->id,
                         ]
                     );
                     // dd($objectiveAssign);
@@ -340,7 +351,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
         $objectives = ObjectiveStaff::with([
             'objective.objectiveKeys',
-            
+
             'objStaffImg'
         ])
             ->where('staff_id', UserData()->id)
@@ -364,12 +375,8 @@ class ObjectiveRepository implements ObjectiveInterface
             'objective.accountable:id,name',
             'objective.consulted:id,name',
             'objective.informed:id,name',
-            // 'objectiveStaff' =>function($query) use ($currentDate){
-            //     $query->whereDate('start_date', $currentDate);
-            //     // ->orderBy('repetition_count', 'asc');
-            // }
         ])
-        ->where('staff_id', $staffId)
+            ->where('staff_id', $staffId)
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
             })->get();
@@ -476,8 +483,9 @@ class ObjectiveRepository implements ObjectiveInterface
             //     // ->orderBy('repetition_count', 'asc');
             // }
         ])
-            ->whereHas('objective',function ($query)use($staffId) {
-                $query->where('accountable_id',$staffId);
+            ->where('staff_id', $staffId)
+            ->whereHas('objective', function ($query) use ($authUser) {
+                $query->where('accountable_id', $authUser);
             })
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
@@ -569,6 +577,19 @@ class ObjectiveRepository implements ObjectiveInterface
         // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
 
+    public function getStaffByAccountable($staffId)
+    {
+        //$staffId is accountable
+        $staffIds = ObjectiveAssign::whereHas('objective', function ($q) use ($staffId) {
+            $q->where('accountable_id', $staffId);
+        })
+            ->distinct()
+            ->pluck('staff_id');
+
+        $staff = Staff::with(['department', 'roles'])->whereIn('id', $staffIds)->get();
+        return $staff;
+    }
+
     public function getObjKeyStaffImage($objStaffId)
     {
         return ObjectiveStaffImage::with('objectiveStaff')->where('objective_staff_id', $objStaffId)->get();
@@ -640,7 +661,7 @@ class ObjectiveRepository implements ObjectiveInterface
     public function updateDailyObjective($data, $objStaffId)
     {
         $objStaff = ObjectiveStaff::findOrFail($objStaffId);
-        $objective= $objStaff->objectiveAssign->objective;
+        $objective = $objStaff->objectiveAssign->objective;
         $objectiveAssign = $objStaff->objectiveAssign;
         $updateData = [];
         $userId = UserData()->id;
@@ -648,17 +669,17 @@ class ObjectiveRepository implements ObjectiveInterface
             ResponseMessage('Permission is not allowed', 403);
             return;
         }
-        if($objective->accountable_id==$userId){
+        if ($objective->accountable_id == $userId) {
             // if(!in_array($data['status'], ['approved', 'cancelled'])){
             //     ResponseMessage('Status is invalid', 403);
             // }
             $updateData = $this->getManagerUpdateData($data, $userId);
-        }elseif($objectiveAssign->staff_id==$userId){
+        } elseif ($objectiveAssign->staff_id == $userId) {
             if (!in_array($data['status'], ['in_progress', 'completed'])) {
                 ResponseMessage('Status is invalid', 403);
             }
             $updateData = $this->getStaffUpdateData($data, $userId, $objStaffId);
-        }else{
+        } else {
             ResponseMessage('Permission is not allowed', 403);
         }
         // dd($objStaff->objectiveAssign->objective);
@@ -672,7 +693,8 @@ class ObjectiveRepository implements ObjectiveInterface
         $objStaff->update($updateData);
         return $objStaff;
     }
-    public function rejectObjectKeyByObjectiveStaffId($data){
+    public function rejectObjectKeyByObjectiveStaffId($data)
+    {
         DB::beginTransaction();
         try {
             $authUser = \UserData();
@@ -683,7 +705,7 @@ class ObjectiveRepository implements ObjectiveInterface
             if (!$objectiveStaff) {
                 \ResponseMessage('Objective Staff Not found', 404);
             }
-            if($objectiveStaff->status=='rejected'){
+            if ($objectiveStaff->status == 'rejected') {
                 \ResponseMessage('Objective  is already rejected', 419);
             }
             $objectiveStaff->update([
@@ -703,7 +725,6 @@ class ObjectiveRepository implements ObjectiveInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-       
     }
 
     private function getSupervisorUpdateData($data, $userId)

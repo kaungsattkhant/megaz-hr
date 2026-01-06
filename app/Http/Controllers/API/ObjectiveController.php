@@ -26,6 +26,11 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function okrAssignByStaff(Request $request){
+        $data = $this->objectiveRepository->okrAssignByStaff($request);
+        ResponseData($data);
+    }
+
     public function getObjectives(Request $request)
     {
         $data = $this->objectiveRepository->getObjectives($request);
@@ -184,6 +189,11 @@ class ObjectiveController extends Controller
     public function getDailyObjectiveByAccountable($staffId)
     {
         $data = $this->objectiveRepository->getDailyObjectiveByAccountable($staffId);
+        ResponseData($data);
+    }
+
+    public function getStaffByAccountable($staffId){
+        $data = $this->objectiveRepository->getStaffByAccountable($staffId);
         ResponseData($data);
     }
 
