@@ -24,6 +24,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/public_holidays', 'createPublicHoliday');
     Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
     Route::get('off_day_settings','getOffDaySetting');
+
+    Route::get('/off_day_requests', 'getOffDayRequests');
+    Route::post('/off_day_requests/{id}/status', 'updateOffDayRequestStatus');
   });
   Route::prefix('hr')->controller(LeaveController::class)->group(function () {
     Route::get('/leave_categories', 'getLeaveCategoryLists');
@@ -135,6 +138,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/staff_time_shifts', 'createStaffTimeShift');
     Route::get('/staff_time_shifts', 'getStaffTimeShifts');
     Route::post('/staff_time_shifts/{id}/status', 'updateStaffTimeShiftStatus');
+    Route::post('/staff_time_shifts/{id}/request_off_day', 'createOffDayRequest');
   });
   Route::prefix('hr')->controller(AssetItemEquipmentAssignController::class)->group(function () {
     Route::post('/asset-assignments', 'createAssetAssign');
@@ -172,7 +176,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/', 'listBenefitRequest');
     Route::get('/benefit_by_type/{type}', 'getBenefitByType');
   });
- 
+
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
   Route::post('/cvs', 'createCv');
