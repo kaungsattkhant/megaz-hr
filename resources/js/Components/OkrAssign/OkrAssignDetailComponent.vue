@@ -2,11 +2,11 @@
     <div class="margin-bg">
         <div class="card-shadow">
             <div>
-                <p class=" page-title">
-                    OKR Assign
+                <p class=" page-title pb-4">
+                    OKR Assign Detail
                 </p>
             </div>
-            <div class="btn-container">
+            <!-- <div class="btn-container">
                 <notifications position="top center" />
                 <div class=" flex gap-x-4">
                     <label for="search" class="search-input">
@@ -36,7 +36,7 @@
                         Add New
                     </a>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
@@ -51,19 +51,22 @@
                                     Staff
                                 </th>
                                 <th scope="col" class="">
-                                    Role
-                                </th>
-                                <th scope="col" class="">
-                                    Department
-                                </th>
-                                <th scope="col" class="">
                                     Objective
                                 </th>
                                 <th scope="col" class="">
-                                    Due
+                                    Type
                                 </th>
                                 <th scope="col" class="">
-
+                                    OKR Point
+                                </th>
+                                <th scope="col" class="">
+                                    Start Date
+                                </th>
+                                <th scope="col" class="">
+                                    End Date
+                                </th>
+                                <th scope="col" class="">
+                                    Status
                                 </th>
                             </tr>
                         </thead>
@@ -80,31 +83,25 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap text-left">
-                                        <a :href="'okr_assign/' + item.id + '/detail'">
-                                            {{ item.staff?.name }}
-                                        </a>
+                                        {{ item.staff_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff?.roles[0].name }}
+                                        {{ item.objective_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.staff?.department.name }}
+                                        {{ item.type }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.objective?.objective_name }}
+                                        {{ item.okr_point }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.start_date === '0000-00-00 00:00:00' ? item.start_date : formatDateToShort(item.start_date) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.end_date === '0000-00-00 00:00:00' ? item.end_date : formatDateToShort(item.end_date) }}
                                     </td>
-                                    
-                                    <td class="whitespace-nowrap" >
-                                        <!-- <a :href="'/okr_assign/'+item.id+'/edit'" class="pr-3">
-                                            <i class="fal fa-pen"></i>
-                                        </a> -->
-                                        <button @click="deleteBtnClicked(item.id)" data-te-toggle="modal"
-                                            data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.status }}
                                     </td>
                                 </tr>
                             </div>
@@ -202,6 +199,8 @@ export default {
         Multiselect,
         TableSkeleton
     },
+
+    props: ["okrAssignId"],
     data() {
         return {
             primaryList: [],
@@ -222,7 +221,6 @@ export default {
 
             overtime: null,
 
-            url:'/api/okr-assigns',
             url_search:'',
             url_department:'',
             url_role:'',
@@ -238,14 +236,7 @@ export default {
 
         async getPrimaryList(pageNumber) {
             this.loading = true;
-            // let url = this.url + this.url_search + this.url_department + this.url_role;
-            let url = this.url
-            if(pageNumber){
-                url = this.url + '?page=' + pageNumber
-            }
-            else{
-                url = this.url + this.url_role
-            }
+            let url = '/api/okr_assign_by_staff?objective_assign_ids=' + this.okrAssignId
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
@@ -263,50 +254,6 @@ export default {
                 this.searchDepartmentList = response.data;
             }
         },
-        searchDepartmentChange(){
-            this.roleList = this.selectedSearchDeparment.roles;
-            this.selectedSearchRole = null;
-        },
-        searchRoleChange(){
-            this.url_role = '?role_id='+this.selectedSearchRole.id;
-            // this.selectedType = null;
-            // this.url_type = '';
-            this.searchInput = null;
-            this.url_search = '';
-            this.getPrimaryList();
-        },
-
-
-        
-        // async searchBtnClicked() {
-        //     this.url_search = '&search=' + this.searchInput
-        //     this.getPrimaryList(1);
-        // },
-        // clearSearchBtnClicked() {
-        //     this.searchInput = null;
-        //     this.url_search = '';
-        //     this.getPrimaryList(1);
-        // },
-
-
-
-        deleteBtnClicked(id) {
-            this.deleteId = id;
-        },
-        async deleteItem() {
-            let response = await deleteApiData({ url: `/api/sops/` + this.deleteId, token: this.getToken() });
-            if (response.success) {
-                this.getPrimaryList(1);
-                document.getElementById('close_delete_modal').click();
-            }
-            else {
-                this.$notify({
-                    title: `Input validation`,
-                    text: response.message,
-                    type: "warn"
-                });
-            }
-        },
         
 
         alertValidationMessage(field) {
@@ -317,7 +264,7 @@ export default {
                 });
             },
 
-            formatDateToShort(dateString) {
+        formatDateToShort(dateString) {
                 const date = new Date(dateString);
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             }

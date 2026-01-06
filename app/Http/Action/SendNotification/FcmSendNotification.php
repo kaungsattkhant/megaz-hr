@@ -47,7 +47,6 @@ trait FcmSendNotification
                 'created_by' => $model->created_by,
             ]
         );
-
         Log::info('Notification Person');
 
         $notificationPersons = [];
