@@ -65,7 +65,7 @@ class StaffTimeShiftController extends Controller
 
         if($data['type'] === 'shift_change'){
             if($timeshift->timeshift_id == $request->change_timeshift_id){
-                ResponseMessage("Change shift and original shift cannot be the same");
+                ResponseMessage("Change shift and original shift cannot be the same", 400, false);
             }
             $data['original_timeshift_id'] = $timeshift->timeshift_id;
             $data['change_timeshift_id'] = (int) $request->change_timeshift_id;
