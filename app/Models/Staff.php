@@ -65,6 +65,10 @@ class Staff extends Authenticatable implements AuditableContract
         'is_cv',
         'profile_image_url',
         'profile_image_path',
+        'off_day_count',
+        'gps_distance',
+        'check_in_late_min',
+        'check_out_early_min'
     ];
 
     protected $hidden = [
