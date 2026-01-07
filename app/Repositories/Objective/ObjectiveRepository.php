@@ -138,8 +138,11 @@ class ObjectiveRepository implements ObjectiveInterface
     public function deleteObjective($objId)
     {
         $objective = Objective::with('objectiveKeys')->findOrFail($objId);
-        $objective->objectiveKeys()->delete();
-        $objective->delete();
+        // $objective->objectiveKeys()->delete();
+        $objective->objectiveKeys()->forceDelete();
+
+        // $objective->delete();
+        $objective->forceDelete();
 
         ResponseMessage("Delete successfully", 200);
     }
@@ -311,7 +314,7 @@ class ObjectiveRepository implements ObjectiveInterface
     {
         // $objKeyStaff = ObjectivekeyStaff::findOrFail($objKeyStaffId);
         // $objKeyStaff->delete();
-        // return $objKeyStaff; 
+        // return $objKeyStaff;
     }
 
     //mobile
@@ -344,7 +347,7 @@ class ObjectiveRepository implements ObjectiveInterface
         // return ObjectiveResource::collection($objectives);
     }
 
-    //objkeylistwithstaff assigns 
+    //objkeylistwithstaff assigns
     public function getdailyObjectives(Request $request, $objId)
     {
         $currentDate = now()->toDateString();

@@ -9,9 +9,12 @@ use App\Models\ObjectiveAssign;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Objective extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'objective_name',
         'created_by',
