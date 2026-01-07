@@ -89,7 +89,7 @@
                             <div class="contents" v-for="(staff, index) in staffList" :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ staff.name }}
@@ -110,7 +110,12 @@
                                         {{ staff.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap text-left relative" v-show="['staff.toggle', 'staff.edit'].some(f => feature.includes(f))">
-                                        <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
+
+                                        <button class="mx-1" data-te-toggle="modal" data-te-target="#uploadContractsModal" @click="contractUploadBtnForStaffClicked(staff.id, index)">
+                                            <i class="fal fa-file-signature"></i>
+                                        </button>
+
+                                        <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 mx-1">
                                             <i class="fal fa-pen"></i>
                                         </a>
                                         <input v-show="feature.includes('staff.toggle')" :checked="staff.is_active == 1" @change="isActiveToggled(staff.id)"
@@ -206,6 +211,150 @@
             </div>
         </div>
 
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="uploadContractsModal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Upload Contracts for {{ selectedStaffName }}
+                        </h5>
+                        <button type="button" id="btn-close-upload-modal" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Contracts
+                            </label>
+                            <input type="file" multiple accept="image/png, image/gif, image/jpeg" id="contract-upload" ref="contractInput"
+                            class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                            border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                            @change="contractFilesChange">
+                            <div v-for="(preview, index) in contractFilePreviews">
+                                <div class="flex items-center">
+                                    <div class="contents">
+                                        <img v-if="preview" :src="preview" alt="Contract Preview" class="mt-2 h-24" />
+                                        <button @click="removeContractBtnClicked(index)"> <i class="fas fa-times"></i> </button>
+                                    </div>
+                                </div>
+                            </div>                        
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <LoadingButton
+                            :loading="buttonLoading"
+                            text="Upload"
+                            loadingText="Uploading..."
+                            @click="uploadContractsBtnClicked"
+                        />
+                        <!-- <button type="button" class="add-btn focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss
+                        @click="uploadContractsBtnClicked">
+                            Upload
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Button trigger modal -->
+<button
+  type="button"
+  class=""
+  hidden
+  disabled
+  data-te-toggle="modal"
+  data-te-target="#exampleModal"
+  data-te-ripple-init
+  data-te-ripple-color="light">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div
+  data-te-modal-init
+  class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div
+    data-te-modal-dialog-ref
+    class="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+    <div
+      class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-4 outline-none dark:bg-surface-dark">
+      <div
+        class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 p-4 dark:border-white/10">
+        <h5
+          class="text-xl font-medium leading-normal text-surface dark:text-white"
+          id="exampleModalLabel">
+          Modal title
+        </h5>
+        <button
+          type="button"
+          class="box-content rounded-none border-none text-neutral-500 hover:text-neutral-800 hover:no-underline focus:text-neutral-800 focus:opacity-100 focus:shadow-none focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-300 dark:focus:text-neutral-300"
+          data-te-modal-dismiss
+          aria-label="Close">
+          <span class="[&>svg]:h-6 [&>svg]:w-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="relative flex-auto p-4" data-te-modal-body-ref>
+        Modal body text goes here.
+      </div>
+
+      <!-- Modal footer -->
+      <div
+        class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 p-4 dark:border-white/10">
+        <button
+          type="button"
+          class="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-200 focus:bg-primary-accent-200 focus:outline-none focus:ring-0 active:bg-primary-accent-200 dark:bg-primary-300 dark:hover:bg-primary-400 dark:focus:bg-primary-400 dark:active:bg-primary-400"
+          data-te-modal-dismiss
+          data-te-ripple-init
+          data-te-ripple-color="light">
+          Close
+        </button>
+        <button
+          type="button"
+          class="ms-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong"
+          data-te-ripple-init
+          data-te-ripple-color="light">
+          Save changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
 </template>
 
@@ -214,10 +363,12 @@ import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { mapGetters } from "vuex";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from '../Common/LoadingButton.vue';
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -252,11 +403,76 @@ export default {
             feature: this.getFeature(),
 
             loading: true,
+
+            contractFiles: [],
+            contractFilePreviews: [],
+            editId: null,
+            editIndex: null,
+
+            selectedStaffName: null,
+
+            buttonLoading: false,
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
+
+        contractFilesChange(e){
+            const files = Array.from(e.target.files);
+            // Clear previous selections if you want to replace, or remove this line to allow accumulating
+            this.contractFiles = [];
+            this.contractFilePreviews = [];
+            files.forEach(file => {
+                this.contractFiles.push(file);
+                this.contractFilePreviews.push(URL.createObjectURL(file));
+            });
+        },
+
+        removeContractBtnClicked(index){
+            this.contractFiles.splice(index,1);
+            this.contractFilePreviews.splice(index,1);
+            // Reset the file input so user can re-select files
+            this.$refs.contractInput.value = '';
+        },
+
+        contractUploadBtnForStaffClicked(id, index){
+            this.editId = id;
+            this.editIndex = index;
+            this.selectedStaffName = this.staffList[index].name;
+        },
+
+        uploadContractsBtnClicked(){
+            this.buttonLoading = true;
+            let formData = new FormData();
+            if (this.contractFiles.length > 0) {
+                this.contractFiles.forEach(file => {
+                    formData.append('contract_images[]', file);
+                });
+            }else{
+                this.showToastMessage("At least one contract file should be uploaded", "warn");
+                this.buttonLoading = false;
+                return;
+            }
+
+            postApiData({url: `/api/staff/${this.staffList[this.editIndex].id}/upload_contracts`, form_data: formData, token: this.getToken()})
+            .then((response)=>{
+                this.buttonLoading = false;
+                if(response.success){
+                    this.getStaffsList(1);
+                    this.selectedStaffName = null;
+                    this.editId = null;
+                    this.editIndex = null;
+
+                    this.$refs.contractInput.value = '';
+                    this.contractFiles = [];
+                    this.contractFilePreviews = [];
+                }else{
+                    this.showToastMessage(response.message, 'error');
+                }
+                document.getElementById('btn-close-upload-modal').click();
+            });
+        },
 
         async getDepartmentList() {
             let url = `/api/departments`;
@@ -376,6 +592,13 @@ export default {
         //     this.getStaffsList(1);
         // },
 
+        showToastMessage(message, type='warn', title=null){
+            this.$notify({
+                title: title,
+                text: message,
+                type: type
+            });
+        },
     },
 
     created() {

@@ -382,7 +382,7 @@
             </div>
 
 
-            <div class="mb-4 col-span-6 pb-6 rounded-md">
+            <!-- <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Address
                 </label>
@@ -391,7 +391,7 @@
                 <div class="mt-1" v-if="addressInputError">
                     <span class="px-1 text-red-600 text-sm">{{ addressInputError }} *</span>
                 </div>
-            </div>
+            </div> -->
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="nrc-front" class="label-form mb-3">
