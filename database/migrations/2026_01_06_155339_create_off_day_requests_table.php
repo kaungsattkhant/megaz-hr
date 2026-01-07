@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('off_day_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staff_timeshift_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['off_day','shift_change'])->default('off_day');
+            $table->unsignedBigInteger('original_timeshift_id')->nullable();
+            $table->unsignedBigInteger('change_timeshift_id')->nullable();
             $table->text('remark')->nullable();
             $table->enum('status', ['pending','confirmed','rejected'])->default('pending');
             $table->unsignedBigInteger('handled_by')->nullable();

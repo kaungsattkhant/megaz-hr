@@ -9,6 +9,9 @@ class OffDayRequest extends Model
     //
     protected $fillable = [
         'staff_timeshift_id',
+        'type',
+        'original_timeshift_id',
+        'change_timeshift_id',
         'remark',
         'status',
         'handled_by',
@@ -18,6 +21,16 @@ class OffDayRequest extends Model
     public function staffTimeshift()
     {
         return $this->belongsTo(StaffTimeshift::class);
+    }
+
+    public function originalShift()
+    {
+        return $this->belongsTo(TimeShift::class, 'original_timeshift_id');
+    }
+
+    public function changeShift()
+    {
+        return $this->belongsTo(TimeShift::class, 'change_timeshift_id');
     }
 
     public function handledBy()

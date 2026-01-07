@@ -134,8 +134,14 @@ class OffDayRepository implements OffDayRepositoryInterface
 
   public function getOffDayRequests()
   {
-    return OffDayRequest::with(['staffTimeshift','handledBy'])->orderByDesc('id')
-      ->paginate(config('common.list_count'));
+    return OffDayRequest::with([
+        'staffTimeshift.staff',
+        'staffTimeshift.timeshift.shift',
+        'staffTimeshift.timeshift.gps',
+        'staffTimeshift.area',
+        'handledBy'
+    ])->orderByDesc('id')
+    ->paginate(config('common.list_count'));
   }
 
   public function updateOffDayRequestStatus($id, $request)
@@ -153,17 +159,23 @@ class OffDayRepository implements OffDayRepositoryInterface
     $offDayRequest->save();
 
     if($offDayRequest->status == 'confirmed'){
-        $offDay = OffDay::create(['repetition' => 'Custom', 'created_by' => UserData()->id]);
-        DayInOffDay::create([
-            'day' => 'Custom',
-            'off_day_id' => $offDay->id,
-            'date' => $staffTimeshift->date_time,
-            'staff_id' => $staffTimeshift->staff_id,
-        ]);
-        $staffTimeshift->status = 'cancelled';
-        $staffTimeshift->cancelled_by = UserData()->id;
-        $staffTimeshift->cancelled_at = now();
-        $staffTimeshift->save();
+        if($offDayRequest->type == 'off_day'){
+            $offDay = OffDay::create(['repetition' => 'Custom', 'created_by' => UserData()->id]);
+            DayInOffDay::create([
+                'day' => 'Custom',
+                'off_day_id' => $offDay->id,
+                'date' => $staffTimeshift->date_time,
+                'staff_id' => $staffTimeshift->staff_id,
+            ]);
+            $staffTimeshift->status = 'cancelled';
+            $staffTimeshift->cancelled_by = UserData()->id;
+            $staffTimeshift->cancelled_at = now();
+            $staffTimeshift->save();
+        }
+        if($offDayRequest->type == 'shift_change'){
+            $staffTimeshift->timeshift_id = $offDayRequest->change_timeshift_id;
+            $staffTimeshift->save();
+        }
     }
   }
 }
