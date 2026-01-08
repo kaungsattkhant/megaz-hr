@@ -35,7 +35,7 @@
                                 <i class="far fa-user"></i>
                             </button>
                             <!-- <button v-show="hasAnyPermission([
-                                
+
                                 ])" data-tab="tab-salary" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Salary">
                                 <i class="fal fa-file-invoice-dollar"></i>
                             </button> -->
@@ -460,15 +460,15 @@
                     </div>
                     <!-- <div class="tab-content" id="tab-salary">
                         <ul v-show="hasAnyPermission([
-                            
+
                           ])">
                             <li>
                                 <p class="sidebar-tab-title">
                                     SALARY
                                 </p>
                             </li>
-                            
-                            
+
+
                         </ul>
                     </div> -->
 
@@ -559,6 +559,12 @@
                                 <a href="/off_day_setting" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-calendar-minus"></i>
                                     Off Day Setting
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('off-day')">
+                                <a href="/off_day_requests" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-calendar-minus"></i>
+                                    Off Day Requests
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('leave-allowance')">
@@ -1101,7 +1107,7 @@
                                     OKR
                                 </p>
                             </li>
-                            
+
                             <li v-show="checkFeaturePermission('event')">
                                 <a href="/events" class="flex items-center sidebar-gap-x">
                                     <i class="fal fa-door-open"></i>

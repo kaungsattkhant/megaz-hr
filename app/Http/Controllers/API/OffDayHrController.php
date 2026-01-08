@@ -49,4 +49,20 @@ class OffDayHrController extends Controller
         $data=OffDaySetting::get();
         \ResponseData($data);
     }
+
+    public function getOffDayRequests()
+    {
+        $data = $this->offDayRepository->getOffDayRequests();
+        ResponseData($data);
+    }
+
+    public function updateOffDayRequestStatus($id, Request $request)
+    {
+        $request->validate([
+            'status' => 'required|string'
+        ]);
+
+        $this->offDayRepository->updateOffDayRequestStatus($id, $request);
+        ResponseMessage("OK");
+    }
 }

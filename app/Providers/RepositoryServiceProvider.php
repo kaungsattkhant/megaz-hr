@@ -209,13 +209,16 @@ use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepository;
 use App\Repositories\CustomerDepositReport\CustomerDepositReportRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
-use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
+
 use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
 
 use App\Repositories\AssetItemEquipmentAssign\AssetItemEquipmentAssignRepositoryInterface;
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepositoryInterface;
+use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
+use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepositoryInterface;
+use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -321,6 +324,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(LoanRepositoryInterface::class, LoanRepository::class);
         $this->app->bind(CustomerDepositReportRepositoryInterface::class, CustomerDepositReportRepository::class);
         $this->app->bind(DepositAndReceivableReportRepositoryInterface::class, DepositAndReceivableReportRepository::class);
+        $this->app->bind(CreditPurchaseJournalRepositoryInterface::class, CreditPurchaseJournalRepository::class);
         $this->app->bind(StaffEquipmentHandoverRepositoryInterface::class, StaffEquipmentHandoverRepository::class);
         $this->app->bind(ReportInterface::class, ReportRepository::class);
 

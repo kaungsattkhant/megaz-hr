@@ -324,6 +324,33 @@
                 </div> -->
             </div>
 
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Off Days Count
+                </label>
+                <input type="number" v-model="offDaysCount" placeholder="Off Days Count" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Check-In Late Minutes
+                </label>
+                <input type="number" v-model="checkInLateMins" placeholder="Check-In Late Minutes" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Check-Out Early Minutes
+                </label>
+                <input type="number" v-model="checkoutEarlyMins" placeholder="Checkout Early Minutes" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    GPS Distance (Meters)
+                </label>
+                <input type="number" v-model="gpsDistance" placeholder="GPS Distance" class="input-ui">
+            </div>
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -893,6 +920,11 @@ export default {
             creatable: false,
 
             isFeature: false,
+
+            offDaysCount: 0,
+            checkInLateMins: 0,
+            checkoutEarlyMins: 0,
+            gpsDistance: 0,
         };
     },
 
@@ -958,6 +990,12 @@ export default {
                 this.address = this.staff.address;
                 this.bankAccountNumber = this.staff.bank_account_number;
                 this.password = null;
+
+                this.offDaysCount = this.staff.off_day_count;
+                this.checkInLateMins = this.staff.check_in_late_min;
+                this.checkoutEarlyMins = this.staff.check_out_early_min;
+                this.gpsDistance = this.staff.gps_distance;
+
                 setTimeout(() => {
                     this.reconstructStaffData();
                 }, 200);
@@ -1385,6 +1423,11 @@ export default {
             if (this.zipCode) {
                 formData.append('zip_code', this.zipCode);
             }
+
+            formData.append('off_day_count', this.offDaysCount);
+            formData.append('check_in_late_min', this.checkInLateMins);
+            formData.append('check_out_early_min', this.checkoutEarlyMins);
+            formData.append('gps_distance', this.gpsDistance);
 
             formData.append('bank_id', this.selectedBank.id);
             formData.append('bank_account_number', this.bankAccountNumber);

@@ -290,6 +290,11 @@ class Staff extends Authenticatable implements AuditableContract
         return $this->hasMany(StaffCertification::class);
     }
 
+    public function contracts()
+    {
+        return $this->hasMany(StaffContract::class);
+    }
+
     public function bank()
     {
         return $this->belongsTo(Bank::class);
