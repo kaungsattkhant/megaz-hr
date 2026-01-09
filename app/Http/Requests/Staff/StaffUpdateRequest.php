@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Staff;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StaffUpdateRequest extends FormRequest
@@ -23,13 +24,23 @@ class StaffUpdateRequest extends FormRequest
     {
         return [
             //
-            "name" => "sometimes",
-            "phone_number" => "sometimes",
+            "name" => "required",
+            'phone_number' => [
+                'required',
+                Rule::unique('staff', 'phone_number')->ignore($this->route('id')),
+            ],
+            'alt_phone_number' => [
+                'required',
+                Rule::unique('staff', 'alt_phone_number')->ignore($this->route('id')),
+            ],
+             'email' => [
+                'required',
+                Rule::unique('staff', 'email')->ignore($this->route('id')),
+            ],
             "nrc_number" => "sometimes",
             "address" => "sometimes",
             "gender_id" => "sometimes",
             "department_id" => "sometimes",
-            "is_active" => "sometimes"
         ];
     }
 }
