@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Department;
 
+use App\Models\Staff;
 use App\Models\Department;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $data['slug']=Str::slug($data['name'], '-');
+            $data['slug'] = Str::slug($data['name'], '-');
             $department = Department::create($data);
             $featureIds = json_decode($data['featureIds'], true);
             foreach ($featureIds as $feature) {
@@ -55,12 +56,27 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             if ($department) {
                 $data = RemoveNullValues($data);
                 $department->update($data);
+
                 if (!empty($data['featureIds'])) {
-                    $featureIds = json_decode($data['featureIds'], true);
-                    $department->features()->sync($featureIds);
+                    $departmentFeatureIds = json_decode($data['featureIds'], true);
+
+                    // Update department features
+                    $department->features()->sync($departmentFeatureIds);
+
+                    // Get all staff under this department
+                    $staffList = Staff::where('department_id', $id)->with('features')->where('id', 211)->get();
+
+                    foreach ($staffList as $staff) {
+                        $staffFeatureIds = $staff->features->pluck('id')->toArray();
+                        // Keep only features that still exist in department
+                        $allowedFeatures = array_values(
+                            array_intersect($staffFeatureIds, $departmentFeatureIds)
+                        );
+                        // Update staff features
+                        $staff->features()->sync($allowedFeatures);
+                    }
                 }
             }
-
             DB::commit();
             return $department;
         } catch (\Exception $e) {
