@@ -1023,7 +1023,9 @@ export default {
                     if (this.staff.department_id == department.id) {
                         this.roleList = department.roles;
                         this.featureList = department.features;
-                        this.inventories.push(department.inventory.inventory);
+                        if(department.inventory){
+                            this.inventories.push(department.inventory.inventory);
+                        }
                     }
                 });
                 getApiData({url:`/api/roles/${this.staff.roles[0].id}/skills`, token: this.getToken()}).then(response =>{
