@@ -8,6 +8,8 @@ interface RoleRepositoryInterface
 {
     public function listAllData(Request $request);
 
+    public function getRole($request);
+
     public function createData(array $data);
 
     public function updateData(array $data, int $id);

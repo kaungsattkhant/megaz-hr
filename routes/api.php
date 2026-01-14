@@ -511,7 +511,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
         Route::get('cashflows', 'getBudgetAccountsCashflow');
     });
-    Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
+    // Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
 
     Route::controller(GpsController::class)->group(function () {
         Route::post('gps', 'updateOrCreateGps');

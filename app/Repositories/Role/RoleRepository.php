@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Role;
 
+use App\Http\Resources\Mobile\RoleResource;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,11 @@ class RoleRepository implements RoleRepositoryInterface
             }
             return $roles;
         }
+    }
+
+    public function getRole($request){
+        $data= Role::orderBy('level','asc')->get();
+        return RoleResource::collection($data);
     }
 
     public function createData(array $data)

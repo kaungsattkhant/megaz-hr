@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Report;
 
-use App\Models\Invoice;
+use App\Models\EntitySession;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class MonthlyTotalKTVSales extends Command
+class MonthlyTotalKTVSession extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'app:monthly-total-k-t-v-sales';
+    protected $signature = 'app:monthly-total-k-t-v-session';
 
     /**
      * The console command description.
@@ -32,35 +32,39 @@ class MonthlyTotalKTVSales extends Command
             $year = now()->year;
             $month = now()->month;
             $monthName = now()->format('M');
-
-            $monthlyTotalKTVSales = Invoice::whereYear('invoice_date', $year)
-                ->whereMonth('invoice_date', $month)
-                ->whereHas('entity.area.areaType',function ($query){
-                    $query->where('type','ktv');
-                })
-                ->sum('sub_total');
+            // Calculate total for current month
+            $monthlyTotalKTVSessions = EntitySession::whereHas('entity',function ($query){
+                $query->where('entity_type','room');
+            })
+            ->whereHas('entity.area.areaType',function ($query){
+                $query->where('type','ktv');
+            })
+            ->whereHas('entity.invoices',function ($q) use ($year, $month){
+                $q->whereYear('invoice_date', $year)
+                ->whereMonth('invoice_date', $month);
+            })->count();
 
             Log::info([
-                "Monthly ktv sales" =>  $monthlyTotalKTVSales,
+                "Monthly ktv session" => $monthlyTotalKTVSessions,
                 "Month" => $monthName,
                 "Year" => $year,
             ]);
 
             
-            if ($monthlyTotalKTVSales == 0) {
-                $this->info("No total ktv sales data found for {$monthName}");
+            if ($monthlyTotalKTVSessions == 0) {
+                $this->info("No total_ktv_session data found for {$monthName}");
                 return Command::SUCCESS;
             }
 
             //  Update or insert this month’s total
-                DB::table('monthly_total_ktv_sales')->updateOrInsert(
+                DB::table('monthly_total_ktv_sessions')->updateOrInsert(
                     [
                         'year' => $year,
                         'month_name' => $monthName,
                         'month_number' => $month,
                     ],
                     [
-                        'total_ktv_sales' => $monthlyTotalKTVSales,
+                        'total_ktv_sessions' => $monthlyTotalKTVSessions,
                         'updated_at' => now(),
                         'created_at' => now(),
                     ]

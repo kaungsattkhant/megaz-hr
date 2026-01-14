@@ -25,6 +25,12 @@ class RoleAPIController extends Controller
         ResponseData($roles);
     }
 
+    public function getAllRoles(Request $request)
+    {
+        $roles = $this->roleRepo->getRole($request);
+        ResponseData($roles);
+    }
+
     public function createRole(RoleCreateRequest $request)
     {
         $role = $this->roleRepo->createData($request->all());
