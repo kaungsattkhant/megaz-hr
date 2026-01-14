@@ -1,5 +1,5 @@
 <template>
-    <nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh]">
+    <nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh] bg-white z-50 shadow-1">
         <div class="relative flex">
             <button type="button" id="toggleBtn"
                 class="py-3 px-2 absolute -right-4 overflow-hidden top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 z-50 shadow-md">
