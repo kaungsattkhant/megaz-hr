@@ -1092,7 +1092,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         'preview' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
       $this->sendFcmNotification($object, $users, $notificationData);
-
       // $this->sendParticipantNoti($object, $users, $notificationData);
     }
   }
@@ -1105,81 +1104,129 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getallNoties($request, $staffId)
   {
     $type = $request->query('type');
-
     $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift', 'staff_equipment_handover'];
+
+    $filterTypes = ($type && in_array($type, $validTypes))
+      ? [$type]              // filter by requested type
+      : $validTypes;       // fallback types
+    // $notificationUsers = NotificationUser::with([
+    //   'notification' => function ($query) {
+    //     $query->with('notificationable');
+    //   }
+    // ])
+    //   ->where('staff_id', $staffId)
+    //   ->whereHas('notification', function ($query) use ($filterTypes) {
+    //     $query->whereIn('notificationable_type', $filterTypes);
+    //   })
+    //   ->orderBy('id', 'desc')
+    //   ->paginate(config('common.list_count'));
+
+    // $filteredNotifications = $notificationUsers->getCollection()->filter(function ($notificationUser) {
+    //   return $notificationUser->notification && $notificationUser->notification->notificationable;
+    // });
+
+    // foreach ($filteredNotifications as $notificationUser) {
+    //   $notificationType = $notificationUser->notification->notificationable_type;
+
+    //   if (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
+    //     $notificationUser->notification->notificationable->load([
+    //       'participants',
+    //       'participants.department.roles',
+    //       'participants.role.department',
+    //       'participants.staff.department',
+    //       'participants.staff.roles'
+    //     ]);
+
+    //     if ($notificationType === Relation::getMorphedModel('meeting') || $notificationType === 'meeting') {
+    //       $notificationUser->notification->notificationable->load('chairedBy');
+    //     } elseif ($notificationType === Relation::getMorphedModel('training') || $notificationType === 'training') {
+    //       $notificationUser->notification->notificationable->load('trainedBy');
+    //     }
+    //   } elseif ($notificationType === Relation::getMorphedModel('staff_timeshift') || $notificationType === 'staff_timeshift') {
+    //     $notificationUser->notification->notificationable->load([
+    //       'timeshift.shift',
+    //       'area'
+    //     ]);
+    //   } elseif ($notificationType === Relation::getMorphedModel('staff_equipment_handover') || $notificationType === 'staff_equipment_handover') {
+    //     $notificationUser->notification->notificationable->load([
+    //       'fromStaff',
+    //       'toStaff',
+    //       'staffTimeshift',
+    //       'staffTimeshift.timeshift',
+    //       'staffTimeshift.timeshift.shift',
+    //       'staffTimeshift.area'
+    //     ]);
+    //   }
+    // }
+    // return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
+
+    //optimize version with one query 
     $notificationUsers = NotificationUser::with([
       'notification' => function ($query) {
-        $query->with('notificationable');
+        $query->with([
+          'notificationable' => function ($morphQuery) {
+            //meeting
+            $morphQuery->morphWith([
+              Relation::getMorphedModel('meeting') ?? 'meeting' => [
+                'participants',
+                'participants.department.roles',
+                'participants.role.department',
+                'participants.staff.department',
+                'participants.staff.roles',
+                'chairedBy',
+              ],
+
+              //  Training
+              Relation::getMorphedModel('training') ?? 'training' => [
+                'participants',
+                'participants.department.roles',
+                'participants.role.department',
+                'participants.staff.department',
+                'participants.staff.roles',
+                'trainedBy',
+              ],
+
+              //  Warning / OrgNew
+              Relation::getMorphedModel('warning') ?? 'warning' => [
+                'participants',
+                'participants.department.roles',
+                'participants.role.department',
+                'participants.staff.department',
+                'participants.staff.roles',
+              ],
+              Relation::getMorphedModel('orgNew') ?? 'orgNew' => [
+                'participants',
+                'participants.department.roles',
+                'participants.role.department',
+                'participants.staff.department',
+                'participants.staff.roles',
+              ],
+
+              //  Staff Time Shift
+              Relation::getMorphedModel('staff_timeshift') ?? 'staff_timeshift' => [
+                'timeshift.shift',
+                'area',
+              ],
+
+              // Equipment Handover
+              Relation::getMorphedModel('staff_equipment_handover') ?? 'staff_equipment_handover' => [
+                'fromStaff',
+                'toStaff',
+                'staffTimeshift.timeshift.shift',
+                'staffTimeshift.area',
+              ],
+            ]);
+          }
+        ]);
       }
     ])
       ->where('staff_id', $staffId)
-      // ->whereHas('notification', function ($query) use ($type, $validTypes) {
-      //   if ($type && in_array($type, $validTypes)) {
-      //     $query->where('notificationable_type', $type);
-      //   } else {
-      //     $query->whereIn('notificationable_type', $validTypes);
-      //   }
-      // })
-      ->whereHas('notification', function ($query) use ($type, $validTypes, $staffId) {
-
-        $query->whereIn('notificationable_type', $validTypes);
-
-        // Apply staff-based filter only for models that have staff_id
-        $query->where(function ($q) use ($staffId) {
-          $q->whereHasMorph(
-            'notificationable',
-            ['staff_timeshift', 'staff_equipment_handover'],
-            function ($q2) use ($staffId) {
-              $q2->where('staff_id', $staffId);
-            }
-          )
-            ->orWhereDoesntHaveMorph(
-              'notificationable',
-              ['staff_timeshift', 'staff_equipment_handover']
-            );
-        });
+      ->whereHas('notification', function ($query) use ($filterTypes) {
+        $query->whereIn('notificationable_type', $filterTypes);
       })
-      ->orderBy('id', 'desc')
+      ->orderByDesc('id')
       ->paginate(config('common.list_count'));
-
-    $filteredNotifications = $notificationUsers->getCollection()->filter(function ($notificationUser) {
-      return $notificationUser->notification && $notificationUser->notification->notificationable;
-    });
-
-    foreach ($filteredNotifications as $notificationUser) {
-      $notificationType = $notificationUser->notification->notificationable_type;
-
-      if (in_array($notificationType, ['meeting', 'training', 'warning', 'orgNew'])) {
-        $notificationUser->notification->notificationable->load([
-          'participants',
-          'participants.department.roles',
-          'participants.role.department',
-          'participants.staff.department',
-          'participants.staff.roles'
-        ]);
-
-        if ($notificationType === Relation::getMorphedModel('meeting') || $notificationType === 'meeting') {
-          $notificationUser->notification->notificationable->load('chairedBy');
-        } elseif ($notificationType === Relation::getMorphedModel('training') || $notificationType === 'training') {
-          $notificationUser->notification->notificationable->load('trainedBy');
-        }
-      } elseif ($notificationType === Relation::getMorphedModel('staff_timeshift') || $notificationType === 'staff_timeshift') {
-        $notificationUser->notification->notificationable->load([
-          'timeshift.shift',
-          'area'
-        ]);
-      } elseif ($notificationType === Relation::getMorphedModel('staff_equipment_handover') || $notificationType === 'staff_equipment_handover') {
-        $notificationUser->notification->notificationable->load([
-          'fromStaff',
-          'toStaff',
-          'staffTimeshift',
-          'staffTimeshift.timeshift',
-          'staffTimeshift.timeshift.shift',
-          'staffTimeshift.area'
-        ]);
-      }
-    }
-    return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
+    return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
   }
 
   public function getMeetingsByStaffId($staffId, $request)
