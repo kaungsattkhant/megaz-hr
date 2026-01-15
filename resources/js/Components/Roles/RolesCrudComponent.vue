@@ -361,7 +361,7 @@ export default {
             roleList: [],
             name: null,
             selectedDepartment: null,
-            selectedRole: null,
+            selectedItem: null,
             deleteId: null,
 
             selectedRole:null,
@@ -450,10 +450,17 @@ export default {
             }
         },
         editRolesBtnClicked(role) {
-            this.selectedRole = role;
+            this.selectedItem = role;
             this.nameEdit = role.name;
             this.selectedDepartmentEdit = role.department.id
-            this.selectedRoleEdit = this.roleList.find(item => item.id === role.parent);
+            if(role.parent != null){
+                this.selectedRoleEdit = this.roleList.find(item => item.id === role.parent.id);
+                console.log('role parent id', role)
+            }
+            else{
+                this.selectedRoleEdit = null;
+                console.log('no role parent id', role)
+            }
             // this.editRole();
         },
 
@@ -463,7 +470,7 @@ export default {
             formData.append('name', this.nameEdit);
             formData.append('department_id', this.selectedDepartmentEdit);
             formData.append('parent_id', this.selectedRoleEdit.id);
-            let response = await postApiData({ url: '/api/roles/'+this.selectedRole.id, form_data: formData, token: this.getToken() });
+            let response = await postApiData({ url: '/api/roles/'+this.selectedItem.id, form_data: formData, token: this.getToken() });
             if (response.success) {
                 if(this.filterDepartment){
                     this.filterDepartmentChange();
