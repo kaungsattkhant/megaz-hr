@@ -176,7 +176,7 @@
                                 :close-on-select="true"
                                 :clear-on-select="false"
                                 :preserve-search="true"
-                                placeholder="Select Account"
+                                placeholder="Select Parent Role"
                                 label="name"
                                 track-by="id"
                                 :preselect-first="false" ></multiselect>
@@ -241,21 +241,22 @@
                                         v-for="(department, departmentIndex) in departmentList" :key="departmentIndex">
                                         {{ department.name }} </option>
                                 </select>
-                                <div class="mb-4">
-                                    <label for="" class="label-form mb-3">
-                                        Parent Role
-                                    </label>
-                                    <multiselect
-                                    v-model="selectedRoleEdit"
-                                    :options="roleList"
-                                    :close-on-select="true"
-                                    :clear-on-select="false"
-                                    :preserve-search="true"
-                                    placeholder="Select Account"
-                                    label="name"
-                                    track-by="id"
-                                    :preselect-first="false" ></multiselect>
-                                </div>
+                                
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Parent Role
+                                </label>
+                                <multiselect
+                                v-model="selectedRoleEdit"
+                                :options="roleList"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :preserve-search="true"
+                                placeholder="Select Parent Role"
+                                label="name"
+                                track-by="id"
+                                :preselect-first="false" ></multiselect>
                             </div>
 
                         </div>
@@ -452,6 +453,7 @@ export default {
             this.selectedRole = role;
             this.nameEdit = role.name;
             this.selectedDepartmentEdit = role.department.id
+            this.selectedRoleEdit = this.roleList.find(item => item.id === role.parent);
             // this.editRole();
         },
 
@@ -460,6 +462,7 @@ export default {
             let formData = new FormData();
             formData.append('name', this.nameEdit);
             formData.append('department_id', this.selectedDepartmentEdit);
+            formData.append('parent_id', this.selectedRoleEdit.id);
             let response = await postApiData({ url: '/api/roles/'+this.selectedRole.id, form_data: formData, token: this.getToken() });
             if (response.success) {
                 if(this.filterDepartment){
