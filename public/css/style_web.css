@@ -80,10 +80,13 @@ p, span, button, a, h1, label, h2, h3, h4, h5 {
 
 .main-content {
   margin-left: auto;
-  width: calc(100% - 336px);
-  margin-inline-start: 336px;
+  width: 100%;
   display: inline-block; }
 
+@media (min-width: 1536px) {
+  .main-content {
+    width: calc(100% - 336px);
+    margin-inline-start: 336px; } }
 .inner-container {
   padding: 2.5rem 1.5rem; }
 
