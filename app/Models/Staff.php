@@ -93,7 +93,7 @@ class Staff extends Authenticatable implements AuditableContract
         return $this->personTokens()->pluck('fcm_token')->toArray();
     }
 
-     public function personTokens()
+    public function personTokens()
     {
         return $this->morphMany(PersonFcmToken::class, 'personable');
     }
@@ -288,6 +288,11 @@ class Staff extends Authenticatable implements AuditableContract
     public function staffCertifications()
     {
         return $this->hasMany(StaffCertification::class);
+    }
+
+    public function contracts()
+    {
+        return $this->hasMany(StaffContract::class);
     }
 
     public function bank()

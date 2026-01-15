@@ -511,7 +511,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
         Route::get('cashflows', 'getBudgetAccountsCashflow');
     });
-    Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
+    // Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
 
     Route::controller(GpsController::class)->group(function () {
         Route::post('gps', 'updateOrCreateGps');
@@ -611,6 +611,8 @@ Route::get('/staff_balances', [StaffAPIController::class, 'staffBalanceList']);
 Route::get('/staff_balances/{id}', [StaffAPIController::class, 'detailStaffBalance']);
 Route::get('/staff/{id}/duties', [StaffAPIController::class, 'getStaffWithDuties']);
 Route::post('/staffs/{staffId}/change_password', [StaffAPIController::class, 'changePassword']);
+Route::post('/staff/{id}/upload_contracts', [StaffAPIController::class, 'uploadStaffContracts']);
+
 Route::get('/nrcs', [StaffAPIController::class, 'nrcLists']);
 Route::controller(BankController::class)->group(function () {
     Route::get('/banks', 'getAllBanks');

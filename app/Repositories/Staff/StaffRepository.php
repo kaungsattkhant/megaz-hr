@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\StaffResource;
 use App\Models\StaffEmergencyContact;
 use Illuminate\Support\Facades\Storage;
+use App\Models\StaffContract;
 
 class StaffRepository implements StaffRepositoryInterface
 {
@@ -116,7 +117,7 @@ class StaffRepository implements StaffRepositoryInterface
                     if ($certificateImage instanceof \Illuminate\Http\UploadedFile) {
                         $extension = $certificateImage->getClientOriginalExtension();
                         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                        $path = $certificateImage->storeAs('staff_images', $hashedName, 'public');
+                        $path = $certificateImage->storeAs("staff_certificates/{$staff->id}", $hashedName, 'public');
                         $url = Storage::url($path);
 
                         $staff->staffCertifications()->create([
@@ -208,7 +209,7 @@ class StaffRepository implements StaffRepositoryInterface
                         if ($certificateImage instanceof \Illuminate\Http\UploadedFile) {
                             $extension = $certificateImage->getClientOriginalExtension();
                             $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                            $path = $certificateImage->storeAs('staff_images', $hashedName, 'public');
+                            $path = $certificateImage->storeAs("staff_images/{$staff->id}", $hashedName, 'public');
                             $url = Storage::url($path);
 
                             $staff->staffCertifications()->create([
@@ -506,5 +507,24 @@ class StaffRepository implements StaffRepositoryInterface
             })
             ->get();
         ResponseData($nrcLists);
+    }
+
+    public function attachStaffContracts($id, Request $request)
+    {
+        $staff = Staff::find($id);
+        if(!$staff){
+            ResponseMessage("No staff found with given id", 404, false);
+        }
+        foreach($request->contract_images as $image){
+            $extension = $image->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $path = $image->storeAs("staff_contracts/{$staff->id}", $hashedName, 'public');
+            $url = Storage::url($path);
+            $staff->contracts()->create([
+                'contract_file_url' => $url,
+                'contract_file_path' => $path,
+            ]);            
+        }
+        ResponseData($staff);
     }
 }

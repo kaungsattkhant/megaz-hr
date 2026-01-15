@@ -44,26 +44,7 @@ class StaffAPIController extends Controller
     public function createStaff(StaffCreateRequest $request)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
-        if ($request->hasFile('nrc_front_image')) {
-            $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
-            $data['nrc_front_url'] = $uploadedFile['file_url'];
-            $data['nrc_front_path'] = $uploadedFile['file_path'];
-        }
-        if ($request->hasFile('nrc_back_image')) {
-            $uploadedFile = UploadFileToServer($request, 'nrc_back_image', 'staff_images');
-            $data['nrc_back_url'] = $uploadedFile['file_url'];
-            $data['nrc_back_path'] = $uploadedFile['file_path'];
-        }
-        if ($request->hasFile('household_registration_image')) {
-            $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
-            $data['household_registration_url'] = $uploadedFile['file_url'];
-            $data['household_registration_path'] = $uploadedFile['file_path'];
-        }
-        if ($request->hasFile('profile_image')) {
-            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
-            $data['profile_image_url'] = $uploadedFile['file_url'];
-            $data['profile_image_path'] = $uploadedFile['file_path'];
-        }
+        
         // $data['roles'] = explode(',', $request->roles);
         $data['role_id'] = $request->role_id;
         $data['feature_ids'] = json_decode($request->feature_ids);
@@ -71,29 +52,59 @@ class StaffAPIController extends Controller
         $data['skill_ids'] = ($request->skill_ids) ? json_decode($request->skill_ids) : [];
         $staff = $this->staffRepo->createData($data);
 
-        ResponseData($staff);
-    }
-
-    public function updateStaff(Request $request, $id)
-    {
-        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
+        $data = [];
         if ($request->hasFile('nrc_front_image')) {
-            $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
+            $uploadedFile = UploadFileToServer($request, 'nrc_front_image', "staff_gov_docs/{$staff->id}");
             $data['nrc_front_url'] = $uploadedFile['file_url'];
             $data['nrc_front_path'] = $uploadedFile['file_path'];
         }
         if ($request->hasFile('nrc_back_image')) {
-            $uploadedFile = UploadFileToServer($request, 'nrc_back_image', 'staff_images');
+            $uploadedFile = UploadFileToServer($request, 'nrc_back_image', "staff_gov_docs/{$staff->id}");
             $data['nrc_back_url'] = $uploadedFile['file_url'];
             $data['nrc_back_path'] = $uploadedFile['file_path'];
         }
         if ($request->hasFile('household_registration_image')) {
-            $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
+            $uploadedFile = UploadFileToServer($request, 'household_registration_image', "staff_gov_docs/{$staff->id}");
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
         if ($request->hasFile('profile_image')) {
-            $uploadedFile = UploadFileToServer($request, 'profile_image', 'staff_images');
+            $uploadedFile = UploadFileToServer($request, 'profile_image', "staff_profile_images/{$staff->id}");
+            $data['profile_image_url'] = $uploadedFile['file_url'];
+            $data['profile_image_path'] = $uploadedFile['file_path'];
+        }
+
+        $staff->update($data);
+
+        ResponseData($staff);
+    }
+
+    public function updateStaff(StaffUpdateRequest $request, $id)
+    {
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
+
+        $staff = Staff::find($id);
+        if (!$staff) {
+            ResponseMessage('Staff not found with given ID', 404);
+        }
+        
+        if ($request->hasFile('nrc_front_image')) {
+            $uploadedFile = UploadFileToServer($request, 'nrc_front_image', "staff_gov_docs/{$staff->id}");
+            $data['nrc_front_url'] = $uploadedFile['file_url'];
+            $data['nrc_front_path'] = $uploadedFile['file_path'];
+        }
+        if ($request->hasFile('nrc_back_image')) {
+            $uploadedFile = UploadFileToServer($request, 'nrc_back_image', "staff_gov_docs/{$staff->id}");
+            $data['nrc_back_url'] = $uploadedFile['file_url'];
+            $data['nrc_back_path'] = $uploadedFile['file_path'];
+        }
+        if ($request->hasFile('household_registration_image')) {
+            $uploadedFile = UploadFileToServer($request, 'household_registration_image', "staff_gov_docs/{$staff->id}");
+            $data['household_registration_url'] = $uploadedFile['file_url'];
+            $data['household_registration_path'] = $uploadedFile['file_path'];
+        }
+        if ($request->hasFile('profile_image')) {
+            $uploadedFile = UploadFileToServer($request, 'profile_image', "staff_gov_docs/{$staff->id}");
             $data['profile_image_url'] = $uploadedFile['file_url'];
             $data['profile_image_path'] = $uploadedFile['file_path'];
         }
@@ -101,11 +112,10 @@ class StaffAPIController extends Controller
         $data['feature_ids'] = json_decode($request->feature_ids);
         $data['inventory_ids'] = ($request->inventory_ids) ? json_decode($request->inventory_ids) : [];
         $data['skill_ids'] = ($request->skill_ids) ? json_decode($request->skill_ids) : [];
+
         $staff = $this->staffRepo->updateData($data, $id);
 
-        if (!$staff) {
-            ResponseMessage('Staff not found with given ID', 404);
-        }
+        
         ResponseData($staff);
     }
     public function changePassword(Request $request, int $staffId)
@@ -196,5 +206,15 @@ class StaffAPIController extends Controller
     {
         $staff = $this->staffRepo->staffList($request);
         ResponseData($staff);
+    }
+
+    public function uploadStaffContracts(Request $request, $id)
+    {
+        $request->validate([
+            'contract_images' => 'required|array|min:1',
+            'contract_images.*' => 'required|file|',
+        ]);
+
+        $this->staffRepo->attachStaffContracts($id, $request);
     }
 }

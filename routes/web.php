@@ -597,6 +597,7 @@ Route::middleware(['departments:warning.edit'])->group(function () {
 
 Route::middleware(['departments:off-day'])->group(function () {
     Route::view('/off_day', 'off_day.index')->name('off_day.index');
+    Route::view('/off_day_requests', 'off_day_requests.index')->name('off_day_requests.index');
 });
 
 // leave allowance

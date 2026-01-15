@@ -4,6 +4,7 @@ namespace App\Repositories\OffDay;
 
 use Exception;
 use App\Models\OffDay;
+use App\Models\OffDayRequest;
 use App\Models\DayInOffDay;
 use App\Models\OffDayAssignment;
 use App\Models\OffDaySetting;
@@ -113,6 +114,68 @@ class OffDayRepository implements OffDayRepositoryInterface
     } catch (Exception $e) {
       DB::rollBack();
       throw $e;
+    }
+  }
+
+  public function createOffDayRequest($data)
+  {
+    try{
+        DB::beginTransaction();
+        $offDayRequest = OffDayRequest::updateOrCreate([
+            'staff_timeshift_id' => $data['staff_timeshift_id']
+        ], $data);
+        DB::commit();
+        return $offDayRequest;
+    }catch(Exception $e){
+        DB::rollBack();
+        return null;
+    }
+  }
+
+  public function getOffDayRequests()
+  {
+    return OffDayRequest::with([
+        'staffTimeshift.staff',
+        'staffTimeshift.timeshift.shift',
+        'staffTimeshift.timeshift.gps',
+        'staffTimeshift.area',
+        'handledBy'
+    ])->orderByDesc('id')
+    ->paginate(config('common.list_count'));
+  }
+
+  public function updateOffDayRequestStatus($id, $request)
+  {
+    $offDayRequest = OffDayRequest::with('staffTimeshift')->find($id);
+    $staffTimeshift = $offDayRequest->staffTimeshift;
+
+    if(!$offDayRequest || $offDayRequest->status !== 'pending'){
+        ResponseMessage("This request doesn't exist or cannot be processed", 400);
+    }
+
+    $offDayRequest->status = $request->status;
+    $offDayRequest->handled_by = UserData()->id;
+    $offDayRequest->handled_at = now();
+    $offDayRequest->save();
+
+    if($offDayRequest->status == 'confirmed'){
+        if($offDayRequest->type == 'off_day'){
+            $offDay = OffDay::create(['repetition' => 'Custom', 'created_by' => UserData()->id]);
+            DayInOffDay::create([
+                'day' => 'Custom',
+                'off_day_id' => $offDay->id,
+                'date' => $staffTimeshift->date_time,
+                'staff_id' => $staffTimeshift->staff_id,
+            ]);
+            $staffTimeshift->status = 'cancelled';
+            $staffTimeshift->cancelled_by = UserData()->id;
+            $staffTimeshift->cancelled_at = now();
+            $staffTimeshift->save();
+        }
+        if($offDayRequest->type == 'shift_change'){
+            $staffTimeshift->timeshift_id = $offDayRequest->change_timeshift_id;
+            $staffTimeshift->save();
+        }
     }
   }
 }

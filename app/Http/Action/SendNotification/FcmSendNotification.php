@@ -32,9 +32,7 @@ trait FcmSendNotification
             'model'=>$model
         ]);
         Log::info('Model Map',[$morphMapName]);
-        // Log::info('Authorized User',[UserData()]);
-
-        // $user_ids = $people->pluck('id');
+     
         $notification = Notification::updateOrCreate(
             [
                 'notificationable_id' => $model->id,
@@ -50,7 +48,6 @@ trait FcmSendNotification
         Log::info('Notification Person');
 
         $notificationPersons = [];
-        // Log::info('notification', $data);
         foreach ($people as $person) {
             $personMorphMapName = RelationMorphName($person);
             $notificationPersons[] = [
@@ -58,11 +55,9 @@ trait FcmSendNotification
                 'staff_id' => $person->id,
                  'title' => $data['title'],
                 'preview' => $data['preview'],
-                // 'personable_type' => $personMorphMapName,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-            // NotificationPerson::create($notificationData);
             Log::info('created notification person');
         }
         NotificationUser::insert($notificationPersons);

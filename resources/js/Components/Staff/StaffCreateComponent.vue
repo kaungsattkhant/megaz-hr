@@ -341,8 +341,48 @@
                 </div>
             </div>
 
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Off Days Count
+                </label>
+                <input type="number" v-model="offDaysCount" placeholder="Off Days Count" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Check-In Late Minutes
+                </label>
+                <input type="number" v-model="checkInLateMins" placeholder="Check-In Late Minutes" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Check-Out Early Minutes
+                </label>
+                <input type="number" v-model="checkoutEarlyMins" placeholder="Checkout Early Minutes" class="input-ui">
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    GPS Distance (Meters)
+                </label>
+                <input type="number" v-model="gpsDistance" placeholder="GPS Distance" class="input-ui">
+            </div>
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Address
+                </label>
+                <textarea name="" v-model="address"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
+                    rows="10"></textarea>
+                <div class="mt-1" v-if="addressInputError">
+                    <span class="px-1 text-red-600 text-sm">{{ addressInputError }} *</span>
+                </div>
+            </div>
+
+
+            <!-- <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Address
                 </label>
@@ -351,7 +391,7 @@
                 <div class="mt-1" v-if="addressInputError">
                     <span class="px-1 text-red-600 text-sm">{{ addressInputError }} *</span>
                 </div>
-            </div>
+            </div> -->
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="nrc-front" class="label-form mb-3">
@@ -906,6 +946,11 @@ export default {
 
             creatable: false,
             isFeature: false,
+
+            offDaysCount: 0,
+            checkInLateMins: 0,
+            checkoutEarlyMins: 0,
+            gpsDistance: 0,
         };
     },
 
@@ -1335,6 +1380,11 @@ export default {
             if (this.zipCode) {
                 formData.append('zip_code', this.zipCode);
             }
+
+            formData.append('off_day_count', this.offDaysCount);
+            formData.append('check_in_late_min', this.checkInLateMins);
+            formData.append('check_out_early_min', this.checkoutEarlyMins);
+            formData.append('gps_distance', this.gpsDistance);
 
             formData.append('bank_id', this.selectedBank.id);
             formData.append('bank_account_number', this.bankAccountNumber);

@@ -41,4 +41,6 @@ interface StaffRepositoryInterface
     public function nrcLists(Request $request);
 
     public function staffList(Request $request);
+
+    public function attachStaffContracts($id, Request $request);
 }

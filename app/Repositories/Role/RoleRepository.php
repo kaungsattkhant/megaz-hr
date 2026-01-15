@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Role;
 
+use App\Http\Resources\Mobile\RoleResource;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ class RoleRepository implements RoleRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills');
+            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills','parent');
 
             if ($request->department_id) {
                 $query->where('department_id', $request->department_id);
@@ -27,6 +28,11 @@ class RoleRepository implements RoleRepositoryInterface
             }
             return $roles;
         }
+    }
+
+    public function getRole($request){
+        $data= Role::orderBy('level','asc')->get();
+        return RoleResource::collection($data);
     }
 
     public function createData(array $data)

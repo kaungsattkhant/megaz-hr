@@ -15,13 +15,44 @@ class Role extends BaseModel
     protected $fillable = [
         'name',
         'department_id',
-        'is_available'
+        'is_available',
+        'parent_id'
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at'
     ];
+
+    protected static function booted()
+    {
+        static::saving(function ($role) {
+            $parentLevel = $role->parent_id ? self::find($role->parent_id)->level ?? 0 : 0;
+            $role->level = $parentLevel + ($role->parent_id ? 1 : 0);
+        });
+
+        static::saved(function ($role) {
+            $role->updateDescendantLevels();
+        });
+    }
+
+    public function updateDescendantLevels()
+    {
+        foreach ($this->children as $child) {
+            $child->level = $this->level + 1;
+            $child->saveQuietly();
+            $child->updateDescendantLevels();
+        }
+    }
+
+    // public static function rebuildLevels()
+    // {
+    //     foreach (self::whereNull('parent_id')->get() as $root) {
+    //         $root->level = 0;
+    //         $root->saveQuietly();
+    //         $root->updateDescendantLevels();
+    //     }
+    // }
 
     public function getCreatedAt()
     {
@@ -36,6 +67,32 @@ class Role extends BaseModel
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Recursively collect all descendants (depth-first).
+     * Returns a nested array representing the subtree.
+     */
+    public function descendants()
+    {
+        $result = [];
+        foreach ($this->children as $child) {
+            $result[] = [
+                'role' => $child,
+                'children' => $child->descendants()
+            ];
+        }
+        return $result;
     }
 
     public function staffs()
