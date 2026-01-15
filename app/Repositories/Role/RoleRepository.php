@@ -12,7 +12,7 @@ class RoleRepository implements RoleRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills');
+            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills','parent');
 
             if ($request->department_id) {
                 $query->where('department_id', $request->department_id);
