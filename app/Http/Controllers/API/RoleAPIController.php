@@ -25,9 +25,9 @@ class RoleAPIController extends Controller
         ResponseData($roles);
     }
 
-    public function getAllRoles(Request $request)
+    public function getOrganizationChart(Request $request)
     {
-        $roles = $this->roleRepo->getRole($request);
+        $roles = $this->roleRepo->getOrganizationChart($request);
         ResponseData($roles);
     }
 

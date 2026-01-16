@@ -8,7 +8,7 @@ interface RoleRepositoryInterface
 {
     public function listAllData(Request $request);
 
-    public function getRole($request);
+    public function getOrganizationChart($request);
 
     public function createData(array $data);
 

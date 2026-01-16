@@ -9,6 +9,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('home', 'index');
     });
     Route::controller(RoleAPIController::class)->group(function () {
-        Route::get('get_roles', 'getAllRoles');
+        Route::get('get_organization_chart', 'getOrganizationChart');
     });
 });

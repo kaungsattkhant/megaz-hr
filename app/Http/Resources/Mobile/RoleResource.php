@@ -19,6 +19,12 @@ class RoleResource extends JsonResource
             'name'=>$this->name,
             'level'=>$this->level,
             'department'=>$this->department,
+            'staffs'=>$this->staffs->map(function($staff) {
+                return [
+                    'id'=>$staff->id,
+                    'name'=>$staff->name,
+                ];
+            })
         ];
     }
 }

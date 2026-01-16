@@ -32,8 +32,8 @@ class RoleRepository implements RoleRepositoryInterface
         }
     }
 
-    public function getRole($request){
-        $data= Role::orderBy('level','asc')->get();
+    public function getOrganizationChart($request){
+        $data= Role::with(['staffs'])->orderBy('level','asc')->where('level', '>', 0)->get();
         return RoleResource::collection($data);
     }
 
