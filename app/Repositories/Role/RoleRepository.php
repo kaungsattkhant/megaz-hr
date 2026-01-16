@@ -33,7 +33,8 @@ class RoleRepository implements RoleRepositoryInterface
     }
 
     public function getOrganizationChart($request){
-        $data= Role::with(['staffs'])->orderBy('level','asc')->where('level', '>', 0)->get();
+        $data= Role::with(['staffs'])->orderBy('level','asc')
+        ->get();
         return RoleResource::collection($data);
     }
 
