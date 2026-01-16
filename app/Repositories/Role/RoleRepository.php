@@ -22,9 +22,11 @@ class RoleRepository implements RoleRepositoryInterface
             return $paginatedRoles;
         } else {
             if ($request->department_id) {
-                $roles = Role::where('department_id', $request->department_id)->with('department', 'skills')->get();
+                $roles = Role::where('department_id', $request->department_id)->with('department', 'skills','parent')
+                ->where('is_available', 1)
+                ->get();
             } else {
-                $roles = Role::with('department')->get();
+                $roles = Role::with('department', 'skills', 'parent')->where('is_available', 1)->get();
             }
             return $roles;
         }
@@ -53,10 +55,9 @@ class RoleRepository implements RoleRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
             $role = Role::findOrFail($id);
             if ($role) {
-                $data = RemoveNullValues($data);
+                // $data = RemoveNullValues($data);
                 $role->update($data);
             }
             DB::commit();
