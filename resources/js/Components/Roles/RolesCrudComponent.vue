@@ -483,7 +483,7 @@ export default {
                 formData.append('parent_id', this.selectedRoleEdit.id);
             }
             else {
-                formData.append('parent_id', this.selectedRoleEdit)
+                formData.append('parent_id', "")
             }
             let response = await postApiData({ url: '/api/roles/'+this.selectedItem.id, form_data: formData, token: this.getToken() });
             if (response.success) {
