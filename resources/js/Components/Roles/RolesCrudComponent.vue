@@ -461,7 +461,7 @@ export default {
             this.nameEdit = role.name;
             this.selectedDepartmentEdit = role.department.id
             if(role.parent != null){
-                this.selectedRoleEdit = this.roleList.find(item => item.id === role.parent.id);
+                this.selectedRoleEdit = this.parentRoleList.find(item => item.id === role.parent.id);
                 console.log('role parent id', role)
             }
             else{
