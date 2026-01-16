@@ -262,7 +262,13 @@
                                 placeholder="Select Parent Role"
                                 label="name"
                                 track-by="id"
-                                :preselect-first="false" ></multiselect>
+                                :preselect-first="false" >
+                                <template #option="{ option }">
+                                    <span>
+                                      {{ option.name }} ({{ option.department?.name }})
+                                    </span>
+                                  </template>
+                                </multiselect>
                             </div>
 
                         </div>
