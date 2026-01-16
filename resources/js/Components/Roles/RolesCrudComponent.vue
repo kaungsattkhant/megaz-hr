@@ -436,6 +436,7 @@ export default {
             if(this.selectedRole){
                 formData.append('parent_id', this.selectedRole.id);
             }
+            
             let response = await postApiData({ url: '/api/roles', form_data: formData, token: this.getToken() });
             if (response.success) {
                 if(this.filterDepartment){
@@ -480,6 +481,9 @@ export default {
             formData.append('department_id', this.selectedDepartmentEdit);
             if(this.selectedRoleEdit){
                 formData.append('parent_id', this.selectedRoleEdit.id);
+            }
+            else {
+                formData.append('parent_id', this.selectedRoleEdit)
             }
             let response = await postApiData({ url: '/api/roles/'+this.selectedItem.id, form_data: formData, token: this.getToken() });
             if (response.success) {
