@@ -172,7 +172,7 @@
                                 </label>
                                 <multiselect
                                 v-model="selectedRole"
-                                :options="roleList"
+                                :options="parentRoleList"
                                 :close-on-select="true"
                                 :clear-on-select="false"
                                 :preserve-search="true"
@@ -249,7 +249,7 @@
                                 </label>
                                 <multiselect
                                 v-model="selectedRoleEdit"
-                                :options="roleList"
+                                :options="parentRoleList"
                                 :close-on-select="true"
                                 :clear-on-select="false"
                                 :preserve-search="true"
@@ -359,6 +359,7 @@ export default {
 
             departmentList: [],
             roleList: [],
+            parentRoleList: [],
             name: null,
             selectedDepartment: null,
             selectedItem: null,
@@ -414,6 +415,12 @@ export default {
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
                 console.log('loading done');
+            }
+        },
+        async getParentRoleList() {
+            const response = await getApiData({ url: `/api/roles`, token: this.getToken() });
+            if (response.data) {
+                this.parentRoleList = response.data;
             }
         },
 
@@ -543,7 +550,7 @@ export default {
     mounted() {
 
         this.getRolesList(1);
-
+        this.getParentRoleList();
         this.getDepartmentList();
         initTE({ Modal, Select, Ripple });
     }
