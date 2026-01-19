@@ -10,7 +10,9 @@ use App\Http\Resources\InventoryLedgerResource;
 use App\Http\Requests\Inventory\InventoryItemRequest;
 use App\Http\Requests\Inventory\InventoryCreateRequest;
 use App\Http\Requests\Inventory\InventoryUpdateRequest;
+use App\Http\Requests\Inventory\InventoryOpeningRequest;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class InventoryAPIController extends Controller
 {
@@ -104,5 +106,11 @@ class InventoryAPIController extends Controller
 
     public function pushDataInventory(Request $request){
         $data = $this->inventoryRepo->pushDataInventory($request);
+    }
+
+    public function createInventoryOpening(InventoryOpeningRequest $request)
+    {
+        $inventory = $this->inventoryRepo->createInventoryOpening($request);
+        \ResponseMessage('Inventory Opening created successfully', 200);
     }
 }

@@ -24,7 +24,8 @@ class RoleResource extends JsonResource
                     'id'=>$staff->id,
                     'name'=>$staff->name,
                 ];
-            })
+            }),
+            'children' => isset($this->children) ? RoleResource::collection($this->children) : [],
         ];
     }
 }

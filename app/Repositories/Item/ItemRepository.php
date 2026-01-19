@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\HeadingRowImport;
 use App\Services\AveragePriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Scopes\WithAveragePriceScope;
 use App\Repositories\PoOrder\PoOrderRepository;
 
 class ItemRepository implements ItemRepositoryInterface
@@ -75,6 +76,12 @@ class ItemRepository implements ItemRepositoryInterface
             return $query->get();
         }
     }
+
+    public function getAllItem($request)
+    {
+        return Item::withoutGlobalScope(WithAveragePriceScope::class)->orderBy('id', 'desc')->get();
+    }
+
     public function equipmentItem(Request $request)
     {
         $query = $this->getBaseItemQuery($request);

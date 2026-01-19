@@ -12,7 +12,7 @@ class RoleRepository implements RoleRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills','parent');
+            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills', 'parent');
 
             if ($request->department_id) {
                 $query->where('department_id', $request->department_id);
@@ -22,9 +22,9 @@ class RoleRepository implements RoleRepositoryInterface
             return $paginatedRoles;
         } else {
             if ($request->department_id) {
-                $roles = Role::where('department_id', $request->department_id)->with('department', 'skills','parent')
-                ->where('is_available', 1)
-                ->get();
+                $roles = Role::where('department_id', $request->department_id)->with('department', 'skills', 'parent')
+                    ->where('is_available', 1)
+                    ->get();
             } else {
                 $roles = Role::with('department', 'skills', 'parent')->where('is_available', 1)->get();
             }
@@ -32,11 +32,89 @@ class RoleRepository implements RoleRepositoryInterface
         }
     }
 
-    public function getOrganizationChart($request){
-        $data= Role::with(['staffs'])->orderBy('level','asc')
-        ->where('is_available',1)
-        ->get();
-        return RoleResource::collection($data);
+    public function getOrganizationChart($request)
+    {
+        // Load all active staffs with their roles and keep only those whose primary role is available
+        $staffs = \App\Models\Staff::with('roles')
+            ->where('is_active', 1)
+            ->get()
+            ->filter(fn($s) => ($s->primaryRole() && ($s->primaryRole()->is_available ?? 0) == 1))
+            ->values();
+
+        // init children container
+        $staffs->each(fn($s) => $s->children = collect());
+
+        // helper to return primary Role model or null
+        $getRole = function ($staff) {
+            return $staff->primaryRole();
+        };
+
+        // build tree by mapping staff under staffs whose role is the parent role
+        $tree = collect();
+        foreach ($staffs as $staff) {
+            $role = $getRole($staff);
+            if (!$role || !$role->parent_id) {
+                $tree->push($staff);
+                continue;
+            }
+
+            $parentRoleId = $role->parent_id;
+            $parentStaffs = $staffs->filter(fn($s) => optional($getRole($s))->id === $parentRoleId);
+
+            if ($parentStaffs->isEmpty()) {
+                $tree->push($staff);
+            } else {
+                foreach ($parentStaffs as $parentStaff) {
+                    $parentStaff->children->push($staff);
+                }
+            }
+        }
+
+        // sort nodes by role.level (fallback 0) recursively
+        $sortRecursively = function ($nodes) use (&$sortRecursively, $getRole) {
+            return $nodes->sortBy(fn($n) => optional($getRole($n))->level ?? 0)
+                         ->values()
+                         ->map(fn($n) => tap($n, fn($x) => $x->children = $sortRecursively($x->children)))
+                         ->values();
+        };
+
+        $tree = $sortRecursively($tree);
+
+        // format output to match sample
+        $format = function ($nodes) use (&$format, $getRole) {
+            return $nodes->map(function ($staff) use ($format, $getRole) {
+                $role = $getRole($staff);
+                return [
+                    'id' => $staff->id,
+                    'name' => $staff->name,
+                    'role' => $role ? [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                        'level' => $role->level,
+                    ] : null,
+                    'children' => $format($staff->children),
+                ];
+            })->values();
+        };
+
+        return $format($tree);
+    }
+
+    private function formatStaffTree($staffs, $getRole)
+    {
+        return $staffs->map(function ($staff) use ($getRole) {
+            $role = $getRole($staff);
+            return [
+                'id' => $staff->id,
+                'name' => $staff->name,
+                'role' => $role ? [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'level' => $role->level,
+                ] : null,
+                'children' => $this->formatStaffTree($staff->children, $getRole),
+            ];
+        })->values();
     }
 
     public function createData(array $data)

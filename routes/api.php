@@ -327,6 +327,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('inventory_ledger_list', 'getInventoryLedgerList');
         Route::post('inventory_item', 'createInventoryItem');
         Route::get('inventory-closing-items', 'getInventoryClosingItems');
+        Route::post('create_inventory_opening', 'createInventoryOpening');
     });
 
     Route::get('/uoms', [UomAPIController::class, 'getUomData']);
@@ -643,6 +644,7 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
+Route::get('/get_items', [ItemAPIController::class, 'getAllItem']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::get('/items/{id}', [ItemAPIController::class, 'detail']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
