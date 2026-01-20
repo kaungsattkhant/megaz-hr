@@ -1,53 +1,29 @@
 <?php
-
 namespace App\Imports;
-
 use App\Models\ItemType;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\Importable;
-use Maatwebsite\Excel\Concerns\SkipsErrors;
-use Maatwebsite\Excel\Concerns\SkipsOnError;
-use Maatwebsite\Excel\Concerns\SkipsFailures;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\Importable;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Row;
 
-class ItemTypeImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnError, SkipsOnFailure, WithBatchInserts, WithChunkReading
+class ItemTypeImport implements OnEachRow, WithHeadingRow
 {
-    use Importable, SkipsErrors, SkipsFailures;
-    /**
-     * @param array $row
-     *
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function model(array $row)
-    {
-        return new ItemType([
-            'item_type_code' => $row['item_type_code'],
-            'name' => $row['name'],
-            'is_active' => $row['is_active'] ?? 1,
-            'created_at' => now(),
-        ]);
-    }
+    use Importable;
 
-    public function rules(): array
+    public function onRow(Row $row)
     {
-        return [
-            'item_type_code' => 'required|unique:item_types,item_type_code',
-            'name' => 'required|unique:item_types,name',
-        ];
-    }
+        $data = $row->toArray();
+        Log::info('Reach Item Type Import', $data);
 
+        $itemType = ItemType::updateOrCreate(
+            ['item_type_code' => trim($data['item_type_code'])],
+            [
+                'name' => trim($data['name']),
+                'is_active' => $data['is_active'] ?? 1,
+            ]
+        );
 
-    public function batchSize(): int
-    {
-        return 500;
-    }
-
-    public function chunkSize(): int
-    {
-        return 500;
+        Log::info('Successfully Item Type Import', ['id' => $itemType->id]);
     }
 }

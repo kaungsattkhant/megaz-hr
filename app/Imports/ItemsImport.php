@@ -73,27 +73,25 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 $minHoldingUomQuantity,
                 $conversionRate
             );
-            $item = new Item([
-                'name' => $row['name'],
-                'code' => $row['code'],
-                'category_id' => $categoryId,
-                'item_type_id' => $itemTypeId,
-                'base_uom_id' => $baseUomId ?? null,
-                'uom_id' => $uomId ?? null,
-                'min_uom_id' => $minUomId,
-                'min_holding_uom_quantity' => $row['min_holding_uom_quantity'],
-                'min_holding_quantity' => $row['min_holding_uom_quantity'] * $row['conversion'],
-                // 'min_holding_base_uom_quantity' => $minHoldingBaseUomQuantity ?? 0,
-                // 'min_holding_uom_quantity' => $minHoldingUomQuantity ?? 0,
-                'minimum_holding_amount' => $minimumHoldingAmount ?? 0,
-                'limitation_type' => $row['limitation_type'] ?? null,
-                'amount' => $row['amount'] ?? 0,
-                'max_uom_id' => $maxUomId,
-                'max_limit_uom_quantity' => $row['max_limit_uom_quantity'],
-                'max_limit_quantity' => $row['max_limit_uom_quantity'] * $row['conversion'],
-                // 'max_limit_base_uom_quantity' => $row['max_limit_base_uom_quantity'] ?? 0,
-                // 'max_limit_uom_quantity' => $row['max_limit_uom_quantity'] ?? 0,
-            ]);
+            $item = Item::updateOrCreate(
+                ['code' => $row['code']],   // 🔑 Unique key
+                [
+                    'name' => $row['name'],
+                    'category_id' => $categoryId,
+                    'item_type_id' => $itemTypeId,
+                    'base_uom_id' => $baseUomId ?? null,
+                    'uom_id' => $uomId ?? null,
+                    'min_uom_id' => $minUomId,
+                    'min_holding_uom_quantity' => $row['min_holding_uom_quantity'],
+                    'min_holding_quantity' => $row['min_holding_uom_quantity'] * $row['conversion'],
+                    'minimum_holding_amount' => $minimumHoldingAmount ?? 0,
+                    'limitation_type' => $row['limitation_type'] ?? null,
+                    'amount' => $row['amount'] ?? 0,
+                    'max_uom_id' => $maxUomId,
+                    'max_limit_uom_quantity' => $row['max_limit_uom_quantity'],
+                    'max_limit_quantity' => $row['max_limit_uom_quantity'] * $row['conversion'],
+                ]
+            );
 
             if ($row['limitation_type'] === "finance") {
                 $item['amount'] = $row['amount'] ?? 0;
