@@ -47,9 +47,9 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         try {
            
             $itemCode = Item::where('code', $row['code'])->first();
-            if ($itemCode) {
-                return ResponseMessage($itemCode . ' is duplicate itemcode.', 419);
-            }
+            // if ($itemCode) {
+            //     return ResponseMessage($itemCode . ' is duplicate itemcode.', 419);
+            // }
             $categoryId = Category::where('category_code', $row['category_code'])->value('id');
             $itemTypeId = ItemType::where('item_type_code', $row['item_type_code'])->value('id');
             $baseUomId = Uom::where('uom_code', $row['base_uom_code'])->value('id');
