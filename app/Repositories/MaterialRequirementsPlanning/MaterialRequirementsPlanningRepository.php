@@ -164,8 +164,22 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
-    ])->where('id', $menuId)
-      ->where('is_active', 1)->get();
+      'menuSteps.menuStepItem' => function ($q) {
+          $q->with(['item' => function ($qi) {
+                   $qi->where('items.is_active', 1);
+                }, 'uom']);
+      },
+      'subMenus.menuSteps' => function ($q) {
+          $q->with(['menuStepItem' => function ($qi) {
+                    $qi->with(['item' => function ($qii) {
+                       $qii->where('items.is_active', 1);
+                    }, 'uom']);
+                }]);
+      },
+    ])
+    ->where('id', $menuId)
+      ->where('is_active', 1)
+      ->get();
   }
 
   public function updateMrpList($menuId, $validatedData)

@@ -2,10 +2,12 @@
 
 namespace App\Repositories\Role;
 
-use App\Http\Resources\Mobile\RoleResource;
 use App\Models\Role;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\Mobile\RoleResource;
+use App\Http\Resources\Mobile\StaffOrganizationChartResource;
 
 class RoleRepository implements RoleRepositoryInterface
 {
@@ -64,9 +66,14 @@ class RoleRepository implements RoleRepositoryInterface
             if ($parentStaffs->isEmpty()) {
                 $tree->push($staff);
             } else {
-                foreach ($parentStaffs as $parentStaff) {
-                    $parentStaff->children->push($staff);
+                // attach child to first parent staff only to avoid duplicate placement
+                $firstParent = $parentStaffs->first();
+                if ($firstParent) {
+                    $firstParent->children->push($staff);
                 }
+                // foreach ($parentStaffs as $parentStaff) {
+                //     $parentStaff->children->push($staff);
+                // }
             }
         }
 
@@ -97,24 +104,7 @@ class RoleRepository implements RoleRepositoryInterface
             })->values();
         };
 
-        return $format($tree);
-    }
-
-    private function formatStaffTree($staffs, $getRole)
-    {
-        return $staffs->map(function ($staff) use ($getRole) {
-            $role = $getRole($staff);
-            return [
-                'id' => $staff->id,
-                'name' => $staff->name,
-                'role' => $role ? [
-                    'id' => $role->id,
-                    'name' => $role->name,
-                    'level' => $role->level,
-                ] : null,
-                'children' => $this->formatStaffTree($staff->children, $getRole),
-            ];
-        })->values();
+        return StaffOrganizationChartResource::collection($tree);
     }
 
     public function createData(array $data)

@@ -117,7 +117,7 @@ class Menu extends BaseModel
             })
             ->when($category, function ($q) use ($category) {
                 $q->whereHas('menu_category', function ($catQuery) use ($category) {
-                    $catQuery->where('name', 'like', '%' . $category . '%');
+                    $catQuery->where('id', $category);
                 });
             })
             ->when($code, function ($q) use ($code) {
