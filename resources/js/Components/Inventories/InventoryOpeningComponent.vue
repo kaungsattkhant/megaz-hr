@@ -229,6 +229,21 @@ export default {
             console.log('items type with json:', Array.isArray(JSON.stringify(this.selectedData.items)));
             let formData = new FormData();
             formData.append('date', this.selectedData.date);
+
+            // this.selectedData.items.forEach((item,index)=>{
+            //     formData.append(`items[${index}]`, item);
+            // });
+
+            // this.selectedData.items.forEach((item, index) => {
+            //     formData.append(`items[${index}][item_id]`, item.item_id);
+            //     formData.append(`items[${index}][inventory_id]`, item.inventory_id);
+            //     formData.append(`items[${index}][base_uom_id]`, item.base_uom_id);
+            //     formData.append(`items[${index}][uom_id]`, item.uom_id);
+            //     formData.append(`items[${index}][base_uom_quantity]`, item.base_uom_quantity);
+            //     formData.append(`items[${index}][uom_quantity]`, item.uom_quantity);
+            // });
+
+
             formData.append('items', JSON.stringify(this.selectedData.items));
             let url = `/api/create_inventory_opening`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
