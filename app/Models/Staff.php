@@ -153,6 +153,21 @@ class Staff extends Authenticatable implements AuditableContract
     //     return $this->hasMany(Task::class, 'staff_id');
     // }
 
+    public static function staffByDepartmentName(string $departmentName, ?string $roleName=null)
+    {
+        $mainQuery = self::whereHas('department', function($query) use ($departmentName, $roleName){
+            $query->where('name', $departmentName);
+        });
+
+        if($roleName){
+            $mainQuery->whereHas('roles', function($subQuery) use ($roleName){
+                $subQuery->where('name', $roleName);
+            });
+        }
+
+        return $mainQuery->get();
+    }
+
     public static function staffByRole($roleId)
     {
         return self::whereHas('roles', function ($query) use ($roleId) {
@@ -160,10 +175,10 @@ class Staff extends Authenticatable implements AuditableContract
         })->get();
     }
 
-    public static function staffByRoleName($roleId)
+    public static function staffByRoleName($roleName)
     {
-        return self::whereHas('roles', function ($query) use ($roleId) {
-            $query->where('id', $roleId);
+        return self::whereHas('roles', function ($query) use ($roleName) {
+            $query->where('name', $roleName);
         })->get();
     }
 
@@ -225,7 +240,7 @@ class Staff extends Authenticatable implements AuditableContract
         return $this->hasMany(StaffAdvance::class);
     }
 
-    public function staffBalance() 
+    public function staffBalance()
     {
         return $this->hasOne(StaffBalance::class)->latest();
     }

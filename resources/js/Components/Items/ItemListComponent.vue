@@ -5,8 +5,8 @@
                 <p class=" page-title">
                     Items
                 </p>
-                
-                
+
+
                 <!-- <div class="flex gap-x-4 pt-4 pr-4">
                     <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer" v-if="feature.includes('item-type.import')">
                         Import Type
@@ -74,7 +74,7 @@
                             data-te-ripple-init data-te-ripple-color="light" @click="sidebarNotificationTrayExpanded">
                             Import
                             <i class="fal fa-file-import"></i>
-                            
+
                         </button>
                         <ul class="absolute z-[1000] float-left m-0 hidden min-w-max list-none pt-6 pb-3 px-6 overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-base shadow-lg data-[te-dropdown-show]:block "
                             aria-labelledby="test1" data-te-dropdown-menu-ref>
@@ -162,25 +162,26 @@
                                         <a :href="'/items/' + item.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
+
+                                        <input :checked="item.is_active == 1" @change="isActiveToggled(item.id)"
+                                            class="pr-2 me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                            before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
+                                            after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                            after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                            checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                            checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                            focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                            focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                            checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                            checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
+                                            type="checkbox" role="switch"
+                                        />
                                     </td>
                                     <!-- <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
                                             data-te-target="#priceUpdateModal" @click="updatePriceBtnClicked(item.id)">
                                             <i class="fas fa-tag"></i>
                                         </button>
-                                        <input :checked="item.is_active == 1" @change="isActiveToggled(item.id)"
-                                            class="pr-2 me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
-                                    before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
-                                    after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
-                                    after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
-                                    checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
-                                    checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
-                                    focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
-                                    focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
-                                    checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
-                                    checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
-                                            type="checkbox" role="switch" />
-
                                     <a :href="`/items/${item.id}/pricing_history`" class="text-blue-600 hover:underline" > Pricing History </a>
                                     </td> -->
                                 </tr>
@@ -725,7 +726,6 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
-import { ref } from 'vue';
 import TableSkeleton from "../Common/TableSkeleton.vue";
 
 export default {

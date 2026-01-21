@@ -227,6 +227,14 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
                     'cancelled_at' => now(),
                 ]);
                 $this->sendShiftStatusNotificationToAdmin($staffTimeshift, $data['status']);
+
+                $hrManagers = Staff::staffByDepartmentName('HR','Manager');
+                $notiData = [
+                    'title'     => 'Shift Cancelled',
+                    'date_time' => now()->format('Y-m-d H:i:s'),
+                    'preview'   => "{$staffTimeshift->staff->name} cancelled the shfit assigned to him/her",
+                ];
+                $this->sendFcmNotification($staffTimeshift, $hrManagers, $notiData);
             }
             DB::commit();
             ResponseData($staffTimeshift, 201);
