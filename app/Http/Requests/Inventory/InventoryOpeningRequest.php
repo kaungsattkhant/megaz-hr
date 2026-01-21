@@ -14,6 +14,17 @@ class InventoryOpeningRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        // if items comes as a JSON string, decode it so array rules work
+        if ($this->has('items') && is_string($this->input('items'))) {
+            $decoded = json_decode($this->input('items'), true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $this->merge(['items' => $decoded]);
+            }
+        }
+    }
+    
     /**
      * Get the validation rules that apply to the request.
      *
