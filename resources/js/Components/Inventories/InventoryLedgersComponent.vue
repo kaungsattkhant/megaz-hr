@@ -617,12 +617,12 @@ export default {
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            let url = `/api/inventory_ledger_list?page=` + pageNumber + `&`;
+            let url = `/api/inventory_ledger_list?page=` + pageNumber;
             if(this.fromDate && this.toDate){
-                url = `${url}from_date=${this.fromDate}&to_date=${this.toDate}`;
+                url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
             if(this.searchInventory){
-                url = `${url}${this.url_inventory}`;
+                url = `${url}&${this.url_inventory}`;
             }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -888,8 +888,8 @@ export default {
             this.getInventoryLegderList(1);
         },
         searchBtnClicked(){
-            this.searchInventory = null;
-            this.url_inventory = '';
+            // this.searchInventory = null;
+            // this.url_inventory = '';
             this.getInventoryLegderList(1);
         },
 
