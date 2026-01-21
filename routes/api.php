@@ -755,4 +755,4 @@ Route::controller(TagController::class)->group(function () {
 
 Route::get("/test-notification", [TestController::class, "testNotification"]);
 
-Route::get('cashflows', 'getBudgetAccountsCashflow');
+// Route::get('cashflows', 'getBudgetAccountsCashflow');
