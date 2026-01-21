@@ -43,10 +43,10 @@
                                 <th scope="col">
                                     Item 
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="text-center">
                                     Base UOM Quantity
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="text-center">
                                     UOM Quantity
                                 </th>
                                 
@@ -71,10 +71,20 @@
                                         {{ item.name }}
                                     </td>
                                     <td>
-                                        <input type="text" class="input-ui" v-model="item.base_uom_quantity">
+                                        <div class="flex gap-x-4 items-center justify-center">
+                                            <input type="text" class="input-ui max-w-xs" v-model="item.base_uom_quantity">
+                                            <span>
+                                                {{ item.base_uom.name }}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td>
-                                        <input type="text" class="input-ui" v-model="item.uom_quantity">
+                                        <div class="flex gap-x-4 items-center justify-center">
+                                            <input type="text" class="input-ui max-w-xs" v-model="item.uom_quantity">
+                                            <span>
+                                                {{ item.uom.name }}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                        
