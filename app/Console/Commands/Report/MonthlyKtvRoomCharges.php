@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Report;
 
 use App\Models\Invoice;
 use Illuminate\Console\Command;

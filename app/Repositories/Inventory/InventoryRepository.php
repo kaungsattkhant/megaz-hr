@@ -298,7 +298,7 @@ class InventoryRepository implements InventoryRepositoryInterface
                 // $areaInventoryable = collect($firstItem->inventory_ledger->inventory->inventoryable)
                 //     ->firstWhere('inventoryable_type', 'area');
                 // $area = $areaInventoryable ? $areaInventoryable->inventoryable : null;
-    
+
                 return [
                     // 'id' => $firstItem->id,
                     'item_id' => $itemId,
@@ -338,49 +338,86 @@ class InventoryRepository implements InventoryRepositoryInterface
         return $ledgers;
     }
 
-    public function pushDataInventory($request)
+    public function createInventoryOpening($request)
     {
         DB::beginTransaction();
         try {
-        if ($request->ip() !== "127.0.0.1") {
-            ResponseMessage('Push data is invalid on server', 422);
-        }
-        $inv = [7]; //local server
-        // $inv = [8, 9]; //165 server
-        // $inv = [8]; //165 server
-        $inventories = Inventory::whereIn('id', $inv)->get(); //hot kitchen 555 and bar inventory
-        $items = Item::all();
-        $inventoryLedgersData = [];
-        $inventoryLedgerItemsData = [];
-        $today = Carbon::today();
-        $now = Carbon::now();
+            $date = Carbon::parse($request->date);
+            $items=$request->items;
+            foreach($items as $itemData){
+                $item = Item::find($itemData['item_id']);
+                $inventoryId = $itemData['inventory_id'];
+                $quantity = ((float)$itemData['base_uom_quantity'] * $item->conversion) + (float)$itemData['uom_quantity'];
+                $inventoryLedger = InventoryLedger::create([
+                    'inventory_id' => $inventoryId,
+                    'date' => $date,
+                    'action' => 'in',
+                ]);
+                $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
+                $inventoryLedger->batch_no = $batchNo;
+                $inventoryLedger->save();
 
-        foreach ($inventories as $inventory) {
-            // foreach ($items as $item) {
-            //     $conversionRate = UomConversion::where('item_id', $item->id)->latest()->first();
-            //     if (!$conversionRate) {
-            //         ResponseMessage('Uom conversion not found for ' . $item->name, 419);
-            //     }
-            //     $inventoryLedger = InventoryLedger::create([
-            //         'inventory_id' => $inventory->id,
-            //         'date' => Carbon::now(),
-            //         'action' => 'in',
-            //     ]);
-            //     $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
-            //     $inventoryLedger->batch_no = $batchNo;
-            //     $inventoryLedger->save();
-            //     $inventoryLedger->inventory_ledger_items()->create([
-            //         'inventory_id' => $inventory->id,
-            //         'item_id' => $item->id,
-            //         'inventory_ledger_id' => $inventoryLedger->id,
-            //         'quantity' => 100000 * $conversionRate->conversion,
-            //     ]);
-            // }
-            // ProcessInventoryJob::dispatch($inventory->id, 100)->delay(now()->addSeconds(2));
-            $this->pushPackToInventory($inventory->id, quantity: 20);
+                $inventoryLedger->inventory_ledger_items()->create([
+                    'inventory_id' => $inventoryId,
+                    'item_id' => $item->id,
+                    'inventory_ledger_id' => $inventoryLedger->id,
+                    'quantity' => $quantity,
+                ]);
+            }
+          
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            ResponseMessage($e->getMessage(), 419);
         }
-        DB::commit();
-        ResponseMessage('Insert successfully', 200);
+    }
+
+    public function pushDataInventory($request)
+    {
+
+        DB::beginTransaction();
+        try {
+            if ($request->ip() !== "127.0.0.1") {
+                ResponseMessage('Push data is invalid on server', 422);
+            }
+            $inv = [7]; //local server
+            // $inv = [8, 9]; //165 server
+            // $inv = [8]; //165 server
+            $inventories = Inventory::whereIn('id', $inv)->get(); //hot kitchen 555 and bar inventory
+            $items = Item::all();
+            $inventoryLedgersData = [];
+            $inventoryLedgerItemsData = [];
+            $today = Carbon::today();
+            $now = Carbon::now();
+
+            foreach ($inventories as $inventory) {
+                // foreach ($items as $item) {
+                //     $conversionRate = UomConversion::where('item_id', $item->id)->latest()->first();
+                //     if (!$conversionRate) {
+                //         ResponseMessage('Uom conversion not found for ' . $item->name, 419);
+                //     }
+                //     $inventoryLedger = InventoryLedger::create([
+                //         'inventory_id' => $inventory->id,
+                //         'date' => Carbon::now(),
+                //         'action' => 'in',
+                //     ]);
+                //     $batchNo = now()->format('YmdHis') . '_' . $item->id . '_' . $inventoryLedger->id;
+                //     $inventoryLedger->batch_no = $batchNo;
+                //     $inventoryLedger->save();
+                //     $inventoryLedger->inventory_ledger_items()->create([
+                //         'inventory_id' => $inventory->id,
+                //         'item_id' => $item->id,
+                //         'inventory_ledger_id' => $inventoryLedger->id,
+                //         'quantity' => 100000 * $conversionRate->conversion,
+                //     ]);
+                // }
+                // ProcessInventoryJob::dispatch($inventory->id, 100)->delay(now()->addSeconds(2));
+                $this->pushPackToInventory($inventory->id, quantity: 20);
+            }
+            DB::commit();
+            ResponseMessage('Insert successfully', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -405,8 +442,8 @@ class InventoryRepository implements InventoryRepositoryInterface
         $now = now();
 
         $menus = Menu::where('is_active', 1)
-        ->where('id',306)
-        ->get(['id', 'name']);
+            ->where('id', 306)
+            ->get(['id', 'name']);
         DB::transaction(function () use ($menus, $inventoryId, $quantity, $now, $expiredAt, $createdBy) {
 
             foreach ($menus as $menu) {

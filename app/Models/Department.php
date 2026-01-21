@@ -38,7 +38,7 @@ class Department extends BaseModel
 
     public function roles()
     {
-        return $this->hasMany(Role::class);
+        return $this->hasMany(Role::class)->where('is_available',1);
     }
 
     public function itemUsageForecasts()

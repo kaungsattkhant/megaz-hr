@@ -24,7 +24,7 @@
 
                     <button type="button" v-if="getFeature().includes('role.create')"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                        data-te-toggle="modal" data-te-target="#create_modal" @click="name = null, selectedDepartment = null">
+                        data-te-toggle="modal" data-te-target="#create_modal" @click="name = null, selectedDepartment = null, selectedRole = null">
                         Add New
                     </button>
                 </div>
@@ -166,6 +166,28 @@
                                         {{ department.name }} </option>
                                 </select>
                             </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Parent Role
+                                </label>
+                                <multiselect
+                                v-model="selectedRole"
+                                :options="parentRoleList"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :preserve-search="true"
+                                placeholder="Select Parent Role"
+                                label="name"
+                                track-by="id"
+                                :preselect-first="false" >
+                                <template #option="{ option }">
+                                    <span>
+                                      {{ option.name }} ({{ option.department?.name }})
+                                    </span>
+                                  </template>
+                                </multiselect>
+                            </div>
+                            
 
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -225,6 +247,28 @@
                                         v-for="(department, departmentIndex) in departmentList" :key="departmentIndex">
                                         {{ department.name }} </option>
                                 </select>
+                                
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Parent Role
+                                </label>
+                                <multiselect
+                                v-model="selectedRoleEdit"
+                                :options="parentRoleList"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :preserve-search="true"
+                                placeholder="Select Parent Role"
+                                label="name"
+                                track-by="id"
+                                :preselect-first="false" >
+                                <template #option="{ option }">
+                                    <span>
+                                      {{ option.name }} ({{ option.department?.name }})
+                                    </span>
+                                  </template>
+                                </multiselect>
                             </div>
 
                         </div>
@@ -311,11 +355,13 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 
+import Multiselect from 'vue-multiselect';
 import TableSkeleton from "../Common/TableSkeleton.vue";
 import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
+        Multiselect,
         TableSkeleton,
         LoadingButton
     },
@@ -325,13 +371,16 @@ export default {
 
             departmentList: [],
             roleList: [],
+            parentRoleList: [],
             name: null,
             selectedDepartment: null,
+            selectedItem: null,
             deleteId: null,
 
             selectedRole:null,
             nameEdit:null,
             selectedDepartmentEdit:null,
+            selectedRoleEdit: null,
 
             filterDepartment:null,
 
@@ -380,6 +429,12 @@ export default {
                 console.log('loading done');
             }
         },
+        async getParentRoleList() {
+            const response = await getApiData({ url: `/api/roles`, token: this.getToken() });
+            if (response.data) {
+                this.parentRoleList = response.data;
+            }
+        },
 
         createRolesBtnClicked() {
             this.createRole();
@@ -390,6 +445,10 @@ export default {
             let formData = new FormData();
             formData.append('name', this.name);
             formData.append('department_id', this.selectedDepartment);
+            if(this.selectedRole){
+                formData.append('parent_id', this.selectedRole.id);
+            }
+            
             let response = await postApiData({ url: '/api/roles', form_data: formData, token: this.getToken() });
             if (response.success) {
                 if(this.filterDepartment){
@@ -413,9 +472,17 @@ export default {
             }
         },
         editRolesBtnClicked(role) {
-            this.selectedRole = role;
+            this.selectedItem = role;
             this.nameEdit = role.name;
             this.selectedDepartmentEdit = role.department.id
+            if(role.parent != null){
+                this.selectedRoleEdit = this.parentRoleList.find(item => item.id === role.parent.id);
+                console.log('role parent id', role)
+            }
+            else{
+                this.selectedRoleEdit = null;
+                console.log('no role parent id', role)
+            }
             // this.editRole();
         },
 
@@ -424,7 +491,13 @@ export default {
             let formData = new FormData();
             formData.append('name', this.nameEdit);
             formData.append('department_id', this.selectedDepartmentEdit);
-            let response = await postApiData({ url: '/api/roles/'+this.selectedRole.id, form_data: formData, token: this.getToken() });
+            if(this.selectedRoleEdit){
+                formData.append('parent_id', this.selectedRoleEdit.id);
+            }
+            else {
+                formData.append('parent_id', "")
+            }
+            let response = await postApiData({ url: '/api/roles/'+this.selectedItem.id, form_data: formData, token: this.getToken() });
             if (response.success) {
                 if(this.filterDepartment){
                     this.filterDepartmentChange();
@@ -497,7 +570,7 @@ export default {
     mounted() {
 
         this.getRolesList(1);
-
+        this.getParentRoleList();
         this.getDepartmentList();
         initTE({ Modal, Select, Ripple });
     }

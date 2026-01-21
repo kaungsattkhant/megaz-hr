@@ -33,4 +33,6 @@ interface InventoryRepositoryInterface
     public function getInventoryClosingItems($request);
 
     public function pushDataInventory($request);
+
+    public function createInventoryOpening($request);   
 }

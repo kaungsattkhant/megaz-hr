@@ -346,10 +346,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $staffTimeShiftId = $requestData['staff_timeshift_id'];
       $today = Carbon::today();
       $currentDate = Carbon::parse(now());
-      $authUser=UserData();
-      $checkInLateMin=$authUser->check_in_late_min;
-      $checkOutEarlyMin=$authUser->check_out_early_min;
-      $gpsAllowDistance=$authUser->gps_distance;
+      $authUser = UserData();
+      $checkInLateMin = $authUser->check_in_late_min;
+      $checkOutEarlyMin = $authUser->check_out_early_min;
+      $gpsAllowDistance = $authUser->gps_distance;
       $existingCheckIn = CheckIn::where('staff_id', $staffId)
         ->whereDate('check_in_date_time', $currentDate)
         ->where('time_shift_id', $timeShiftId)
@@ -412,14 +412,14 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $officeGps = $existShiftAssign?->timeshift?->gps;
 
       if (!$officeGps) {
-          ResponseData('Office GPS coordinates not found.', 422);
+        ResponseData('Office GPS coordinates not found.', 422);
       }
       $officeLat = $officeGps->latitude;
       $officeLng = $officeGps->longitude;
       // dd($userLat,$userLng,$officeLat,$officeLng);
       $distance = $this->haversineFormula($userLat, $userLng, $officeLat, $officeLng);
       if ($distance > $gpsAllowDistance) {
-        \ResponseMessage("Your are not within allow range in ($gpsAllowDistance) meter") ;
+        \ResponseMessage("Your are not within allow range in ($gpsAllowDistance) meter");
       }
       if (isset($requestData['check_in_photo'])) {
         $image = $requestData['check_in_photo'];
@@ -473,7 +473,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       }
       $earlyCheckOutAllowed = $toCarbon->copy()->subMinutes($checkOutEarlyMin);
       $now      = Carbon::now();
-      if($now->lt($earlyCheckOutAllowed)){
+      if ($now->lt($earlyCheckOutAllowed)) {
         \ResponseMessage("You cannot be checkout.Allow $earlyCheckOutAllowed");
       }
       if ($checkIn && $checkIn->is_current_checked_in) {

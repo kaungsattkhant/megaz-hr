@@ -35,6 +35,7 @@ class SupplierImport implements ToModel, WithHeadingRow, WithBatchInserts, WithC
             // if(!isset($row['supplier_code'])){
             //     dd($row);
             // }
+          
             if (!isset($row['name']) || $row['name'] === null || trim($row['name']) === '' || $row['supplier_ap_name']==null  || $row['supplier_code']==null) {
                 DB::rollback();
                 return null;
@@ -73,7 +74,7 @@ class SupplierImport implements ToModel, WithHeadingRow, WithBatchInserts, WithC
                     'account_id'            => $otherPayable->id,
                     'creditor_account_id'   => $creditor->id,
                     'name'                  => trim((string) $row['name']),
-                    'shop_name'             => $row['shop_name'],
+                    'shop_name'             => $row['shop_name']??null,
                     'address'               => $row['address'],
                     'email'                 => $row['email'],
                     'credit_limit'          => $row['credit_limit'],

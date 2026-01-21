@@ -93,7 +93,7 @@ class Staff extends Authenticatable implements AuditableContract
         return $this->personTokens()->pluck('fcm_token')->toArray();
     }
 
-     public function personTokens()
+    public function personTokens()
     {
         return $this->morphMany(PersonFcmToken::class, 'personable');
     }
@@ -134,6 +134,13 @@ class Staff extends Authenticatable implements AuditableContract
     {
         return $this->belongsToMany(Role::class);
     }
+
+    // returns Role model or null
+    public function primaryRole()
+    {
+        return $this->roles->first(); // or $this->roles()->orderBy('pivot_priority')->first()
+    }
+
 
     public function task_details()
     {

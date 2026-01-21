@@ -79,7 +79,7 @@ class StaffAPIController extends Controller
         ResponseData($staff);
     }
 
-    public function updateStaff(Request $request, $id)
+    public function updateStaff(StaffUpdateRequest $request, $id)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
 
