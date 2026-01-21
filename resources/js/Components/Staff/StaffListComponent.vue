@@ -24,7 +24,7 @@
                         </select>
                     </div>
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Type" @change="searchRoleChange()"
+                        <select data-te-select-init data-te-select-placeholder="Select Role" @change="searchRoleChange()"
                             data-te-select-filter="true" name="" id="" v-model="searchRole" class="input-ui">
                             <option :value="role" v-for="(role, roleIndex) in searchRoleList"
                                 :key="roleIndex"> {{ role.name }} </option>

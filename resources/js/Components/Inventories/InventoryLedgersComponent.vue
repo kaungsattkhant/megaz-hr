@@ -24,7 +24,7 @@
                     </div>
 
                 </div>
-                <div>
+                <div class="flex gap-x-4">
 
                     <div class="w-full !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
@@ -32,6 +32,9 @@
                             <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
                                 :key="inventoryIndex"> {{ inventory.name }} </option>
                         </select>
+                    </div>
+                    <div class="pt-1">
+                        <a href="/inventory_stocks/opening" class="add-btn text-[13px]"> Add </a>
                     </div>
         
                 </div>
