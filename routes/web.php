@@ -298,6 +298,7 @@ Route::middleware(['departments:pos-ar'])->group(function () {
 
 Route::middleware(['departments:inventory-stock'])->group(function () {
     Route::view('/inventory_stocks', 'inventory_stocks.index')->name('inventory_stocks.index');
+    Route::view('/inventory_stocks/opening', 'inventory_stocks.inventory_opening')->name('inventory_stocks.inventory_opening');
 });
 
 Route::middleware(['departments:package'])->group(function () {

@@ -25,6 +25,7 @@
                             data-te-select-placeholder="Filter by category"
                             data-te-select-filter="true"
                             v-model="searchCategory"
+                            @change="searchCategoryChanged()"
                         >
                             <option
                                 :value="category"
@@ -540,7 +541,9 @@ export default {
                 this.totalData = response.data.total;
             }
         },
-
+        searchCategoryChanged(){
+            this.getMenuList(1);
+        },
         isActiveToggled(id) {
             let index = this.menuList.findIndex((menu) => menu.id == id);
             if (index != -1) {
