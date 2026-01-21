@@ -79,7 +79,12 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function getAllItem($request)
     {
-        return Item::withoutGlobalScope(WithAveragePriceScope::class)->orderBy('id', 'desc')->get();
+        $query= Item::withoutGlobalScope(WithAveragePriceScope::class)->with(['base_uom','uom'])->orderBy('id', 'desc');
+        if ($request->per_page || $request->page) {
+            return $query->paginate(config('common.list_count'));
+        } else {
+            return $query->get();
+        }
     }
 
     public function equipmentItem(Request $request)

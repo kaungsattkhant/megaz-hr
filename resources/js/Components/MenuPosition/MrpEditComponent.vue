@@ -1,6 +1,6 @@
 <template>
     <div class="px-0">
-        
+
 
         <div class="grid !grid-cols-12 gap-x-8 gap-y-2 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-12">
@@ -835,7 +835,13 @@ export default {
             this.itemUoms = [];
             let response = await getApiData({ url: `/api/items?category_id=${this.selectedItemCategory.id}`, token: this.getToken() });
             if (response.data) {
-                this.itemList = response.data;
+                this.itemList = [];
+                response.data.forEach(item => {
+                    if(item.is_active == 1){
+                        this.itemList.push(item);
+                    }
+                });
+                // this.itemList = response.data;
             }
         },
 

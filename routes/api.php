@@ -510,7 +510,7 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('catering/target_actual_menu_sales', 'getMenuSales');
         Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
-        Route::get('cashflows', 'getBudgetAccountsCashflow');
+        // Route::get('cashflows', 'getBudgetAccountsCashflow');
     });
     // Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
 
@@ -754,3 +754,5 @@ Route::controller(TagController::class)->group(function () {
 });
 
 Route::get("/test-notification", [TestController::class, "testNotification"]);
+
+// Route::get('cashflows', 'getBudgetAccountsCashflow');
