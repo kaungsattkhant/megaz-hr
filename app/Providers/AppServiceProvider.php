@@ -72,6 +72,8 @@ class AppServiceProvider extends ServiceProvider
             'staff_equipment_handover_item' => 'App\Models\StaffEquipmentHandoverItem',
             'lost_item' => 'App\Models\LostItem',
             'pack' => 'App\Models\Pack',
+            'objective_staff' => 'App\Models\ObjectiveStaff',
+            'objective_assign' => 'App\Models\ObjectiveAssign',
         ]);
     }
 }

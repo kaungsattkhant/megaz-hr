@@ -38,4 +38,8 @@ class ObjectiveAssign extends Model
     {
         return $this->hasMany(ObjectiveStaff::class, 'objective_assign_id');
     }
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
+    }
 }

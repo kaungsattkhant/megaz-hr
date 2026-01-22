@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Objective;
 
-use App\Http\Resources\Admin\Okr\OkrByStaffResource;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Item;
@@ -32,10 +31,12 @@ use App\Http\Resources\KtvObjectiveRsource;
 use App\Http\Resources\dailyObjectiveByStaffId;
 use App\Http\Resources\DailyObjKeyStaffResource;
 use App\Http\Resources\KtvProductTreeEditResource;
+use App\Http\Resources\Admin\Okr\OkrByStaffResource;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class ObjectiveRepository implements ObjectiveInterface
 {
-
+    use FcmSendNotification;
     public function dashboardOkr($request)
     {
         $from_date = isset($request->from_date) ? convertDateFormat($request->from_date) : null;
@@ -211,7 +212,6 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function storeAssignDutiesByObjectives($validatedData)
     {
-        // dd($validatedData);
         DB::beginTransaction();
         try {
             if (isset($validatedData['okr_assign'])) {
@@ -219,6 +219,11 @@ class ObjectiveRepository implements ObjectiveInterface
                 if (!is_array($okrAssigns)) {
                     return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
                 }
+                $staffIds = collect($okrAssigns)
+                    ->pluck('staff_id')
+                    ->filter()      // remove null/empty
+                    ->values()
+                    ->toArray();
                 foreach ($okrAssigns as $okrAssign) {
                     $objective = Objective::findOrFail($okrAssign['objective_id']);
                     $objectiveAssign = ObjectiveAssign::create([
@@ -233,8 +238,15 @@ class ObjectiveRepository implements ObjectiveInterface
                             'objective_assign_id' => $objectiveAssign->id,
                         ]
                     );
-                    // dd($objectiveAssign);
+                    // dd($objectiveStaff);
+                    $notificationData = [
+                        'title' => 'OKR Assigned',
+                        'preview' => 'A New Okr Assigned to you.',
+                    ];
+                    $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
                 }
+             
+
             }
             DB::commit();
             return $objectiveStaff;
