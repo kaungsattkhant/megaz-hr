@@ -1,7 +1,7 @@
 <template>
     
     <div class="margin-bg">
-        <div class="card-shadow">
+        <div class="card-shadow pb-4">
             <div>
                 <p class=" page-title">
                     Inventory Stocks
@@ -137,6 +137,12 @@
                 <button class=" add-btn" @click="btnClickedCreateInventoryOpening()">
                     Create
                 </button>
+                <LoadingButton
+                    :loading="buttonLoading"
+                    text="Createasdf"
+                    loadingText="Creating..."
+                    @onClick="btnClickedCreateInventoryOpening()"
+                />
             </div>
 
 
@@ -158,10 +164,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import 'tw-elements';
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -235,6 +243,8 @@ export default {
             this.createInventoryOpening();
         },
         async createInventoryOpening(){
+
+            this.buttonLoading = true;
             console.log('items type:', Array.isArray(this.selectedData.items));
             console.log('items type with json:', Array.isArray(JSON.stringify(this.selectedData.items)));
             let formData = new FormData();
@@ -263,11 +273,11 @@ export default {
                     type: 'info'
                 });
                 this.getInventoryLegderList(1);
-                document.getElementById('close_add_minimum_modal').click();
-                this.base_min_amount = 0;
-                this.min_amount = 0;
+                this.buttonLoading = false
+
             }
             else{
+                this.buttonLoading = false
                 this.$notify({
                     text: response.message,
                     type: 'info'
