@@ -14,6 +14,7 @@ use App\Models\Training;
 use App\Models\Department;
 use App\Models\Participant;
 use App\Models\Notification;
+use App\Models\ObjectiveStaff;
 use App\Models\StaffTimeshift;
 use App\Models\NotificationUser;
 use Illuminate\Support\Facades\DB;
@@ -1104,7 +1105,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getallNoties($request, $staffId)
   {
     $type = $request->query('type');
-    $validTypes = ['meeting', 'training', 'warning', 'orgNew', 'staff_timeshift', 'staff_equipment_handover'];
+    $validTypes = ['objective_staff', 'meeting', 'training', 'warning', 'orgNew', 'staff_timeshift', 'staff_equipment_handover'];
 
     $filterTypes = ($type && in_array($type, $validTypes))
       ? [$type]              // filter by requested type
@@ -1161,12 +1162,25 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     // return ResponseData(NotificationUserResource::collection($filteredNotifications), 200, true, "Notifications retrieved successfully.");
 
     //optimize version with one query 
+    // dd(Relation::getMorphedModel('objective_staff'));
+    // dd(NotificationUser::latest()->first()->notification->notificationable);
+    $test = NotificationUser::with('notification')
+      ->latest()
+      ->first();
+    // dd(
+    //   $test->notification->notificationable_type,
+    //   get_class($test->notification->notificationable)
+    // );
     $notificationUsers = NotificationUser::with([
       'notification' => function ($query) {
         $query->with([
           'notificationable' => function ($morphQuery) {
             //meeting
             $morphQuery->morphWith([
+
+              Relation::morphMap([
+                'objective_staff' => ObjectiveStaff::class,
+              ]),
               Relation::getMorphedModel('meeting') ?? 'meeting' => [
                 'participants',
                 'participants.department.roles',
@@ -1215,6 +1229,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
                 'staffTimeshift.timeshift.shift',
                 'staffTimeshift.area',
               ],
+              //Objective Staff
+
             ]);
           }
         ]);
@@ -1226,7 +1242,21 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       })
       ->orderByDesc('id')
       ->paginate(config('common.list_count'));
-    return ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
+    // $notificationUsers->getCollection()->transform(function ($item) {
+    //   $notification = $item->notification;
+
+    //   if (!$notification) return $item;
+
+    //   if ($notification->notificationable_type === 'objective_staff') {
+    //     $model = \App\Models\ObjectiveStaff::find($notification->notificationable_id);
+
+    //     // 👇 THIS makes Laravel think it's eager-loaded
+    //     $notification->setRelation('notificationable', $model);
+    //   }
+
+    //   return $item;
+    // });
+    ResponseData(NotificationUserResource::collection($notificationUsers), 200, true, "Notifications retrieved successfully.");
   }
 
   public function getMeetingsByStaffId($staffId, $request)

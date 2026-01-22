@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Objective;
+use App\Models\Notification;
 use App\Models\ObjectiveAssign;
 use App\Models\CompletedObjectiveKey;
 use Illuminate\Database\Eloquent\Model;
@@ -50,5 +51,9 @@ class ObjectiveStaff extends Model
     public function completedObjectiveKeys()
     {
         return $this->hasMany(CompletedObjectiveKey::class, 'objective_staff_id');
+    }
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
     }
 }

@@ -14,6 +14,8 @@ interface MaterialRequirementsPlanningInterface
 
   public function updateMrpList($menuId, $validatedData);
 
+  public function createMenuCategory($data);
+  
   public function menuToggle($menuId, $validatedData);
 
   public function getMenuStepList($menuStepId);

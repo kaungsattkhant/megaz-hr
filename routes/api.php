@@ -449,6 +449,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/remarks', 'getRemarks');
         Route::post('/remarks', 'createRemark');
         Route::get('/sale-reports', 'saleReport');
+        Route::post('menu_categories','createMenuCategory');
     });
 
     Route::controller(CreditorController::class)->group(function () {
