@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MRP\MrpStoreRequest;
 use App\Http\Requests\MRP\MenuToggleRequest;
 use App\Http\Requests\Menu\StoreRemarkRequest;
+use App\Http\Requests\Admin\CreateMenuCategoryRequest;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 
 class MaterialRequirementsPlanningAPIController extends Controller
@@ -33,6 +34,12 @@ class MaterialRequirementsPlanningAPIController extends Controller
     {
 
         $data = $this->MaterialRequirementsPlanningRepository->showMrpList($menuId, $request);
+        ResponseData($data);
+    }
+
+    public function createMenuCategory(CreateMenuCategoryRequest $request)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->createMenuCategory($request->all());
         ResponseData($data);
     }
 

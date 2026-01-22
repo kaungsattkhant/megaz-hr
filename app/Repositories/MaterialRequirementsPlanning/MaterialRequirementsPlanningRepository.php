@@ -165,19 +165,19 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
       'menuSteps.menuStepItem' => function ($q) {
-          $q->with(['item' => function ($qi) {
-                   $qi->where('items.is_active', 1);
-                }, 'uom']);
+        $q->with(['item' => function ($qi) {
+          $qi->where('items.is_active', 1);
+        }, 'uom']);
       },
       'subMenus.menuSteps' => function ($q) {
-          $q->with(['menuStepItem' => function ($qi) {
-                    $qi->with(['item' => function ($qii) {
-                       $qii->where('items.is_active', 1);
-                    }, 'uom']);
-                }]);
+        $q->with(['menuStepItem' => function ($qi) {
+          $qi->with(['item' => function ($qii) {
+            $qii->where('items.is_active', 1);
+          }, 'uom']);
+        }]);
       },
     ])
-    ->where('id', $menuId)
+      ->where('id', $menuId)
       ->where('is_active', 1)
       ->get();
   }
@@ -308,6 +308,33 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
     }
   }
 
+  public function createMenuCategory($data)
+  {
+    DB::beginTransaction();
+    try {
+      if (isset($data['image'])) {
+        $imageData = $data['image'];
+        $extension = $imageData->getClientOriginalExtension();
+        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+        $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
+        $data['image_url'] = Storage::url($data['image_path']);
+      }
+      $menuCategory = MenuCategory::updateOrCreate([
+        'id'=>$data['id'] ?? null
+      ],
+        [
+        'name' => $data['name'],
+        'image_path' => $data['image_path'] ?? null,
+        'image_url' => $data['image_url'] ?? null,
+      ]);
+      DB::commit();
+      ResponseData($menuCategory, 201, 'Menu Category created successfully!');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
 
   public function menuToggle($menuId, $validatedData)
   {
