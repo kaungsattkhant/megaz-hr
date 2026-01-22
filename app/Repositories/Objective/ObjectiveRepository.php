@@ -733,6 +733,11 @@ class ObjectiveRepository implements ObjectiveInterface
             ]);
             $deleteRejectedObjectiveKey = CompletedObjectiveKey::whereIn('objective_key_id', $data['reject_objective_keys'])
                 ->delete();
+            $notificationData = [
+                'title' => 'OKR Rejected',
+                'preview' => 'Rejected your OKR.',
+            ];
+            $this->sendFcmNotification($objectiveStaff, $objectiveStaff->objectiveAssign->staff, $notificationData);
             DB::commit();
             ResponseMessage('Objective rejected successfully', 200);
         } catch (\Exception $e) {
