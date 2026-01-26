@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
 use App\Http\Action\SendNotification\FcmSendNotification;
 use App\Models\DayInOffDay;
+use App\Models\User;
 
 class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
 {
@@ -219,22 +220,34 @@ class StaffTimeShiftRepository implements StaffTimeShiftRepositoryInterface
                     'confirmed_by' => UserData()->id,
                     'confirmed_at' => now(),
                 ]);
-                $this->sendShiftStatusNotificationToAdmin($staffTimeshift, $data['status']);
+                $parentRoleId = UserData()->primaryRole()->parent_id;
+                $parentStaff = Staff::whereHas('roles', function ($query) use ($parentRoleId) {
+                    $query->where('roles.id', $parentRoleId);
+                })->get();
+                $notiData = [
+                    'title'     => 'Shift Confirmed',
+                    'date_time' => now()->format('Y-m-d H:i:s'),
+                    'preview'   => " Shift Confirmed by {$staffTimeshift->staff->name} for the assigned {$staffTimeshift->timeshift->shift->name} ",
+                ];
+                $this->sendFcmNotification($staffTimeshift, $parentStaff, $notiData);
             }
             if ($data['status'] === "cancelled") {
                 $staffTimeshift->update([
                     'cancelled_by' => UserData()->id,
                     'cancelled_at' => now(),
                 ]);
-                $this->sendShiftStatusNotificationToAdmin($staffTimeshift, $data['status']);
-
-                $hrManagers = Staff::staffByDepartmentName('HR','Manager');
+                // $this->sendShiftStatusNotificationToAdmin($staffTimeshift, $data['status']);
+                // dd(UserData()->primaryRole()->parent_id);
+                $parentRoleId=UserData()->primaryRole()->parent_id;
+                $parentStaff = Staff::whereHas('roles', function ($query) use ($parentRoleId) {
+                    $query->where('roles.id', $parentRoleId);
+                })->get();
                 $notiData = [
                     'title'     => 'Shift Cancelled',
                     'date_time' => now()->format('Y-m-d H:i:s'),
-                    'preview'   => "{$staffTimeshift->staff->name} cancelled the shfit assigned to him/her",
+                    'preview'   => "{$staffTimeshift->staff->name} cancelled the assigned shift {$staffTimeshift->timeshift->shift->name} ",
                 ];
-                $this->sendFcmNotification($staffTimeshift, $hrManagers, $notiData);
+                $this->sendFcmNotification($staffTimeshift, $parentStaff, $notiData);
             }
             DB::commit();
             ResponseData($staffTimeshift, 201);

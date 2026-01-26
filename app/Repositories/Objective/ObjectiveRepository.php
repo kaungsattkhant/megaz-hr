@@ -141,7 +141,6 @@ class ObjectiveRepository implements ObjectiveInterface
         $objective = Objective::with('objectiveKeys')->findOrFail($objId);
         // $objective->objectiveKeys()->delete();
         $objective->objectiveKeys()->forceDelete();
-
         // $objective->delete();
         $objective->forceDelete();
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\Report;
 
 use App\Models\Area;
@@ -16,14 +17,14 @@ class ReportRepository implements ReportInterface
         $areaType = $request->area_type ?? null;
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
         $results = DB::table('bar_monthly_sale')
-            ->select('year','month_name', 'area_type', 'cooking_area_type', DB::raw('SUM(total) as amount'))
-            ->when(isset($areaType), function($query) use ($areaType) {
+            ->select('year', 'month_name', 'area_type', 'cooking_area_type', DB::raw('SUM(total) as amount'))
+            ->when(isset($areaType), function ($query) use ($areaType) {
                 return $query->where('area_type', $areaType);
             })
-            ->groupBy('year','month_name', 'area_type', 'cooking_area_type')
+            ->groupBy('year', 'month_name', 'area_type', 'cooking_area_type')
             ->get()
             ->groupBy('month_name')
-            ->map(function($items) {
+            ->map(function ($items) {
                 $firstItem = $items->first();
                 return [
                     'year' => $firstItem->year,
@@ -34,9 +35,9 @@ class ReportRepository implements ReportInterface
                 ];
             });
 
-        return $months->map(function($month) use ($request, $results) {
+        return $months->map(function ($month) use ($request, $results) {
             $monthData = $results->get($month);
-            if(!$monthData){
+            if (!$monthData) {
                 return [
                     'month_name' => $month,
                     'area_type' => '',
@@ -145,50 +146,50 @@ class ReportRepository implements ReportInterface
     {
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
         $results = DB::table('target_actual_monthly_menu_sales as tamms')
-        ->join('menus as mn', 'tamms.menu_id', '=', 'mn.id')
-        ->join('areas as ar', 'tamms.area_id', '=', 'ar.id')
-        ->select(
-            'tamms.id as target_id',
-            'tamms.year as target_year',
-            'tamms.month_number as target_month_number',
-            'tamms.month_name as target_month_name',
-            'tamms.menu_id as target_menu_id',
-            'mn.name as menu_name',
-            'ar.name as area_name',
-            'tamms.target_quantity as target_qty',
-            'tamms.actual_quantity as actual_qty',
-            'tamms.target_sales_amount as target_amount',
-            'tamms.actual_sales_amount as actual_amount',
-            'tamms.achieved_percentage as percentage_hit'
-        )
-        ->where('tamms.year', $request->year?? now()->year)
-        ->where(function ($query) use ($request) {
-            if($request->month_name)
-                $query->where('tamms.month_name', $request->month_name);
-            if($request->month)
-                $query->where('tamms.month_number', $request->month);
-        })
-        ->get();
+            ->join('menus as mn', 'tamms.menu_id', '=', 'mn.id')
+            ->join('areas as ar', 'tamms.area_id', '=', 'ar.id')
+            ->select(
+                'tamms.id as target_id',
+                'tamms.year as target_year',
+                'tamms.month_number as target_month_number',
+                'tamms.month_name as target_month_name',
+                'tamms.menu_id as target_menu_id',
+                'mn.name as menu_name',
+                'ar.name as area_name',
+                'tamms.target_quantity as target_qty',
+                'tamms.actual_quantity as actual_qty',
+                'tamms.target_sales_amount as target_amount',
+                'tamms.actual_sales_amount as actual_amount',
+                'tamms.achieved_percentage as percentage_hit'
+            )
+            ->where('tamms.year', $request->year ?? now()->year)
+            ->where(function ($query) use ($request) {
+                if ($request->month_name)
+                    $query->where('tamms.month_name', $request->month_name);
+                if ($request->month)
+                    $query->where('tamms.month_number', $request->month);
+            })
+            ->get();
 
         return $results;
     }
 
     public function getDailyAreaSalesVolumeByStaff($request)
     {
-        if(!$request->start_date){
+        if (!$request->start_date) {
             ResponseMessage('start_date must be provided', 400);
         }
-        if(!$request->end_date){
+        if (!$request->end_date) {
             ResponseMessage('end_date must be provided', 400);
         }
-        $areaId = $request->area_id?? Area::where('name','like','%Sky%')->first()->id;
+        $areaId = $request->area_id ?? Area::where('name', 'like', '%Sky%')->first()->id;
 
         $results = DB::table('daily_area_sales_volume_by_staff as dasvs')
-        ->join('staff as st', 'dasvs.staff_id', '=', 'st.id')
-        ->join('areas as ar', 'dasvs.area_id', '=', 'ar.id')
-        ->whereBetween('dasvs.work_date', [$request->start_date, $request->end_date])
-        ->where('dasvs.area_id',$areaId)
-        ->selectRaw('
+            ->join('staff as st', 'dasvs.staff_id', '=', 'st.id')
+            ->join('areas as ar', 'dasvs.area_id', '=', 'ar.id')
+            ->whereBetween('dasvs.work_date', [$request->start_date, $request->end_date])
+            ->where('dasvs.area_id', $areaId)
+            ->selectRaw('
             dasvs.id AS target_id,
             dasvs.year AS target_year,
             dasvs.month_number AS target_month_number,
@@ -201,7 +202,7 @@ class ReportRepository implements ReportInterface
             COALESCE(SUM(dasvs.total_pax), 0) AS total_pax,
             COALESCE(SUM(dasvs.per_pax), 0) AS total_per_pax
         ')
-        ->groupByRaw('
+            ->groupByRaw('
             dasvs.work_date,
             dasvs.staff_id,
             st.name,
@@ -212,9 +213,9 @@ class ReportRepository implements ReportInterface
             dasvs.month_name,
             dasvs.id
         ')
-        ->orderBy('dasvs.work_date')
-        ->orderBy('st.name')
-        ->get();
+            ->orderBy('dasvs.work_date')
+            ->orderBy('st.name')
+            ->get();
 
         return $results;
     }
@@ -226,15 +227,15 @@ class ReportRepository implements ReportInterface
 
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
         $query = DB::table('kitchen_monthly_sales')
-            ->select('year','month_name', 'area_type', 'cooking_area_type', DB::raw('SUM(total_kitchen_sale) as total_kitchen_sale'))
+            ->select('year', 'month_name', 'area_type', 'cooking_area_type', DB::raw('SUM(total_kitchen_sale) as total_kitchen_sale'))
             ->where('year', $year);
-            if(isset($areaType)){
-                $query->where('area_type', $areaType);
-            }
-            $results = $query->groupBy('year','month_name', 'area_type', 'cooking_area_type')
+        if (isset($areaType)) {
+            $query->where('area_type', $areaType);
+        }
+        $results = $query->groupBy('year', 'month_name', 'area_type', 'cooking_area_type')
             ->get()
             ->groupBy('month_name')
-            ->map(function($items) {
+            ->map(function ($items) {
                 $firstItem = $items->first();
                 return [
                     'year' => $firstItem->year,
@@ -245,9 +246,9 @@ class ReportRepository implements ReportInterface
                 ];
             });
 
-        return $months->map(function($month) use ($request, $results) {
+        return $months->map(function ($month) use ($request, $results) {
             $monthData = $results->get($month);
-            if(!$monthData){
+            if (!$monthData) {
                 return [
                     'month_name' => $month,
                     'area_type' => '',
@@ -286,68 +287,68 @@ class ReportRepository implements ReportInterface
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
         $menuItems = DB::table('monthly_kitchen_menus')
             ->where('year', $year)
-            ->when($areaType, function($query) use ($areaType) {
+            ->when($areaType, function ($query) use ($areaType) {
                 return $query->where('area_type', $areaType);
             })
             ->select('menu_name')
             ->distinct()
             ->pluck('menu_name');
-            $result = $menuItems->map(function($menuName) use ($year, $areaType) {
-                $menuData = [
-                    'menu_name' => $menuName
-                ];
-                $monthlyData = DB::table('monthly_kitchen_menus')
-                    ->where('year', $year)
-                    ->where('menu_name', $menuName)
-                    ->when($areaType, function($query) use ($areaType) {
-                        return $query->where('area_type', $areaType);
-                    })
-                    ->get()
-                    ->keyBy('month_name');
-                foreach(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $month) {
-                    $menuData[$month] = $monthlyData->get($month)->total_menu_sale ?? 0;
-                }
+        $result = $menuItems->map(function ($menuName) use ($year, $areaType) {
+            $menuData = [
+                'menu_name' => $menuName
+            ];
+            $monthlyData = DB::table('monthly_kitchen_menus')
+                ->where('year', $year)
+                ->where('menu_name', $menuName)
+                ->when($areaType, function ($query) use ($areaType) {
+                    return $query->where('area_type', $areaType);
+                })
+                ->get()
+                ->keyBy('month_name');
+            foreach (['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $month) {
+                $menuData[$month] = $monthlyData->get($month)->total_menu_sale ?? 0;
+            }
 
-                return $menuData;
-            });
+            return $menuData;
+        });
 
-            return $result;
+        return $result;
     }
 
     public function getBudgetAccountsCashflow(Request $request)
     {
-        $yearMonth = explode("-",$request->month);
+        $yearMonth = explode("-", $request->month);
         $year = $yearMonth[0];
         $month = $yearMonth[1];
         $start = Carbon::create($year, $month, 1);
         $end   = $start->copy()->endOfMonth();
 
         $raw = DB::table('budget_accounts as ba')
-        ->selectRaw('
+            ->selectRaw('
             a.id AS account_id,
             a.name AS account,
             bp.priority,
             DATE(ba.date) AS day,
             SUM(ba.amount) AS total
         ')
-        ->join('budget_priorities as bp', 'bp.id', '=', 'ba.budget_priority_id')
-        ->join('accounts as a', function($j){
-            $j->on('a.id', '=', 'ba.sub_account_id')
-            ->where('ba.sub_account_type', 'account');
-        })
-        ->where('ba.status','confirmed')
-        ->whereBetween('ba.date', [$start, $end])
-        ->groupBy('a.id', 'a.name', 'bp.priority', 'day')
-        ->orderBy('bp.priority')
-        ->orderBy('a.name')
-        ->get();
+            ->join('budget_priorities as bp', 'bp.id', '=', 'ba.budget_priority_id')
+            ->join('accounts as a', function ($j) {
+                $j->on('a.id', '=', 'ba.sub_account_id')
+                    ->where('ba.sub_account_type', 'account');
+            })
+            ->where('ba.status', 'confirmed')
+            ->whereBetween('ba.date', [$start, $end])
+            ->groupBy('a.id', 'a.name', 'bp.priority', 'day')
+            ->orderBy('bp.priority')
+            ->orderBy('a.name')
+            ->get();
 
         $dates = collect(
             new DatePeriod($start, new DateInterval('P1D'), $end->copy()->addDay())
         )->map(fn($d) => $d->format('Y-m-d'));
 
         // Group by account_id + priority
-        $grouped = $raw->groupBy(function($row){
+        $grouped = $raw->groupBy(function ($row) {
             return $row->account_id . '-' . $row->priority;
         });
 
@@ -377,5 +378,11 @@ class ReportRepository implements ReportInterface
             $final[] = $entry;
         }
         return $final;
+    }
+
+    public function getSaleByArea($request)
+    { 
+        dd('area sale report');
+        // OrderItem::
     }
 }
