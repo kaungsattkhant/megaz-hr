@@ -22,6 +22,7 @@ use Maatwebsite\Excel\HeadingRowImport;
 use App\Services\AveragePriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Scopes\WithAveragePriceScope;
+use App\Models\Uom;
 use App\Repositories\PoOrder\PoOrderRepository;
 
 class ItemRepository implements ItemRepositoryInterface
@@ -426,33 +427,45 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function itemImport($request)
     {
+        DB::beginTransaction();
+        try {
 
-        $file = $request->file('item_import');
-        $headings = (new HeadingRowImport)->toArray($file);
-        $expectedHeadings = [
-            'name',
-            'code',
-            'category_code',
-            'item_type_code',
-            'base_uom_code',
-            'uom_code',
-            // 'min_holding_base_uom_quantity',
-            'min_holding_uom_quantity',
-            'limitation_type',
-            'amount',
-            // 'max_limit_base_uom_quantity',
-            'max_limit_uom_quantity',
-        ];
-        $actualHeadings = $headings[0][0];
-        foreach ($expectedHeadings as $heading) {
-            if (!in_array($heading, $actualHeadings)) {
-                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            $item = Item::where('items.id', '>', 0)->update([
+                'items.is_active' => 0
+            ]);
+            $file = $request->file('item_import');
+            $headings = (new HeadingRowImport)->toArray($file);
+            $expectedHeadings = [
+                'name',
+                'code',
+                'category_code',
+                'item_type_code',
+                'base_uom_code',
+                'uom_code',
+                // 'min_holding_base_uom_quantity',
+                'min_holding_uom_quantity',
+                'limitation_type',
+                'amount',
+                // 'max_limit_base_uom_quantity',
+                'max_limit_uom_quantity',
+            ];
+            $actualHeadings = $headings[0][0];
+            foreach ($expectedHeadings as $heading) {
+                if (!in_array($heading, $actualHeadings)) {
+                    return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+                }
             }
+            $itemService = new ItemService();
+            $import = new ItemsImport($itemService);
+            $import->import($file);
+            DB::commit();
+            ResponseMessage('Import Successfully', 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
         }
-        $itemService = new ItemService();
-        $import = new ItemsImport($itemService);
-        $import->import($file);
-        ResponseMessage('Import Successfully', 200);
+        
     }
 
     public function brandlistOfSupplierByItem($itemId)
