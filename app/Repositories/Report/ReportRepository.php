@@ -2,13 +2,14 @@
 
 namespace App\Repositories\Report;
 
-use App\Models\Area;
-use App\Models\OrderItem;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use DatePeriod;
 use DateInterval;
+use App\Models\Area;
+use App\Models\OrderItem;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReportRepository implements ReportInterface
 {
@@ -381,8 +382,57 @@ class ReportRepository implements ReportInterface
     }
 
     public function getSaleByArea($request)
-    { 
-        dd('area sale report');
-        // OrderItem::
+    {
+
+        $date = Carbon::parse($request->date);
+        $currentMonth=$date->month;
+        $currentYear = $date->year;
+        $months = collect(range(1, $currentMonth))->map(function ($m) use ($currentYear) {
+            $date = Carbon::create($currentYear, $m, 1);
+
+            return [
+                'month'      => $date->format('m'),   // 01, 02, ...
+                'month_name' => $date->format('M'),   // Jan, Feb, ...
+                'year'       => $date->format('Y'),   // 2025
+            ];
+        });
+        $rows = DB::table('sale_by_area')
+            ->join('menus', 'sale_by_area.menu_id', '=', 'menus.id')
+            ->selectRaw('
+        menus.id as menu_id,
+        menus.name as menu_name,
+        DATE_FORMAT(sale_by_area.date_time, "%m") as month,
+        DATE_FORMAT(sale_by_area.date_time, "%Y") as year,
+        SUM(sale_by_area.total_foc) as total_foc,
+        SUM(sale_by_area.total_sale_qty) as qty
+    ')
+            ->whereYear('sale_by_area.date_time', $currentYear)
+            ->whereMonth('sale_by_area.date_time', '<=', $currentMonth)
+            ->groupBy('menus.id', 'menus.name', 'month', 'year')
+            ->get();
+        $grouped = $rows->groupBy('menu_id')->map(function ($items) use ($months) {
+
+            $byMonth = $items->keyBy('month');
+
+            $data = $months->map(function ($tpl) use ($byMonth) {
+                $row = $byMonth->get($tpl['month']);
+
+                return [
+                    'month'      => $tpl['month'],
+                    'month_name' => $tpl['month_name'],
+                    'year'       => $tpl['year'],
+                    'total_foc'  => $row ? (int) $row->total_foc : 0,
+                    'qty'        => $row ? (int) $row->qty : 0,
+                ];
+            });
+
+            return [
+                'name' => $items->first()->menu_name,
+                'data' => $data->values(),
+            ];
+        })->values();
+
+
+        return $grouped;
     }
 }

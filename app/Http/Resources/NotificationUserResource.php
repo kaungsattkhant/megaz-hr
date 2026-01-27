@@ -31,7 +31,6 @@ class NotificationUserResource extends JsonResource
                 // 'notifiationable'=> $this->notification->notificationable,
                 'notification' => new NotificationResource($this->notification),
                 // 'notification' => $this->whenLoaded('notificationable'),
-
             ];
     }
 }
