@@ -385,6 +385,7 @@ class ReportRepository implements ReportInterface
     {
 
         $date = Carbon::parse($request->date);
+        $sellingAreaId = $request->selling_area_id;
         $currentMonth=$date->month;
         $currentYear = $date->year;
         $months = collect(range(1, $currentMonth))->map(function ($m) use ($currentYear) {
@@ -396,11 +397,51 @@ class ReportRepository implements ReportInterface
                 'year'       => $date->format('Y'),   // 2025
             ];
         });
+        //     $rows = DB::table('sale_by_area')
+        //         ->join('menus', 'sale_by_area.menu_id', '=', 'menus.id')
+        //         ->selectRaw('
+        //     menus.id as menu_id,
+        //     menus.name as menu_name,
+        //     DATE_FORMAT(sale_by_area.date_time, "%m") as month,
+        //     DATE_FORMAT(sale_by_area.date_time, "%Y") as year,
+        //     SUM(sale_by_area.total_foc) as total_foc,
+        //     SUM(sale_by_area.total_sale_qty) as qty
+        // ')
+        //         ->whereYear('sale_by_area.date_time', $currentYear)
+        //         ->whereMonth('sale_by_area.date_time', '<=', $currentMonth)
+        //         ->where('sale_by_area.selling_area_id', $sellingAreaId)
+        //         ->groupBy('menus.id', 'menus.name', 'month', 'year')
+        //         ->get();
+        //     $grouped = $rows->groupBy('menu_id')->map(function ($items) use ($months) {
+
+        //         $byMonth = $items->keyBy('month');
+
+        //         $data = $months->map(function ($tpl) use ($byMonth) {
+        //             $row = $byMonth->get($tpl['month']);
+
+        //             return [
+        //                 'month'      => $tpl['month'],
+        //                 'month_name' => $tpl['month_name'],
+        //                 'year'       => $tpl['year'],
+        //                 'total_foc'  => $row ? (int) $row->total_foc : 0,
+        //                 'qty'        => $row ? (int) $row->qty : 0,
+        //             ];
+        //         });
+
+        //         return [
+        //             'name' => $items->first()->menu_name,
+        //             'data' => $data->values(),
+        //         ];
+        //     })->values();
+
         $rows = DB::table('sale_by_area')
             ->join('menus', 'sale_by_area.menu_id', '=', 'menus.id')
+            ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id')
             ->selectRaw('
-        menus.id as menu_id,
-        menus.name as menu_name,
+        menu_categories.id   as menu_category_id,
+        menu_categories.name as category_name,
+        menus.id        as menu_id,
+        menus.name      as menu_name,
         DATE_FORMAT(sale_by_area.date_time, "%m") as month,
         DATE_FORMAT(sale_by_area.date_time, "%Y") as year,
         SUM(sale_by_area.total_foc) as total_foc,
@@ -408,29 +449,47 @@ class ReportRepository implements ReportInterface
     ')
             ->whereYear('sale_by_area.date_time', $currentYear)
             ->whereMonth('sale_by_area.date_time', '<=', $currentMonth)
-            ->groupBy('menus.id', 'menus.name', 'month', 'year')
+            ->when($sellingAreaId, function ($query) use ($sellingAreaId) {
+                $query->where('sale_by_area.selling_area_id', $sellingAreaId);
+            })
+            ->groupBy('menu_categories.id', 'menu_categories.name', 'menus.id', 'menus.name', 'month', 'year')
             ->get();
-        $grouped = $rows->groupBy('menu_id')->map(function ($items) use ($months) {
 
-            $byMonth = $items->keyBy('month');
+        $grouped = $rows
+            ->groupBy('menu_category_id')
+            ->map(function ($categoryItems) use ($months) {
 
-            $data = $months->map(function ($tpl) use ($byMonth) {
-                $row = $byMonth->get($tpl['month']);
+                $categoryName = $categoryItems->first()->category_name;
+
+                $items = $categoryItems
+                    ->groupBy('menu_id')
+                    ->map(function ($menus) use ($months) {
+
+                        $byMonth = $menus->keyBy('month');
+
+                        $data = $months->map(function ($tpl) use ($byMonth) {
+                            $row = $byMonth->get($tpl['month']);
+
+                            return [
+                                'month'      => $tpl['month'],
+                                'month_name' => $tpl['month_name'],
+                                'year'       => $tpl['year'],
+                                'total_foc'  => $row ? (int) $row->total_foc : 0,
+                                'qty'        => $row ? (int) $row->qty : 0,
+                            ];
+                        });
+
+                        return [
+                            'name' => $menus->first()->menu_name,
+                            'data' => $data->values(),
+                        ];
+                    })->values();
 
                 return [
-                    'month'      => $tpl['month'],
-                    'month_name' => $tpl['month_name'],
-                    'year'       => $tpl['year'],
-                    'total_foc'  => $row ? (int) $row->total_foc : 0,
-                    'qty'        => $row ? (int) $row->qty : 0,
+                    'category_name' => $categoryName,
+                    'items'         => $items,
                 ];
-            });
-
-            return [
-                'name' => $items->first()->menu_name,
-                'data' => $data->values(),
-            ];
-        })->values();
+            })->values();
 
 
         return $grouped;

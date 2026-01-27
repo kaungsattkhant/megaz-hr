@@ -185,7 +185,6 @@ class NotificationableResource extends JsonResource
             $notificationable['end_date'] = $this->end_date;
             $notificationable['status'] = $this->status;
             $notificationable['okr_point'] = $this->okr_point;
-            // $notificationable['objective_assign'] = $this->id;
         }
 
         return $notificationable;

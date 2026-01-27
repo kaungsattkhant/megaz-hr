@@ -41,6 +41,7 @@ class ItemRepository implements ItemRepositoryInterface
     {
         $category_id = $request->category_id;
         $tag_id = $request->tag_id;
+        $isActive=$request->is_active;
         $searchInput = $request->search_input;
         return Item::with([
             'tag',
@@ -57,6 +58,9 @@ class ItemRepository implements ItemRepositoryInterface
             })
             ->when($tag_id, function ($q) use ($tag_id) {
                 $q->where('items.tag_id', $tag_id);
+            })
+            ->when(isset($request->is_active), function ($q) use ($isActive) {
+                $q->where('items.is_active', $isActive);
             })
             ->when($searchInput, function ($q) use ($searchInput) {
                 $q->where('items.name', 'LIKE', '%' . $searchInput . '%');
