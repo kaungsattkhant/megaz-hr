@@ -179,6 +179,14 @@ class NotificationableResource extends JsonResource
             $notificationable['status'] = $this->status ?? null;
             // $notificationable['handover_items'] = $this->staffEquipmentHandoverItems ?? [];
         }
+        if($this->notification->notificationable_type=== 'objective_staff'){
+            $notificationable['id'] = $this->id;
+            $notificationable['start_date'] = $this->start_date;
+            $notificationable['end_date'] = $this->end_date;
+            $notificationable['status'] = $this->status;
+            $notificationable['okr_point'] = $this->okr_point;
+            // $notificationable['objective_assign'] = $this->id;
+        }
 
         return $notificationable;
     }
