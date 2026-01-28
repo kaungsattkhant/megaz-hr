@@ -1025,7 +1025,7 @@ export default {
                 url = `${url}&tag_id=${this.searchTag.id}`;
             }
             if(this.isActive){
-                if(this.isActive = 'active'){
+                if(this.isActive === 'active'){
                     url = `${url}&is_active=1`;
                 }
                 else{
