@@ -50,6 +50,13 @@
                             </option>
                         </select>
                     </div>
+                    <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Filter by Active"
+                            data-te-select-filter="true" v-model="isActive">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
 
                     <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
                     <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
@@ -793,6 +800,9 @@ export default {
             feature: this.getFeature(),
 
             loading: true,
+
+            isActive: null,
+            searchUrl: null,
         };
     },
 
@@ -1014,6 +1024,14 @@ export default {
             if(this.searchTag){
                 url = `${url}&tag_id=${this.searchTag.id}`;
             }
+            if(this.isActive){
+                if(this.isActive = 'active'){
+                    url = `${url}&is_active=1`;
+                }
+                else{
+                    url = `${url}&is_active=0`;
+                }
+            }
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/items?search_input=${this.searchInput}&category_id=${this.searchCategory.id}&page=1`;
             // }
@@ -1034,6 +1052,7 @@ export default {
             this.searchInput = null;
             this.searchCategory = null;
             this.searchTag = null;
+            this.isActive = null;
             this.getItemList(1);
         },
         handleFileChange(event) {
