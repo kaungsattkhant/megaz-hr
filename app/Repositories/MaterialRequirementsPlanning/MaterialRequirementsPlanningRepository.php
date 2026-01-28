@@ -159,27 +159,35 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_category',
       'price',
       'menuPlaces.area',
-      'menuSteps.role.department',
-      'menuSteps.menuStepItem.item',
-      'menuSteps.menuStepItem.uom',
-      'subMenus.menuSteps.menuStepItem.item',
-      'subMenus.menuSteps.menuStepItem.uom',
-      'menuSteps.menuStepItem' => function ($q) {
-        $q->with(['item' => function ($qi) {
-          $qi->where('items.is_active', 1);
-        }, 'uom']);
+      // load menuSteps and only menuStepItems that have an existing item
+      'menuSteps' => function ($q) {
+        $q->with([
+          'role.department',
+          'menuStepItem' => function ($qi) {
+            $qi->whereHas('item') // ensure the related item exists
+               ->with([
+                 'item' => function ($qii) { $qii->where('items.is_active', 1); },
+                 'uom'
+               ]);
+          },
+        ]);
       },
+      // same for subMenus -> menuSteps -> menuStepItem
       'subMenus.menuSteps' => function ($q) {
-        $q->with(['menuStepItem' => function ($qi) {
-          $qi->with(['item' => function ($qii) {
-            $qii->where('items.is_active', 1);
-          }, 'uom']);
-        }]);
+        $q->with([
+          'menuStepItem' => function ($qi) {
+            $qi->whereHas('item')
+               ->with([
+                 'item' => function ($qii) { $qii->where('items.is_active', 1); },
+                 'uom'
+               ]);
+          },
+        ]);
       },
     ])
       ->where('id', $menuId)
       ->where('is_active', 1)
-      ->get();g
+      ->get();
   }
 
   public function updateMrpList($menuId, $validatedData)
