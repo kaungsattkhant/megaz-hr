@@ -30,7 +30,7 @@ class SaleByCategoryOfArea extends Command
     {
         //
         try{
-            Carbon::setTestNow(Carbon::parse('2025-06-21 00:00:00'));
+            Carbon::setTestNow(Carbon::parse('2026-01-29 00:00:00'));
             
             $currentDate = Carbon::parse(now())->subDays(1);
             $year = $currentDate->year;

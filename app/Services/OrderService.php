@@ -489,10 +489,11 @@ class OrderService
     public function getInventoryIdByCookingArea($cookingAreaId)
     {
         $inventoryId = DB::table('inventoryables')
+        ->join('inventories', 'inventoryables.inventory_id','inventories.id')
             ->where('inventoryable_type', 'area')
             ->where('inventoryable_id', $cookingAreaId)
+            ->where('is_active',1)
             ->value('inventory_id');
-
         if (!$inventoryId) {
             ResponseMessage('Inventory and Area are not related,pls check', 419);
         }
