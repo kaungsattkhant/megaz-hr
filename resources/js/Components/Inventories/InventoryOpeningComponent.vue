@@ -100,13 +100,20 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="w-full text-center">
+                    <div class="w-full text-center flex gap-x-4 justify-center">
                         <button
                             v-if="limit < primaryList.length"
                             @click="loadMore"
                             class="mt-4 px-4 py-2 text-sm underline underline-offset-2"
                         >
                             More
+                        </button>
+                        <button
+                            v-if="limit < primaryList.length"
+                            @click="showAll"
+                            class="mt-4 px-4 py-2 text-sm underline underline-offset-2"
+                        >
+                            Show All
                         </button>
                     </div>
                     <!-- pagination -->
@@ -133,13 +140,13 @@
 
             </div>
 
-            <div class="text-right px-8">
-                <button class=" add-btn" @click="btnClickedCreateInventoryOpening()">
+            <div class="text-right flex justify-end px-8">
+                <!-- <button class=" add-btn" @click="btnClickedCreateInventoryOpening()">
                     Create
-                </button>
+                </button> -->
                 <LoadingButton
                     :loading="buttonLoading"
-                    text="Createasdf"
+                    text="Create"
                     loadingText="Creating..."
                     @onClick="btnClickedCreateInventoryOpening()"
                 />
@@ -187,6 +194,7 @@ export default {
             limit: 20,
             
             loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -218,6 +226,9 @@ export default {
         loadMore() {
             this.limit += 20
         },
+        showAll(){
+            this.limit = this.primaryList.length
+        },
         btnClickedCreateInventoryOpening(){
             if(!this.selectedDate){
                 this.alertValidationMessage(`Date`);
@@ -229,7 +240,7 @@ export default {
             }
             this.selectedData.date = this.selectedDate
             this.primaryList.forEach(inventory => {
-                if(inventory.base_uom_quantity && inventory.uom_quantity){
+                if(inventory.base_uom_quantity || inventory.uom_quantity){
                     this.selectedData.items.push({
                         item_id: inventory.id,
                         inventory_id: this.selectedInventory.id,
@@ -272,16 +283,17 @@ export default {
                     text: `Success`,
                     type: 'info'
                 });
-                this.getInventoryLegderList(1);
-                this.buttonLoading = false
-
+                window.location.replace('/inventory_stocks')
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 300);
             }
             else{
-                this.buttonLoading = false
                 this.$notify({
                     text: response.message,
                     type: 'info'
                 });
+                this.buttonLoading = false
             }
         },
         
