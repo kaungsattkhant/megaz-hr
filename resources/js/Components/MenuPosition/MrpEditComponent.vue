@@ -788,13 +788,13 @@ export default {
                         id: item.id,
                         item_id: item.item_id,
                         menu_step_id: item.menu_step_id,
-                        price: item.item.average_price,
-                        name: item.item.name,
+                        price: item.item?.average_price,
+                        name: item.item?.name,
                         weight: item.weight,
                         uom_id: item.uom_id,
                         uom_name: item.uom.name,
                         uom_type: item.uom_type,
-                        uom_conversion: item.item.uom_conversion
+                        uom_conversion: item.item?.uom_conversion
                     });
                 })
                 this.testtestmenu = sampleMenuLevel
