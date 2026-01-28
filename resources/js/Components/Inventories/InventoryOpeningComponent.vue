@@ -1,7 +1,7 @@
 <template>
     
     <div class="margin-bg">
-        <div class="card-shadow">
+        <div class="card-shadow pb-4">
             <div>
                 <p class=" page-title">
                     Inventory Stocks
@@ -100,13 +100,20 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="w-full text-center">
+                    <div class="w-full text-center flex gap-x-4 justify-center">
                         <button
                             v-if="limit < primaryList.length"
                             @click="loadMore"
                             class="mt-4 px-4 py-2 text-sm underline underline-offset-2"
                         >
                             More
+                        </button>
+                        <button
+                            v-if="limit < primaryList.length"
+                            @click="showAll"
+                            class="mt-4 px-4 py-2 text-sm underline underline-offset-2"
+                        >
+                            Show All
                         </button>
                     </div>
                     <!-- pagination -->
@@ -133,10 +140,16 @@
 
             </div>
 
-            <div class="text-right px-8">
-                <button class=" add-btn" @click="btnClickedCreateInventoryOpening()">
+            <div class="text-right flex justify-end px-8">
+                <!-- <button class=" add-btn" @click="btnClickedCreateInventoryOpening()">
                     Create
-                </button>
+                </button> -->
+                <LoadingButton
+                    :loading="buttonLoading"
+                    text="Create"
+                    loadingText="Creating..."
+                    @onClick="btnClickedCreateInventoryOpening()"
+                />
             </div>
 
 
@@ -158,10 +171,12 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 import 'tw-elements';
 import TableSkeleton from "../Common/TableSkeleton.vue";
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        TableSkeleton
+        TableSkeleton,
+        LoadingButton
     },
     data() {
         return {
@@ -179,6 +194,7 @@ export default {
             limit: 20,
             
             loading: true,
+            buttonLoading: false,
         };
     },
 
@@ -210,6 +226,9 @@ export default {
         loadMore() {
             this.limit += 20
         },
+        showAll(){
+            this.limit = this.primaryList.length
+        },
         btnClickedCreateInventoryOpening(){
             if(!this.selectedDate){
                 this.alertValidationMessage(`Date`);
@@ -221,7 +240,7 @@ export default {
             }
             this.selectedData.date = this.selectedDate
             this.primaryList.forEach(inventory => {
-                if(inventory.base_uom_quantity && inventory.uom_quantity){
+                if(inventory.base_uom_quantity || inventory.uom_quantity){
                     this.selectedData.items.push({
                         item_id: inventory.id,
                         inventory_id: this.selectedInventory.id,
@@ -235,6 +254,8 @@ export default {
             this.createInventoryOpening();
         },
         async createInventoryOpening(){
+
+            this.buttonLoading = true;
             console.log('items type:', Array.isArray(this.selectedData.items));
             console.log('items type with json:', Array.isArray(JSON.stringify(this.selectedData.items)));
             let formData = new FormData();
@@ -262,16 +283,17 @@ export default {
                     text: `Success`,
                     type: 'info'
                 });
-                this.getInventoryLegderList(1);
-                document.getElementById('close_add_minimum_modal').click();
-                this.base_min_amount = 0;
-                this.min_amount = 0;
+                window.location.replace('/inventory_stocks')
+                setTimeout(() => {
+                    this.buttonLoading = false
+                }, 300);
             }
             else{
                 this.$notify({
                     text: response.message,
                     type: 'info'
                 });
+                this.buttonLoading = false
             }
         },
         
