@@ -509,15 +509,17 @@
                                 </td>
                             </tr>
                             <tr v-if="level.isShow" v-for="item in level.item_menu">
-                                <td>
-                                    {{ item.name }}
-                                </td>
-                                <td>
-                                    {{ item.weight }}
-                                </td>
-                                <td>
-                                    {{ item.uom_name }}
-                                </td>
+                                <div class="contents" v-if="item.name">
+                                    <td>
+                                        {{ item.name }}
+                                    </td>
+                                    <td>
+                                        {{ item.weight }}
+                                    </td>
+                                    <td>
+                                        {{ item.uom_name }}
+                                    </td>
+                                </div>
                             </tr>
                         </div>
                         <tr class="" v-for="(submenu, submenuIndex) in subMenuList"
