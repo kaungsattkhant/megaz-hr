@@ -394,6 +394,7 @@ export default {
 
             loading: true,
             buttonLoading: false,
+            page_number: 1,
         };
     },
 
@@ -416,8 +417,9 @@ export default {
         },
         async getRolesList(pageNumber) {
             this.loading = true;
-            console.log('loading');
-            const response = await getApiData({ url: `/api/roles?${this.department_url}page=${pageNumber}`, token: this.getToken() });
+            this.page_number = pageNumber;
+            console.log('page number' + this.page_number);
+            const response = await getApiData({ url: `/api/roles?${this.department_url}page=${this.page_number}`, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
                 this.roleList = response.data.data;
@@ -548,7 +550,7 @@ export default {
                         type: 'error'
                     });
                 }
-                this.getRolesList(1);
+                this.getRolesList(this.page_number);
             }
         },
         // deleteBtnClicked(id) {

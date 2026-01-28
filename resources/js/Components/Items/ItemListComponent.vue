@@ -58,8 +58,8 @@
                         </select>
                     </div>
 
-                    <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-                    <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+                    <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
+                    <button class="add-btn h-8" @click="clearSearchBtnClicked">Clear</button>
 
                 </div>
                 <div class="flex justify-end gap-x-4">
@@ -803,6 +803,8 @@ export default {
 
             isActive: null,
             searchUrl: null,
+            url: null,
+            page_number: 1,
         };
     },
 
@@ -816,7 +818,6 @@ export default {
                 type: "warn"
             });
         },
-
         updatePriceBtnClicked(itemId){
             let index = this.itemList.findIndex(item => item.id == itemId);
             if(index != -1){
@@ -824,7 +825,6 @@ export default {
                 this.updatedPrice = this.updatePriceItem.item_prices.price;
             }
         },
-
         async confirmUpdatePriceBtnClicked(){
             let formData = new FormData();
             formData.append('price', this.updatedPrice);
@@ -834,7 +834,6 @@ export default {
                 this.getItemList(1);
             }
         },
-
         async getItemCategoryList() {
             let url = `/api/categories`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -842,7 +841,6 @@ export default {
                 this.itemCategoryList = response.data;
             }
         },
-
         getItemTagList() {
             getApiData({ url: `/api/tags`, token: this.getToken() }).then((response)=>{
                 if(response.data){
@@ -850,7 +848,6 @@ export default {
                 }
             });
         },
-
         async getItemTypeList()
         {
             let url = `/api/get_item_type`;
@@ -867,8 +864,6 @@ export default {
                 this.brandList = response.data;
             }
         },
-
-
         async getUomList() {
             let url = `/api/uoms`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -878,8 +873,26 @@ export default {
         },
         async getItemList(pageNumber) {
             this.loading = true;
-            let url = `/api/items?page=${pageNumber}`;
-            let response = await getApiData({ url: url, token: this.getToken() });
+            this.url = '/api/items?page=' + pageNumber
+            // let url = `/api/items?page=${pageNumber}`;
+            if(this.searchInput){
+                this.url = `${this.url}&search_input=${this.searchInput}`;
+            }
+            if(this.searchCategory){
+                this.url = `${this.url}&category_id=${this.searchCategory.id}`;
+            }
+            if(this.searchTag){
+                this.url = `${this.url}&tag_id=${this.searchTag.id}`;
+            }
+            if(this.isActive){
+                if(this.isActive === 'active'){
+                    this.url = `${this.url}&is_active=1`;
+                }
+                else{
+                    this.url = `${this.url}&is_active=0`;
+                }
+            }
+            let response = await getApiData({ url: this.url, token: this.getToken() });
             if (response.data) {
                 this.loading = false;
                 this.itemList = response.data.data;
@@ -895,9 +908,6 @@ export default {
                 });
             }
         },
-
-
-
         async createBrand(){
             if(!this.brandName){
                 this.alertValiationMessage('Brand Name');
@@ -993,7 +1003,6 @@ export default {
                 });
             }
         },
-
         isActiveToggled(id) {
             let index = this.itemList.findIndex(table => table.id == id);
             if (index != -1) {
@@ -1011,27 +1020,26 @@ export default {
                 let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
             }
         },
-
-        async searchBtnClicked() {
-            this.loading = true;
-            let url = `/api/items?page=1`;
-            if(this.searchInput){
-                url = `${url}&search_input=${this.searchInput}`;
-            }
-            if(this.searchCategory){
-                url = `${url}&category_id=${this.searchCategory.id}`;
-            }
-            if(this.searchTag){
-                url = `${url}&tag_id=${this.searchTag.id}`;
-            }
-            if(this.isActive){
-                if(this.isActive === 'active'){
-                    url = `${url}&is_active=1`;
-                }
-                else{
-                    url = `${url}&is_active=0`;
-                }
-            }
+        async searchBtnClicked(pageNumber) {
+            // this.loading = true;
+            // this.url = '/api/items?page=' + pageNumber
+            // if(this.searchInput){
+            //     this.url = `${this.url}&search_input=${this.searchInput}`;
+            // }
+            // if(this.searchCategory){
+            //     this.url = `${this.url}&category_id=${this.searchCategory.id}`;
+            // }
+            // if(this.searchTag){
+            //     this.url = `${this.url}&tag_id=${this.searchTag.id}`;
+            // }
+            // if(this.isActive){
+            //     if(this.isActive === 'active'){
+            //         this.url = `${this.url}&is_active=1`;
+            //     }
+            //     else{
+            //         this.url = `${this.url}&is_active=0`;
+            //     }
+            // }
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/items?search_input=${this.searchInput}&category_id=${this.searchCategory.id}&page=1`;
             // }
@@ -1041,11 +1049,12 @@ export default {
             // if ((!this.searchInput) && this.searchCategory) {
             //     url = `/api/items?category_id=${this.searchCategory.id}&page=1`;
             // }
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.loading = false;
-                this.itemList = response.data.data;
-            }
+            // let response = await getApiData({ url: this.url, token: this.getToken() });
+            // if (response.data) {
+            //     this.loading = false;
+            //     this.itemList = response.data.data;
+            // }
+            this.getItemList(1)
         },
 
         clearSearchBtnClicked() {
