@@ -347,7 +347,7 @@ class InventoryRepository implements InventoryRepositoryInterface
             foreach($items as $itemData){
                 $item = Item::find($itemData['item_id']);
                 $inventoryId = $itemData['inventory_id'];
-                $quantity = ((float)$itemData['base_uom_quantity'] * $item->conversion) + (float)$itemData['uom_quantity'];
+                $quantity = ((float)$itemData['base_uom_quantity'] * $item->uom_conversion) + (float)$itemData['uom_quantity'];
                 $inventoryLedger = InventoryLedger::create([
                     'inventory_id' => $inventoryId,
                     'date' => $date,

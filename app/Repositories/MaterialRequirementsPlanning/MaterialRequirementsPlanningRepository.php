@@ -179,7 +179,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
     ])
       ->where('id', $menuId)
       ->where('is_active', 1)
-      ->get();
+      ->get();g
   }
 
   public function updateMrpList($menuId, $validatedData)
