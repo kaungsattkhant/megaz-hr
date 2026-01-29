@@ -937,14 +937,14 @@
                                     {{ foodDiscount > 0 ? '- ' : '' }} {{ foodDiscount }}
                                 </p>
                             </div>
-                            <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <!-- <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Package Discount
                                 </p>
                                 <p class=" w-28">
                                     {{ selectedRoom.invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.invoice.package.package_discount }}
                                 </p>
-                            </div>
+                            </div> -->
                             <div v-show="discount_type != 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Discount
@@ -986,6 +986,7 @@
                                             printInvoiceData.service_tax : 0) : 0)
                                         + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax : 0) :
                                     0) ).toLocaleString() }} MMKs
+                                        <!-- {{ printInvoiceData }} -->
                                 </p>
                             </div>
                             <div class="">
@@ -1649,7 +1650,7 @@
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <div class="relative  p-4">
                         <p class="text-xl w-full text-center">
-                            Add Accessory
+                            Add Accessory For Package
                         </p>
                         <button type="button" id="closeAccessoryModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -2433,12 +2434,13 @@
                 //         })
                 //     });
                 // }
+                // this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.foodDiscount;
                 if (this.selectedRoom.invoice.invoice_type == 'package') {
                     this.printInvoiceData.room = this.selectedRoom.invoice.total_session_price;
                     this.printInvoiceData.package_discount = this.selectedRoom.invoice.package.package_discount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.invoice.paid_amount
-                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.printInvoiceData.package_discount - this.foodDiscount;
+                    this.printInvoiceData.total = (this.selectedRoom.invoice.sub_total + this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.foodDiscount;
                 }
                 else {
                     this.isPackage = false;
@@ -2587,7 +2589,8 @@
                 }
             },
             discountChanged() {
-                let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.printInvoiceData.package_discount - this.foodDiscount
+                let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.foodDiscount
+                // let roomTotalAmount = this.selectedRoom.
                 console.log('room total = ' + this.printInvoiceData.room)
                 if (this.discount_type == 'percentage') {
                     this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
