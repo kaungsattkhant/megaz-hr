@@ -143,7 +143,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-
         DB::beginTransaction();
         try {
             // $sessionStartedTime = Carbon::parse($data['start_time'])->format('H:i');
@@ -270,6 +269,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             if (!$receptionistRole) {
                                 ResponseMessage('Reception Role Not found', 419);
                             }
+                            //currenty comment for broadcast
                             broadcast(new RoomNotificationRequest($customer, $entity, $invoice, UserData()->department_id, $order['order'], $order['orderItems']));
                         }
                     }
@@ -279,6 +279,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 if (!$data['is_waiter']) {
                     $waiterRole = Role::getRoleByName('Waiter');
                     $latestUpdatedEntity = Entity::find($entity->id);
+                    //currenty comment for broadcast
                     broadcast(new WaiterNotificationRequest($latestUpdatedEntity, $waiterRole->department_id));
                 }
                 //end

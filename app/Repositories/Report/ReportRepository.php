@@ -5,6 +5,8 @@ namespace App\Repositories\Report;
 use DatePeriod;
 use DateInterval;
 use App\Models\Area;
+use App\Models\Invoice;
+use App\Models\Package;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -386,7 +388,7 @@ class ReportRepository implements ReportInterface
 
         $date = Carbon::parse($request->date);
         $sellingAreaId = $request->selling_area_id;
-        $currentMonth=$date->month;
+        $currentMonth = $date->month;
         $currentYear = $date->year;
         $months = collect(range(1, $currentMonth))->map(function ($m) use ($currentYear) {
             $date = Carbon::create($currentYear, $m, 1);
@@ -493,5 +495,40 @@ class ReportRepository implements ReportInterface
 
 
         return $grouped;
+    }
+
+    public function getMonthlyPackage($request)
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-30 00:00:00'));
+        $currentDate = Carbon::parse(now())->subDays(1);
+        $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
+        $raw = Invoice::where('invoice_type', 'package')
+            ->whereYear('invoice_date', $currentDate->year)
+            ->selectRaw('
+        package_id,
+        MONTH(invoice_date) as month_number,
+        COUNT(id) as total_package_count
+    ')
+            ->groupBy('package_id', 'month_number')
+            ->get();
+        $packages = Package::whereIn('id', $raw->pluck('package_id')->unique())->get()->keyBy('id');
+
+        $result = $packages->map(function ($package) use ($raw) {
+            // Start with 12 zeros (Jan → Dec)
+            $months = array_fill(0, 12, 0);
+
+            $raw->where('package_id', $package->id)->each(function ($row) use (&$months) {
+                // month_number is 1–12, array index is 0–11
+                $months[$row->month_number - 1] = (int) $row->total_package_count;
+            });
+
+            return [
+                'id' => $package->id,
+                'name' => $package->name,
+                'package_count_by_month' => $months,
+            ];
+        })->values();
+
+        return ['months' => $months, 'data' => $result,];
     }
 }

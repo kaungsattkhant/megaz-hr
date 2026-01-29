@@ -514,6 +514,7 @@ Route::middleware('auth:api')->group(function () {
         Route::prefix('finance')->group(function () {
             Route::get('cashflows', 'getBudgetAccountsCashflow');
             Route::get('sale_by_area', 'getSaleByArea'); //compare food restaurant sale grouby category 
+            Route::get('monthly_package', 'getMonthlyPackage'); //compare food restaurant sale grouby category 
         });
     });
     // Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);

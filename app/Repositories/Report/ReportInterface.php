@@ -32,4 +32,6 @@ interface ReportInterface
 
    public function getBudgetAccountsCashflow(Request $request);
    public function getSaleByArea($request);
+
+   public function getMonthlyPackage($request);
 }
