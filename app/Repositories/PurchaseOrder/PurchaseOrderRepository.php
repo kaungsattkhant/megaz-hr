@@ -19,9 +19,11 @@ use App\Http\Action\SendNotification\SendNotification;
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Events\SendNotification as EventsSendNotification;
 use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
+    use FcmSendNotification;
     private $select = [
         'po_id',
         'total_price',
@@ -245,14 +247,15 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $departmentId = $staff->department_id;
                 $users = $this->getUserByDepartment($departmentId, ['Manager']);
                 $data = [
-                    'date' => $po->created_at,
-                    'title' => 'You have received a new PO to confirm',
-                    'body' => 'New Purchase Order',
+                    'date_time' => $po->created_at,
+                    'preview' => 'You have received a new PO to confirm',
+                    'title' => 'New Purchase Order',
                 ];
                 #send old notificaiton
                 #end
                 if ($users->isNotEmpty()) {
-                    $this->send($po, $users, $data);
+                    // $this->send($po, $users, $data);
+                    $this->sendFcmNotification($po, $users, $data);
                 }
             }
             DB::commit();

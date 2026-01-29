@@ -150,7 +150,8 @@ class NotificationableResource extends JsonResource
             $notificationable['status'] = $this->status ?? null;
             $notificationable['timeshift_id'] = $this->timeshift_id ?? null;
             $notificationable['timeshift'] = $this->whenLoaded('timeshift', function() {
-                return [
+
+            return [
                     'id' => $this->timeshift->id ?? null,
                     'shift_id' => $this->timeshift->shift_id ?? null,
                     'shift_name' => $this->timeshift->shift->name ?? null,
@@ -177,6 +178,13 @@ class NotificationableResource extends JsonResource
             $notificationable['notes'] = $this->notes ?? null;
             $notificationable['status'] = $this->status ?? null;
             // $notificationable['handover_items'] = $this->staffEquipmentHandoverItems ?? [];
+        }
+        if($this->notification->notificationable_type=== 'objective_staff'){
+            $notificationable['id'] = $this->id;
+            $notificationable['start_date'] = $this->start_date;
+            $notificationable['end_date'] = $this->end_date;
+            $notificationable['status'] = $this->status;
+            $notificationable['okr_point'] = $this->okr_point;
         }
 
         return $notificationable;

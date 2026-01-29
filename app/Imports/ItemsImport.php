@@ -90,6 +90,7 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                     'max_uom_id' => $maxUomId,
                     'max_limit_uom_quantity' => $row['max_limit_uom_quantity'],
                     'max_limit_quantity' => $row['max_limit_uom_quantity'] * $row['conversion'],
+                    'is_active'=> true,
                 ]
             );
 
@@ -100,6 +101,7 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
                 $item['max_limit_uom_quantity'] = $row['max_limit_uom_quantity'] ?? 0;
             }
             $item->save();
+            //claean uom converion
             $uomConversion = UomConversion::create([
                 'item_id' => $item->id,
                 'base_unit_id' => $baseUomId,

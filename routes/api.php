@@ -449,7 +449,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/remarks', 'getRemarks');
         Route::post('/remarks', 'createRemark');
         Route::get('/sale-reports', 'saleReport');
-        Route::post('menu_categories','createMenuCategory');
+        Route::post('menu_categories', 'createMenuCategory');
     });
 
     Route::controller(CreditorController::class)->group(function () {
@@ -511,7 +511,11 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('catering/target_actual_menu_sales', 'getMenuSales');
         Route::get('catering/daily_area_sales_by_staff', 'getDailyAreaSalesVolume');
-        // Route::get('cashflows', 'getBudgetAccountsCashflow');
+        Route::prefix('finance')->group(function () {
+            Route::get('cashflows', 'getBudgetAccountsCashflow');
+            Route::get('sale_by_area', 'getSaleByArea'); //compare food restaurant sale grouby category 
+            Route::get('monthly_package', 'getMonthlyPackage'); //compare food restaurant sale grouby category 
+        });
     });
     // Route::get('push_data_to_inventory', [InventoryAPIController::class, 'pushDataInventory']);
 

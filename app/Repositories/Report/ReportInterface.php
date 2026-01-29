@@ -31,4 +31,7 @@ interface ReportInterface
    public function getMonthlyKitchenMenuTotal($request);
 
    public function getBudgetAccountsCashflow(Request $request);
+   public function getSaleByArea($request);
+
+   public function getMonthlyPackage($request);
 }
