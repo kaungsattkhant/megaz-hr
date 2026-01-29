@@ -890,7 +890,7 @@
                                     Package Price
                                 </p>
                                 <p class=" w-28">
-                                    {{ selectedRoom.room_sessions[0].invoice.package.name }}
+                                    {{ selectedRoom.invoice.package.name }}
                                 </p>
                             </div>
                             <div v-if="!isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -942,7 +942,7 @@
                                     Package Discount
                                 </p>
                                 <p class=" w-28">
-                                    {{ selectedRoom.room_sessions[0].invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.room_sessions[0].invoice.package.package_discount }}
+                                    {{ selectedRoom.invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.invoice.package.package_discount }}
                                 </p>
                             </div>
                             <div v-show="discount_type != 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
