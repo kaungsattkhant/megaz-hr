@@ -1986,6 +1986,7 @@
                         this.printInvoiceData.room = response.data.total_session_price
                         this.printInvoiceData.food = response.data.total_order_value
                         this.printInvoiceData.total = response.data.invoice_total - response.data.total_order_discount_price
+                        this.printInvoiceData.discount = 0
                         this.getMenuCategoryList();
                     }
                 }
@@ -2575,7 +2576,7 @@
                     roomChargeTotal = roomSessions.total_session_price;
                     // });
                     if (this.selectedRoom.invoice.invoice_type == 'package') {
-                        this.printInvoiceData.room = (this.roomSessionData.total_session_price - this.selectedRoom.invoice.package.package_discount);
+                        this.printInvoiceData.room = (this.roomSessionData.sub_total);
                     }
                     else {
                         // this.printInvoiceData.room = roomChargeTotal;
@@ -2583,14 +2584,14 @@
                     }
                     this.printInvoiceData.roomDiscountAmount = null;
                     this.printInvoiceData.discountSession = null;
-                    console.log(this.printInvoiceData.room, this.printInvoiceData.food);
+                    console.log('testing dis',this.printInvoiceData.room, this.printInvoiceData.food);
                     this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - (this.foodDiscount ));
                     // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 }
             },
             discountChanged() {
-                let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.foodDiscount
-                // let roomTotalAmount = this.selectedRoom.
+                let roomTotalAmount = (this.roomSessionData.sub_total + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.foodDiscount
+                // let roomTotalAmount = this.roomSessionData.sub_total
                 console.log('room total = ' + this.printInvoiceData.room)
                 if (this.discount_type == 'percentage') {
                     this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
