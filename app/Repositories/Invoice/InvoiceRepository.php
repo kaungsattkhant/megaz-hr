@@ -910,6 +910,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // $roomDoneResponse['total_session_value'] = $total_session_value;
             $roomDoneResponse['total_service_value'] = $total_service_value;
             $roomDoneResponse['total_accessory_value'] = $total_accessory_value;
+            $roomDoneResponse['sub_total'] = $invoice->sub_total;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
