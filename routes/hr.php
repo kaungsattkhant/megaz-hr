@@ -122,7 +122,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
     Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
     Route::get('get_exam_by_role/{id}/exam_type/{examType}','getExamByRole');
-    Route::post('exam_questions/answer','answerExamQuestion');
+    Route::post('staff_exam/answer','answerExamQuestion');
   });
   Route::prefix('hr')->controller(InterviewController::class)->group(function () {
     Route::get('/interviews-by-role/{roleId}', 'getInterviewsByRoleId');
