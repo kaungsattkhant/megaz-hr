@@ -34,4 +34,6 @@ interface ReportInterface
    public function getSaleByArea($request);
 
    public function getMonthlyPackage($request);
+
+   public function getSaleByAreaType($request);
 }

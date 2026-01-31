@@ -325,4 +325,10 @@ class ExamRepository implements ExamRepositoryInterface
       throw $e;
     }
   }
+
+  public function getExamByRole($roleId, $examType){
+     return Exam::where('role_id',$roleId)
+     ->where('type',$examType)
+     ->get();
+  }
 }

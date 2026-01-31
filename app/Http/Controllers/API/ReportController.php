@@ -96,4 +96,9 @@ class ReportController extends Controller
         $data = $this->reportRepo->getMonthlyPackage($request);
         ResponseData($data);
     }
+
+    public function getSaleByAreaType(Request $request){
+        $data = $this->reportRepo->getSaleByAreaType($request);
+        ResponseData($data);
+    }
 }

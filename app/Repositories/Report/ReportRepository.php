@@ -531,4 +531,9 @@ class ReportRepository implements ReportInterface
 
         return ['months' => $months, 'data' => $result,];
     }
+
+    public function getSaleByAreaType($request)
+    {
+        
+    }
 }
