@@ -327,7 +327,7 @@ class ExamRepository implements ExamRepositoryInterface
   }
 
   public function getExamByRole($roleId, $examType){
-     return Exam::where('role_id',$roleId)
+     return Exam::with(['examQuestions.answers'])->where('role_id',$roleId)
      ->where('type',$examType)
      ->get();
   }
