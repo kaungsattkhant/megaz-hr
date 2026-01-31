@@ -66,7 +66,11 @@ class ExamController extends Controller
     }
 
     public function getExamByRole($roleId,$examType){
-        $data = $this->examRepository->getExamByRole($roleId,$examType);
+        $data = $this->examRepository->getExamByRole($roleId, $examType);
+        ResponseData($data);
+    }
+    public function answerExamQuestion(Request $request){
+        $data = $this->examRepository->answerExamQuestion($request);
         ResponseData($data);
     }
 }

@@ -23,4 +23,5 @@ interface ExamRepositoryInterface
   public function toggleExamQuestion($id);
 
   public function getExamByRole($roleId, $examType);
+  public function answerExamQuestion($request);
 }

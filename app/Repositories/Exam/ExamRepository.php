@@ -5,9 +5,12 @@ namespace App\Repositories\Exam;
 use App\Models\Exam;
 use App\Models\Grade;
 use App\Models\Skill;
+use App\Models\Staff;
 use App\Models\Answer;
 use App\Models\ExamSkill;
+use App\Models\StaffExam;
 use App\Models\ExamQuestion;
+use App\Models\StaffExamAnswer;
 use Illuminate\Support\Facades\DB;
 
 
@@ -326,9 +329,56 @@ class ExamRepository implements ExamRepositoryInterface
     }
   }
 
-  public function getExamByRole($roleId, $examType){
-     return Exam::with(['examQuestions.answers'])->where('role_id',$roleId)
-     ->where('type',$examType)
-     ->get();
+  public function getExamByRole($roleId, $examType)
+  {
+    return Exam::with(['examQuestions.answers'])->where('role_id', $roleId)
+      ->where('type', $examType)
+      ->get();
+  }
+
+  public function answerExamQuestion($request)
+  {
+
+    DB::beginTransaction();
+    try {
+      // prevent duplicate StaffExam for same staff and exam
+      if ($this->staffExamExists($request->staff_id, $request->exam_id)) {
+        ResponseMessage('Staff exam already exists for this staff and exam', 409);
+      }
+      $exam = Exam::find($request->exam_id);
+      $grade = $exam->gradeForMark($request->total_mark);
+      if(!$grade){
+        ResponseMessage('No grade found for the given total mark', 404);
+      }
+      $staffExam= StaffExam::create([
+        'staff_id'=>$request->staff_id,
+        'exam_id'=>$request->exam_id,
+        'grade_id'=>$grade->id,
+        'total_mark'=>$request->total_mark,
+      ]);
+      foreach($request->answers as $answer){
+        StaffExamAnswer::create([
+          'staff_exam_id'=>$staffExam->id,
+          'exam_question_id'=>$answer['exam_question_id'],
+          'answer_id'=>$answer['answer_id'],
+        ]);
+      }
+      DB::commit();
+      return $staffExam;
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  /**
+   * Check whether a StaffExam already exists for a given staff and exam.
+   */
+  public function staffExamExists(int $staffId, int $examId): bool
+  {
+    return StaffExam::where('staff_id', $staffId)
+      ->where('exam_id', $examId)
+      ->exists();
   }
 }

@@ -43,4 +43,13 @@ class Exam extends Model
     {
         return $this->belongsToMany(Skill::class, 'exam_skills');
     }
+
+    public function gradeForMark($totalMark)
+    {
+        return $this->grades()
+            ->where('is_active', true)
+            ->where('mark', '<=', $totalMark)
+            ->orderByDesc('mark')
+            ->first();
+    }
 }
