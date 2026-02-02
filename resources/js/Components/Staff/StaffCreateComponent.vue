@@ -734,7 +734,7 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
         >
-    <div v-show="isFeature" class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008]" @click="btnClickedChangeFeature">
+    <div v-show="isFeature" class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008] pl-0 xl:pl-16" @click="btnClickedChangeFeature">
         <div class="container-card pb-4 px-10 m-16 z-50 overflow-hidden" @click.stop>
             <div class="mb-8 pt-3 flex justify-between">
                 <p class="text-2xl font-semibold font-inter">

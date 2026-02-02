@@ -828,7 +828,7 @@ export default {
             let url = '/api/hr/exams/'+this.examId;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/exams");
+                window.location.replace("/exam");
             }else {
                 this.$notify({
                     text: response.message,
