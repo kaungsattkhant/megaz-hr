@@ -11,5 +11,4 @@ interface LocationRepositoryInterface
   public function getPlaceByLocationAndFloorId($locationId, $floorId);
   public function assignStaffToPlace(array $data, $placeId);
   public function getAllPlace();
-  public function addedLocation(array $data);
 }
