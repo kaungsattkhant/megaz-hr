@@ -1445,6 +1445,51 @@
         "slug": "cv.delete"
     },
     {
+        "module": "exam",
+        "name": "Exam list",
+        "slug": "exam"
+    },
+    {
+        "module": "exam",
+        "name": "Exam create",
+        "slug": "exam.create"
+    },
+    {
+        "module": "exam",
+        "name": "Exam edit",
+        "slug": "exam.edit"
+    },
+    {
+        "module": "exam",
+        "name": "Exam delete",
+        "slug": "exam.delete"
+    },
+     {
+        "module": "exam-result",
+        "name": "Exam Result",
+        "slug": "exam-result"
+    },
+    {
+        "module": "interview",
+        "name": "Interview list",
+        "slug": "interview"
+    },
+    {
+        "module": "interview",
+        "name": "Interview create",
+        "slug": "interview.create"
+    },
+    {
+        "module": "interview-result",
+        "name": "Interview Result",
+        "slug": "interview-result"
+    },
+    {
+        "module": "location",
+        "name": "Location list",
+        "slug": "location"
+    },
+    {
         "module": "accrual",
         "name": "accrual list",
         "slug": "accrual"

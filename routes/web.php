@@ -669,18 +669,18 @@ Route::view('/resignations', 'resignations.index')->name('resignations.index');
 
 
 Route::view('/cv/form', 'CV.form')->name('CV.form');
-Route::view('/cv', 'CV.index')->name('CV.index');
+Route::view('/cv', 'CV.index')->name('CV.index')->middleware('departments:cv');
 Route::view('/cv/{id}/detail', 'CV.detail');
-Route::view('/exam', 'exams.index');
+Route::view('/exam', 'exams.index')->name('exams.index')->middleware('departments:exam');
 Route::view('/exam/create', 'exams.create')->name('exams.create');
 Route::view('/exam/{id}/edit', 'exams.edit');
 Route::view('/exam/{id}/assessment/{assessId}', 'exams.assessment')->name('exams.assessment');
 
-Route::view('/interviews', 'interviews.index');
+Route::view('/interviews', 'interviews.index')->name('interviews.index')->middleware('departments:interview');
 Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
 // Route::view('/interviews/create', 'interviews.create')->name('interviews.create');
-Route::view('/interview/result', 'interviews.result');
-Route::view('/locations', 'locations.index');
+Route::view('/interview/result', 'interviews.result')->name('interviews.result')->middleware('departments:interview-result');
+Route::view('/locations', 'locations.index')->name('locations.index')->middleware('departments:location');
 Route::view('/location/{id}/floor/{floorId}/detail', 'locations.detail');
 
 
@@ -693,16 +693,18 @@ Route::middleware(['departments:resignation'])->group(function () {
 });
 
 
+//commented for duplicate routes
 
-Route::view('/exams', 'exams.index');
-Route::view('/exam/create', 'exams.create')->name('exams.create');
-Route::view('/exam/{id}/edit', 'exams.edit');
-Route::view('/interviews', 'interviews.index');
-Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
+// Route::view('/exams', 'exams.index');
+// Route::view('/exam/create', 'exams.create')->name('exams.create');
+// Route::view('/exam/{id}/edit', 'exams.edit');
+// Route::view('/interviews', 'interviews.index');
+// Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
 // Route::view('/interviews/create', 'interviews.create')->name('interviews.create');
-Route::view('/interview/result', 'interviews.result');
-Route::view('/locations', 'locations.index');
-Route::view('/location/{id}/floor/{floorId}/detail', 'locations.detail');
+// Route::view('/interview/result', 'interviews.result');
+// Route::view('/locations', 'locations.index');
+// Route::view('/location/{id}/floor/{floorId}/detail', 'locations.detail');
+//end duplicate routes
 
 
 Route::middleware(['departments:pay-slip'])->group(function () {

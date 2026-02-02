@@ -13,11 +13,13 @@ class Grade extends Model
     protected $fillable = [
         'mark',
         'grade',
+        'is_pass',
         'is_active',
         'exam_id',
     ];
     protected $casts = [
         'mark' => 'integer',
+        'is_pass' => 'boolean',
         'is_active' => 'boolean',
     ];
     public function exam()

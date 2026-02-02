@@ -376,7 +376,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
       // $fromTime = "22:30";
       // $toTime = "06:00";
-      $earlyMinutes = 30;
+      $earlyMinutes = $checkInLateMin;
       $lateMinutes  = $checkInLateMin;
       // dd($existShiftAssign->timeshift->from_time);
       $fromTime = $existShiftAssign->timeshift->from_time; // "00:00" or "22:31"
