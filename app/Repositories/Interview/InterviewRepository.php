@@ -160,7 +160,7 @@ class InterviewRepository implements InterviewRepositoryInterface
       ->when($request->has('department_id'), function ($query) use ($request) {
         $query->where('staff.department_id', $request->department_id);
       })
-      ->where('exams.type',$request->type ?? 'exam')
+      ->where('exams.type',$request->type ?? 'interview')
       ->groupBy('staff.id', 'staff.name', 'staff.department_id', 'departments.name')
       ->orderByDesc('interview_count');
     return $query->paginate(config('common.list_count', 20));

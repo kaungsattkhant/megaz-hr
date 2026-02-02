@@ -1464,6 +1464,11 @@
         "name": "Exam delete",
         "slug": "exam.delete"
     },
+     {
+        "module": "exam-result",
+        "name": "Exam Result",
+        "slug": "exam-result"
+    },
     {
         "module": "interview",
         "name": "Interview list",
@@ -1473,6 +1478,11 @@
         "module": "interview",
         "name": "Interview create",
         "slug": "interview.create"
+    },
+    {
+        "module": "interview-result",
+        "name": "Interview Result",
+        "slug": "interview-result"
     },
     {
         "module": "location",
