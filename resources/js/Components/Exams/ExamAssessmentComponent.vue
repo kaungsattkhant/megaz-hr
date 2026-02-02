@@ -168,32 +168,41 @@ export default {
 
     methods: {
         ...mapGetters(['getUser', 'getDepartment','getToken']),
-        async getStaffList() {
-            let response = await getApiData({ url: `/api/staffs`, token: this.getToken() });
-            if (response.data) {
-                this.staffList = response.data;
-                this.getDetail(response.data);
-            }
-        },
-        async getDetail(list) {
-            const staffId = Number(this.staffId);
-            const staff = list.find(staff => staff.id === staffId);
-            if (!staff || !staff.roles?.length) {
-                console.warn('Staff or role not found');
-                return;
-            }
-            const roleId = staff.roles[0].id;
-            console.log('staff id ' ,staff)
-            let response = await getApiData({ url: `/api/hr/get_exam_by_role/`+ roleId +`/exam_type/exam`, token: this.getToken() });
+        async getDetail() {
+            let response = await getApiData({ url: `/api/hr/exams/${this.examId}`, token: this.getToken() });
             if (response.data) {
                 this.detail = response.data;
-                let index = this.detail.findIndex(item => item.id === Number(this.examId))
-                console.log(index)
                 setTimeout(() => {
-                    this.questionList = response.data[index].exam_questions
+                    this.questionList = response.data.exam_questions
                 }, 500);
             }
         },
+        // async getStaffList() {
+        //     let response = await getApiData({ url: `/api/staffs`, token: this.getToken() });
+        //     if (response.data) {
+        //         this.staffList = response.data;
+        //         this.getDetail(response.data);
+        //     }
+        // },
+        // async getDetail(list) {
+        //     const staffId = Number(this.staffId);
+        //     const staff = list.find(staff => staff.id === staffId);
+        //     if (!staff || !staff.roles?.length) {
+        //         console.warn('Staff or role not found');
+        //         return;
+        //     }
+        //     const roleId = staff.roles[0].id;
+        //     console.log('staff id ' ,staff)
+        //     let response = await getApiData({ url: `/api/hr/get_exam_by_role/`+ roleId +`/exam_type/exam`, token: this.getToken() });
+        //     if (response.data) {
+        //         this.detail = response.data;
+        //         let index = this.detail.findIndex(item => item.id === Number(this.examId))
+        //         console.log(index)
+        //         setTimeout(() => {
+        //             this.questionList = response.data[index].exam_questions
+        //         }, 500);
+        //     }
+        // },
         handleRadioChange(answer,q){
             // this.questionList[first].questions[second].answers.forEach((a, i) => {
             //     a.checked = i === third
@@ -389,11 +398,11 @@ export default {
             formData.append('staff_id', this.staffId);
             formData.append('exam_id', this.examId);
             formData.append('total_mark', total);
-            formData.append('answers', JSON.stringify(exam_answers));
+            formData.append('interview_answers', JSON.stringify(exam_answers));
             formData.append('custom_questions', JSON.stringify(custom_questions));
-            let response = await postApiData({ url: '/api/hr/staff_exam/answer', form_data: formData, token: this.getToken() });
+            let response = await postApiData({ url: '/api/hr/interviews', form_data: formData, token: this.getToken() });
             if (response.success) {
-                window.location.replace('/staff');
+                window.location.replace('/interview/result');
             }
             else {
                 this.$notify({
@@ -423,8 +432,8 @@ export default {
         }
     },
     created() {
-        // this.getDetail();
-        this.getStaffList();
+        this.getDetail();
+        // this.getStaffList();
     },
 
     mounted() {
