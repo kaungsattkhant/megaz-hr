@@ -133,8 +133,10 @@ Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(LocationController::class)->group(function () {
     Route::get('/locations', 'getAllLocations');
     Route::post('/locations', 'createLocation');
+    Route::post('/added_location', 'addedLocation');
     Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
     Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
+    Route::get('places','getAllPlace');
   });
   Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
     Route::post('/staff_time_shifts', 'createStaffTimeShift');
