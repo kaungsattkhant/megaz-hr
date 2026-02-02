@@ -310,9 +310,9 @@
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
                                 <select data-te-select-init data-te-select-placeholder="Select Location"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedLocation" class="input-ui !text-black text-sm">
+                                    data-te-select-filter="true" name="" id="" v-model="selectedPlace" class="input-ui !text-black text-sm">
                                     <option :value="location" v-for="(location, index) in placeList"
-                                        :key="index"> {{ location.name }} </option>
+                                        :key="index"> {{ location.floor.name }} ({{ location.name }})</option>
                                 </select>
                             </div>
                         </div>
@@ -497,7 +497,7 @@ export default {
             loading: false,
 
             placeList: [],
-            selectedLocation: null,
+            selectedPlace: null,
         };
     },
 
@@ -570,11 +570,11 @@ export default {
         //     this.getSalaryList(1);
         // },
         async addLocationModalClicked(item){
-            this.selectedLocation = null;
+            this.selectedPlace = null;
             this.selectedItem = item;
         },
         async addLocationBtnClicked(){
-            if(!this.selectedLocation){
+            if(!this.selectedPlace){
                 this.$notify({
                     title: `Input validation`,
                     text: 'You Forgot to Select Location',
@@ -587,9 +587,9 @@ export default {
         },
         async addLocation(){
             let formData = new FormData();
-                formData.append('cv_id',this.selectedItem.id);
-                formData.append('location_id',this.selectedLocation.id);
-                let response = await postApiData({url:`/api/cv/added_location`, form_data:formData, token:this.getToken()})
+                formData.append('staff_id',this.selectedItem.id);
+                formData.append('place_id',this.selectedPlace.id);
+                let response = await postApiData({url:`/api/hr/added_location`, form_data:formData, token:this.getToken()})
                 if(response.success){
                     this.getPrimaryList();
                     document.getElementById('close_add_location_modal').click();
