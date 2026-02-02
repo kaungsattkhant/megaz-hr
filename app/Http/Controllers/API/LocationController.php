@@ -37,4 +37,15 @@ class LocationController extends Controller
     {
         $location = $this->locationRepository->assignStaffToPlace($request->all(), $placeId);
     }
+    public function getAllPlace()
+    {
+        $data = $this->locationRepository->getAllPlace();
+        ResponseData($data);
+    }
+    public function addedLocation(Request $request)
+    {
+        $placeId=$request->place_id;
+        $data = $this->locationRepository->assignStaffToPlace($request->all(),$placeId);
+        ResponseData($data);
+    }
 }

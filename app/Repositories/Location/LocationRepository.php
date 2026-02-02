@@ -5,6 +5,7 @@ namespace App\Repositories\Location;
 use App\Models\Floor;
 use App\Models\Place;
 use App\Models\Location;
+use App\Models\Staff;
 use Illuminate\Support\Facades\DB;
 
 class LocationRepository implements LocationRepositoryInterface
@@ -77,5 +78,11 @@ class LocationRepository implements LocationRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+  public function getAllPlace()
+  {
+    return Place::with('floor.location', 'staff')
+    ->whereNull('staff_id')
+    ->get();
   }
 }

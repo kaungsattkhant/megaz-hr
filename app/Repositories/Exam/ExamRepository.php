@@ -338,7 +338,6 @@ class ExamRepository implements ExamRepositoryInterface
 
   public function answerExamQuestion($request)
   {
-
     DB::beginTransaction();
     try {
       // prevent duplicate StaffExam for same staff and exam
