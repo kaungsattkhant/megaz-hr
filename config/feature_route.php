@@ -88,6 +88,8 @@ return [
     'js'=>'job_specifications.index',
     'sop'=>'SOP.index',
     'cv'=>'CV.index',
+    'exam'=> 'exams.index',
+    'interview'=> 'interviews.index',
     'shift-assignment'=>'shift_assignment.index',
     'equipment-assignment'=>'equipment_assignment.index',
     'asset-assignment'=>'asset_assignment.index',

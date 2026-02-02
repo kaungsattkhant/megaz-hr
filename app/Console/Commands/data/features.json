@@ -1445,6 +1445,41 @@
         "slug": "cv.delete"
     },
     {
+        "module": "exam",
+        "name": "Exam list",
+        "slug": "exam"
+    },
+    {
+        "module": "exam",
+        "name": "Exam create",
+        "slug": "exam.create"
+    },
+    {
+        "module": "exam",
+        "name": "Exam edit",
+        "slug": "exam.edit"
+    },
+    {
+        "module": "exam",
+        "name": "Exam delete",
+        "slug": "exam.delete"
+    },
+    {
+        "module": "interview",
+        "name": "Interview list",
+        "slug": "interview"
+    },
+    {
+        "module": "interview",
+        "name": "Interview create",
+        "slug": "interview.create"
+    },
+    {
+        "module": "location",
+        "name": "Location list",
+        "slug": "location"
+    },
+    {
         "module": "accrual",
         "name": "accrual list",
         "slug": "accrual"

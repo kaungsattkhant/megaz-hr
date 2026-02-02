@@ -143,6 +143,7 @@ class InterviewRepository implements InterviewRepositoryInterface
             ')
       ])
       ->join('staff', 'interviews.staff_id', '=', 'staff.id')
+      ->join('exams', 'interviews.exam_id', '=', 'exams.id')
       ->leftJoin('departments', 'staff.department_id', '=', 'departments.id')
       ->leftJoin('role_staff as staff_roles', 'staff.id', '=', 'staff_roles.staff_id')
       ->leftJoin('roles', 'staff_roles.role_id', '=', 'roles.id')
@@ -159,6 +160,7 @@ class InterviewRepository implements InterviewRepositoryInterface
       ->when($request->has('department_id'), function ($query) use ($request) {
         $query->where('staff.department_id', $request->department_id);
       })
+      ->where('exams.type',$request->type ?? 'exam')
       ->groupBy('staff.id', 'staff.name', 'staff.department_id', 'departments.name')
       ->orderByDesc('interview_count');
     return $query->paginate(config('common.list_count', 20));
