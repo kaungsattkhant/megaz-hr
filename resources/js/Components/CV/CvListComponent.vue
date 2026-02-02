@@ -104,12 +104,15 @@
                                     </td>
 
                                     <td class="whitespace-nowrap">
-                                        <button @click="addJoinedDateBtnClicked(item)" data-te-toggle="modal"
-                                            
+                                        <button @click="addLocationModalClicked(item)" data-te-toggle="modal" title="Add Location"
+                                            data-te-target="#add_location" id="date-btn" class="pr-3">
+                                            <i class="fas fa-map-marker-plus"></i>
+                                        </button>
+                                        <button @click="addJoinedDateBtnClicked(item)" data-te-toggle="modal" title="Add Joined Date"
                                             data-te-target="#add_date" id="date-btn" class="pr-3">
                                             <i class="fal fa-calendar-check"></i>
                                         </button>
-                                        <button @click="addSalaryBtnClicked(item)" data-te-toggle="modal"
+                                        <button @click="addSalaryBtnClicked(item)" data-te-toggle="modal" title="Add Salary"
                                             v-show="feature.includes('cv-salary.create')"
                                             data-te-target="#add_salary" id="salary-btn" class="">
                                             <i class="fal fa-money-bill-wave pr-3"></i>
@@ -269,6 +272,59 @@
                             Cancel
                         </button>
                         <button type="button" @click="addSalaryAndAllowance"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Location Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_location" tabindex="-1" aria-labelledby="add_question_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_question_modalLabel">
+                            Add Location
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close" id="close_add_location_modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-0 col-span-3 pb-0 rounded-md">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Location
+                            </label>
+                            <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Location"
+                                    data-te-select-filter="true" name="" id="" v-model="selectedLocation" class="input-ui !text-black text-sm">
+                                    <option :value="location" v-for="(location, index) in placeList"
+                                        :key="index"> {{ location.name }} </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" @click="addLocationBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 ">
                             Add
                         </button>
@@ -439,6 +495,9 @@ export default {
 
             feature: this.getFeature(),
             loading: false,
+
+            placeList: [],
+            selectedLocation: null,
         };
     },
 
@@ -464,6 +523,12 @@ export default {
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
+            }
+        },
+        async getPlaceList() {
+            let response = await getApiData({ url: '/api/hr/places', token: this.getToken() });
+            if (response.data) {
+                this.placeList = response.data;
             }
         },
         statusFilter() {
@@ -504,8 +569,39 @@ export default {
         //     this.url_search = '';
         //     this.getSalaryList(1);
         // },
-
-
+        async addLocationModalClicked(item){
+            this.selectedLocation = null;
+            this.selectedItem = item;
+        },
+        async addLocationBtnClicked(){
+            if(!this.selectedLocation){
+                this.$notify({
+                    title: `Input validation`,
+                    text: 'You Forgot to Select Location',
+                    type: "warn"
+                });
+            }
+            else{
+                this.addLocation();
+            }
+        },
+        async addLocation(){
+            let formData = new FormData();
+                formData.append('cv_id',this.selectedItem.id);
+                formData.append('location_id',this.selectedLocation.id);
+                let response = await postApiData({url:`/api/cv/added_location`, form_data:formData, token:this.getToken()})
+                if(response.success){
+                    this.getPrimaryList();
+                    document.getElementById('close_add_location_modal').click();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+        },
         async addSalaryBtnClicked(item){
             this.selectedItem = item;
             this.selectedSalary = null;
@@ -643,6 +739,7 @@ export default {
     created() {
         this.getPrimaryList();
         this.getDepartmentList();
+        this.getPlaceList();
     }
 }
 </script>
