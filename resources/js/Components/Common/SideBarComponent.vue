@@ -42,7 +42,7 @@
                             <button  v-show="hasAnyPermission([
                                 'staff', 'salary-batch', 'jd','js','sop','cv','okr','time-shift','gps','contact','off-day','leave-allowance',
                                 'overtime-fee','salary-setup','salary','resignation-categories','skill','handbook',
-                                'overtime-confirmation','allowance'
+                                'overtime-confirmation','allowance','exams','interviews','locations'
                                 ])" data-tab="tab-hr-setup" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Hr Setup">
                                 <i class="fal fa-layer-group"></i>
                             </button>
@@ -476,12 +476,30 @@
                         <ul v-show="hasAnyPermission([
                             'salary-batch', 'staff', 'jd','js','sop','cv','okr','time-shift','gps','contact','off-day','leave-allowance',
                             'overtime-fee','salary-setup','salary','resignation-categories','skill','handbook',
-                            'overtime-confirmation','allowance'
+                            'overtime-confirmation','allowance','exams','interviews','locations'
                           ])">
                             <li>
                                 <p class="sidebar-tab-title">
                                     HR SETUP
                                 </p>
+                            </li>
+                            <li>
+                                <a href="/exam" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-door-open"></i>
+                                    Exams
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/interviews" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-door-open"></i>
+                                    Interviews
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('locations')">
+                                <a href="/locations" class="flex items-center sidebar-gap-x">
+                                    <i class="fal fa-door-open"></i>
+                                    Locations
+                                </a>
                             </li>
                             <li v-show="checkFeaturePermission('salary-batch')">
                                 <a href="/salary_batch" class="flex items-center sidebar-gap-x">

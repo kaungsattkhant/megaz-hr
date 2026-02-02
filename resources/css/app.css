@@ -42,6 +42,9 @@
     .input-form{
         @apply focus:ring-0 focus:outline-none focus:shadow-none
     }
+    .title-container-card{
+        @apply bg-white mt-4 pt-4  px-9 pb-4 mb-4 shadow-lg border border-gray-100
+    }
     .container-card{
         @apply bg-white mt-4 pt-8  px-9 pb-8 mb-4 shadow-lg border border-gray-100
     }

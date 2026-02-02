@@ -245,6 +245,7 @@ import CvDetailComponent from './Components/CV/CvDetailComponent.vue';
 import ExamListComponent from './Components/Exams/ExamListComponent.vue';
 import ExamCreateComponent from './Components/Exams/ExamCreateComponent.vue';
 import ExamEditComponent from './Components/Exams/ExamEditComponent.vue';
+import ExamAssessmentComponent from './Components/Exams/ExamAssessmentComponent.vue';
 import InterviewListComponent from './Components/Interviews/InterviewListComponent.vue';
 import InterviewCreateComponent from './Components/Interviews/InterviewCreateComponent.vue';
 import InterviewResultComponent from './Components/Interviews/InterviewResultComponent.vue';
@@ -512,6 +513,7 @@ app.component('CvDetailComponent',CvDetailComponent);
 app.component('ExamListComponent',ExamListComponent);
 app.component('ExamCreateComponent',ExamCreateComponent);
 app.component('ExamEditComponent',ExamEditComponent);
+app.component('ExamAssessmentComponent',ExamAssessmentComponent)
 app.component('InterviewListComponent',InterviewListComponent);
 app.component('InterviewCreateComponent',InterviewCreateComponent);
 app.component('InterviewResultComponent',InterviewResultComponent);

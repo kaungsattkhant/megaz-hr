@@ -110,12 +110,17 @@
                                         {{ staff.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap text-left relative" v-show="['staff.toggle', 'staff.edit'].some(f => feature.includes(f))">
-
-                                        <button class="mx-1" data-te-toggle="modal" data-te-target="#uploadContractsModal" @click="contractUploadBtnForStaffClicked(staff.id, index)">
+                                        <button data-te-toggle="modal" data-te-target="#create_exam_modal" class="mx-4"
+                                            @click="createExamBtnClicked(staff)" title="Take Exam">
+                                            <i class="fal fa-plus"></i>
+                                        </button>
+                                        <button class="mx-1" data-te-toggle="modal" data-te-target="#uploadContractsModal" @click="contractUploadBtnForStaffClicked(staff.id, index)"
+                                            title="Update Contract">
                                             <i class="fal fa-file-signature"></i>
                                         </button>
 
-                                        <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 mx-1">
+                                        <a v-if="feature.includes('staff.edit')" :href="'/staff/' + staff.id + '/edit'" class="pr-2 mx-1"
+                                            title="Edit">
                                             <i class="fal fa-pen"></i>
                                         </a>
                                         <input v-show="feature.includes('staff.toggle')" :checked="staff.is_active == 1" @change="isActiveToggled(staff.id)"
@@ -356,6 +361,58 @@
   </div>
 </div>
     </div>
+
+
+<!-- exam modal -->
+<div data-te-modal-init
+    class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+    id="create_exam_modal" tabindex="-1" aria-labelledby="create_exam_modalLabel" aria-hidden="true">
+    <div data-te-modal-dialog-ref
+        class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+        <div
+            class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+            <div class="relative flex justify-between py-2 px-6 border-b">
+                <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                    id="create_exam_modalLabel">
+                    Create Exam
+                </h5>
+                <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    aria-label="Close" id="close_exam_modal">  
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                <div class="mb-4">
+                    <label for="" class="label-form mb-3">
+                        Exam
+                    </label>
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Exam"
+                            data-te-select-filter="true" name="" id="" v-model="selectedExam" class="input-ui !text-black text-sm">
+                            <option :value="exam" v-for="(exam, index) in examList"
+                                :key="index"> {{ exam.name }} </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                    data-te-modal-dismiss aria-label="Close">
+                    Cancel
+                </button>
+                <button type="button" @click="createInterview()"
+                    class="add-btn focus:outline-none focus:ring-0 ">
+                    Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </template>
 
 <script>
@@ -412,11 +469,39 @@ export default {
             selectedStaffName: null,
 
             buttonLoading: false,
+            examList: [],
+            selectedStaff: null,
+            selectedExam: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
+
+        async createExamBtnClicked(item){
+            this.selectedStaff = item;
+            this.selectedExam = null;
+            let response = await getApiData({ url: '/api/hr/get_exam_by_role/' + item.roles[0].id + '/exam_type/exam', token: this.getToken() });
+            if (response.data) {
+                this.examList = response.data;
+            }else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
+            console.log('selected staff id = ', this.selectedStaff)
+        },
+        createInterview(){
+            if(!this.selectedExam){
+                this.showToastMessage(`Please Choose Exam`, 'warn');
+                return 1;
+            }
+            else{
+                window.location.replace('/exam/' + this.selectedStaff.id+ '/assessment/' + this.selectedExam.id )
+                // console.log('staff id = ' + this.selectedStaff.id , 'exam id = ' + this.selectedExam.id)
+            }
+        },
 
         contractFilesChange(e){
             const files = Array.from(e.target.files);

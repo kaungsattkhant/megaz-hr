@@ -330,7 +330,7 @@
     <transition enter-active-class="fade-out duration-[200ms]" enter-from-class="opacity-0" enter-to-class="opacity-100"
         leave-active-class="fade-in duration-[300ms]" leave-from-class="opacity-100" leave-to-class="opacity-0">
         <div v-show="isShow" 
-            class="fixed top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008]"
+            class="absolute top-0 left-0 right-0 bottom-0 w-[100vw] h-[100vh] z-40 overflow-y-auto bg-[#0008] pl-0 xl:pl-16"
             @click="btnClickedChangeFeature">
             <div class="container-card pb-4 px-8 m-16 z-50 overflow-hidden" @click.stop>
                 <div class="mb-6 flex justify-between">

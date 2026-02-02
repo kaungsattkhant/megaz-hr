@@ -671,9 +671,11 @@ Route::view('/resignations', 'resignations.index')->name('resignations.index');
 Route::view('/cv/form', 'CV.form')->name('CV.form');
 Route::view('/cv', 'CV.index')->name('CV.index');
 Route::view('/cv/{id}/detail', 'CV.detail');
-Route::view('/exams', 'exams.index');
+Route::view('/exam', 'exams.index');
 Route::view('/exam/create', 'exams.create')->name('exams.create');
 Route::view('/exam/{id}/edit', 'exams.edit');
+Route::view('/exam/{id}/assessment/{assessId}', 'exams.assessment')->name('exams.assessment');
+
 Route::view('/interviews', 'interviews.index');
 Route::view('/interviews/{id}/create/{cvId}/cv', 'interviews.create')->name('interviews.create');
 // Route::view('/interviews/create', 'interviews.create')->name('interviews.create');
