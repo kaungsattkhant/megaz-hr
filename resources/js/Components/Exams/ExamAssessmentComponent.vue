@@ -27,7 +27,7 @@
                 <!-- <input type="text" v-model="customQuestion" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
-            <div class="mb-6 col-span-3 pb-6 rounded-md">
+            <div class="mb-6 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Type
                 </label>
@@ -120,78 +120,7 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="mb-12" v-for="(question,questionIndex) in questionList">
-                <div v-if="question.length > 0">
-                    <div class="  mb-6">
-                        <p class=" text-xl font-semibold text-black">
-                            {{ question[0].type }}
-                        </p>
-                    </div>
-                    <div class="contents" v-for="(q,qIndex) in question">
-                        <div v-if="!q.is_custom" class="mb-8 pl-2">
-                            <div class="  mb-3">
-                                <p class=" text-base text-black">
-                                    {{ q.question }}
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap gap-y-4 gap-x-8 mb-6">
-                                <label
-                                class="inline-flex flex-grow-0 items-start space-x-2"
-                                v-for="(answer, aIndex) in q.answers"
-                                :key="aIndex"
-                                >
-                                <input
-                                    type="radio"
-                                    :name="'question-' + q.id"
-                                    :value="answer"
-                                    v-model="q.selected"
-                                    :checked="answer.checked"
-                                    @change="handleRadioChange(answer,q)"
-                                    class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none mt-0.5"
-                                />
-                                <p class="text-gray-600">{{ answer.answer }}</p>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="flex gap-x-4 mb-5 pl-2" v-if="q.is_custom">
-                            <div class=" min-w-[30%] max-w-[80%]"> 
-                                <p  class="text-gray-800">{{ q.question }}</p>
-                            </div>
-                            <div class=" w-[10%] text-center">
-                                <p>{{ q.mark }}</p>
-                            </div>
-                            <div class="w-[10%]">
-                                <button  class="mx-4" @click="deleteItem(qIndex,question,q)">
-                                    <i class="fal fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-                <div class="contents" v-else>
-                    <div class="  mb-6">
-                        <p class=" text-lg text-black">
-                            {{ question.type_name }}
-                        </p>
-                    </div>
-                    
-                    <div class="flex gap-x-4 mb-5 pl-2" v-for="(q,cqIndex) in question.question">
-                        <div class=" min-w-[30%] max-w-[80%]"> 
-                            <p  class="text-gray-600">{{ q.question }}</p>
-                        </div>
-                        <div class=" w-[10%] text-center">
-                            <p>{{ q.mark }}</p>
-                        </div>
-                        <div class="w-[10%]">
-                            <button  class="mx-4" @click="deleteCustomQuestion(questionIndex,cqIndex,q)">
-                                <i class="fal fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+            
         </div>
         <div class="px-4 mb-8">
             <button class="add-btn" @click="btnClickedAssessExam">
@@ -258,8 +187,10 @@ export default {
             let response = await getApiData({ url: `/api/hr/get_exam_by_role/`+ roleId +`/exam_type/exam`, token: this.getToken() });
             if (response.data) {
                 this.detail = response.data;
+                let index = this.detail.findIndex(item => item.id === Number(this.examId))
+                console.log(index)
                 setTimeout(() => {
-                    this.questionList = response.data[0].exam_questions
+                    this.questionList = response.data[index].exam_questions
                 }, 500);
             }
         },
@@ -453,7 +384,7 @@ export default {
                 });
             }
             let total = 0;
-            total = this.total_mark;
+            total = this.total_mark + this.total_custom_mark;
             let formData = new FormData();
             formData.append('staff_id', this.staffId);
             formData.append('exam_id', this.examId);
