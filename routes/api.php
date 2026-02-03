@@ -608,6 +608,7 @@ Route::get('/staffs', [StaffAPIController::class, 'getStaffData']);
 Route::get('/staffs/{id}', [StaffAPIController::class, 'detailStaff']);
 Route::post('/staffs', [StaffAPIController::class, 'createStaff']);
 Route::post('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
+Route::post('/update_staff_status', [StaffAPIController::class, 'updateStatus']);
 Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
 Route::delete('/staffs/{staff_id}/roles/{role_id}', [StaffAPIController::class, 'deleteRoleStaff']);
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}', [StaffAPIController::class, 'deleteInventoryStaff']);

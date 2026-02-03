@@ -3,7 +3,9 @@
 namespace App\Repositories\Interview;
 
 use App\Models\Exam;
+use App\Models\Staff;
 use App\Models\Interview;
+use App\Enums\StaffStatus;
 use App\Models\CustomQuestion;
 use App\Models\InterviewAnswer;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +84,10 @@ class InterviewRepository implements InterviewRepositoryInterface
           ]);
         }
       }
+      //update Staff Status
+      $staff=Staff::find($data['staff_id']);
+      $staff->status=StaffStatus::HIRED;
+      $staff->save();
       DB::commit();
       return ResponseMessage("Interview submitted successfully", 201);
     } catch (\Exception $e) {

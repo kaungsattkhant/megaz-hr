@@ -48,7 +48,7 @@ class Exam extends Model
     {
         return $this->grades()
             ->where('is_active', true)
-            ->where('mark', '<=', $totalMark)
+            ->where('mark', '>=', $totalMark)
             ->orderByDesc('mark')
             ->first();
     }
