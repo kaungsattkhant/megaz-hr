@@ -46,8 +46,15 @@ class InterviewRepository implements InterviewRepositoryInterface
       if ($existInterviews) {
         return ResponseMessage('Staff already took this exam. Retake is not allowed.', 400);
       }
-
+      $exam = Exam::find($data['exam_id']);
+      $grade = $exam->gradeForMark($data['total_mark']);
+      $data['status'] = $this->checkPassOrFail($exam, $data['total_mark']);
+      $data['grade_id'] = $grade ? $grade->id : null;
       $interview = Interview::create($data);
+      if ($data['status'] == 'pass') {
+        $skillIds = $exam->skills->pluck('id')->toArray();
+        $interview->staff->skills()->attach($skillIds);
+      }
       if (isset($data['interview_answers'])) {
         $interviewAnswers = json_decode($data['interview_answers'], true);
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -82,6 +89,20 @@ class InterviewRepository implements InterviewRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+
+  public function checkPassOrFail($exam, $totalMark)
+  {
+    $passMarkGrade = $exam->grades()
+      ->where('is_pass', true)
+      ->orderBy('mark', 'asc')
+      ->first();
+    if (!$passMarkGrade) {
+      \ResponseMessage('No pass mark grade defined for this exam', 500);
+    }
+    // Define your pass mark criteria here
+    $passMark = $passMarkGrade->mark; // Example: 50 is the pass mark
+    return $totalMark >= $passMark ? 'pass' : 'fail';
   }
 
   public function getInterviewResults($request)
@@ -160,7 +181,7 @@ class InterviewRepository implements InterviewRepositoryInterface
       ->when($request->has('department_id'), function ($query) use ($request) {
         $query->where('staff.department_id', $request->department_id);
       })
-      ->where('exams.type',$request->type ?? 'interview')
+      ->where('exams.type', $request->type ?? 'interview')
       ->groupBy('staff.id', 'staff.name', 'staff.department_id', 'departments.name')
       ->orderByDesc('interview_count');
     return $query->paginate(config('common.list_count', 20));

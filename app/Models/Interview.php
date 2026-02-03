@@ -16,6 +16,8 @@ class Interview extends Model
         'staff_id',
         'exam_id',
         'total_mark',
+        'grade_id',
+        'status',
         'created_by',
     ];
 
