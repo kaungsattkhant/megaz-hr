@@ -29,7 +29,7 @@ class CvRepository implements CvRepositoryInterface
   {
     $query = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
       // ->where('is_cv', 1)
-      ->whereIn('status', [StaffStatus::APPLIED])
+      ->whereIn('status', [StaffStatus::APPLIED->value])
       ->orderBy('created_at', 'desc');
     if ($request->has('status')) {
       $query->where('status', $request->status);
@@ -65,7 +65,7 @@ class CvRepository implements CvRepositoryInterface
     try {
       // $data['is_cv'] = 1;
       // $data['is_active'] = 1;
-      $data['status'] = StaffStatus::APPLIED;
+      $data['status'] = StaffStatus::APPLIED->value;
       $data = RemoveNullValues($data);
       $staff = Staff::create($data);
       if (isset($data['skills'])) {
@@ -104,7 +104,7 @@ class CvRepository implements CvRepositoryInterface
         ResponseMessage('Staff not found with given ID', 404);
       }
       $data['is_cv'] = 1;
-      $data['status'] = StaffStatus::APPLIED;
+      $data['status'] = StaffStatus::APPLIED->value;
       $data['is_active'] = 1;
       $data = RemoveNullValues($data);
       $staff->update($data);
@@ -201,13 +201,13 @@ class CvRepository implements CvRepositoryInterface
         $staff->cancelled_by = $data['cancelled_by'] ?? null;
         $staff->cancelled_at = now();
       }
-      if (isset($data['status']) && $data['status'] === StaffStatus::SHORTLISTED) {
+      if (isset($data['status']) && $data['status'] === StaffStatus::SHORTLISTED->value) {
         $staff->status = $data['status'];
         $staff->confirmed_by = $data['confirmed_by'] ?? null;
         $staff->confirmed_at = now();
       }
 
-      if (isset($data['status']) && $data['status'] === StaffStatus::REJECTED) {
+      if (isset($data['status']) && $data['status'] === StaffStatus::REJECTED->vaue) {
         $staff->status = $data['status'];
         $staff->cancelled_by = $data['cancelled_by'] ?? null;
         $staff->cancelled_at = now();
@@ -284,7 +284,7 @@ class CvRepository implements CvRepositoryInterface
       $data['created_by'] = UserData()->id;
       $staff = Staff::find($data['staff_id']);
       // if (!$staff || $staff->status !== 'confirmed') {
-      if (!$staff || $staff->status !== StaffStatus::HIRED) {
+      if (!$staff || $staff->status !== StaffStatus::HIRED->value) {
         ResponseMessage('Staff must be confirmed before assigning a join date.', 403);
       }
       $staff = Staff::updateOrCreate(
@@ -294,7 +294,7 @@ class CvRepository implements CvRepositoryInterface
         [
           'joined_date' => $data['joined_date'],
           'probation_period' => $data['probation_period'],
-          'stauts' => StaffStatus::PROBATION,
+          'status' => StaffStatus::PROBATION->value,
         ]
       );
       // $this->sendStaffJoinNotification($staff);

@@ -18,6 +18,6 @@ enum StaffStatus: string{
         // Employment types
     case PROBATION   = 'probation';  
     case PERMANENT   = 'permanent';
-    case TEMPORARY   = 'temporary';
+    // case TEMPORARY   = 'temporary';
     // case CONTRACT    = 'contract';
 }
