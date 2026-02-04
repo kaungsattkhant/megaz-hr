@@ -133,6 +133,9 @@
                         <thead class="font-medium text-left ">
                             <tr>
                                 <th scope="col" class=" pr-6 pl-2 py-4 ">
+                                    Pass
+                                </th>
+                                <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Mark
                                 </th>
                                 <th scope="col" class=" px-6 py-4 ">
@@ -145,6 +148,22 @@
                         </thead>
                         <tbody>
                             <tr v-for="(grade,gradeIndex) in selectedGradeList" >
+                                <td class=" pr-6 pl-2 py-3 font-medium ">
+                                    <!-- {{ grade.mark }} -->
+                                    <div class="flex flex-wrap gap-y-4 gap-x-8 mb-6">
+                                        <label
+                                        class="inline-flex flex-grow-0 items-start space-x-2"
+                                        >
+                                        <input
+                                            type="radio"
+                                            name="passGrade"
+                                            :value="gradeIndex"
+                                            v-model="passGradeIndex"
+                                            class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none mt-0.5"
+                                        />
+                                        </label>
+                                    </div>
+                                </td>
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ grade.mark }}
                                 </td>
@@ -436,6 +455,7 @@ export default {
             selectedQuestionDetail: null,
             selectedAnswerList: [],
 
+            passGradeIndex: null,
 
             
             name: null,
@@ -450,7 +470,14 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-
+        handleRadioChange(answer,q){
+            // this.questionList[first].questions[second].answers.forEach((a, i) => {
+            //     a.checked = i === third
+            // })
+            // answer.checked = 'yellow';
+            q.answer_id = answer.id
+            this.total_mark = this.totalMark
+        },
         
 
         async getDepartmentList() {
@@ -524,6 +551,7 @@ export default {
                 this.selectedGradeList.push({
                     mark: this.mark,
                     grade: this.grade,
+                    is_pass: 0,
                 });
                 this.mark = null;
                 this.grade = null;
@@ -681,7 +709,13 @@ export default {
             }
         },
     },
-
+    watch: {
+        passGradeIndex(newIndex) {
+            this.selectedGradeList.forEach((grade, i) => {
+                grade.is_pass = i === newIndex ? 1 : 0
+            })
+        }
+    },
     created(){
         this.getDepartmentList();
     },
