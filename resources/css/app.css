@@ -63,7 +63,10 @@
     .add-btn{
         @apply min-w-[75px]
     }
+    .te-select .form-select {
+        @apply text-sm;
     }
+}
 
 
 

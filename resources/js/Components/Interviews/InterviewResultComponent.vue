@@ -19,6 +19,14 @@
                 </div>
                 <div class="flex pr-0 gap-x-4">
                     <div class=" !text-sm" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type"
+                            @change="resultFilter" data-te-select-filter="true" name="" id=""
+                            v-model="selectedType" class="input-ui">
+                            <option :value="result" v-for="(result, resultIndex) in resultList"
+                                :key="resultIndex"> {{ result.name }} </option>
+                        </select>
+                    </div>
+                    <div class=" !text-sm" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department"
                             @change="departmentFilter" data-te-select-filter="true" name="" id=""
                             v-model="selectedDepartment" class="input-ui">
@@ -209,7 +217,12 @@ export default {
 
             departmentList: [],
             roleList: [],
+            resultList: [
+                {value: 'interview', name: 'Interview'},
+                {value: 'exam', name: 'Exam'},
+            ],
 
+            selectedType: {value: 'interview', name: 'Interview'},
             selectedDepartment: null,
             selectedRole: null,
 
@@ -237,13 +250,13 @@ export default {
         ...mapGetters(['getUser', 'getDepartment', 'getToken']),
 
         async getPrimaryList(pageNumber) {
-            let url = '';
-            if (this.url_search) {
-                url = this.url + this.url_search;
-            }
-            else {
-                url = this.url + this.url_department + this.url_role;
-            }
+            let url = this.url + '?page=' + pageNumber + this.url_type + this.url_search + this.url_department + this.url_role;
+            // if (this.url_search) {
+            //     url = this.url + this.url_search;
+            // }
+            // else {
+            //     url = this.url + this.url_department + this.url_role;
+            // }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.primaryList = response.data.data;
@@ -260,9 +273,21 @@ export default {
             this.roleList = this.selectedDepartment.roles;
         },
         roleFilter() {
+            this.url_search = '';
+            this.searchInput = null;
             this.url_department = '&departmentIds[]=' + this.selectedDepartment.id;
             this.url_role = '&roleIds[]=' + this.selectedRole.id;
-            this.getPrimaryList();
+            this.getPrimaryList(1);
+        },
+        resultFilter() {
+            this.url_search = '';
+            this.searchInput = null;
+            this.url_department = '';
+            this.url_role = '';
+            this.selectedRole = null;
+            this.selectedDepartment = null;
+            this.url_type = '&type=' + this.selectedType.value;
+            this.getPrimaryList(1);
         },
         // async searchBtnClicked() {
         //     this.url_search = '&search=' + this.searchInput
@@ -311,7 +336,7 @@ export default {
 
     },
     created() {
-        this.getPrimaryList();
+        this.getPrimaryList(1);
         this.getDepartmentList();
     }
 }

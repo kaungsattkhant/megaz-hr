@@ -1,7 +1,7 @@
 <template>
     
-    <div class="mt-4 bg-white">
-        <div class="card-shadow">
+    <div class="mt-4">
+        <div class="card-shadow pt-2 pb-2">
             <div>
                 <p class=" page-title">
                     CV Forms
@@ -456,10 +456,18 @@ export default {
             departmentList: [],
             roleList: [],
             statusList: [
-                { value: 'received', name: 'Received' },
-                { value: 'pending', name: 'Pending' },
-                { value: 'confirmed', name: 'Confirmed' },
-                { value: 'cancelled', name: 'Cancelled' },
+                { value: 'applied', name: 'Applied' },
+                { value: 'shortlisted', name: 'Shortlisted' },
+                { value: 'interviewed', name: 'Interviewed' },
+                { value: 'hired', name: 'Hired' },
+                { value: 'rejected', name: 'Rejected' },
+                { value: 'probation', name: 'Probation' },
+                { value: 'permanent', name: 'Permanent' },
+
+                // { value: 'received', name: 'Received' },
+                // { value: 'pending', name: 'Pending' },
+                // { value: 'confirmed', name: 'Confirmed' },
+                // { value: 'cancelled', name: 'Cancelled' },
             ],
 
             selectedDepartment: null,

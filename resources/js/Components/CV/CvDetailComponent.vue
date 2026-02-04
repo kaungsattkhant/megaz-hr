@@ -437,7 +437,10 @@ export default {
                 //     });
                 // }
             };
-
+            // const file = this.$refs.nrc_front_image.files[0]
+            this.nrcFrontFile = detail.nrc_front_url
+            this.nrcBackFile = detail.nrc_back_url
+            this.houseHoldRegistrationFile = detail.household_registration_url
         },
 
 
@@ -492,7 +495,7 @@ export default {
         },
         async btnClickedConfirmCV(item){
             let formData = new FormData();
-            formData.append('status', 'confirmed');
+            formData.append('status', 'shortlisted');
             formData.append('confirmed_by', this.getUser().id);
             formData.append('confirmed_at', this.currentTime);
             let response = await postApiData({url:`/api/hr/cvs/` + this.cvId + '/status', form_data:formData, token:this.getToken()})
