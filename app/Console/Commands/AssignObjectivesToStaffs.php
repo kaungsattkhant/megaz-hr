@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Staff;
 use App\Models\Objective;
+use App\Enums\StaffStatus;
 use App\Models\ObjectiveKey;
 use App\Models\ObjectiveStaff;
 use App\Models\ObjectiveAssign;
@@ -41,7 +42,11 @@ class AssignObjectivesToStaffs extends Command
             foreach ($objectives as $objective) {
                 $roleId = $objective->role_id;
 
-                $staffLists = Staff::staffByRole($roleId)->where('is_cv', 0);
+                $staffLists = Staff::staffByRole($roleId)
+                    ->whereIn('status', [
+                        StaffStatus::PROBATION->value,
+                        StaffStatus::PERMANENT->value,
+                    ]);
 
                 foreach ($staffLists as $staff) {
                     $existingAssign = ObjectiveAssign::where('objective_id', $objective->id)

@@ -3,6 +3,7 @@
 namespace App\Http\Action\SendNotification;
 
 use App\Models\Staff;
+use App\Enums\StaffStatus;
 use App\Models\Notification;
 use App\Models\StaffFcmToken;
 use App\Models\NotificationUser;
@@ -18,7 +19,7 @@ use App\Events\SendNotification as EventsSendNotification;
 trait SendNotification
 {
     //sending notification 
-    
+
     public function send($model, $users, $data)
     {
         $morphMapName = RelationMorphName($model);
@@ -77,11 +78,11 @@ trait SendNotification
         }
         if ($users->isNotEmpty()) {
             $staff_ids = $users->pluck('id')->filter()->values()->toArray();
-            broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));//this is common broadcast channel for mobilenoti for staff notification
+            broadcast(new SendDepartmentNotification($notification, $staff_ids, $morphMapName)); //this is common broadcast channel for mobilenoti for staff notification
             // if ($type === "dep_type") {
             //     $department_id = $users->first()->department_id;
             //     $department_ids = $users->pluck('department_id')->unique()->filter()->values()->toArray();
-                
+
             //     foreach ($staff_ids as $staff_id) {
             //         broadcast(new SendDepartmentNotification($notification,$staff_ids,$morphMapName));
             //     }
@@ -116,15 +117,16 @@ trait SendNotification
                     'preview' => "Leave Status Update",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
-            ]);
+                ]
+            );
 
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $staff_id,
-            ],[
+            ], [
                 'title' => 'Leave Status Update',
                 'preview' => "Leave Status Update",
             ]);
-            broadcast(new SendDepartmentNotification($notification,$staff_id,$morphMapName));
+            broadcast(new SendDepartmentNotification($notification, $staff_id, $morphMapName));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);
@@ -145,11 +147,12 @@ trait SendNotification
                     'preview' => $complaint->title,
                     'date_time' => $complaint->created_at,
                     'created_by' => UserData()->id,
-            ]);
+                ]
+            );
 
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $staff_id,
-            ],[
+            ], [
                 'title' => 'Complaints',
                 'preview' => $complaint->title,
             ]);
@@ -248,12 +251,17 @@ trait SendNotification
                     'preview' => "Staff {$staff->name} has officially joined on {$joinDateFormatted}",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
-            ]);
-            $allStaff = Staff::where('is_cv', 0)->get();
+                ]
+            );
+            $allStaff = Staff::whereIn('status', [
+                StaffStatus::PROBATION->value,
+                StaffStatus::PERMANENT->value,
+            ])
+                ->get();
             foreach ($allStaff as $user) {
                 $notification->notificationUsers()->updateOrCreate([
                     'staff_id' => $user->id,
-                ],[
+                ], [
                     'title' => 'New Staff Joined'
                 ]);
             }
@@ -278,10 +286,11 @@ trait SendNotification
                     'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
-            ]);
+                ]
+            );
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $staffTimeshift->staff_id,
-            ],[
+            ], [
                 'title' => 'Shift Assigned',
                 'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
             ]);
@@ -294,7 +303,7 @@ trait SendNotification
         }
     }
 
-    public function sendShiftStatusNotificationToAdmin($staffTimeshift , $status)
+    public function sendShiftStatusNotificationToAdmin($staffTimeshift, $status)
     {
         try {
             $morphMapName = RelationMorphName($staffTimeshift);
@@ -308,11 +317,12 @@ trait SendNotification
                     'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
-            ]);
+                ]
+            );
 
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $staffTimeshift->created_by,
-            ],[
+            ], [
                 'title' => 'Shift Status ' . ucfirst($status),
                 'preview' => "Shift {$staffTimeshift->timeshift->shift->name} has been assigned to {$staffTimeshift->staff->name}",
             ]);
@@ -334,16 +344,17 @@ trait SendNotification
                     'notificationable_type' => $morphMapName
                 ],
                 [
-                    'title' => 'Handover from '. $handOver->staffTimeshift->timeshift->shift->name,
+                    'title' => 'Handover from ' . $handOver->staffTimeshift->timeshift->shift->name,
                     'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
-            ]);
+                ]
+            );
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $handOver->toStaff->id,
-            ],[
-                'title' => 'Handover from '. $handOver->staffTimeshift->timeshift->shift->name,
-                'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}" ,
+            ], [
+                'title' => 'Handover from ' . $handOver->staffTimeshift->timeshift->shift->name,
+                'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
             ]);
             broadcast(new SendDepartmentNotification($notification, $handOver->toStaff->id, $morphMapName));
             return $notification;
@@ -365,12 +376,13 @@ trait SendNotification
                     'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
                     'date_time' => now(),
                     'created_by' => UserData()->id,
-            ]);
+                ]
+            );
             $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $handOver->fromStaff->id,
-            ],[
+            ], [
                 'title' => "Handover Status {$handOver->status} Update from " . $handOver->staffTimeshift->timeshift->shift->name,
-                'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}" ,
+                'preview' => "Handover {$handOver->fromStaff->name} to {$handOver->toStaff->name}",
             ]);
             broadcast(new SendDepartmentNotification($notification, $handOver->fromStaff->id, $morphMapName));
             return $notification;

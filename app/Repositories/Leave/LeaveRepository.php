@@ -5,6 +5,7 @@ namespace App\Repositories\Leave;
 use App\Models\Leave;
 use App\Models\Staff;
 use App\Models\ExitPass;
+use App\Enums\StaffStatus;
 use App\Models\ExitCategory;
 use App\Models\LeaveCategory;
 use App\Models\LeaveAllowance;
@@ -533,7 +534,10 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->where('department_id', $departmentId)
       ->with(['department', 'roles'])
       ->orderByDesc('id')
-      ->where('is_cv', 0)
+      ->whereIn('status', [
+        StaffStatus::PROBATION->value,
+        StaffStatus::PERMANENT->value,
+      ])
       ->where('is_active', 1)
       ->paginate(config('common.list_count'));
     ResponseData($staffs);

@@ -2,13 +2,13 @@
 
 namespace App\Repositories\Salary;
 
-use App\Http\Resources\Mobile\PaySlipResource;
 use App\Models\Staff;
 use App\Models\Salary;
 use App\Models\CheckIn;
 use App\Models\PaySlip;
 use App\Models\Overtime;
 use App\Models\Allowance;
+use App\Enums\StaffStatus;
 use App\Models\DayInOffDay;
 use App\Models\OvertimeFee;
 use App\Models\SalaryBatch;
@@ -20,6 +20,7 @@ use App\Models\OvertimeCategory;
 use App\Models\PaySlipAllowance;
 use App\Models\SalaryBatchStaff;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\Mobile\PaySlipResource;
 
 class SalaryRepository implements SalaryRepositoryInterface
 {
@@ -80,7 +81,11 @@ class SalaryRepository implements SalaryRepositoryInterface
       }
 
       $staffIds = Staff::whereHas('roles', function ($query) use ($data) {
-        $query->where('id', $data['role_id'])->where('is_cv', 0);
+        $query->where('id', $data['role_id'])
+          ->whereIn('status', [
+            StaffStatus::PROBATION->value,
+            StaffStatus::PERMANENT->value,
+          ]);
       })->pluck('id');
       if ($staffIds->isNotEmpty()) {
         foreach ($staffIds as $staffId) {

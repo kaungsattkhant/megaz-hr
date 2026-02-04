@@ -104,8 +104,8 @@ class CvRepository implements CvRepositoryInterface
       if (!$staff) {
         ResponseMessage('Staff not found with given ID', 404);
       }
-      $data['is_cv'] = 1;
-      $data['status'] = StaffStatus::APPLIED->value;
+      // $data['is_cv'] = 1;
+      // $data['status'] = StaffStatus::APPLIED->value;
       $data['is_active'] = 1;
       $data = RemoveNullValues($data);
       $staff->update($data);
