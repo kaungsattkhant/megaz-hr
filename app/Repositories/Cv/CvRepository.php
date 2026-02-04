@@ -29,7 +29,7 @@ class CvRepository implements CvRepositoryInterface
   {
     $query = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
       // ->where('is_cv', 1)
-      ->whereIn('status', [StaffStatus::APPLIED->value])
+      ->whereIn('status', [StaffStatus::APPLIED->value, StaffStatus::SHORTLISTED->value, StaffStatus::INTERVIEWED->value])
       ->orderBy('created_at', 'desc');
     if ($request->has('status')) {
       $query->where('status', $request->status);
@@ -89,7 +89,8 @@ class CvRepository implements CvRepositoryInterface
   }
   public function getCvById($id)
   {
-    $staff = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])->where('is_cv', 1)->find($id);
+    $staff = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
+    ->find($id);
     if (!$staff) {
       ResponseMessage('CV not found with given ID', 404);
     }
@@ -184,35 +185,34 @@ class CvRepository implements CvRepositoryInterface
       if (!$staff) {
         ResponseMessage('Staff not found with given ID', 404);
       }
-      if (isset($data['status']) && $data['status'] === "pending") {
-        $staff->status = $data['status'];
-        $staff->confirmed_by = null;
-        $staff->confirmed_at = null;
-        $staff->cancelled_by = null;
-        $staff->cancelled_at = null;
-      }
-      if (isset($data['status']) && $data['status'] === "confirmed") {
-        $staff->status = $data['status'];
-        $staff->confirmed_by = $data['confirmed_by'] ?? null;
-        $staff->confirmed_at = now();
-      }
-      if (isset($data['status']) && $data['status'] === 'cancelled') {
-        $staff->status = $data['status'];
-        $staff->cancelled_by = $data['cancelled_by'] ?? null;
-        $staff->cancelled_at = now();
-      }
+      // if (isset($data['status']) && $data['status'] === "pending") {
+      //   $staff->status = $data['status'];
+      //   $staff->confirmed_by = null;
+      //   $staff->confirmed_at = null;
+      //   $staff->cancelled_by = null;
+      //   $staff->cancelled_at = null;
+      // }
+      // if (isset($data['status']) && $data['status'] === "confirmed") {
+      //   $staff->status = $data['status'];
+      //   $staff->confirmed_by = $data['confirmed_by'] ?? null;
+      //   $staff->confirmed_at = now();
+      // }
+      // if (isset($data['status']) && $data['status'] === 'cancelled') {
+      //   $staff->status = $data['status'];
+      //   $staff->cancelled_by = $data['cancelled_by'] ?? null;
+      //   $staff->cancelled_at = now();
+      // }
       if (isset($data['status']) && $data['status'] === StaffStatus::SHORTLISTED->value) {
         $staff->status = $data['status'];
         $staff->confirmed_by = $data['confirmed_by'] ?? null;
         $staff->confirmed_at = now();
       }
-
-      if (isset($data['status']) && $data['status'] === StaffStatus::REJECTED->vaue) {
+      if (isset($data['status']) && $data['status'] === StaffStatus::REJECTED->value) {
         $staff->status = $data['status'];
         $staff->cancelled_by = $data['cancelled_by'] ?? null;
         $staff->cancelled_at = now();
       }
-      $staff->update($data);
+      $staff->save();
       DB::commit();
       return $staff;
     } catch (\Exception $e) {
