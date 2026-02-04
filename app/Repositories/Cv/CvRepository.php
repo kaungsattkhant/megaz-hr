@@ -293,7 +293,8 @@ class CvRepository implements CvRepositoryInterface
         ],
         [
           'joined_date' => $data['joined_date'],
-          'stauts' => StaffStatus::TEMPORARY,
+          'probation_period' => $data['probation_period'],
+          'stauts' => StaffStatus::PROBATION,
         ]
       );
       // $this->sendStaffJoinNotification($staff);

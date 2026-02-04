@@ -69,6 +69,7 @@ class Staff extends Authenticatable implements AuditableContract
         'gps_distance',
         'check_in_late_min',
         'check_out_early_min',
+        'probation_period',
         'status',
     ];
 

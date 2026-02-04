@@ -16,7 +16,7 @@ enum StaffStatus: string{
     case REJECTED    = 'rejected';
 
         // Employment types
-    // case PROBATION   = 'probation';  
+    case PROBATION   = 'probation';  
     case PERMANENT   = 'permanent';
     case TEMPORARY   = 'temporary';
     // case CONTRACT    = 'contract';

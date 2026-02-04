@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::table('staff', function (Blueprint $table) {
             $table->dropColumn('status');
             $table->enum('status', StaffStatus::getValues())->default(StaffStatus::PERMANENT);
+            $table->integer('probation_period')->default(0);
         });
     }
 

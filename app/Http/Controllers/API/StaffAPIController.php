@@ -220,6 +220,6 @@ class StaffAPIController extends Controller
 
     public function updateStatus(Request $request){
         $data=$this->staffRepo->updateStaffStatus($request);
-        \ResponseMessage("Update Status Successfully");
+        \ResponseMessage("Status Update  Successfully");
     }
 }
