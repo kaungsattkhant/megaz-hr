@@ -113,7 +113,7 @@
                                         {{ staff.department.name }}
                                     </td>
                                     <td lass="whitespace-nowrap text-left  ">
-                                        <button data-te-toggle="modal" data-te-target="#change_status" class="mx-4 cursor-pointer"
+                                        <button data-te-toggle="modal" data-te-target="#change_status" class="mx-4 cursor-pointer text-blue-600"
                                             @click="statusChangeBtnClicked(staff)" title="Change Status">
                                             {{ staff.status ? staff.status : '--' }}
                                         </button>
