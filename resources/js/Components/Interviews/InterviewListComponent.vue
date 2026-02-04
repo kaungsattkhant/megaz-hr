@@ -209,7 +209,7 @@ export default {
             selectedItem: null,
 
 
-            url: '/api/hr/cvs?status=confirmed',
+            url: '/api/hr/cvs?status=shorlisted',
             url_search: '',
             url_department: '',
             url_role: '',
