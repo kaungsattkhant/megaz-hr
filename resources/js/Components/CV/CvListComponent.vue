@@ -356,11 +356,18 @@
                         </button>
                     </div>
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                        <div class="mb-0 col-span-3 pb-0 rounded-md">
+                        <div class="mb-4 col-span-3 pb-0 rounded-md">
                             <label for="" class="block text-sm text-black mb-3">
                                 Date
                             </label>
                             <input type="date" v-model="selectedJoinedDate" autocomplete="off"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-0 col-span-3 pb-0 rounded-md">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Probation Month
+                            </label>
+                            <input type="number" v-model="selectedProbationMonth" autocomplete="off"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
@@ -500,6 +507,7 @@ export default {
 
             isExceed: false,
             selectedJoinedDate: null,
+            selectedProbationMonth: null,
 
             feature: this.getFeature(),
             loading: false,
@@ -679,6 +687,7 @@ export default {
 
         async addJoinedDateBtnClicked(item){
             this.selectedJoinedDate = null;
+            this.selectedProbationMonth = null;
             this.selectedItem = item;
             // let response = await getApiData({ url: '/api/hr/new-staff-join-date/', token: this.getToken() });
             // if (response.data) {
@@ -697,6 +706,7 @@ export default {
                 let formData = new FormData();
                 formData.append('staff_id',this.selectedItem.id);
                 formData.append('joined_date',this.selectedJoinedDate);
+                formData.append('probation_month',this.selectedProbationMonth);
                 let response = await postApiData({url:`/api/hr/new-staff-join-date`, form_data:formData, token:this.getToken()})
                 if(response.success){
                     this.getPrimaryList();
