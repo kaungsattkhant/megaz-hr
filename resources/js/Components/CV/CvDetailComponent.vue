@@ -7,7 +7,7 @@
             <div class="flex justify-end gap-x-4 px-6">
                 <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                     @click="btnClickedCancelledCV">
-                        Cancel
+                        Reject
                 </button>
                 <button type="button" @click="btnClickedConfirmCV()"
                     class="add-btn focus:outline-none focus:ring-0 ">
@@ -512,7 +512,7 @@ export default {
         },
         async btnClickedCancelledCV(item){
             let formData = new FormData();
-            formData.append('status', 'cancelled');
+            formData.append('status', 'rejected');
             formData.append('cancelled_by', this.getUser().id);
             formData.append('cancelled_at', this.currentTime);
             let response = await postApiData({url:`/api/hr/cvs/` + this.cvId + '/status', form_data:formData, token:this.getToken()})
