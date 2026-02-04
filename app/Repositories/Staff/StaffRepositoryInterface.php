@@ -43,4 +43,6 @@ interface StaffRepositoryInterface
     public function staffList(Request $request);
 
     public function attachStaffContracts($id, Request $request);
+
+    public function updateStaffStatus($request);
 }

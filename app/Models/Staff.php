@@ -68,7 +68,9 @@ class Staff extends Authenticatable implements AuditableContract
         'off_day_count',
         'gps_distance',
         'check_in_late_min',
-        'check_out_early_min'
+        'check_out_early_min',
+        'probation_period',
+        'status',
     ];
 
     protected $hidden = [

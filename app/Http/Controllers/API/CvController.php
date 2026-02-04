@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Cv\CvCreateRequest;
+use App\Http\Requests\Cv\CvJoinRequest;
 use App\Repositories\Cv\CvRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -26,7 +28,7 @@ class CvController extends Controller
         ResponseData($data);
     }
 
-    public function createCv(Request $request)
+    public function createCv(CvCreateRequest $request)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
         if ($request->hasFile('nrc_front_image')) {
@@ -109,7 +111,7 @@ class CvController extends Controller
         ResponseData($data);
     }
 
-    public function storeNewStaffJoinDate(Request $request)
+    public function storeNewStaffJoinDate(CvJoinRequest $request)
     {
         $data = $this->cvRepository->storeNewStaffJoinDate($request->all());
         ResponseData($data);

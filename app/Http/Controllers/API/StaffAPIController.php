@@ -217,4 +217,9 @@ class StaffAPIController extends Controller
 
         $this->staffRepo->attachStaffContracts($id, $request);
     }
+
+    public function updateStatus(Request $request){
+        $data=$this->staffRepo->updateStaffStatus($request);
+        \ResponseMessage("Status Update  Successfully");
+    }
 }

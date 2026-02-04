@@ -6,16 +6,17 @@ use App\Models\Role;
 use App\Models\Staff;
 use App\Models\Feature;
 use App\Models\Inventory;
+use App\Enums\StaffStatus;
 use App\Models\NrcTownship;
 use App\Models\StaffAdvance;
 use App\Models\StaffBalance;
 use Illuminate\Http\Request;
+use App\Models\StaffContract;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\StaffResource;
 use App\Models\StaffEmergencyContact;
 use Illuminate\Support\Facades\Storage;
-use App\Models\StaffContract;
 
 class StaffRepository implements StaffRepositoryInterface
 {
@@ -283,9 +284,9 @@ class StaffRepository implements StaffRepositoryInterface
     {
 
         $allowedRoles = $roles ? ((in_array('Manager', $roles) || in_array('Captain', $roles) || in_array('Chief Accountant', $roles) || in_array('Sous Chef', $roles) || in_array('Senior Receptionist', $roles))
-            ? ['Supervisor', 'Staff','Helper','Bartender','Demi Chef','Waiter','Receptionist','Accountant','Cashier','Driver','M&E','Security','Staff Cook']
-            : ['Staff','Helper','Demi Chef','Bartender','Waiter','Receptionist','Driver','M&E','Security','Staff Cook','Accountant','Cashier']) : null;
-            
+            ? ['Supervisor', 'Staff', 'Helper', 'Bartender', 'Demi Chef', 'Waiter', 'Receptionist', 'Accountant', 'Cashier', 'Driver', 'M&E', 'Security', 'Staff Cook']
+            : ['Staff', 'Helper', 'Demi Chef', 'Bartender', 'Waiter', 'Receptionist', 'Driver', 'M&E', 'Security', 'Staff Cook', 'Accountant', 'Cashier']) : null;
+
         if ($request->per_page || $request->page) {
             // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             // $pageNumber = 1;
@@ -512,10 +513,10 @@ class StaffRepository implements StaffRepositoryInterface
     public function attachStaffContracts($id, Request $request)
     {
         $staff = Staff::find($id);
-        if(!$staff){
+        if (!$staff) {
             ResponseMessage("No staff found with given id", 404, false);
         }
-        foreach($request->contract_images as $image){
+        foreach ($request->contract_images as $image) {
             $extension = $image->getClientOriginalExtension();
             $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
             $path = $image->storeAs("staff_contracts/{$staff->id}", $hashedName, 'public');
@@ -523,8 +524,30 @@ class StaffRepository implements StaffRepositoryInterface
             $staff->contracts()->create([
                 'contract_file_url' => $url,
                 'contract_file_path' => $path,
-            ]);            
+            ]);
         }
         ResponseData($staff);
+    }
+
+    public function updateStaffStatus($request)
+    {
+        DB::beginTransaction();
+        try {
+            $staff = Staff::find($request->id);
+            if (!$staff) {
+                \ResponseMessage('Staff Not found', 419);
+            }
+            if (!in_array($request->status, StaffStatus::getValues())) {
+                \ResponseMessage('Invalid staff status.', 422);
+            }
+            $staff->status = $request->status;
+            $staff->save();
+            DB::commit();
+            return $staff;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
