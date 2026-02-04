@@ -47,8 +47,8 @@ class CvCreateRequest extends FormRequest
             // "secondary_phone" => "required|regex:/^09/",
             "secondary_phone" => "required",
             "secondary_relationship" => "required",
-            "roles" => "required|array",
-            "roles.*" => "required|exists:roles,id"
+            "role_id" => "required|array",
+            "role_id.*" => "required|exists:roles,id"
         ];
     }
 }
