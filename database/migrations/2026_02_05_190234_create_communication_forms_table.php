@@ -40,6 +40,7 @@ return new class extends Migration
             $table->longText('overcoming_obstacles')->nullable();
             $table->longText('future_review')->nullable();
             $table->longText('declaration')->nullable();
+            $table->longText('signature')->nullable();
             $table->timestamps();
         });
     }

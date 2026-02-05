@@ -35,5 +35,6 @@ class CommunicationForm extends Model
         'overcoming_obstacles',
         'future_review',
         'declaration',
+        'signature'
     ];
 }
