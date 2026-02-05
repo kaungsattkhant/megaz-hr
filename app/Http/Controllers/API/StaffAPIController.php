@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 use App\Http\Requests\Staff\StaffCreateRequest;
+use App\Http\Requests\Staff\StaffStatusUpdate;
 use App\Http\Requests\Staff\StaffUpdateRequest;
 use App\Repositories\Staff\StaffRepositoryInterface;
 
@@ -218,7 +219,7 @@ class StaffAPIController extends Controller
         $this->staffRepo->attachStaffContracts($id, $request);
     }
 
-    public function updateStatus(Request $request){
+    public function updateStatus(StaffStatusUpdate $request){
         $data=$this->staffRepo->updateStaffStatus($request);
         \ResponseMessage("Status Update  Successfully");
     }
