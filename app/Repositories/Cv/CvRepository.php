@@ -3,6 +3,7 @@
 namespace App\Repositories\Cv;
 
 use App\Enums\StaffStatus;
+use App\Http\Action\SendNotification\FcmSendNotification;
 use App\Models\Skill;
 use App\Models\Staff;
 use App\Models\Salary;
@@ -14,7 +15,7 @@ use App\Http\Action\SendNotification\SendNotification;
 
 class CvRepository implements CvRepositoryInterface
 {
-  use SendNotification;
+  use SendNotification, FcmSendNotification;
   public function skillByRoleAndDepartment($depId, $roleId)
   {
     $skills = Skill::whereHas('role', function ($query) use ($roleId, $depId) {
@@ -29,7 +30,12 @@ class CvRepository implements CvRepositoryInterface
   {
     $query = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
       // ->where('is_cv', 1)
-      ->whereIn('status', [StaffStatus::APPLIED->value, StaffStatus::SHORTLISTED->value, StaffStatus::INTERVIEWED->value])
+      ->whereIn('status', [
+        StaffStatus::APPLIED->value,
+        StaffStatus::HIRED->value,
+        StaffStatus::SHORTLISTED->value,
+        StaffStatus::INTERVIEWED->value
+      ])
       ->orderBy('created_at', 'desc');
     if ($request->has('status')) {
       $query->where('status', $request->status);
@@ -90,7 +96,7 @@ class CvRepository implements CvRepositoryInterface
   public function getCvById($id)
   {
     $staff = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
-    ->find($id);
+      ->find($id);
     if (!$staff) {
       ResponseMessage('CV not found with given ID', 404);
     }
@@ -293,11 +299,24 @@ class CvRepository implements CvRepositoryInterface
         ],
         [
           'joined_date' => $data['joined_date'],
-          'probation_period' => $data['probation_period'],
+          'probation_period' => $data['probation_period'] ?? 0,
           'status' => StaffStatus::PROBATION->value,
         ]
       );
-      // $this->sendStaffJoinNotification($staff);
+      //send notificaiton 
+      $allStaff = Staff::whereIn('status', [
+        StaffStatus::PROBATION->value,
+        StaffStatus::PERMANENT->value,
+      ])
+        ->where('id', '!=', $staff->id)
+        ->get();
+      $joinDateFormatted = date('d M, Y', strtotime($staff->joined_date));
+
+      $notificationData = [
+        'title' => 'New Staff Joined',
+        'preview' => "Staff {$staff->name} has officially joined on {$joinDateFormatted}",
+      ];
+      $this->sendFcmNotification($staff, $allStaff, $notificationData);
       DB::commit();
       return $staff;
     } catch (\Exception $e) {

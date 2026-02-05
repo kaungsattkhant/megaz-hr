@@ -25,7 +25,7 @@ class CvJoinRequest extends FormRequest
             //
             "joined_date"=> ['required'],
             "staff_id" => ['required','exists:staff,id'],
-            "probation_period"=>["required","integer","min:0"],
+            // "probation_period"=>["required","integer","min:0"],
         ];
     }
 }

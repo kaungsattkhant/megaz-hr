@@ -257,7 +257,8 @@ trait SendNotification
                 StaffStatus::PROBATION->value,
                 StaffStatus::PERMANENT->value,
             ])
-                ->get();
+            ->where('id','!=',$staff->id)
+            ->get();
             foreach ($allStaff as $user) {
                 $notification->notificationUsers()->updateOrCreate([
                     'staff_id' => $user->id,
@@ -265,7 +266,7 @@ trait SendNotification
                     'title' => 'New Staff Joined'
                 ]);
             }
-            broadcast(new SendStaffJoinNotification($staff, $notification));
+            // broadcast(new SendStaffJoinNotification($staff, $notification));
             return $notification;
         } catch (\Exception $e) {
             ResponseMessage($e->getMessage(), 402);

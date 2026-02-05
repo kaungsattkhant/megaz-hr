@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:kitchen-expense')->monthly();
         $schedule->command('app:kitchen-menu-total')->monthly();
         $schedule->command('staff:auto-checkout')->everyMinute();
+        $schedule->command('notify:staff-joined-today')->dailyAt('08:00');
     }
 
 

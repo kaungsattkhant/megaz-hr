@@ -393,7 +393,9 @@ class ObjectiveRepository implements ObjectiveInterface
             ->where('staff_id', $staffId)
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
-            })->get();
+            })
+            ->orderBy('id','desc')
+            ->get();
 
         foreach ($objectiveAssigns as $objectiveAssign) {
             $objectiveAssign->approver = false;
@@ -409,27 +411,13 @@ class ObjectiveRepository implements ObjectiveInterface
                     ->first();
                 if (!$objectiveStaff) {
                     $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->where('status', 'assigned')
+                        ->whereIn('status', ['assigned','rejected']) //rejected  from accountable 
                         ->whereDate('start_date', $currentDate)
                         ->orderBy('repetition_count', 'asc')
                         ->first();
                 }
-
-                // if (!$objectiveStaff && $objectiveAssign->objective->repetition > 1) {
-                //     $lastCompletedRepetition = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                //         ->whereDate('start_date', $currentDate)
-                //         ->where('status', 'completed')
-                //         ->max('repetition_count');
-                //     if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
-                //         $nextRepetition = $lastCompletedRepetition + 1;
-                //         $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                //             ->whereDate('start_date', $currentDate)
-                //             ->where('repetition_count', $nextRepetition)
-                //             ->first();
-                //     }
-                // }
-
                 if ($objectiveStaff) {
+
                     $objectiveStaffCollection = collect([$objectiveStaff]);
                     $objectiveAssign->setRelation('objectiveStaff', $objectiveStaffCollection);
 
