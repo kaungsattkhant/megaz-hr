@@ -196,7 +196,7 @@
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedQuestionType" class="input-ui !text-black"
-                        data-te-select-filter="true" @change="typeChange">
+                        data-te-select-filter="true">
                             <option :value="type" v-for="(type, typeIndex) in questionTypeList" :key="typeIndex">
                                 {{ type.name }}
                             </option>

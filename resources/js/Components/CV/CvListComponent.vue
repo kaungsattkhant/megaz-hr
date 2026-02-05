@@ -706,7 +706,7 @@ export default {
                 let formData = new FormData();
                 formData.append('staff_id',this.selectedItem.id);
                 formData.append('joined_date',this.selectedJoinedDate);
-                formData.append('probation_month',this.selectedProbationMonth);
+                formData.append('probation_period',this.selectedProbationMonth);
                 let response = await postApiData({url:`/api/hr/new-staff-join-date`, form_data:formData, token:this.getToken()})
                 if(response.success){
                     this.getPrimaryList();
