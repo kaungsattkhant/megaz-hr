@@ -243,6 +243,7 @@ export default {
             url_department: '',
             url_role: '',
             url_search: '',
+            url_type: '',
         };
     },
 
