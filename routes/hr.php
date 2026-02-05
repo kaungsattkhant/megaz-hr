@@ -23,7 +23,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
     Route::post('/public_holidays', 'createPublicHoliday');
     Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
-    Route::get('off_day_settings','getOffDaySetting');
+    Route::get('off_day_settings', 'getOffDaySetting');
 
     Route::get('/off_day_requests', 'getOffDayRequests');
     Route::post('/off_day_requests/{id}/status', 'updateOffDayRequestStatus');
@@ -84,7 +84,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
-    Route::get('pay_slips/confirm/{id}','confirmPaySlip');
+    Route::get('pay_slips/confirm/{id}', 'confirmPaySlip');
 
     Route::get('/export-salary', 'exportSalary');
     //mobile
@@ -121,8 +121,8 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/grades/{id}', 'deleteGrade');
     Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
     Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
-    Route::get('get_exam_by_role/{id}/exam_type/{examType}','getExamByRole');
-    Route::post('staff_exam/answer','answerExamQuestion');
+    Route::get('get_exam_by_role/{id}/exam_type/{examType}', 'getExamByRole');
+    Route::post('staff_exam/answer', 'answerExamQuestion');
   });
   Route::prefix('hr')->controller(InterviewController::class)->group(function () {
     Route::get('/interviews-by-role/{roleId}', 'getInterviewsByRoleId');
@@ -136,7 +136,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/added_location', 'addedLocation');
     Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
     Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
-    Route::get('places','getAllPlace');
+    Route::get('places', 'getAllPlace');
   });
   Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
     Route::post('/staff_time_shifts', 'createStaffTimeShift');
@@ -180,8 +180,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/', 'listBenefitRequest');
     Route::get('/benefit_by_type/{type}', 'getBenefitByType');
   });
-
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
   Route::post('/cvs', 'createCv');
+  Route::post('/communication_form', 'createCommunicationForm');
 });

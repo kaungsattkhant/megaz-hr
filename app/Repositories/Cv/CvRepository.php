@@ -12,6 +12,7 @@ use App\Models\SalaryAllowance;
 use Illuminate\Support\Facades\DB;
 use App\Models\StaffEmergencyContact;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Models\CommunicationForm;
 
 class CvRepository implements CvRepositoryInterface
 {
@@ -34,7 +35,8 @@ class CvRepository implements CvRepositoryInterface
         StaffStatus::APPLIED->value,
         StaffStatus::HIRED->value,
         StaffStatus::SHORTLISTED->value,
-        StaffStatus::INTERVIEWED->value
+        StaffStatus::INTERVIEWED->value,
+        StaffStatus::PROBATION->value,
       ])
       ->orderBy('created_at', 'desc');
     if ($request->has('status')) {
@@ -299,7 +301,7 @@ class CvRepository implements CvRepositoryInterface
         ],
         [
           'joined_date' => $data['joined_date'],
-          'probation_period' => $data['probation_period'] ?? 0,
+          'probation_period' => $data['probation_period'],
           'status' => StaffStatus::PROBATION->value,
         ]
       );
@@ -319,6 +321,19 @@ class CvRepository implements CvRepositoryInterface
       $this->sendFcmNotification($staff, $allStaff, $notificationData);
       DB::commit();
       return $staff;
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+    }
+  }
+
+  public function createCommunicationForm(array $data)
+  {
+    DB::beginTransaction();
+    try {
+      $comminicationForm = CommunicationForm::create($data);
+      DB::commit();
+      return $comminicationForm;
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
