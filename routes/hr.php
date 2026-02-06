@@ -104,7 +104,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/cvs', 'getAllCvs');
     Route::post('/cvs/{id}', 'updateCv');
     Route::delete('/cvs/{id}', 'deleteCv');
-    Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
+    // Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
     Route::get('/cvs/{id}', 'getCvById');
     Route::post('/cvs/{id}/status', 'updateCvStatus');
     Route::get('/salary_setup/department/{departmentId}/role/{roleId}', 'getSalarySetupByDepartmentIdAndRoleId');
@@ -184,4 +184,5 @@ Route::middleware('auth:api')->group(function () {
 Route::prefix('hr')->controller(CvController::class)->group(function () {
   Route::post('/cvs', 'createCv');
   Route::post('/communication_form', 'createCommunicationForm');
+  Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
 });
