@@ -64,6 +64,11 @@ class SalaryRepository implements SalaryRepositoryInterface
   {
     DB::beginTransaction();
     try {
+      $exists = SalarySetup::where('role_id', $data['role_id'])->exists();
+
+      if ($exists) {
+        \ResponseMessage('Salary setup already exists for this role.',422);
+      }
       $salarySetup = SalarySetup::create([
         'basic_salary' => $data['basic_salary'],
         'role_id' => $data['role_id'],

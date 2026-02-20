@@ -1,20 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AssetItemEquipmentAssignController;
+use App\Http\Controllers\API\BenefitController;
+use App\Http\Controllers\API\ContractCategoryController;
+use App\Http\Controllers\API\ContractController;
 use App\Http\Controllers\API\CvController;
 use App\Http\Controllers\API\ExamController;
-use App\Http\Controllers\API\LeaveController;
-use App\Http\Controllers\API\SalaryController;
-use App\Http\Controllers\API\BenefitController;
-use App\Http\Controllers\API\LocationController;
-use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
-use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\LeaveController;
+use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\MenuItemImportController;
-use App\Http\Controllers\API\StaffTimeShiftController;
+use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\SalaryController;
 use App\Http\Controllers\API\StaffEquipmentHandoverController;
-use App\Http\Controllers\API\AssetItemEquipmentAssignController;
+use App\Http\Controllers\API\StaffTimeShiftController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -179,6 +181,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/', 'createBenefitRequest');
     Route::get('/', 'listBenefitRequest');
     Route::get('/benefit_by_type/{type}', 'getBenefitByType');
+  });
+
+  Route::prefix('contract_categories')->controller(ContractCategoryController::class)->group(function () {
+    Route::post('/', 'store');
+    Route::get('/', 'index');
+  });
+  Route::prefix('contracts')->controller(ContractController::class)->group(function () {
+    Route::post('/', 'store');
+    Route::get('/', 'index');
+    Route::post('add_staff','addStaffToContract');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

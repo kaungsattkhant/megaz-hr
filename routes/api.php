@@ -613,7 +613,7 @@ Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
 Route::delete('/staffs/{staff_id}/roles/{role_id}', [StaffAPIController::class, 'deleteRoleStaff']);
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}', [StaffAPIController::class, 'deleteInventoryStaff']);
 Route::delete('/staffs/{staff_id}/features/{feature_id}', [StaffAPIController::class, 'deleteFeatureStaff']);
-Route::get('/departments/{department_id}/staffs', [StaffAPIController::class, 'getStaffByDepartment']);
+Route::get('/dddepartment_id}/staffs', [StaffAPIController::class, 'getStaffByDepartment']);
 Route::get('/staff_by_department_slug/{slug}', [StaffAPIController::class, 'getStaffByDepartmentSlug']);
 Route::get('/staff_balances', [StaffAPIController::class, 'staffBalanceList']);
 Route::get('/staff_balances/{id}', [StaffAPIController::class, 'detailStaffBalance']);
