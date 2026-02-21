@@ -291,6 +291,8 @@ import BudgetAccountCrudComponent from './Components/BudgetAccounts/BudgetAccoun
 import CashflowReportComponent from './Components/CashflowReport/CashflowReportComponent.vue';
 import BenefitsCrudComponent from './Components/Benefits/BenefitsCrudComponent.vue';
 import BenefitsRequestComponent from './Components/Benefits/BenefitsRequestComponent.vue';
+import ContractComponent from './Components/Contract/ContractComponent.vue';
+import ContractCreateComponent from './Components/Contract/ContractCreateComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -559,6 +561,8 @@ app.component('BudgetAccountCrudComponent',BudgetAccountCrudComponent);
 app.component('CashflowReportComponent',CashflowReportComponent);
 app.component('BenefitsCrudComponent',BenefitsCrudComponent);
 app.component('BenefitsRequestComponent',BenefitsRequestComponent);
+app.component('ContractComponent',ContractComponent);
+app.component('ContractCreateComponent',ContractCreateComponent);
 
 const toastificationOptions = {};
 app.use(store);
