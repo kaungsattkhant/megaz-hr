@@ -1,19 +1,12 @@
 <template>
     <div class="px-0">
-        
+
         <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
             <div class="mb-6 col-span-12">
                 <p class="text-lg font-semibold font-inter">
                     Add New Contract
                 </p>
             </div>
-            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Exam Name
-                </label>
-                <input type="text" v-model="name"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div> -->
             <div class="col-span-3 rounded-md mb-8">
                 <label for="" class="label-form mb-3">
                     Department
@@ -29,31 +22,39 @@
             </div>
 
             <div class="col-span-3 rounded-md mb-8">
-                <label class="label-form mb-3">Roles</label>
+                <label class="label-form mb-3">Role</label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
-                        name="" id="" v-model="selectedRoles" @change="roleChange()" class="input-ui">
+                        name="" id="" v-model="selectedRole" class="input-ui">
                         <option :value="role" v-for="(role, roleIndex) in roleList"
                             :key="roleIndex"> {{ role.name }} </option>
                     </select>
                 </div>
-            </div><div class="col-span-6"></div>
-            
-                
+            </div>
+
+            <div class="col-span-6"></div>
 
             <div class="mb-6 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Category
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select category" v-model="selectedCategory" class="input-ui !text-black"
-                    data-te-select-filter="true" >
-                        <option :value="category.value" v-for="(category, categoryIndex) in categoryList" :key="categoryIndex">
-                            {{ category.name }}
-                        </option>
-                    </select>
-                </div>
+                            Category
+                        </label>
+                        <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select category" v-model="selectedContractCategory" class="input-ui !text-black"
+                            data-te-select-filter="true" >
+                                <option :value="category" v-for="(category, categoryIndex) in contractCategories" :key="categoryIndex">
+                                    {{ category.name }}
+                                </option>
+                            </select>
+                        </div>
             </div>
+
+            <div class="col-span-1 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-5">
+                    &nbsp;
+                </label>
+                <button data-te-toggle="modal" data-te-target="#add_category_modal" > <i class="fas fa-plus"></i> </button>
+            </div>
+
             <div class="mb-6 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Type
@@ -66,18 +67,21 @@
                         </option>
                     </select>
                 </div>
-            </div><div class="col-span-6"></div>
+            </div>
+
+            <div class="col-span-5"></div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
-                <label class="label-form mb-3">Company</label>
+                <label class="label-form mb-3">Company Authorizer</label>
                 <multiselect
-                v-model="selectedCompany"
-                :options="companyList"
+                v-model="selectedCompanyAuthorizor"
+                :options="staffList"
                 :multiple="false"
                 :close-on-select="true"
                 :clear-on-select="false"
                 :preserve-search="true"
-                placeholder="Select Company"
-                label="skill" class=" capitalize"
+                placeholder="Select Authorizer"
+                label="name"
                 track-by="id"
                 :preselect-first="false">
                 </multiselect>
@@ -86,13 +90,13 @@
                 <label class="label-form mb-3">Witness</label>
                 <multiselect
                 v-model="selectedWitness"
-                :options="witnessList"
+                :options="staffList"
                 :multiple="false"
                 :close-on-select="true"
                 :clear-on-select="false"
                 :preserve-search="true"
                 placeholder="Select Witness"
-                label="skill" class=" capitalize"
+                label="name"
                 track-by="id"
                 :preselect-first="false">
                 </multiselect>
@@ -111,7 +115,7 @@
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create 
+                Create
             </button>
         </div>
     </div>
@@ -145,9 +149,9 @@
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                         <div class="mb-4 pb-0 rounded-md">
                             <label for="" class="block text-sm text-black mb-3">
-                                Answer
+                                Name
                             </label>
-                            <input type="text" v-model="answer" autocomplete="off"
+                            <input type="text" v-model="categoryName" autocomplete="off"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
@@ -166,7 +170,7 @@
                 </div>
             </div>
         </div>
-    
+
 </template>
 
 <script>
@@ -192,11 +196,19 @@ export default {
             witnessList: [],
 
             selectedDepartment: null,
-            selectedRoles: null,
+            selectedRole: null,
             selectedType: null,
             selectedCategory: null,
 
             categoryName: null,
+            contractCategories: [],
+            selectedContractCategory: null,
+
+            staffList: [],
+
+            selectedCompanyAuthorizor: null,
+            selectedWitness: null,
+            description: null,
 
         };
     },
@@ -212,7 +224,7 @@ export default {
         },
 
         async departmentSelectChanged() {
-            this.selectedRoles = null;
+            this.selectedRole = null;
             this.roleList = [];
 
             if(this.selectedDepartment){
@@ -230,30 +242,39 @@ export default {
 
 
         async createBtnClicked(){
-            if(!this.department){
-                this.alertValidationMessage(`Department`);
-                return 1;
-            }
-            if(!this.selectedRoles){
+            if(!this.selectedRole){
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            if(!this.selectedCategory){
-                this.alertValidationMessage(`Category`);
+            if(!this.selectedContractCategory){
+                this.alertValidationMessage(`contract category`);
                 return 1;
             }
             if(!this.selectedType){
-                this.alertValidationMessage(`Type`);
+                this.alertValidationMessage(`contract type`);
                 return 1;
             }
-            
+            if(!this.selectedCompanyAuthorizor){
+                this.alertValidationMessage(`authorizor`);
+                return;
+            }
+            if(!this.selectedWitness){
+                this.alertValidationMessage(`witness`);
+                return;
+            }
+            if(!this.description){
+                this.alertValidationMessage(`contract text`);
+            }
+
             let formData = new FormData();
-            formData.append("department_id", this.selectedDepartment.id);
-            formData.append("role_id", this.selectedRoles.id);
+            formData.append("role_id", this.selectedRole.id);
             formData.append("type", this.selectedType);
-            formData.append("category", this.selectedCategory);
-            
-            let url = `/api/`;
+            formData.append("contract_category_id", this.selectedContractCategory.id);
+            formData.append("company_authorizer_id", this.selectedCompanyAuthorizor.id);
+            formData.append("witness_id", this.selectedWitness.id);
+            formData.append("text", this.description);
+
+            let url = `/api/contracts`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 window.location.replace("/contract");
@@ -265,11 +286,44 @@ export default {
             }
         },
 
-        
+        getContractCategories(){
+            getApiData({url: `/api/contract_categories`, token: this.getToken()})
+            .then((response)=>{
+                if(response.data){
+                    console.log(response.data);
+                    this.contractCategories = response.data;
+                }
+            });
+        },
+
+        createCategory(){
+            if(!this.categoryName){
+                this.alertValidationMessage(`category name`);
+                return;
+            }
+            let formData = new FormData();
+            formData.append('name', this.categoryName);
+            postApiData({url: `/api/contract_categories`, form_data: formData, token: this.getToken()})
+            .then((response)=>{
+                this.contractCategories.push({
+                    "id": response.id,
+                    "name": response.name
+                });
+            });
+        },
+
+        getStaffList(){
+            getApiData({url: `/api/staffs`, token: this.getToken()})
+            .then((response)=>{
+                this.staffList = response.data;
+            });
+        },
     },
-    
+
     created(){
         this.getDepartmentList();
+        this.getContractCategories();
+        this.getStaffList();
     },
 
     mounted() {
