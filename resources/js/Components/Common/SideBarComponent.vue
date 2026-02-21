@@ -982,6 +982,15 @@
                             <li>
                                 <p class="sidebar-tab-title">HR SETUP</p>
                             </li>
+                            <li>
+                                <a
+                                    href="/contract"
+                                    class="flex items-center sidebar-gap-x"
+                                >
+                                    <i class="fal fa-door-open"></i>
+                                    Contract
+                                </a>
+                            </li>
                             <li v-show="checkFeaturePermission('exam')">
                                 <a
                                     href="/exam"

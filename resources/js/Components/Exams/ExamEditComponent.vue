@@ -133,6 +133,9 @@
                         <thead class="font-medium text-left ">
                             <tr>
                                 <th scope="col" class=" pr-6 pl-2 py-4 ">
+                                    Pass
+                                </th>
+                                <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Mark
                                 </th>
                                 <th scope="col" class=" px-6 py-4 ">
@@ -145,6 +148,23 @@
                         </thead>
                         <tbody>
                             <tr v-for="(grade,gradeIndex) in selectedGradeList" >
+                                <td class=" pr-6 pl-2 py-3 font-medium ">
+                                    <!-- {{ grade.mark }} -->
+                                    <div class="flex flex-wrap gap-y-4 gap-x-8 mb-6">
+                                        <label
+                                        class="inline-flex flex-grow-0 items-start space-x-2"
+                                        >
+                                        <input
+                                            type="radio"
+                                            name="passGrade"
+                                            :value="gradeIndex"
+                                            :checked="grade.is_pass"
+                                            v-model="passGradeIndex"
+                                            class="form-radio h-4 w-4 text-[#845adf] focus:ring-0 focus:shadow-none mt-0.5"
+                                        />
+                                        </label>
+                                    </div>
+                                </td>
                                 <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ grade.mark }}
                                 </td>
@@ -242,7 +262,6 @@
                 </div>
             </div>
         </div>
-        <p>{{ test }} </p>
         <div class="mb-12">
             <button class="add-btn" @click="createBtnClicked">
                 Edit Exam
@@ -492,6 +511,7 @@ export default {
             questionDetail: null,
 
             detail: null,
+            passGradeIndex: null,
         };
     },
 
@@ -536,10 +556,18 @@ export default {
             }
             if(detail.grades.length > 0){
                 detail.grades.forEach(grade => {
+                    let passGrade = null;
+                    if(grade.is_pass){
+                        passGrade = 1;
+                    }
+                    else{
+                        passGrade = 0;
+                    }
                     this.selectedGradeList.push({
                         mark: grade.mark,
                         grade: grade.grade,
                         id: grade.id,
+                        is_pass: passGrade,
                     });
                 });
             }
@@ -634,6 +662,7 @@ export default {
                 this.selectedGradeList.push({
                     mark: this.mark,
                     grade: this.grade,
+                    is_pass: 0,
                 });
                 this.mark = null;
                 this.grade = null;
@@ -828,7 +857,7 @@ export default {
             let url = '/api/hr/exams/'+this.examId;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/exam");
+                // window.location.replace("/exam");
             }else {
                 this.$notify({
                     text: response.message,
@@ -852,7 +881,13 @@ export default {
     onBeforeMount(){
         this.getDetail();
     },
-    
+    watch: {
+        passGradeIndex(newIndex) {
+            this.selectedGradeList.forEach((grade, i) => {
+                grade.is_pass = i === newIndex ? 1 : 0
+            })
+        }
+    },
 
     mounted() {
         initTE({Modal, Ripple, Input, Select, Dropdown});

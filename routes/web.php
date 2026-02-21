@@ -789,6 +789,8 @@ Route::view('/sky_menu_sale', 'kitchen_menu_sale.sky_menu_sale');
 Route::view('/budget_accounts', 'budget_accounts.index');
 Route::view('/cashflow_report', 'cashflow_report.index');
 Route::view('/off_day_setting', 'off_day_setting.index');
+Route::view('/contract', 'contract.index');
+Route::view('/contract/create', 'contract.create');
 
 // =======
 // Route::middleware(['departments:event'])->group(function () {
