@@ -17,6 +17,7 @@ class Contract extends Model
         "type",
         "witness_id",
         "text",
+        'status',
     ];
     public function contract_category()
     {
@@ -37,6 +38,6 @@ class Contract extends Model
 
     public function contract_staff()
     {
-        return $this->belongsToMany(ContractStaff::class, 'contract_staff', 'contract_id', 'staff_id');
+        return $this->hasMany(ContractStaff::class);
     }
 }

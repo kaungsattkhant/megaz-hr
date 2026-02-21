@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ContractListResource;
+use App\Http\Resources\ContractStaffListResource;
 use App\Models\Contract;
 use App\Repositories\Contract\ContractRepositoryInterface;
 use Illuminate\Http\Request;
@@ -60,6 +60,15 @@ class ContractController extends Controller
     //staff
     public function getContractList(){
         $contracts=$this->contractRepo->getContractList();
-        return ContractListResource::collection($contracts);
+        return ContractStaffListResource::collection($contracts);
+    }
+
+    public function signedContract(Request $request){
+        $request->validate([
+            'id' => 'required|exists:contract_staff,id',
+            'signed_document' => 'required',
+        ]);
+        $contractStaff=$this->contractRepo->signedContract($request->all());
+        return new ContractStaffListResource($contractStaff);
     }
 }

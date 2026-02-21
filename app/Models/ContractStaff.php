@@ -10,6 +10,13 @@ class ContractStaff extends Model
     protected $fillable=[
         'contract_id',
         'staff_id', 
+        'signed_document',
+        'signed_at',
+        'confirmed_by',
+        'confirmed_at',
+        'cancelled_by',
+        'cancelled_at',
+        'status',
     ];
     public function contract()
     {
@@ -19,4 +26,5 @@ class ContractStaff extends Model
     {
         return $this->belongsTo(Staff::class);
     }
+    
 }

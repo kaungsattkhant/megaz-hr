@@ -14,5 +14,6 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(ContractController::class)->group(function(){
         Route::get('get_contracts','getContractList');
+        Route::post('signed_contract','signedContract');
     });
 });
