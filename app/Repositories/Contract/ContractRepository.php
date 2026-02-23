@@ -15,7 +15,7 @@ class ContractRepository implements ContractRepositoryInterface
 {
     public function list($request)
     {
-        $query = Contract::with('contract_category')->orderBy('id', 'DESC');
+        $query = Contract::with(['contract_category','company_authorizer:id,name','witness:id,name','role:id,name'])->orderBy('id', 'DESC');
 
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
@@ -67,8 +67,9 @@ class ContractRepository implements ContractRepositoryInterface
 
     public function getContractStaffList($request)
     {
-        $query = ContractStaff::with(['contract.contract_category', 'staff'])->where('staff_id', \UserData()->id)->orderBy('id', 'DESC');
-
+        $query = ContractStaff::with(['contract.contract_category', 'staff'])
+        ->whereIn('status',[ContractStaffEnum::SIGNED->value])
+        ->orderBy('id', 'DESC');
         if ($request->has('per_page') || $request->has('page')) {
             return $query->paginate(config('common.list_count'));
         }
