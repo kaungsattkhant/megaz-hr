@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="margin-bg">
         <div class="card-shadow">
             <div>
@@ -56,7 +56,7 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Name
+                                    Category
                                 </th>
                                 <th scope="col" class="">
                                     Type
@@ -66,8 +66,14 @@
                                 </th>
                                 <th scope="col" class="">
                                     Role
-                                </th>   
-                                
+                                </th>
+                                <th scope="col" class="">
+                                    Authorizer
+                                </th>
+                                <th scope="col" class="">
+                                    Witness
+                                </th>
+
                                 <th scope="col" class="">
 
                                 </th>
@@ -81,16 +87,22 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.name }}
+                                        {{ item.contract_category.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <td class="whitespace-nowrap capitalize">
                                         {{ item.type }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.role.department.name }}
+                                        {{ item.role_id }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.role.name }}
+                                        {{ item.role_id }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.company_authorizer_id }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.witness_id }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <a :href="'/exam/' + item.id + '/edit'" class="pr-3">
@@ -237,7 +249,7 @@ export default {
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.primaryList = response.data.data;
+                this.primaryList = response.data;
             }
         },
         async getDepartmentList() {
