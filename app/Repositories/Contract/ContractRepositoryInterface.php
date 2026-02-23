@@ -12,6 +12,8 @@ interface ContractRepositoryInterface
 
     public function getContractList();
 
+    public function getContractStaffList($request);
+
     public function addStaffToContract(array $data);
 
     public function signedContract(array $data);

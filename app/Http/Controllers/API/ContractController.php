@@ -57,6 +57,11 @@ class ContractController extends Controller
         ResponseMessage('Staff added to contract successfully');
     }
 
+    public function getContractStaff(Request $request){
+        $contractStaff=$this->contractRepo->getContractStaffList($request);
+        return ContractStaffListResource::collection($contractStaff);
+    }
+
     //staff
     public function getContractList(){
         $contracts=$this->contractRepo->getContractList();

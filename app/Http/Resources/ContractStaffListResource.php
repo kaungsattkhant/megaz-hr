@@ -24,6 +24,10 @@ class ContractStaffListResource extends JsonResource
                 'id'=>$this->contract->contract_category->id,
                 'name'=>$this->contract->contract_category->name,
             ],
+            'staff'=>[
+                'id'=>$this->staff->id,
+                'name'=>$this->staff->name,
+            ],
             
             // 'status'=>$this->status,
             // 'role'=>[

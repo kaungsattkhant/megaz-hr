@@ -65,6 +65,17 @@ class ContractRepository implements ContractRepositoryInterface
         return $contract;
     }
 
+    public function getContractStaffList($request)
+    {
+        $query = ContractStaff::with(['contract.contract_category', 'staff'])->where('staff_id', \UserData()->id)->orderBy('id', 'DESC');
+
+        if ($request->has('per_page') || $request->has('page')) {
+            return $query->paginate(config('common.list_count'));
+        }
+
+        return $query->get();
+    }
+
     public function addStaffToContract(array $data)
     {
         DB::beginTransaction();
@@ -90,7 +101,7 @@ class ContractRepository implements ContractRepositoryInterface
     //staff
     public function getContractList()
     {
-        return ContractStaff::where('staff_id', \UserData()->id)
+        return ContractStaff::query()->where('staff_id', \UserData()->id)
             ->orderBy('id', 'desc')
             ->get();
     }

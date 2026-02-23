@@ -221,6 +221,8 @@ use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportReposi
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
 use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepositoryInterface;
 use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepository;
+use App\Repositories\MeetingMinute\MeetingMinuteRepository;
+use App\Repositories\MeetingMinute\MeetingMinuteRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -334,5 +336,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BudgetAccountRepositoryInterface::class, BudgetAccountRepository::class);
         $this->app->bind(AdvanceInterface::class, AdvanceRepository::class);
         $this->app->bind(BenefitInterface::class, BenefitRepository::class);
+        $this->app->bind(MeetingMinuteRepositoryInterface::class, MeetingMinuteRepository::class);
     }
 }
