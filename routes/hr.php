@@ -10,8 +10,10 @@ use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\LocationController;
+use App\Http\Controllers\API\MeetingMinuteController;
 use App\Http\Controllers\API\MenuItemImportController;
 use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\ResignationController;
 use App\Http\Controllers\API\SalaryController;
 use App\Http\Controllers\API\StaffEquipmentHandoverController;
@@ -191,6 +193,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/', 'store');
     Route::get('/', 'index');
     Route::post('add_staff','addStaffToContract');
+    Route::get('/staff','getContractStaff');
+  });
+  Route::prefix('projects')->controller(ProjectController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+  });
+  Route::prefix('meeting_minutes')->controller(MeetingMinuteController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('/{meetingMinute}', 'show');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
