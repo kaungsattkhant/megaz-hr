@@ -105,12 +105,13 @@
                                         {{ item.witness_id }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/exam/' + item.id + '/edit'" class="pr-3">
+                                        <!-- <a :href="'/exam/' + item.id + '/edit'" class="pr-3">
                                             <i class="fal fa-pen"></i>
-                                        </a>
-                                        <button @click="deleteBtnClicked(item.id)" data-te-toggle="modal"
-                                            data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
+                                        </a> -->
+                                        <button data-te-toggle="modal"
+                                        @click="addStaffBtnClicked(item.id)"
+                                            data-te-target="#add_staff_modal" id="delete-btn" class="pr-1">
+                                            <i class="fas fa-users-medical"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -188,6 +189,71 @@
     </div>
 
 
+    <!-- Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_staff_modal" tabindex="-1" aria-labelledby="add_category_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_category_modalLabel">
+                            Add Staff to Contract
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close" id="btn-close-add-staff-modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4 pb-0 rounded-md">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Name
+                            </label>
+                            <multiselect
+                            v-model="selectedStaff"
+                            :options="staffList"
+                            :multiple="true"
+                            :close-on-select="false"
+                            :clear-on-select="false"
+                            :preserve-search="false"
+                            placeholder="Select Staff"
+                            label="name"
+                            track-by="id"
+                            :preselect-first="false">
+                            </multiselect>
+                            <!-- <input type="text" v-model="categoryName" autocomplete="off"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <LoadingButton
+                            :loading="addStaffLoading"
+                            text="Add"
+                            loadingText="Loading..."
+                            @click="addStaffToContract"
+                        />
+                        <!-- <button type="button" @click="createCategory()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 </template>
 
@@ -197,10 +263,12 @@ import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
+import LoadingButton from '../Common/LoadingButton.vue';
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     data() {
         return {
@@ -233,6 +301,12 @@ export default {
             url_type: '',
             deleteId: null,
 
+            staffList: [],
+            selectedStaff: [],
+
+            addStaffLoading: false,
+
+            id: null,
         };
     },
 
@@ -313,6 +387,44 @@ export default {
             }
         },
 
+        getStaffList(){
+            getApiData({url: `/api/staffs`, token: this.getToken()})
+            .then((response)=>{
+                this.staffList = response.data;
+            });
+        },
+
+        addStaffBtnClicked(id){
+            this.id = id;
+        },
+
+        addStaffToContract(){
+            this.addStaffLoading = true;
+            if(this.selectedStaff.length < 1){
+                this.alertValidationMessage('staff for contract');
+                this.addStaffLoading = false;
+            }
+            let formData = new FormData();
+            formData.append('contract_id', this.id);
+            let staffIds = [];
+            this.selectedStaff.forEach(staff => {
+                formData.append('staff_ids[]', staff.id);
+                staffIds.push(staff.id);
+            });
+            postApiData({url: `/api/contracts/add_staff`, form_data: formData, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.id = null;
+                    this.selectedStaff = [];
+                    this.addStaffLoading = false;
+                    this.$notify({
+                        text: `${response.message}`,
+                        type: 'success'
+                    });
+                    document.getElementById('btn-close-add-staff-modal').click();
+                }
+            });
+        },
 
         alertValidationMessage(field) {
             this.$notify({
@@ -330,6 +442,7 @@ export default {
     created() {
         this.getPrimaryList();
         this.getDepartmentList();
+        this.getStaffList();
     }
 }
 </script>

@@ -31,7 +31,8 @@ class ContractCategoryController extends Controller
                 ['id' => $data['id'] ?? null],
                 $data
             );
-            return $category;
+            ResponseData($category);
+            // return $category;
         // });
     }
 }

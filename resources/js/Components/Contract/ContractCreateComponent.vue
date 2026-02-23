@@ -139,7 +139,7 @@
                             Category
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close" id="close_add_answer_modal">
+                            aria-label="Close" id="btn-close-create-category-modal">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -162,10 +162,16 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="createCategory()"
+                        <LoadingButton
+                            :loading="categoryCreateLoading"
+                            text="Create"
+                            loadingText="Loading..."
+                            @click="createCategory"
+                        />
+                        <!-- <button type="button" @click="createCategory()"
                             class="add-btn focus:outline-none focus:ring-0 ">
                             Create
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>
@@ -178,10 +184,12 @@ import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     data() {
         return {
@@ -201,6 +209,8 @@ export default {
             selectedCategory: null,
 
             categoryName: null,
+            categoryCreateLoading: false,
+
             contractCategories: [],
             selectedContractCategory: null,
 
@@ -298,17 +308,19 @@ export default {
 
         createCategory(){
             if(!this.categoryName){
+                this.categoryCreateLoading = false;
                 this.alertValidationMessage(`category name`);
                 return;
             }
             let formData = new FormData();
             formData.append('name', this.categoryName);
+            this.categoryCreateLoading = true;
             postApiData({url: `/api/contract_categories`, form_data: formData, token: this.getToken()})
             .then((response)=>{
-                this.contractCategories.push({
-                    "id": response.id,
-                    "name": response.name
-                });
+                this.categoryCreateLoading = false;
+                this.contractCategories.push(response.data);
+                this.selectedContractCategory = response.data;
+                document.getElementById('btn-close-create-category-modal').click();
             });
         },
 
