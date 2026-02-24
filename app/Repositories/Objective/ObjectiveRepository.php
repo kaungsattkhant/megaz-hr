@@ -406,7 +406,6 @@ class ObjectiveRepository implements ObjectiveInterface
 
         foreach ($objectiveAssigns as $objectiveAssign) {
             $objectiveAssign->approver = false;
-            // $objectiveAssign->priority= $objectiveAssign->objective->priority ?? null;
             if ($objectiveAssign->objective->accountable_id == $authUser) {
                 $objectiveAssign->approver = true;
             }
