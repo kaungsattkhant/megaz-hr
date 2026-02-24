@@ -293,6 +293,7 @@ import BenefitsCrudComponent from './Components/Benefits/BenefitsCrudComponent.v
 import BenefitsRequestComponent from './Components/Benefits/BenefitsRequestComponent.vue';
 import ContractComponent from './Components/Contract/ContractComponent.vue';
 import ContractCreateComponent from './Components/Contract/ContractCreateComponent.vue';
+import MeetingOperationComponent from './Components/Meeting/MeetingOperationComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -563,6 +564,7 @@ app.component('BenefitsCrudComponent',BenefitsCrudComponent);
 app.component('BenefitsRequestComponent',BenefitsRequestComponent);
 app.component('ContractComponent',ContractComponent);
 app.component('ContractCreateComponent',ContractCreateComponent);
+app.component('MeetingOperationComponent',MeetingOperationComponent);
 
 const toastificationOptions = {};
 app.use(store);

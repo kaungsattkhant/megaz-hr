@@ -791,6 +791,7 @@ Route::view('/cashflow_report', 'cashflow_report.index');
 Route::view('/off_day_setting', 'off_day_setting.index');
 Route::view('/contract', 'contract.index');
 Route::view('/contract/create', 'contract.create');
+Route::view('/meeting/operation', 'meeting.operation_meeting');
 
 // =======
 // Route::middleware(['departments:event'])->group(function () {
