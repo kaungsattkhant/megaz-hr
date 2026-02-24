@@ -114,6 +114,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/salary_setup/department/{departmentId}/role/{roleId}', 'getSalarySetupByDepartmentIdAndRoleId');
     Route::post('/new-staff-salary', 'createNewStaffSalary');
     Route::post('/new-staff-join-date', 'storeNewStaffJoinDate');
+    Route::get('communication_form/{id}','getCommunicationForm');
   });
   Route::prefix('hr')->controller(ExamController::class)->group(function () {
     Route::get('/exams', 'getAllExams');

@@ -21,4 +21,6 @@ interface CvRepositoryInterface
   public function storeNewStaffJoinDate(array $data);
 
   public function createCommunicationForm(array $data);
+
+  public function getCommunicationForm($staffId);
 }
