@@ -134,6 +134,9 @@ class ObjectiveController extends Controller
 
     public function objectiveLists(Request $request)
     {
+        $request->validate([
+            'date'=>['required'],
+        ]);
         $data = $this->objectiveRepository->objectiveLists($request);
         ResponseData($data);
     }
@@ -188,9 +191,9 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getdailyObjectivesByStaffId($request, $staffId);
         ResponseData($data);
     }
-    public function getDailyObjectiveByAccountable($staffId)
+    public function getDailyObjectiveByAccountable(Request $request,$staffId)
     {
-        $data = $this->objectiveRepository->getDailyObjectiveByAccountable($staffId);
+        $data = $this->objectiveRepository->getDailyObjectiveByAccountable($request,$staffId);
         ResponseData($data);
     }
 
@@ -199,9 +202,9 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
+    public function getCompletedObjKeysByStaffId(Request $request,$objectiveId,$staffId)
     {
-        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
+        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($request,$objectiveId,$staffId);
         ResponseData(new CompleteObjectivesResource($data));
     }
 
