@@ -56,7 +56,12 @@ class MeetingMinuteListResource extends JsonResource
                         ] : null,
                         'start_date' => $instruction->start_date,
                         'due_date' => $instruction->due_date,
-                        'reamark' => $instruction->reamark,
+                        'remark' => $instruction->remark,
+                        'priority' => $instruction->priority,
+                        'responsible' => $instruction->responsible ? [
+                            'id' => $instruction->responsible->id,
+                            'name' => $instruction->responsible->name,
+                        ] : null,
                         'accountable' => $instruction->accountable ? [
                             'id' => $instruction->accountable->id,
                             'name' => $instruction->accountable->name,

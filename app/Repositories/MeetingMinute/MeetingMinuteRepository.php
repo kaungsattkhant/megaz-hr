@@ -61,9 +61,11 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
                 $instruction->start_date = $instructionData['start_date'] ?? null;
                 $instruction->due_date = $instructionData['due_date'] ?? null;
+                $instruction->priority = $instructionData['priority'] ?? null;
                 $instruction->reamark = $instructionData['reamark'] ?? ($instructionData['remark'] ?? null);
                 $instruction->accountable_id = $instructionData['accountable'] ?? ($instructionData['accountable_id'] ?? null);
                 $instruction->consulted_id = $instructionData['consulted_id'] ?? null;
+                $instruction->responsible_id = $instructionData['responsible_id'] ?? null;
                 $instruction->informed_id = $instructionData['informed_id'] ?? null;
                 $instruction->save();
 

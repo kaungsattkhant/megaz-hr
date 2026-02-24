@@ -27,6 +27,7 @@ class Objective extends Model
         'accountable_id',
         'consulted_id',
         'informed_id',
+        'priority'
     ];
 
     public function objectiveAssigns(): HasMany
