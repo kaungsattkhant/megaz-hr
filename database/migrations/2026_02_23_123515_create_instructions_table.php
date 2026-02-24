@@ -22,6 +22,8 @@ return new class extends Migration
             $table->dateTime('start_date')->nullable();
             $table->dateTime('due_date')->nullable();
             $table->longText('reamark')->nullable();
+            $table->intege('priority')->nullable();
+            $table->unsignedInteger('responsible_id')->nullable();
             $table->unsignedInteger('accountable_id')->nullable();
             $table->unsignedInteger('consulted_id')->nullable();
             $table->unsignedInteger('informed_id')->nullable();

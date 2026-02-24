@@ -599,6 +599,7 @@ Route::get('/deps', [DepartmentAPIController::class, 'getDepartments']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
 Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);
+Route::get('role_by_departments',[RoleAPIController::class,'getRoleByDepartments']);
 Route::post('/roles', [RoleAPIController::class, 'createRole']);
 Route::post('/roles/{id}', [RoleAPIController::class, 'updateRole']);
 Route::post('/roles/{roleId}/available_toggle', [RoleAPIController::class, 'roleAvailableToggle']);

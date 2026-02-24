@@ -16,5 +16,7 @@ interface RoleRepositoryInterface
 
     public function getRoleByDepartment($department_id);
 
+    public function getRoleByDepartments(array $data);
+
     public function roleAvailableToggle($roleId);
 }

@@ -46,7 +46,9 @@ class ObjectiveController extends Controller
 
     public function store(Request $request)
     {
-
+        $request->validate([
+            'priority' => ['required', 'integer', 'between:1,10'],
+        ]);
         $data = $this->objectiveRepository->store($request->all());
         ResponseData($data);
     }

@@ -17,6 +17,8 @@ class Instruction extends Model
         'start_date',
         'due_date',
         'reamark',
+        'priority',
+        'responsible_id',
         'accountable_id',
         'consulted_id',
         'informed_id',
@@ -33,6 +35,10 @@ class Instruction extends Model
     public function assignedTo()
     {
         return $this->belongsTo(Staff::class, 'assigned_to');
+    }
+    public function responsible()
+    {
+        return $this->belongsTo(Staff::class, 'responsible_id');
     }
     public function accountable()
     {
