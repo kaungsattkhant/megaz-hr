@@ -93,16 +93,16 @@
                                         {{ item.type }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.role_id }}
+                                        <span v-if="item.role"> {{ item.role.name }}'s department </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.role_id }}
+                                        <span v-if="item.role"> {{ item.role.name }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.company_authorizer_id }}
+                                        <span v-if="item.company_authorizer"> {{ item.company_authorizer.name }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.witness_id }}
+                                        <span v-if="item.witness"> {{ item.witness.name }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <a :href="'/exam/' + item.id + '/edit'" class="pr-3">
