@@ -37,9 +37,9 @@ interface ObjectiveInterface
   public function getObjKeyStaffImage($objKeystaffId);
   public function deleteObjKeystaffImage($imgId);
   public function getdailyObjectivesByStaffId(Request $request, $staffId);
-  public function getDailyObjectiveByAccountable($staffId);
+  public function getDailyObjectiveByAccountable($request,$staffId);
   public function getStaffByAccountable($staffId);
-  public function getCompletedObjKeysByStaffId($objectiveId,$staffId);
+  public function getCompletedObjKeysByStaffId($request,$objectiveId,$staffId);
   public function rejectObjectKeyByObjectiveStaffId($data);
 
   //ktvobjtree

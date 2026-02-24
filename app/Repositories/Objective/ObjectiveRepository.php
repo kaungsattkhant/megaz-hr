@@ -332,8 +332,7 @@ class ObjectiveRepository implements ObjectiveInterface
     public function objectiveLists(Request $request)
     {
         // $currentDate = now()->toDateString();
-        $currentDate = now()->format('Y-m-d');
-
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
         $staffId = UserData()->id;
         $objectiveStaffFilter = function ($query) use ($staffId, $currentDate) {
             $query->where('staff_id', $staffId);
@@ -361,7 +360,8 @@ class ObjectiveRepository implements ObjectiveInterface
     //objkeylistwithstaff assigns
     public function getdailyObjectives(Request $request, $objId)
     {
-        $currentDate = now()->toDateString();
+        // $currentDate = now()->toDateString();
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
 
         $objectives = ObjectiveStaff::with([
             'objective.objectiveKeys',
@@ -383,7 +383,9 @@ class ObjectiveRepository implements ObjectiveInterface
         if (!$authUser) {
             ResponseMessage('Authorized user not found', 401);
         }
-        $currentDate = now()->toDateString();
+        // $currentDate = now()->toDateString();
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
+
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
             'objective.accountable:id,name',
@@ -468,13 +470,14 @@ class ObjectiveRepository implements ObjectiveInterface
         return $objectiveAssigns;
         // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
-    public function getDailyObjectiveByAccountable($staffId)
+    public function getDailyObjectiveByAccountable($request,$staffId)
     {
         $authUser = UserData()->id ?? null;
         if (!$authUser) {
             ResponseMessage('Authorized user not found', 401);
         }
-        $currentDate = now()->toDateString();
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
+
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
             'objective.accountable:id,name',
@@ -815,9 +818,9 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    public function getCompletedObjKeysByStaffId($objectiveId, $staffId)
+    public function getCompletedObjKeysByStaffId($request,$objectiveId, $staffId)
     {
-        $today = now()->format('Y-m-d');
+        $today = Carbon::parse($request->date) ?? now()->format('Y-m-d');
         $objectives = Objective::with([
             'objectiveKeys',
             'objectiveAssigns.objectiveStaff.completedObjectiveKeys',
