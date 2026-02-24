@@ -1,5 +1,5 @@
 <template>
-    
+
     <div class="margin-bg">
         <div class="card-shadow">
             <div>
@@ -82,22 +82,26 @@
                                           department
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        
+
                                         {{ meeting.place }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        
+
                                         {{ meeting.from_date }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        
+
                                         {{ meeting.to_date }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        
+
                                         {{ meeting.chaired_by.name }}
                                     </td>
                                     <td class="whitespace-nowrap " v-show="['meeting.edit', 'meeting.delete'].some(f => feature.includes(f))">
+                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/operation'" v-if="feature.includes('meeting.edit')">
+                                            <i class="fal fa-clock"></i>
+                                        </a>
+
                                         <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'" v-if="feature.includes('meeting.edit')">
                                             <i class="fal fa-pen"></i>
                                         </a>
