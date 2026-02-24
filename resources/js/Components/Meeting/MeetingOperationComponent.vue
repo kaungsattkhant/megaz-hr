@@ -11,43 +11,84 @@
                     Meeting : Operation Meeting
                 </p>
             </div>
-            
+
             <div class="col-span-3 rounded-md mb-8">
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true"
+                    <multiselect
+                    v-model="selectedDepartment"
+                    :options="departmentList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Department"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    @select="departmentSelectChanged">
+                    </multiselect>
+                    <!-- <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true"
                         name="" id=""  class="input-ui"
                         @change="departmentSelectChanged">
                         <option :value="department" v-for="(department, departmentIndex) in departmentList"
                         :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+                    </select> -->
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-8">
                 <label class="label-form mb-3">Roles</label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
+                    <multiselect
+                    v-model="selectedRole"
+                    :options="roleList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Role"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    @select="roleSelectChanged">
+                    </multiselect>
+                    <!-- <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
                         name="" id=""  @change="roleChange()" class="input-ui">
                         <option :value="role" v-for="(role, roleIndex) in roleList"
                             :key="roleIndex"> {{ role.name }} </option>
-                    </select>
+                    </select> -->
                 </div>
             </div>
             <div class="col-span-3 rounded-md mb-8">
                 <label class="label-form mb-3">Staff</label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Staff" data-te-select-filter="true"
+                    <multiselect
+                    v-model="selectedStaff"
+                    :options="staffList"
+                    :multiple="true"
+                    :close-on-select="false"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Staff"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                    </multiselect>
+                    <!-- <select data-te-select-init data-te-select-placeholder="Select Staff" data-te-select-filter="true"
                         name="" id=""  class="input-ui">
                         <option :value="staff" v-for="(staff, staffIndex) in staffList"
                             :key="staffIndex"> {{ staff.name }} </option>
-                    </select>
+                    </select> -->
                 </div>
             </div>
             <div class="col-span-3">
-                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10">
+                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10"
+                :disabled="selectedStaff.length < 1"
+                @click="addSelectedStaffToMeeting">
                     Add
                 </button>
             </div>
@@ -66,20 +107,20 @@
                                 Staff
                             </th>
                             <th scope="col" class=" px-6 py-3">
-                                
+
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="">
+                        <tr class="" v-for="(staff, index) in meetingStaff" >
                             <td class=" pr-6 pl-2 py-3 font-medium ">
-                                Dep
+                                {{ staff.department.name }}
                             </td>
                             <td class=" pr-6 pl-2 py-3 font-medium ">
-                                Role
+                                {{ staff.role.name }}
                             </td>
                             <td class=" pr-6 pl-2 py-3 font-medium ">
-                                admin
+                                {{ staff.staff.name }}
                             </td>
                             <td class=" px-6 py-3 font-medium text-left">
                                 <button>
@@ -96,7 +137,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
-                    <textarea type='text' class="input-ui w-full !p-1 text-xs" rows="8" placeholder="Description" ></textarea>
+                    <textarea type='text' v-model="meetingMinutesText" class="input-ui w-full !p-1 text-xs" rows="8" placeholder="Description" ></textarea>
                 </div>
 
             </div>
@@ -110,93 +151,263 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Objective Name
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <multiselect
+                    v-model="selectedObjective"
+                    :options="objectiveList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Objective"
+                    label="objective_name"
+                    track-by="id"
+                    :preselect-first="false"
+                    @select="objectiveSelectChanged">
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
+
             <div class="mb-4 col-span-4 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     OKR Point
                 </label>
-                <input type="number" autocomplete="off"
+                <input type="number" v-model="okrPoint" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div><div class="col-span-4"></div>
+            </div>
+
+            <div class="mb-4 col-span-4 pb-0 rounded-md">
+                <!-- <label for="" class="block text-sm text-black mb-3">
+                    Assigned Person
+                </label>
+                <multiselect
+                    v-model="assignedStaff"
+                    :options="allStaffList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Accountable"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect> -->
+            </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Project
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <multiselect
+                    v-model="selectedProject"
+                    :options="projectList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Project"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Tag
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <multiselect
+                    v-model="selectedTag"
+                    :options="tagList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Tag"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Assigned Person
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div><div class="col-span-3"></div>
+                <multiselect
+                    v-model="assignedStaff"
+                    :options="allStaffList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Accountable"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+            </div>
+
+            <div class="col-span-3"></div>
 
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Start Date 
+                    Start Date
                 </label>
-                <input type="number" autocomplete="off"
+                <input type="date" v-model="startDate" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Due Date
                 </label>
-                <input type="number" autocomplete="off"
+                <input type="date" v-model="dueDate" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Remark
                 </label>
-                <input type="number" autocomplete="off"
+                <input type="text" v-model="remark" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div><div class="col-span-3"></div>
+            </div>
+
+            <div class="col-span-3"></div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Accountable
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <multiselect
+                    v-model="accountableStaff"
+                    :options="allStaffList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Accountable"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Consulted
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <multiselect
+                    v-model="consultedStaff"
+                    :options="allStaffList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Accountable"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
+
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Informed
                 </label>
-                <input type="number" autocomplete="off"
+                <multiselect
+                    v-model="informedStaff"
+                    :options="allStaffList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Accountable"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+            </div>
+
+            <div class="col-span-3"></div>
+
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Responsible
+                </label>
+                <multiselect
+                    v-model="responsibleStaff"
+                    :options="allStaffList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Responsible"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+            </div>
+
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Priority
+                </label>
+                <input type="number" v-model="priority" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div><div class="col-span-3"></div>
+            </div>
+
+            <div class="col-span-6"></div>
 
             <div class="mb-4 col-span-6 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Key Result
                 </label>
-                <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <multiselect
+                    v-model="selectedObjectiveKeys"
+                    :options="objectiveKeys"
+                    :multiple="true"
+                    :close-on-select="false"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Objective"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
+
             <div class="col-span-3">
-                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10">
+                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10"
+                :disabled="selectedObjectiveKeys.length < 1">
                     Add
                 </button>
             </div>
+
             <div class=" col-span-12 mb-10">
                 <table class="min-w-[50%] text-sm font-light ml-2">
                     <thead class="font-medium text-left ">
@@ -205,17 +416,17 @@
                                 Key Results
                             </th>
                             <th scope="col" class=" px-6 py-3">
-                                
+
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="">
+                        <tr class="" v-for="(objectiveKey, index) in selectedObjectiveKeys">
                             <td class=" pr-6 pl-2 py-3 font-medium ">
-                                Key REsult 1
+                                {{ objectiveKey.name }}
                             </td>
                             <td class=" px-6 py-3 font-medium text-left">
-                                <button>
+                                <button @click="removeSelectedObjectiveKey(objectiveKey.id, index)">
                                     <i class="fal fa-times  pr-3" ></i>
                                 </button>
                             </td>
@@ -224,7 +435,8 @@
                 </table>
             </div>
             <div class="col-span-12">
-                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10">
+                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10"
+                @click="addInstructionBtnClicked">
                     Add
                 </button>
             </div>
@@ -238,7 +450,7 @@
                                 Instruction
                             </th>
                             <th scope="col" class=" px-6 py-3">
-                                
+
                             </th>
                         </tr>
                     </thead>
@@ -257,15 +469,15 @@
                 </table>
             </div>
         </div>
-        <!-- <div>
+        <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create 
+                Create
             </button>
-        </div> -->
+        </div>
     </div>
 
 
-    
+
 
     <!--Delete Modal -->
     <div data-te-modal-init
@@ -278,7 +490,7 @@
                 <div
                     class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
                     <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
-                        Delete 
+                        Delete
                     </h5>
                     <button type="button"
                         class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
@@ -318,23 +530,276 @@ import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 
 export default {
+    props: ["meetingId"],
     components: {
         Multiselect
     },
     data() {
         return {
             departmentList: [],
+            selectedDepartment: null,
             roleList: [],
+            selectedRole: null,
             staffList: [],
-            
+            selectedStaff: [],
+
+            meetingStaff: [],
+
+            meetingMinutesText: null,
+
+            allStaffList: [],
+            accountableStaff: null,
+            consultedStaff: null,
+            informedStaff: null,
+            assignedStaff: null,
+            responsibleStaff: null,
+
+            startDate: null,
+            dueDate: null,
+            remark: null,
+
+            objectiveList: [],
+
+            selectedObjective: null,
+            okrPoint: 0,
+            objectiveKeys: [],
+            selectedObjectiveKeys: [],
+
+            projectList: [],
+            selectedProject: null,
+            tagList: [
+                {value: 'plan', name: 'Plan', id: 1},
+                {value: 'do', name: 'Do', id: 2},
+                {value: 'check', name: 'Check', id: 3},
+                {value: 'act', name: 'Act', id: 4},
+            ],
+            selectedTag: null,
+            priority: null,
+
+            meetingInstructions: [],
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-        
+
+        getObjectiveList(){
+            getApiData({url: `/api/objectives`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.objectiveList = response.data;
+                }
+            });
+        },
+
+        getProjectList(){
+            getApiData({url: `/api/projects`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.projectList = response.data;
+                }
+            });
+        },
+
+        getAllStaffList(){
+            getApiData({url: `/api/staffs`, token: this.getToken()})
+            .then((response)=>{
+                if(response.data){
+                    this.allStaffList = response.data;
+                }
+            });
+        },
+
+        getDepartmentList(){
+            getApiData({url: `/api/departments`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.roleList = [];
+                    this.selectedRole = null;
+                    this.selectedDepartment = null;
+                    this.departmentList = response.data;
+                }
+            });
+        },
+
+        departmentSelectChanged(){
+            getApiData({url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.roleList = response.data;
+                    this.selectedRole = null;
+                }
+            });
+        },
+
+        roleSelectChanged(){
+            getApiData({url: `/api/staffs?department_id[]=${this.selectedDepartment.id}&role_id[]=${this.selectedRole.id}`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.staffList = response.data;
+                    this.selectedStaff = [];
+                }
+            });
+        },
+
+        addSelectedStaffToMeeting(){
+            if(!this.selectedStaff.length > 0){
+                this.showToastMessage("Please select staff first");
+                return;
+            }
+            this.selectedStaff.forEach(staff => {
+                this.meetingStaff.push({
+                    'staff': staff,
+                    'department': this.selectedDepartment,
+                    'role': this.selectedRole
+                });
+            });
+
+            this.selectedStaff = [];
+        },
+
+        objectiveSelectChanged(){
+            this.objectiveKeys = this.selectedObjective.objective_keys;
+            this.okrPoint = this.selectedObjective.okr_point;
+        },
+
+        removeSelectedObjectiveKey(id, index){
+            this.selectedObjectiveKeys.splice(index, 1);
+        },
+
+        addInstructionBtnClicked(){
+            if(!this.selectedObjective){
+                this.showToastMessage("Objective must be selected");
+                return;
+            }
+            if(!this.okrPoint){
+                this.showToastMessage("OKR point must be assigned");
+                return;
+            }
+            if(!this.selectedProject){
+                this.showToastMessage("Project must be selected");
+                return;
+            }
+            if(!this.selectedTag){
+                this.showToastMessage("Tag must be selected");
+                return;
+            }
+            if(!this.assignedStaff || !this.accountableStaff || !this.consultedStaff || !this.informedStaff || !this.responsibleStaff){
+                this.showToastMessage("Assigned, accountable, consulted, informed and responsible staff must be selected");
+                return;
+            }
+            if(!this.priority){
+                this.showToastMessage("Priority must be assigned");
+                return;
+            }
+            if(this.selectedObjectiveKeys.length < 1){
+                this.showToastMessage("At least one objective key result must be selected");
+                return;
+            }
+            if(!this.startDate || !this.dueDate){
+                this.showToastMessage("Start date and due date are required");
+                return;
+            }
+            if(!this.remark){
+                this.showToastMessage("Remark must be entered");
+                return;
+            }
+
+            let instructionObjectiveKeys = [];
+            this.selectedObjectiveKeys.forEach(element => {
+                instructionObjectiveKeys.push(element.id);
+            });
+            this.showToastMessage("Instruction can now be entered", "success", "OK");
+            this.meetingInstructions.push({
+                "objective_id": this.selectedObjective.id,
+                "okr_point": this.okrPoint,
+                "project_id": this.selectedProject.id,
+                'tag': this.selectedTag.value,
+                "assign_to": this.assignedStaff.id,
+                "priority": this.priority,
+                "start_date": this.startDate,
+                "due_date": this.dueDate,
+                "remark": this.remark,
+                "accountable": this.accountableStaff.id,
+                "responsible_id": this.responsibleStaff.id,
+                "consulted_id": this.consultedStaff.id,
+                "informed_id": this.informedStaff.id,
+                "instruction_objective_key": instructionObjectiveKeys
+            });
+
+            this.resetInputs();
+            console.log(this.meetingInstructions);
+        },
+
+        async createBtnClicked(){
+            if(this.meetingInstructions.length < 1){
+                this.showToastMessage("At least one meeting instruction must be present");
+                return;
+            }
+            if(!this.meetingMinutesText){
+                this.showToastMessage("Meeting minute must be present");
+                return;
+            }
+            if(this.meetingStaff.length < 2){
+                this.showToastMessage("Meeting instruction cannot be created with less than 2 attendee");
+                return;
+            }
+
+            let attendances = [];
+            this.meetingStaff.forEach(element => {
+                attendances.push(element.staff.id);
+            });
+            const response = await axios.post(
+                "/api/meeting_minutes",
+                {
+                    meeting_id: this.meetingId,
+                    meeting_minute: this.meetingMinutesText,
+                    attendances: attendances,
+                    instructions: this.meetingInstructions
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.getToken()}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            if(response.status > 199 && response.status < 300){
+                window.location.replace("/meeting");
+            }
+        },
+
+        resetInputs(){
+            this.selectedObjective = null;
+            this.selectedObjectiveKeys = [];
+            this.okrPoint = null;
+            this.selectedProject = null;
+            this.selectedTag = null;
+            this.assignedStaff = null;
+            this.priority = null;
+            this.startDate = null;
+            this.dueDate = null;
+            this.remark = null;
+            this.accountableStaff = null;
+            this.responsibleStaff = null;
+            this.consultedStaff = null;
+            this.informedStaff = null;
+        },
+
+        showToastMessage(message, type = "warn", title = "Input Validation") {
+            this.$notify({
+                title: `${title}`,
+                text: `${message}`,
+                type: `${type}`
+            });
+        },
+
     },
     created(){
+        this.getDepartmentList();
+        this.getAllStaffList();
+        this.getObjectiveList();
+        this.getProjectList();
     },
 
     mounted() {

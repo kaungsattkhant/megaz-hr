@@ -559,6 +559,7 @@ Route::middleware(['departments:meeting'])->group(function () {
 Route::middleware(['departments:meeting.create'])->group(function () {
     Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
 });
+Route::view('/meeting/{id}/operation', 'meeting.operation_meeting');
 Route::middleware(['departments:meeting.edit'])->group(function () {
     Route::view('/meeting/{id}/edit', 'meeting.edit');
 });
@@ -791,7 +792,6 @@ Route::view('/cashflow_report', 'cashflow_report.index');
 Route::view('/off_day_setting', 'off_day_setting.index');
 Route::view('/contract', 'contract.index');
 Route::view('/contract/create', 'contract.create');
-Route::view('/meeting/operation', 'meeting.operation_meeting');
 
 // =======
 // Route::middleware(['departments:event'])->group(function () {

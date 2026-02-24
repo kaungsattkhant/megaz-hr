@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <meeting-operation-component/>
+    <meeting-operation-component meeting-id={{$id}} />
 </div>
 
 @endsection
