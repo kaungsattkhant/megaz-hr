@@ -215,8 +215,13 @@
                 <!-- <input type="number" autocomplete="off"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
-
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
+            <div class="mb-4 col-span-1 pb-0 rounded-md">
+                <label for="" class="label-form mb-5">
+                    &nbsp;
+                </label>
+                <button data-te-toggle="modal" data-te-target="#addProjectModal" > <i class="fas fa-plus"></i> </button>
+            </div>
+            <div class="mb-4 col-span-2 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Tag
                 </label>
@@ -477,7 +482,57 @@
     </div>
 
 
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="addProjectModal" tabindex="-1" aria-labelledby="add_category_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_category_modalLabel">
+                            Create Project
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close" id="btn-close-create-project-modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4 pb-0 rounded-md">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Name
+                            </label>
+                            <input type="text" v-model="projectName" autocomplete="off"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <LoadingButton
+                            :loading="projectCreateLoading"
+                            text="Create"
+                            loadingText="Loading..."
+                            @click="createProject"
+                        />
+                        <!-- <button type="button" @click="createCategory()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!--Delete Modal -->
     <div data-te-modal-init
@@ -528,11 +583,13 @@ import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     props: ["meetingId"],
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton,
     },
     data() {
         return {
@@ -577,11 +634,34 @@ export default {
             priority: null,
 
             meetingInstructions: [],
+
+            projectName: null,
+            projectCreateLoading: false,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        createProject(){
+            this.projectCreateLoading = true;
+            if(!this.projectName){
+                this.projectCreateLoading = false;
+                this.showToastMessage("Name of the project is required");
+                return;
+            }
+            let formData = new FormData();
+            formData.append('name', this.projectName);
+            postApiData({url: `/api/projects`, form_data: formData, token: this.getToken()})
+            .then((response)=>{
+                this.projectCreateLoading = false;
+                if(response.data){
+                    this.projectList.push(response.data);
+                    this.selectedProject = response.data;
+                }                
+            });
+            document.getElementById('btn-close-create-project-modal').click();
+        },
 
         getObjectiveList(){
             getApiData({url: `/api/objectives`, token: this.getToken()})
