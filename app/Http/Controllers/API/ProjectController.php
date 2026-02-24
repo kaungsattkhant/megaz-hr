@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProjectInstructionResource;
+use App\Models\Instruction;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -36,6 +38,40 @@ class ProjectController extends Controller
         );
 
         return ResponseData($project);
+    }
+
+    public function getInstructionByProject($projectId, Request $request)
+    {
+        Project::findOrFail($projectId);
+
+        $instructions = Instruction::with([
+            'objective',
+            'objectiveKeys',
+            'assignedTo',
+            'responsible',
+            'accountable',
+            'consulted',
+            'informed',
+        ])
+            ->where('project_id', $projectId)
+            ->orderByRaw('priority IS NULL')
+            ->orderBy('priority')
+            ->get();
+
+        $groupedData = $instructions
+            ->groupBy('tag')
+            ->map(function ($tagGroup) use ($request) {
+                return ProjectInstructionResource::collection($tagGroup)->resolve($request);
+            });
+
+        $tagOrder = ['plan', 'do', 'check', 'act'];
+        $groupedData = collect($tagOrder)
+            ->filter(fn($tag) => $groupedData->has($tag))
+            ->mapWithKeys(fn($tag) => [$tag => $groupedData->get($tag)]);
+
+        return response()->json([
+            'data' => $groupedData,
+        ]);
     }
 
 }

@@ -192,12 +192,13 @@ Route::middleware('auth:api')->group(function () {
   Route::prefix('contracts')->controller(ContractController::class)->group(function () {
     Route::post('/', 'store');
     Route::get('/', 'index');
-    Route::post('add_staff','addStaffToContract');
-    Route::get('/staff','getContractStaff');
+    Route::post('add_staff', 'addStaffToContract');
+    Route::get('/staff', 'getContractStaff');
   });
   Route::prefix('projects')->controller(ProjectController::class)->group(function () {
     Route::get('/', 'index');
     Route::post('/', 'store');
+    Route::get('{projectId}/instruction_by_project','getInstructionByProject');
   });
   Route::prefix('meeting_minutes')->controller(MeetingMinuteController::class)->group(function () {
     Route::get('/', 'index');
