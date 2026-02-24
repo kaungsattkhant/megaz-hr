@@ -16,7 +16,7 @@ class Instruction extends Model
         'assigned_to',
         'start_date',
         'due_date',
-        'reamark',
+        'remark',
         'priority',
         'responsible_id',
         'accountable_id',
