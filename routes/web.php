@@ -791,6 +791,7 @@ Route::view('/budget_accounts', 'budget_accounts.index');
 Route::view('/cashflow_report', 'cashflow_report.index');
 Route::view('/off_day_setting', 'off_day_setting.index');
 Route::view('/contract', 'contract.index');
+Route::view('/signed_contract', 'contract.signed_contracts');
 Route::view('/contract/create', 'contract.create');
 
 // =======
