@@ -163,6 +163,7 @@ class ExamRepository implements ExamRepositoryInterface
               [
                 'mark' => $grade['mark'],
                 'grade' => $grade['grade'],
+                'is_pass' => $grade['is_pass'] ?? 0,
                 'is_active' => 1,
               ]
             );
