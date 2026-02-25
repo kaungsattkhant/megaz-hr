@@ -339,4 +339,9 @@ class CvRepository implements CvRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
     }
   }
+
+  public function getCommunicationForm($staffId){
+    $comminicationForm = CommunicationForm::where('staff_id', $staffId)->first();
+    return $comminicationForm;
+  }
 }

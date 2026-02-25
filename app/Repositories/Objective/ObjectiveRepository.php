@@ -396,7 +396,12 @@ class ObjectiveRepository implements ObjectiveInterface
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
             })
-            ->orderBy('id','desc')
+            ->orderByRaw('(SELECT objectives.priority FROM objectives WHERE objectives.id = objective_assigns.objective_id) IS NULL')
+            ->orderBy(
+                Objective::select('priority')
+                    ->whereColumn('objectives.id', 'objective_assigns.objective_id')
+            )
+            ->orderBy('id', 'desc')
             ->get();
 
         foreach ($objectiveAssigns as $objectiveAssign) {
