@@ -295,6 +295,8 @@ import ContractComponent from './Components/Contract/ContractComponent.vue';
 import ContractCreateComponent from './Components/Contract/ContractCreateComponent.vue';
 import SignedContractsListComponent from './Components/Contract/SignedContractsListComponent.vue';
 import MeetingOperationComponent from './Components/Meeting/MeetingOperationComponent.vue';
+import ProjectListComponent from './Components/Project/ProjectListComponent.vue';
+import ProjectInstructionComponent from './Components/Project/ProjectInstructionComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -567,6 +569,8 @@ app.component('ContractComponent',ContractComponent);
 app.component('ContractCreateComponent',ContractCreateComponent);
 app.component('SignedContractsListComponent',SignedContractsListComponent);
 app.component('MeetingOperationComponent',MeetingOperationComponent);
+app.component('ProjectListComponent',ProjectListComponent);
+app.component('ProjectInstructionComponent',ProjectInstructionComponent);
 
 const toastificationOptions = {};
 app.use(store);

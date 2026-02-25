@@ -563,6 +563,8 @@ Route::view('/meeting/{id}/operation', 'meeting.operation_meeting');
 Route::middleware(['departments:meeting.edit'])->group(function () {
     Route::view('/meeting/{id}/edit', 'meeting.edit');
 });
+Route::view('/project', 'project.index');
+Route::view('/project/{id}/instruction', 'project.project_instruction');
 
 // training
 Route::middleware(['departments:training'])->group(function () {
