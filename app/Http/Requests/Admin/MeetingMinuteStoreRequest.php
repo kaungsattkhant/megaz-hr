@@ -6,6 +6,7 @@ use App\Enums\PDCAEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+
 class MeetingMinuteStoreRequest extends FormRequest
 {
     /**
@@ -34,20 +35,23 @@ class MeetingMinuteStoreRequest extends FormRequest
             'attendances' => ['required', 'array', 'min:1'],
             'attendances.*' => ['integer', 'distinct', 'exists:staff,id'],
             'instructions' => ['required', 'array', 'min:1'],
-            'instructions.*.objective_id' => ['required', 'integer', 'exists:objectives,id'],
+            'instructions.*.objective_name' => ['required'],
             'instructions.*.okr_point' => ['nullable', 'numeric'],
             'instructions.*.project_id' => ['required', 'integer', 'exists:projects,id'],
             'instructions.*.tag' => ['required', Rule::in(PDCAEnum::getValues())],
             'instructions.*.priority' => ['required', 'integer', 'between:1,10'],
             'instructions.*.assign_to' => ['required', 'integer', 'exists:staff,id'],
             'instructions.*.responsible_id' => ['required', 'integer', 'exists:staff,id'],
+            'instructions.*.sop_id' => ['required', 'integer', 'exists:sops,id'],
+            'instructions.*.role_id' => ['required', 'integer', 'exists:roles,id'],
             'instructions.*.accountable' => ['required', 'integer', 'exists:staff,id'],
             'instructions.*.consulted_id' => ['nullable', 'integer', 'exists:staff,id'],
             'instructions.*.informed_id' => ['nullable', 'integer', 'exists:staff,id'],
             'instructions.*.start_date' => ['required'],
             'instructions.*.due_date' => ['required','after_or_equal:instructions.*.start_date'],
             'instructions.*.instruction_objective_key' => ['required', 'array', 'min:1'],
-            'instructions.*.instruction_objective_key.*' => ['integer', 'distinct', 'exists:objective_keys,id'],
+            'instructions.*.instruction_objective_key.*.name' => ['required'],
+            // 'instructions.*.instruction_objective_key.*' => ['integer', 'distinct', 'exists:objective_keys,id'],
         ];
     }
 }

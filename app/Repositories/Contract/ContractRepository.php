@@ -8,6 +8,7 @@ use App\Enums\StaffStatus;
 use App\Models\Contract;
 use App\Models\ContractStaff;
 use App\Models\Staff;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,7 +16,7 @@ class ContractRepository implements ContractRepositoryInterface
 {
     public function list($request)
     {
-        $query = Contract::with(['contract_category','company_authorizer:id,name','witness:id,name','role:id,name'])->orderBy('id', 'DESC');
+        $query = Contract::with(['contract_category', 'company_authorizer:id,name', 'witness:id,name', 'role:id,name'])->orderBy('id', 'DESC');
 
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
@@ -68,8 +69,8 @@ class ContractRepository implements ContractRepositoryInterface
     public function getContractStaffList($request)
     {
         $query = ContractStaff::with(['contract.contract_category', 'staff'])
-        ->whereIn('status',[ContractStaffEnum::SIGNED->value])
-        ->orderBy('id', 'DESC');
+            ->whereIn('status', [ContractStaffEnum::SIGNED->value, ContractStaffEnum::CONFIRMED->value])
+            ->orderBy('id', 'DESC');
         if ($request->has('per_page') || $request->has('page')) {
             return $query->paginate(config('common.list_count'));
         }
@@ -85,7 +86,7 @@ class ContractRepository implements ContractRepositoryInterface
             if ($contract->type === ContractTypeEnum::ORIENTATION->value) {
                 \ResponseMessage('Only Occasional contract can add staff', 422);
             }
-            foreach($data['staff_ids'] as $staffId) {
+            foreach ($data['staff_ids'] as $staffId) {
                 $this->exitContractStaff($contract, $staffId);
                 $contract->contract_staff()->create(['staff_id' => $staffId]);
             }
@@ -131,14 +132,33 @@ class ContractRepository implements ContractRepositoryInterface
             throw $e;
         }
     }
-    public function exitContractStaff($contract,$staffId){
+    public function exitContractStaff($contract, $staffId)
+    {
         $exists = $contract->contract_staff()
             ->where('staff_id', $staffId)
             ->exists();
 
         if ($exists) {
-            $staff=Staff::find($staffId);
+            $staff = Staff::find($staffId);
             ResponseMessage("{$staff->name} already attached to this contract", 400);
+        }
+    }
+
+    public function updateStatus(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $contractStaff = ContractStaff::findOrFail($data['id']);
+            $contractStaff->status = $data['status'];
+            $contractStaff->confirmed_at = $data['date_time'] ?? now();
+            $contractStaff->confirmed_by = \UserData()->id ?? null;
+            $contractStaff->save();
+            DB::commit();
+            return $contractStaff;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
         }
     }
 }

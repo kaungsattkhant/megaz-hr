@@ -195,6 +195,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/', 'index');
     Route::post('add_staff', 'addStaffToContract');
     Route::get('/staff', 'getContractStaff');
+    Route::post('/update_status','updateStatus');
   });
   Route::prefix('projects')->controller(ProjectController::class)->group(function () {
     Route::get('/', 'index');

@@ -95,6 +95,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/sops', 'storeSop');
     Route::get('/sops', 'getSop');
+    Route::get('get_sop','getAllSop');
     Route::get('/sop-jd/{jdSopId}', 'showSop');
     Route::delete('/sop-jd/{jdSopId}', 'deleteJdSopById');
   });

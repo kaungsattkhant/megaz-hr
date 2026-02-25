@@ -26,5 +26,14 @@ class ContractStaff extends Model
     {
         return $this->belongsTo(Staff::class);
     }
+
+    public function confirmedBy()
+    {
+        return $this->belongsTo(Staff::class, 'confirmed_by');
+    }
+    public function cancelledBy()
+    {
+        return $this->belongsTo(Staff::class, 'cancelled_by');
+    }
     
 }

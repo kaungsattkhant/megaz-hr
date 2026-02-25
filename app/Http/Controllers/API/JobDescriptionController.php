@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-use App\Http\Requests\JD\StoreJDrequest;
-use App\Http\Requests\JD\SopStoreRequest;
 use App\Http\Requests\JD\JobSpecStoreRequest;
+use App\Http\Requests\JD\SopStoreRequest;
+use App\Http\Requests\JD\StoreJDrequest;
+use App\Models\Sop;
 use App\Repositories\JobDescription\JobDescriptionRepositoryInterface;
+use Illuminate\Http\Request;
 
 class JobDescriptionController extends Controller
 {
@@ -83,6 +83,12 @@ class JobDescriptionController extends Controller
     public function deleteJdSopById(int $jdSopId)
     {
         $sop = $this->jobDescriptionRepository->deleteJdSopById($jdSopId);
+        ResponseData($sop);
+    }
+
+    public function getAllSop()
+    {
+        $sop =Sop::orderBy('id', 'desc')->get();
         ResponseData($sop);
     }
 }

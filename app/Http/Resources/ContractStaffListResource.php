@@ -20,6 +20,8 @@ class ContractStaffListResource extends JsonResource
             'text'=>$this->contract->text,
             'status' => $this->status,
             'signed_at' => $this->signed_at,
+            'confirmed_by'=> $this->confirmedBy->name ?? null,
+            'confirmed_at'=>$this->confirmed_at,
             'contract_category'=>[
                 'id'=>$this->contract->contract_category->id,
                 'name'=>$this->contract->contract_category->name,
@@ -28,7 +30,6 @@ class ContractStaffListResource extends JsonResource
                 'id'=>$this->staff->id,
                 'name'=>$this->staff->name,
             ],
-            
             // 'status'=>$this->status,
             // 'role'=>[
             //     'id'=>$this->role->id,
