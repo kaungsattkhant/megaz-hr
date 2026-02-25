@@ -391,6 +391,7 @@ class ObjectiveRepository implements ObjectiveInterface
             'objective.accountable:id,name',
             'objective.consulted:id,name',
             'objective.informed:id,name',
+            'objective.project:id,name',
         ])
             ->where('staff_id', $staffId)
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {

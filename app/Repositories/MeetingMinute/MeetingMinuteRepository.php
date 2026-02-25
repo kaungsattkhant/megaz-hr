@@ -68,6 +68,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                     'informed_id' => $instructionData['informed_id'],
                     'responsible_id' => $instructionData['responsible_id'],
                     'priority' => $instructionData['priority'],
+                    'project_id'=>$instructionData['project_id'],
                 ]);
                 $objectiveKeyIds = [];
                 foreach ($instructionData['instruction_objective_key'] as $objectiveKey) {
