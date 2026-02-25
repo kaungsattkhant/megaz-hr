@@ -835,6 +835,15 @@
                                     Meeting
                                 </a>
                             </li>
+                            <li v-show="checkFeaturePermission('meeting')">
+                                <a
+                                    href="/project"
+                                    class="flex items-center sidebar-gap-x"
+                                >
+                                    <i class="fal fa-chart-network"></i>
+                                    Project
+                                </a>
+                            </li>
                             <li v-show="checkFeaturePermission('training')">
                                 <a
                                     href="/training"
