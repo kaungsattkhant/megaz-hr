@@ -5,10 +5,17 @@ namespace App\Repositories\MeetingMinute;
 use App\Models\Instruction;
 use App\Models\Meeting;
 use App\Models\MeetingMinute;
+use App\Models\Objective;
+use App\Models\ObjectiveAssign;
+use App\Models\ObjectiveKey;
+use App\Models\ObjectiveStaff;
 use Illuminate\Support\Facades\DB;
+use App\Http\Action\SendNotification\FcmSendNotification;
 
 class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
 {
+    use FcmSendNotification;
+
     public function list($request)
     {
         $query = MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys'])->orderByDesc('id');
@@ -45,7 +52,52 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
             $meetingMinute->attendances()->sync($data['attendances'] ?? []);
 
             $keptInstructionIds = [];
+
+
+
             foreach ($data['instructions'] ?? [] as $instructionData) {
+                //create Objective 
+                $objective = Objective::create([
+                    'objective_name' => $instructionData['objective_name'],
+                    'create_by' => \UserData()->id,
+                    'okr_point' => $instructionData['okr_point'],
+                    'role_id' => $instructionData['role_id'],
+                    'sop_id' => $instructionData['sop_id'],
+                    'accountable_id' => $instructionData['accountable'],
+                    'consulted_id' => $instructionData['consulted_id'],
+                    'informed_id' => $instructionData['informed_id'],
+                    'responsible_id' => $instructionData['responsible_id'],
+                    'priority' => $instructionData['priority'],
+                ]);
+                $objectiveKeyIds = [];
+                foreach ($instructionData['instruction_objective_key'] as $objectiveKey) {
+                    $objectiveKey = ObjectiveKey::create(
+                        [
+                            'objective_id' => $objective->id,
+                            'name' => $objectiveKey['name'],
+                        ]
+                    );
+                    $objectiveKeyIds[] = $objectiveKey->id;
+                }
+                //assign objective 
+                $objectiveAssign = ObjectiveAssign::create([
+                    'objective_id' => $objective->id,
+                    'staff_id' => $instructionData['responsible_id'],
+                ]);
+                $objectiveStaff = ObjectiveStaff::create(
+                    [
+                        'start_date' => $instructionData['start_date'],
+                        'end_date' => $instructionData['due_date'],
+                        'okr_point' => $instructionData['okr_point'],
+                        'objective_assign_id' => $objectiveAssign->id,
+                    ]
+                );
+                $notificationData = [
+                    'title' => 'OKR Assigned',
+                    'preview' => 'A New Okr Assigned to you.',
+                ];
+
+                //end objective
                 if (!empty($instructionData['id'])) {
                     $instruction = Instruction::where('meeting_minute_id', $meetingMinute->id)
                         ->findOrFail($instructionData['id']);
@@ -54,7 +106,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                     $instruction->meeting_minute_id = $meetingMinute->id;
                 }
 
-                $instruction->objective_id = $instructionData['objective_id'];
+                $instruction->objective_id = $objective->id;
                 $instruction->okr_point = $instructionData['okr_point'] ?? null;
                 $instruction->project_id = $instructionData['project_id'];
                 $instruction->tag = $instructionData['tag'] ?? null;
@@ -70,7 +122,8 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->save();
 
                 $keptInstructionIds[] = $instruction->id;
-                $instruction->objectiveKeys()->sync($instructionData['instruction_objective_key'] ?? []);
+                $instruction->objectiveKeys()->sync($objectiveKeyIds);
+                $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
             }
 
             if (!empty($data['id'])) {

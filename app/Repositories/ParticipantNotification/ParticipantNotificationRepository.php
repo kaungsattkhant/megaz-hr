@@ -1261,7 +1261,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getMeetingsByStaffId($staffId, $request)
   {
-    $staff = Staff::with('department', 'roles')->find($staffId);
+    $staff = Staff::with('department', 'roles')
+    ->find($staffId);
     if (!$staff) {
       return ResponseData(null, 400, false, 'Staff not found.');
     }

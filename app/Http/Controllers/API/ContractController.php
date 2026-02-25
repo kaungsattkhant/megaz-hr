@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Enums\ContractStaffEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ContractStaffListResource;
 use App\Models\Contract;
 use App\Repositories\Contract\ContractRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ContractController extends Controller
 {
@@ -74,6 +76,16 @@ class ContractController extends Controller
             'signed_document' => 'required',
         ]);
         $contractStaff=$this->contractRepo->signedContract($request->all());
+        return new ContractStaffListResource($contractStaff);
+    }
+
+    public function updateStatus(Request $request){
+        $request->validate([
+            'id'=>'required|exists:contract_staff,id',
+            'date_time'=>['required'],
+            'status' =>['required',Rule::in(ContractStaffEnum::getValues())],
+        ]);
+        $contractStaff=$this->contractRepo->updateStatus($request->all());
         return new ContractStaffListResource($contractStaff);
     }
 }
