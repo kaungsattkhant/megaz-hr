@@ -104,6 +104,11 @@
                                     </td>
 
                                     <td class="whitespace-nowrap">
+                                        <a :href="'/cv/' + item.id + '/ocf'" class="pr-3"
+                                        >
+                                            <i class="fal fa-address-book"></i>
+                                        </a>
+
                                         <button @click="addLocationModalClicked(item)" data-te-toggle="modal" title="Add Location"
                                             data-te-target="#add_location" id="date-btn" class="pr-3">
                                             <i class="fas fa-map-marker-plus"></i>
