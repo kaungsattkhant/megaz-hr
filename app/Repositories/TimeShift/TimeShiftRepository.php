@@ -452,7 +452,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   public function checkOut(array $validatedData, $checkInId)
   {
     DB::beginTransaction();
-    Carbon::setTestNow(Carbon::parse('2026-01-05 23:44:00'));
+    // Carbon::setTestNow(Carbon::parse('2026-01-05 23:44:00'));
     try {
       $checkIn = CheckIn::find($checkInId);
       $authUser = UserData();
@@ -474,7 +474,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $earlyCheckOutAllowed = $toCarbon->copy()->subMinutes($checkOutEarlyMin);
       $now      = Carbon::now();
       if ($now->lt($earlyCheckOutAllowed)) {
-        \ResponseMessage("You cannot be checkout.Allow $earlyCheckOutAllowed");
+        \ResponseMessage("You cannot be checkout.Allow within $now and $earlyCheckOutAllowed");
       }
       if ($checkIn && $checkIn->is_current_checked_in) {
         if (isset($validatedData['check_out_photo'])) {
