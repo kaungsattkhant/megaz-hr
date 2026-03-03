@@ -499,7 +499,7 @@ class ReportRepository implements ReportInterface
 
     public function getMonthlyPackage($request)
     {
-        Carbon::setTestNow(Carbon::parse('2026-01-30 00:00:00'));
+        // Carbon::setTestNow(Carbon::parse('2026-01-30 00:00:00'));
         $currentDate = Carbon::parse(now())->subDays(1);
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']);
         $raw = Invoice::where('invoice_type', 'package')

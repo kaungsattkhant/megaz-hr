@@ -1,0 +1,851 @@
+[
+    {
+        "module": "staff",
+        "name": "Staff List",
+        "slug": "staff"
+    },
+    {
+        "module": "staff",
+        "name": "Staff Create",
+        "slug": "staff.create"
+    },
+    {
+        "module": "staff",
+        "name": "Staff Edit",
+        "slug": "staff.edit"
+    },
+    {
+        "module": "staff",
+        "name": "Staff Active On/Off",
+        "slug": "staff.toggle"
+    },
+    {
+        "module": "role",
+        "name": "Role List",
+        "slug": "role"
+    },
+    {
+        "module": "role",
+        "name": "Role Create",
+        "slug": "role.create"
+    },
+    {
+        "module": "role",
+        "name": "Role Edit",
+        "slug": "role.edit"
+    },
+    {
+        "module": "department",
+        "name": "Department List",
+        "slug": "department"
+    },
+    {
+        "module": "department",
+        "name": "Department Create",
+        "slug": "department.create"
+    },
+    {
+        "module": "department",
+        "name": "Department Edit",
+        "slug": "department.edit"
+    },
+    {
+        "module": "complain",
+        "name": "getComplainData",
+        "slug": "complaint"
+    },
+    {
+        "module": "complain",
+        "name": "getStaffComplaints",
+        "slug": "staff.complaints"
+    },
+    {
+        "module": "complain",
+        "name": "createComplain",
+        "slug": "complain.create"
+    },
+    {
+        "module": "complain",
+        "name": "complaintDetail",
+        "slug": "complaint.detail"
+    },
+    {
+        "module": "complain",
+        "name": "updateComplain",
+        "slug": "complaint.update"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplain",
+        "slug": "complain.delete"
+    },
+    {
+        "module": "complain",
+        "name": "complainStatusChange",
+        "slug": "complain.toggle"
+    },
+    {
+        "module": "complain",
+        "name": "complaintResponsiblesByStaff",
+        "slug": "complaint.responsibles-by-staff"
+    },
+    {
+        "module": "complain",
+        "name": "complaintCarbonCopiesByStaff",
+        "slug": "complaint.carbon-copies-by-staff"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplaintImage",
+        "slug": "complaint.delete.image"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplaintResponsible",
+        "slug": "complaint.delete.responsible"
+    },
+    {
+        "module": "complain",
+        "name": "deleteComplaintCarbonCopy",
+        "slug": "complaint.delete.carbon-copies"
+    },
+    {
+        "module": "complaint-category",
+        "name": "ComplaintCategory",
+        "slug": "complaint-category"
+    },
+   
+    {
+        "module": "duty",
+        "name": "createDuty",
+        "slug": "duty.create"
+    },
+    {
+        "module": "duty",
+        "name": "listDuties",
+        "slug": "duty"
+    },
+    {
+        "module": "duty",
+        "name": "updateDuty",
+        "slug": "duty.update"
+    },
+    {
+        "module": "duty",
+        "name": "deleteDuty",
+        "slug": "duty.delete"
+    },
+    {
+        "module": "duty",
+        "name": "dutyDetail",
+        "slug": "duty.edit"
+    },
+  
+    {
+        "module": "skill",
+        "name": "Skill List",
+        "slug": "skill"
+    },
+    {
+        "module": "skill",
+        "name": "Skill Create",
+        "slug": "skill.create"
+    },
+    {
+        "module": "skill",
+        "name": "Skill Edit",
+        "slug": "skill.edit"
+    },
+    {
+        "module": "skill",
+        "name": "Skill Delete",
+        "slug": "skill.delete"
+    },
+    
+    {
+        "module": "area",
+        "name": "Area List",
+        "slug": "area.list"
+    },
+    {
+        "module": "area",
+        "name": "Area Create",
+        "slug": "area.create"
+    },
+    {
+        "module": "area",
+        "name": "Area Edit",
+        "slug": "area.edit"
+    },
+    {
+        "module": "area",
+        "name": "Area Active On/Off",
+        "slug": "area.toggle"
+    },
+    {
+        "module": "staff-balance",
+        "name": "Staff Balance List",
+        "slug": "staff-balance"
+    },
+    {
+        "module": "staff-balance",
+        "name": "staff balance create",
+        "slug": "staff-balance.create"
+    },
+   
+    {
+        "module": "okr",
+        "name": "OKR create",
+        "slug": "okr.create"
+    },
+    {
+        "module": "okr",
+        "name": "OKR list",
+        "slug": "okr"
+    },
+    {
+        "module": "okr",
+        "name": "OKR edit",
+        "slug": "okr.edit"
+    },
+    {
+        "module": "okr",
+        "name": "OKR delete",
+        "slug": "okr.delete"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty list",
+        "slug": "okr-duty"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty create",
+        "slug": "okr-duty.create"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty edit",
+        "slug": "okr-duty.edit"
+    },
+    {
+        "module": "okr-duty",
+        "name": "OKR duty delete",
+        "slug": "okr-duty.delete"
+    },
+    {
+        "module": "okr-dashboard",
+        "name": "okr-dashboard list ",
+        "slug": "okr-dashboard"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift list",
+        "slug": "time-shift"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift create",
+        "slug": "time-shift.create"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift edit",
+        "slug": "time-shift.edit"
+    },
+    {
+        "module": "time-shift",
+        "name": "time-shift delete",
+        "slug": "time-shift.delete"
+    },
+    {
+        "module": "gps",
+        "name": "gps list",
+        "slug": "gps"
+    },
+    {
+        "module": "gps",
+        "name": "gps edit",
+        "slug": "gps.edit"
+    },
+    {
+        "module": "check-in",
+        "name": "check-in list",
+        "slug": "check-in"
+    },
+    {
+        "module": "contact",
+        "name": "contact",
+        "slug": "contact"
+    },
+    {
+        "module": "contact",
+        "name": "contact create",
+        "slug": "contact.create"
+    },
+    {
+        "module": "contact",
+        "name": "contact edit",
+        "slug": "contact.edit"
+    },
+    {
+        "module": "contact",
+        "name": "contact delete",
+        "slug": "contact.delete"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting create",
+        "slug": "meeting.create"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting list ",
+        "slug": "meeting"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting edit",
+        "slug": "meeting.edit"
+    },
+    {
+        "module": "meeting",
+        "name": "meeting delete",
+        "slug": "meeting.delete"
+    },
+    {
+        "module": "training",
+        "name": "training list",
+        "slug": "training"
+    },
+    {
+        "module": "training",
+        "name": "training create",
+        "slug": "training.create"
+    },
+    {
+        "module": "training",
+        "name": "training edit",
+        "slug": "training.edit"
+    },
+    {
+        "module": "training",
+        "name": "training delete",
+        "slug": "training.delete"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new list",
+        "slug": "org-new"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new create",
+        "slug": "org-new.create"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new edit",
+        "slug": "org-new.edit"
+    },
+    {
+        "module": "org-new",
+        "name": "org-new delete",
+        "slug": "org-new.delete"
+    },
+    {
+        "module": "warning",
+        "name": "warning list",
+        "slug": "warning"
+    },
+    {
+        "module": "warning",
+        "name": "warning create",
+        "slug": "warning.create"
+    },
+    {
+        "module": "warning",
+        "name": "warning edit ",
+        "slug": "warning.edit"
+    },
+    {
+        "module": "warning",
+        "name": "warning delete",
+        "slug": "warning.delete"
+    },
+    {
+        "module": "off day",
+        "name": "off day list",
+        "slug": "off-day"
+    },
+    {
+        "module": "off day",
+        "name": "off-day create",
+        "slug": "off-day.create"
+    },
+    {
+        "module": "off day",
+        "name": "off-day edit",
+        "slug": "off-day.edit"
+    },
+    {
+        "module": "off day",
+        "name": "off-day delete",
+        "slug": "off-day.delete"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance list",
+        "slug": "leave-allowance"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance create",
+        "slug": "leave-allowance.create"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance edit ",
+        "slug": "leave-allowance.edit"
+    },
+    {
+        "module": "leave-allowance",
+        "name": "leave-allowance delete",
+        "slug": "leave-allowance.delete"
+    },
+    {
+        "module": "leave",
+        "name": "leave list",
+        "slug": "leave"
+    },
+    {
+        "module": "leave",
+        "name": "leave create",
+        "slug": "leave.create"
+    },
+    {
+        "module": "leave",
+        "name": "leave delete ",
+        "slug": "leave.delete"
+    },
+    {
+        "module": "exit-pass",
+        "name": "exit-pass list",
+        "slug": "exit-pass"
+    },
+    {
+        "module": "exit-pass",
+        "name": "exit-pass delete",
+        "slug": "exit-pass.delete"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee list",
+        "slug": "overtime-fee"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee create",
+        "slug": "overtime-fee.create"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee edit",
+        "slug": "overtime-fee.edit"
+    },
+    {
+        "module": "overtime-fee",
+        "name": "overtime-fee delete",
+        "slug": "overtime-fee.delete"
+    },
+    {
+        "module": "overtime-confirmation",
+        "name": "overtime-confirmation list",
+        "slug": "overtime-confirmation"
+    },
+    {
+        "module": "overtime-confirmation",
+        "name": "overtime-confirmation create",
+        "slug": "overtime-confirmation.create"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup list",
+        "slug": "salary-setup"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup create",
+        "slug": "salary-setup.create"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup edit",
+        "slug": "salary-setup.edit"
+    },
+    {
+        "module": "salary-setup",
+        "name": "salary-setup delete",
+        "slug": "salary-setup.delete"
+    },
+    {
+        "module": "salary",
+        "name": "salary list",
+        "slug": "salary"
+    },
+    {
+        "module": "salary",
+        "name": "salary create",
+        "slug": "salary.create"
+    },
+    {
+        "module": "salary",
+        "name": "salary edit",
+        "slug": "salary.edit"
+    },
+    {
+        "module": "salary",
+        "name": "salary delete",
+        "slug": "salary.delete"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance list",
+        "slug": "allowance"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance create",
+        "slug": "allowance.create"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance edit",
+        "slug": "allowance.edit"
+    },
+    {
+        "module": "allowance",
+        "name": "allowance delete",
+        "slug": "allowance.delete"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch list",
+        "slug": "salary-batch"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch create",
+        "slug": "salary-batch.create"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch edit",
+        "slug": "salary-batch.edit"
+    },
+    {
+        "module": "salary-batch",
+        "name": "salary-batch delete",
+        "slug": "salary-batch.delete"
+    },
+    {
+        "module": "salary-calculate",
+        "name": "salary-calculate list",
+        "slug": "salary-calculate"
+    },
+    {
+        "module": "salary-calculate",
+        "name": "salary-calculate create",
+        "slug": "salary-calculate.create"
+    },
+    {
+        "module": "salary-calculate",
+        "name": "salary-calculate publish",
+        "slug": "salary-calculate.publish"
+    },
+    {
+        "module": "pay-slip",
+        "name": "pay-slip list",
+        "slug": "pay-slip"
+    },
+    {
+        "module": "pay-slip",
+        "name": "pay-slip edit",
+        "slug": "pay-slip.edit"
+    },
+    {
+        "module": "resignation-categories",
+        "name": "resignation-categories list",
+        "slug": "resignation-categories"
+    },
+    {
+        "module": "resignation-categories",
+        "name": "resignation-categories create ",
+        "slug": "resignation-categories.create"
+    },
+    {
+        "module": "resignation",
+        "name": "resignation list",
+        "slug": "resignation"
+    },
+    {
+        "module": "resignation",
+        "name": "resignation create",
+        "slug": "resignation.create"
+    },
+    {
+        "module": "resignation",
+        "name": "resignation status",
+        "slug": "resignation.status"
+    },
+    {
+        "module": "jd",
+        "name": "jd list",
+        "slug": "jd"
+    },
+    {
+        "module": "jd",
+        "name": "jd create",
+        "slug": "jd.create"
+    },
+    {
+        "module": "jd",
+        "name": "jd edit",
+        "slug": "jd.edit"
+    },
+    {
+        "module": "jd",
+        "name": "jd delete",
+        "slug": "jd.delete"
+    },
+    {
+        "module": "js",
+        "name": "js list",
+        "slug": "js"
+    },
+    {
+        "module": "js",
+        "name": "js create",
+        "slug": "js.create"
+    },
+    {
+        "module": "js",
+        "name": "js edit",
+        "slug": "js.edit"
+    },
+    {
+        "module": "js",
+        "name": "js delete",
+        "slug": "js.delete"
+    },
+    {
+        "module": "sop",
+        "name": "sop list",
+        "slug": "sop"
+    },
+    {
+        "module": "sop",
+        "name": "sop create",
+        "slug": "sop.create"
+    },
+    {
+        "module": "sop",
+        "name": "sop delete",
+        "slug": "sop.delete"
+    },
+    {
+        "module": "cv",
+        "name": "cv list",
+        "slug": "cv"
+    },
+    {
+        "module": "cv",
+        "name": "cv salary create",
+        "slug": "cv-salary.create"
+    },
+    {
+        "module": "cv",
+        "name": "cv edit",
+        "slug": "cv.edit"
+    },
+    {
+        "module": "cv",
+        "name": "cv delete",
+        "slug": "cv.delete"
+    },
+    {
+        "module": "exam",
+        "name": "Exam list",
+        "slug": "exam"
+    },
+    {
+        "module": "exam",
+        "name": "Exam create",
+        "slug": "exam.create"
+    },
+    {
+        "module": "exam",
+        "name": "Exam edit",
+        "slug": "exam.edit"
+    },
+    {
+        "module": "exam",
+        "name": "Exam delete",
+        "slug": "exam.delete"
+    },
+    {
+        "module": "exam-result",
+        "name": "Exam Result",
+        "slug": "exam-result"
+    },
+    {
+        "module": "interview",
+        "name": "Interview list",
+        "slug": "interview"
+    },
+    {
+        "module": "interview",
+        "name": "Interview create",
+        "slug": "interview.create"
+    },
+    {
+        "module": "interview-result",
+        "name": "Interview Result",
+        "slug": "interview-result"
+    },
+    {
+        "module": "location",
+        "name": "Location list",
+        "slug": "location"
+    },
+    {
+        "module": "accrual",
+        "name": "accrual list",
+        "slug": "accrual"
+    },
+    {
+        "module": "accrual",
+        "name": "accrual create",
+        "slug": "accrual.create"
+    },
+    {
+        "module": "accrual",
+        "name": "accrual detail",
+        "slug": "accrual.detail"
+    },
+    {
+        "module": "shift-assignment",
+        "name": "shift-assignment list",
+        "slug": "shift-assignment"
+    },
+    {
+        "module": "shift-assignment",
+        "name": "shift-assignment create",
+        "slug": "shift-assignment.create"
+    },
+    {
+        "module": "equipment-assignment",
+        "name": "equipment-assignment list",
+        "slug": "equipment-assignment"
+    },
+    {
+        "module": "equipment-assignment",
+        "name": "equipment-assignment create",
+        "slug": "equipment-assignment.create"
+    },
+    {
+        "module": "asset-assignment",
+        "name": "asset-assignment list",
+        "slug": "asset-assignment"
+    },
+    {
+        "module": "asset-assignment",
+        "name": "asset-assignment create",
+        "slug": "asset-assignment.create"
+    },
+    {
+        "module": "handbook",
+        "name": "handbook list",
+        "slug": "handbook"
+    },
+    {
+        "module": "handbook",
+        "name": "handbook create",
+        "slug": "handbook.create"
+    },
+    {
+        "module": "handbook",
+        "name": "handbook delete",
+        "slug": "handbook.delete"
+    },
+    {
+        "module": "loan-creditor-account",
+        "name": "loan-creditor-account list",
+        "slug": "loan-creditor-account"
+    },
+    {
+        "module": "loan-creditor-account",
+        "name": "loan-creditor-account create",
+        "slug": "loan-creditor-account.create"
+    },
+    {
+        "module": "loan",
+        "name": "loan list",
+        "slug": "loan"
+    },
+    {
+        "module": "loan",
+        "name": "loan create",
+        "slug": "loan.create"
+    },
+    {
+        "module": "loan",
+        "name": "loan detail",
+        "slug": "loan.detail"
+    },
+    {
+        "module": "benefit",
+        "name": "Benefit List",
+        "slug": "benefit"
+    },
+    {
+        "module": "benefit",
+        "name": "Benefit.create",
+        "slug": "benefit.create"
+    },
+    {
+        "module": "benefit",
+        "name": "benefit detail",
+        "slug": "benefit.detail"
+    },
+    {
+        "module": "benefit_request",
+        "name": "Benfit Request List",
+        "slug": "benefit_request"
+    },
+    {
+        "module": "benefit_request",
+        "name": "Benfit Confirmation List",
+        "slug": "benefit_request.confirmation"
+    },
+    {
+        "module": "advance",
+        "name": "Advance List",
+        "slug": "advance"
+    },
+    {
+        "module": "advance",
+        "name": "Advance Create",
+        "slug": "advance.create"
+    },
+    {
+        "module": "advance",
+        "name": "Advance Detail",
+        "slug": "advance.detail"
+    },
+    {
+        "module": "advance",
+        "name": "Advance Payment Create",
+        "slug": "advance.payment_create"
+    }
+]
