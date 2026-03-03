@@ -104,8 +104,8 @@
                         />
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(okr, index) in okrList" :key="index">
-                                <tr class="">
+                            <template v-for="(okr, index) in okrList" :key="index">
+                                <tr class=" cursor-pointer" @click="toggleOkrAssignDetails(okr, index)">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
@@ -134,19 +134,62 @@
                                     <td class="whitespace-nowrap">
                                         <!-- {{ okr.okr_total_point }} -->
                                     </td>
-                                    
-                                    <!-- <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(gps, index)">
-                                            <i class="fal fa-pen"></i>
-                                        </button>
-                                        <button @click="deleteBtnClicked(gps.id)"
-                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </td> -->
                                 </tr>
-                            </div>
+                                <tr v-if="expandedOkrIndex === index">
+                                    <td colspan="9" class="bg-gray-50 !py-0">
+                                        <div class="py-0 px-4">
+                                            <div v-if="okrAssignLoading" class="text-center text-xs text-gray-500">
+                                                Loading OKR details...
+                                            </div>
+                                            <div v-else>
+                                                <table class="w-full text-xs">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-left px-2 py-1">#</th>
+                                                            <th class="text-left px-2 py-1">Objective</th>
+                                                            <th class="text-left px-2 py-1">Type</th>
+                                                            <th class="text-left px-2 py-1">OKR Point</th>
+                                                            <th class="text-left px-2 py-1">Start Date</th>
+                                                            <th class="text-left px-2 py-1">End Date</th>
+                                                            <th class="text-left px-2 py-1">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(item, dIndex) in okrAssignDetails" :key="dIndex" class="text-left">
+                                                            <td class="px-2 py-1">
+                                                                {{ dIndex + 1 }}
+                                                            </td>
+                                                            <td class="px-2 py-1">
+                                                                {{ item.objective_name }}
+                                                            </td>
+                                                            <td class="px-2 py-1">
+                                                                {{ item.type }}
+                                                            </td>
+                                                            <td class="px-2 py-1">
+                                                                {{ item.okr_point }}
+                                                            </td>
+                                                            <td class="px-2 py-1">
+                                                                {{ item.start_date === '0000-00-00 00:00:00' ? item.start_date : formatDateToShort(item.start_date) }}
+                                                            </td>
+                                                            <td class="px-2 py-1">
+                                                                {{ item.end_date === '0000-00-00 00:00:00' ? item.end_date : formatDateToShort(item.end_date) }}
+                                                            </td>
+                                                            <td class="px-2 py-1">
+                                                                {{ item.status }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr v-if="okrAssignDetails.length < 1">
+                                                            <td colspan="7" class="text-center text-xs text-gray-400 py-2">
+                                                                No OKR Assign data.
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
                             <tr class=" !text-center" v-if="okrList.length < 1 && !loading">
                                 <td class="" colspan="9">
                                     No Data Here
@@ -224,6 +267,9 @@ export default {
             ],
 
             loading: true,
+            expandedOkrIndex: null,
+            okrAssignDetails: [],
+            okrAssignLoading: false,
         };
     },
 
@@ -342,7 +388,44 @@ export default {
                     type: 'warn'
                 });
             },
+        async toggleOkrAssignDetails(okr, index) {
+            if (this.expandedOkrIndex === index) {
+                this.expandedOkrIndex = null;
+                this.okrAssignDetails = [];
+                return;
+            }
 
+            this.expandedOkrIndex = index;
+            this.okrAssignLoading = true;
+            this.okrAssignDetails = [];
+
+            const ids = okr.objective_assign_ids;
+
+            if (!ids) {
+                this.okrAssignLoading = false;
+                return;
+            }
+
+            const idsParam = Array.isArray(ids) ? ids.join(',') : ids;
+            const url = `/api/okr_assign_by_staff?objective_assign_ids=${idsParam}`;
+
+            try {
+                const response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    if (response.data.data) {
+                        this.okrAssignDetails = response.data.data;
+                    } else {
+                        this.okrAssignDetails = response.data;
+                    }
+                }
+            } finally {
+                this.okrAssignLoading = false;
+            }
+        },
+        formatDateToShort(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
