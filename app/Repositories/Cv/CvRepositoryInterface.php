@@ -19,4 +19,8 @@ interface CvRepositoryInterface
   public function getSalarySetupByDepartmentIdAndRoleId($departmentId, $roleId);
   public function createNewStaffSalary(array $data);
   public function storeNewStaffJoinDate(array $data);
+
+  public function createCommunicationForm(array $data);
+
+  public function getCommunicationForm($staffId);
 }

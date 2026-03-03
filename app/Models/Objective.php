@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Sop;
 use App\Models\Role;
-use App\Models\ObjectiveStaff;
 use App\Models\ObjectiveAssign;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,6 +26,8 @@ class Objective extends Model
         'accountable_id',
         'consulted_id',
         'informed_id',
+        'priority',
+        'project_id',
     ];
 
     public function objectiveAssigns(): HasMany
@@ -61,6 +62,10 @@ class Objective extends Model
     public function sop(): BelongsTo
     {
         return $this->belongsTo(Sop::class, 'sop_id');
+    }
+
+    public function project(){
+        return $this->belongsTo(Project::class, 'project_id');
     }
 
     public function accountable(): BelongsTo

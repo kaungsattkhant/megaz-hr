@@ -2,6 +2,8 @@
 namespace App\Repositories\StaffEquipmentHandover;
 
 use App\Models\Staff;
+use App\Models\LostItem;
+use App\Enums\StaffStatus;
 use App\Models\StaffEquipment;
 use App\Models\StaffTimeshift;
 use App\Models\InventoryLedger;
@@ -11,7 +13,6 @@ use App\Models\StaffEquipmentAssign;
 use App\Models\StaffEquipmentHandover;
 use App\Models\StaffEquipmentHandoverItem;
 use App\Http\Action\SendNotification\SendNotification;
-use App\Models\LostItem;
 use App\Repositories\StaffEquipmentHandover\StaffEquipmentHandoverRepositoryInterface;
 
 class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverRepositoryInterface
@@ -20,7 +21,10 @@ class StaffEquipmentHandoverRepository implements StaffEquipmentHandoverReposito
     public function getHandoverStaffs()
     {
         return Staff::where('id', '!=', UserData()->id)->where('department_id', UserData()->department_id)
-        ->where('is_cv', 0)
+            ->whereIn('status', [
+                StaffStatus::PROBATION->value,
+                StaffStatus::PERMANENT->value,
+            ])
         ->where('is_active', 1)
         ->get();
     }

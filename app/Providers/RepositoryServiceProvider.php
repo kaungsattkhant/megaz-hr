@@ -70,6 +70,8 @@ use App\Repositories\Creditor\CreditorInterface;
 use App\Repositories\HandBook\HandBookInterface;
 
 use App\Repositories\Supplier\SupplierInterface;
+use App\Repositories\Contract\ContractRepository;
+use App\Repositories\Contract\ContractRepositoryInterface;
 use App\Repositories\Tag\TagRepositoryInterface;
 use App\Repositories\Uom\UomRepositoryInterface;
 
@@ -219,6 +221,8 @@ use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportReposi
 use App\Repositories\DepositAndReceivableReport\DepositAndReceivableReportRepository;
 use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepositoryInterface;
 use App\Repositories\CreditPurchaseJournal\CreditPurchaseJournalRepository;
+use App\Repositories\MeetingMinute\MeetingMinuteRepository;
+use App\Repositories\MeetingMinute\MeetingMinuteRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -260,6 +264,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TransactionInterface::class, TransactionRepository::class);
         $this->app->bind(CashBookInterface::class, CashBookRepository::class);
         $this->app->bind(SupplierInterface::class, SupplierRepository::class);
+        $this->app->bind(ContractRepositoryInterface::class, ContractRepository::class);
         $this->app->bind(NotificationInterface::class, NotificationRepository::class);
         $this->app->bind(PurchaseOrderItemLeftInterface::class, PurchaseOrderItemLeftRepository::class);
         $this->app->bind(FixedAssetPurchaseRepositoryInterface::class, FixedAssetPurchaseRepository::class);
@@ -331,5 +336,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BudgetAccountRepositoryInterface::class, BudgetAccountRepository::class);
         $this->app->bind(AdvanceInterface::class, AdvanceRepository::class);
         $this->app->bind(BenefitInterface::class, BenefitRepository::class);
+        $this->app->bind(MeetingMinuteRepositoryInterface::class, MeetingMinuteRepository::class);
     }
 }

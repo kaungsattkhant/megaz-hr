@@ -3,6 +3,7 @@
 namespace App\Repositories\Cv;
 
 use App\Enums\StaffStatus;
+use App\Http\Action\SendNotification\FcmSendNotification;
 use App\Models\Skill;
 use App\Models\Staff;
 use App\Models\Salary;
@@ -11,10 +12,11 @@ use App\Models\SalaryAllowance;
 use Illuminate\Support\Facades\DB;
 use App\Models\StaffEmergencyContact;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Models\CommunicationForm;
 
 class CvRepository implements CvRepositoryInterface
 {
-  use SendNotification;
+  use SendNotification, FcmSendNotification;
   public function skillByRoleAndDepartment($depId, $roleId)
   {
     $skills = Skill::whereHas('role', function ($query) use ($roleId, $depId) {
@@ -29,7 +31,13 @@ class CvRepository implements CvRepositoryInterface
   {
     $query = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
       // ->where('is_cv', 1)
-      ->whereIn('status', [StaffStatus::APPLIED->value])
+      ->whereIn('status', [
+        StaffStatus::APPLIED->value,
+        StaffStatus::HIRED->value,
+        StaffStatus::SHORTLISTED->value,
+        StaffStatus::INTERVIEWED->value,
+        StaffStatus::PROBATION->value,
+      ])
       ->orderBy('created_at', 'desc');
     if ($request->has('status')) {
       $query->where('status', $request->status);
@@ -89,7 +97,8 @@ class CvRepository implements CvRepositoryInterface
   }
   public function getCvById($id)
   {
-    $staff = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])->where('is_cv', 1)->find($id);
+    $staff = Staff::with(['emergencyContacts', 'skills', 'department', 'roles'])
+      ->find($id);
     if (!$staff) {
       ResponseMessage('CV not found with given ID', 404);
     }
@@ -103,8 +112,8 @@ class CvRepository implements CvRepositoryInterface
       if (!$staff) {
         ResponseMessage('Staff not found with given ID', 404);
       }
-      $data['is_cv'] = 1;
-      $data['status'] = StaffStatus::APPLIED->value;
+      // $data['is_cv'] = 1;
+      // $data['status'] = StaffStatus::APPLIED->value;
       $data['is_active'] = 1;
       $data = RemoveNullValues($data);
       $staff->update($data);
@@ -184,35 +193,34 @@ class CvRepository implements CvRepositoryInterface
       if (!$staff) {
         ResponseMessage('Staff not found with given ID', 404);
       }
-      if (isset($data['status']) && $data['status'] === "pending") {
-        $staff->status = $data['status'];
-        $staff->confirmed_by = null;
-        $staff->confirmed_at = null;
-        $staff->cancelled_by = null;
-        $staff->cancelled_at = null;
-      }
-      if (isset($data['status']) && $data['status'] === "confirmed") {
-        $staff->status = $data['status'];
-        $staff->confirmed_by = $data['confirmed_by'] ?? null;
-        $staff->confirmed_at = now();
-      }
-      if (isset($data['status']) && $data['status'] === 'cancelled') {
-        $staff->status = $data['status'];
-        $staff->cancelled_by = $data['cancelled_by'] ?? null;
-        $staff->cancelled_at = now();
-      }
+      // if (isset($data['status']) && $data['status'] === "pending") {
+      //   $staff->status = $data['status'];
+      //   $staff->confirmed_by = null;
+      //   $staff->confirmed_at = null;
+      //   $staff->cancelled_by = null;
+      //   $staff->cancelled_at = null;
+      // }
+      // if (isset($data['status']) && $data['status'] === "confirmed") {
+      //   $staff->status = $data['status'];
+      //   $staff->confirmed_by = $data['confirmed_by'] ?? null;
+      //   $staff->confirmed_at = now();
+      // }
+      // if (isset($data['status']) && $data['status'] === 'cancelled') {
+      //   $staff->status = $data['status'];
+      //   $staff->cancelled_by = $data['cancelled_by'] ?? null;
+      //   $staff->cancelled_at = now();
+      // }
       if (isset($data['status']) && $data['status'] === StaffStatus::SHORTLISTED->value) {
         $staff->status = $data['status'];
         $staff->confirmed_by = $data['confirmed_by'] ?? null;
         $staff->confirmed_at = now();
       }
-
-      if (isset($data['status']) && $data['status'] === StaffStatus::REJECTED->vaue) {
+      if (isset($data['status']) && $data['status'] === StaffStatus::REJECTED->value) {
         $staff->status = $data['status'];
         $staff->cancelled_by = $data['cancelled_by'] ?? null;
         $staff->cancelled_at = now();
       }
-      $staff->update($data);
+      $staff->save();
       DB::commit();
       return $staff;
     } catch (\Exception $e) {
@@ -297,12 +305,43 @@ class CvRepository implements CvRepositoryInterface
           'status' => StaffStatus::PROBATION->value,
         ]
       );
-      // $this->sendStaffJoinNotification($staff);
+      //send notificaiton 
+      $allStaff = Staff::whereIn('status', [
+        StaffStatus::PROBATION->value,
+        StaffStatus::PERMANENT->value,
+      ])
+        ->where('id', '!=', $staff->id)
+        ->get();
+      $joinDateFormatted = date('d M, Y', strtotime($staff->joined_date));
+
+      $notificationData = [
+        'title' => 'New Staff Joined',
+        'preview' => "Staff {$staff->name} has officially joined on {$joinDateFormatted}",
+      ];
+      $this->sendFcmNotification($staff, $allStaff, $notificationData);
       DB::commit();
       return $staff;
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
     }
+  }
+
+  public function createCommunicationForm(array $data)
+  {
+    DB::beginTransaction();
+    try {
+      $comminicationForm = CommunicationForm::create($data);
+      DB::commit();
+      return $comminicationForm;
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+    }
+  }
+
+  public function getCommunicationForm($staffId){
+    $comminicationForm = CommunicationForm::where('staff_id', $staffId)->first();
+    return $comminicationForm;
   }
 }

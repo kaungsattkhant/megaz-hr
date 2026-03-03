@@ -85,9 +85,12 @@ class InterviewRepository implements InterviewRepositoryInterface
         }
       }
       //update Staff Status
-      $staff=Staff::find($data['staff_id']);
-      $staff->status=StaffStatus::HIRED;
-      $staff->save();
+      if($exam->type=='interview'){
+        $staff = Staff::find($data['staff_id']);
+        $staff->status = StaffStatus::HIRED;
+        $staff->save();
+      }
+     
       DB::commit();
       return ResponseMessage("Interview submitted successfully", 201);
     } catch (\Exception $e) {

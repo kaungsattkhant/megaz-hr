@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Staff;
-
-use Illuminate\Http\Request;
-
-use Psy\Readline\Hoa\_Protocol;
+use App\Enums\StaffStatus;
 use App\Http\Controllers\Controller;
-
-use Illuminate\Support\Facades\Storage;
-
 use App\Http\Requests\Staff\StaffCreateRequest;
 use App\Http\Requests\Staff\StaffStatusUpdate;
 use App\Http\Requests\Staff\StaffUpdateRequest;
+use App\Models\Staff;
 use App\Repositories\Staff\StaffRepositoryInterface;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Psy\Readline\Hoa\_Protocol;
 
 class StaffAPIController extends Controller
 {
@@ -45,7 +42,7 @@ class StaffAPIController extends Controller
     public function createStaff(StaffCreateRequest $request)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image', 'profile_image']);
-        
+
         // $data['roles'] = explode(',', $request->roles);
         $data['role_id'] = $request->role_id;
         $data['feature_ids'] = json_decode($request->feature_ids);
@@ -88,7 +85,7 @@ class StaffAPIController extends Controller
         if (!$staff) {
             ResponseMessage('Staff not found with given ID', 404);
         }
-        
+
         if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', "staff_gov_docs/{$staff->id}");
             $data['nrc_front_url'] = $uploadedFile['file_url'];
@@ -116,7 +113,7 @@ class StaffAPIController extends Controller
 
         $staff = $this->staffRepo->updateData($data, $id);
 
-        
+
         ResponseData($staff);
     }
     public function changePassword(Request $request, int $staffId)
@@ -144,7 +141,7 @@ class StaffAPIController extends Controller
         // if (!$isSupervisorOrManager) {
         //     ResponseMessage('Not authorized', 403);
         // }
-        $allowedRoles = ['Supervisor', 'Manager', 'Captain', 'Chief Accountant', 'Sous Chef','Senior Receptionist'];
+        $allowedRoles = ['Supervisor', 'Manager', 'Captain', 'Chief Accountant', 'Sous Chef', 'Senior Receptionist'];
 
         if (!array_intersect($roles, $allowedRoles)) {
             ResponseMessage('Not authorized', 403);
@@ -219,8 +216,20 @@ class StaffAPIController extends Controller
         $this->staffRepo->attachStaffContracts($id, $request);
     }
 
-    public function updateStatus(StaffStatusUpdate $request){
-        $data=$this->staffRepo->updateStaffStatus($request);
+    public function updateStatus(StaffStatusUpdate $request)
+    {
+        $data = $this->staffRepo->updateStaffStatus($request);
         \ResponseMessage("Status Update  Successfully");
+    }
+
+    public function getDepartmentStaff(Request $request, int $id)
+    {
+        $staff = Staff::where('department_id', $id)
+            ->whereIn('status', [
+                StaffStatus::PROBATION->value,
+                StaffStatus::PERMANENT->value,
+            ])
+        ->get();
+        ResponseData($staff);
     }
 }

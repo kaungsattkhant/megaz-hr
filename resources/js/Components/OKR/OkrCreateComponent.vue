@@ -83,19 +83,25 @@
                 </label>
 
             </div> -->
-            <div class="mb-4 col-span-3">
+            <div class="mb-4 col-span-2">
                 <label for="" class="label-form mb-3">
                     Objective
                 </label>
                 <input type="text" v-model="objName" class="input-ui ">
             </div>
-            <div class="col-span-3">
+            <div class="col-span-2">
                 <label for="" class="label-form mb-3">
                     OKR Point
                 </label>
                 <input type="number" v-model="selectedOkrPoint" class="input-ui ">
             </div>
-            <div class="mb-6 col-span-3">
+            <div class="col-span-2">
+                <label for="" class="label-form mb-3">
+                    Priority
+                </label>
+                <input type="number" v-model="selectedPriority" class="input-ui ">
+            </div>
+            <div class="mb-6 col-span-2">
                 <label for="" class="label-form mb-3">
                     Type
                 </label>
@@ -108,13 +114,16 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-3" v-if="selectedType?.value === 'daily'">
+            <div class="col-span-2" v-if="selectedType?.value === 'daily'">
                 <label for="" class="label-form mb-3">
                     Repetition
                 </label>
                 <input type="number" v-model="selectedRepition" class="input-ui ">
             </div>
-            <div class="col-span-3" v-else></div>
+            <div class="col-span-2" v-else></div>
+
+            <div class="col-span-2"></div>
+
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Key Result
@@ -261,6 +270,7 @@ export default {
             selectedRole:null,
             key_result:null,
             selectedOkrPoint:null,
+            selectedPriority: null,
             selectedDate:null,
             duration:null,
 
@@ -370,6 +380,10 @@ export default {
                 this.alertValidationMessage(`OKR Point`);
                 return 1;
             }
+            else if(!this.selectedPriority){
+                this.alertValidationMessage('Priority');
+                return;
+            }
 
             else if(!this.selectedType){
                 this.alertValidationMessage(`Type`);
@@ -422,6 +436,7 @@ export default {
             formData.append('accountable_id', this.accountableStaff.id);
             formData.append('consulted_id', this.consultedStaff.id);
             formData.append('informed_id', this.informedStaff.id);
+            formData.append('priority', this.selectedPriority);
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');

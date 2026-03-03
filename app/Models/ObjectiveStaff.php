@@ -27,6 +27,8 @@ class ObjectiveStaff extends Model
         'approved_by',
         'cancelled_at',
         'cancelled_by',
+        'rejected_at',
+        'rejected_by',
         'okr_point',
         'manager_checked_at',
         'manager_checked_by',

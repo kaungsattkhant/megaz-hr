@@ -332,8 +332,7 @@ class ObjectiveRepository implements ObjectiveInterface
     public function objectiveLists(Request $request)
     {
         // $currentDate = now()->toDateString();
-        $currentDate = now()->format('Y-m-d');
-
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
         $staffId = UserData()->id;
         $objectiveStaffFilter = function ($query) use ($staffId, $currentDate) {
             $query->where('staff_id', $staffId);
@@ -361,7 +360,8 @@ class ObjectiveRepository implements ObjectiveInterface
     //objkeylistwithstaff assigns
     public function getdailyObjectives(Request $request, $objId)
     {
-        $currentDate = now()->toDateString();
+        // $currentDate = now()->toDateString();
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
 
         $objectives = ObjectiveStaff::with([
             'objective.objectiveKeys',
@@ -383,17 +383,27 @@ class ObjectiveRepository implements ObjectiveInterface
         if (!$authUser) {
             ResponseMessage('Authorized user not found', 401);
         }
-        $currentDate = now()->toDateString();
+        // $currentDate = now()->toDateString();
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
+
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
             'objective.accountable:id,name',
             'objective.consulted:id,name',
             'objective.informed:id,name',
+            'objective.project:id,name',
         ])
             ->where('staff_id', $staffId)
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
-            })->get();
+            })
+            ->orderByRaw('(SELECT objectives.priority FROM objectives WHERE objectives.id = objective_assigns.objective_id) IS NULL')
+            ->orderBy(
+                Objective::select('priority')
+                    ->whereColumn('objectives.id', 'objective_assigns.objective_id')
+            )
+            ->orderBy('id', 'desc')
+            ->get();
 
         foreach ($objectiveAssigns as $objectiveAssign) {
             $objectiveAssign->approver = false;
@@ -409,27 +419,13 @@ class ObjectiveRepository implements ObjectiveInterface
                     ->first();
                 if (!$objectiveStaff) {
                     $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->where('status', 'assigned')
+                        ->whereIn('status', ['assigned','rejected']) //rejected  from accountable 
                         ->whereDate('start_date', $currentDate)
                         ->orderBy('repetition_count', 'asc')
                         ->first();
                 }
-
-                // if (!$objectiveStaff && $objectiveAssign->objective->repetition > 1) {
-                //     $lastCompletedRepetition = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                //         ->whereDate('start_date', $currentDate)
-                //         ->where('status', 'completed')
-                //         ->max('repetition_count');
-                //     if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
-                //         $nextRepetition = $lastCompletedRepetition + 1;
-                //         $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                //             ->whereDate('start_date', $currentDate)
-                //             ->where('repetition_count', $nextRepetition)
-                //             ->first();
-                //     }
-                // }
-
                 if ($objectiveStaff) {
+
                     $objectiveStaffCollection = collect([$objectiveStaff]);
                     $objectiveAssign->setRelation('objectiveStaff', $objectiveStaffCollection);
 
@@ -480,13 +476,14 @@ class ObjectiveRepository implements ObjectiveInterface
         return $objectiveAssigns;
         // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
-    public function getDailyObjectiveByAccountable($staffId)
+    public function getDailyObjectiveByAccountable($request,$staffId)
     {
         $authUser = UserData()->id ?? null;
         if (!$authUser) {
             ResponseMessage('Authorized user not found', 401);
         }
-        $currentDate = now()->toDateString();
+        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
+
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
             'objective.accountable:id,name',
@@ -827,9 +824,9 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    public function getCompletedObjKeysByStaffId($objectiveId, $staffId)
+    public function getCompletedObjKeysByStaffId($request,$objectiveId, $staffId)
     {
-        $today = now()->format('Y-m-d');
+        $today = Carbon::parse($request->date) ?? now()->format('Y-m-d');
         $objectives = Objective::with([
             'objectiveKeys',
             'objectiveAssigns.objectiveStaff.completedObjectiveKeys',

@@ -144,6 +144,19 @@ class RoleRepository implements RoleRepositoryInterface
         return Role::where('department_id', $department_id)->with('skills')->get();
     }
 
+    public function getRoleByDepartments(array $data){
+        $query= Role::query()->with('skills');
+        if(isset($data['department_id'])){
+            $query->whereIn('department_id', $data['department_id']);
+        }
+        return $query->get();
+    }
+
+    public function deleteData($id)
+    {
+      return $id;
+    }
+
     public function roleAvailableToggle($roleId)
     {
         DB::beginTransaction();

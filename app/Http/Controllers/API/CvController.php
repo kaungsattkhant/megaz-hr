@@ -116,4 +116,14 @@ class CvController extends Controller
         $data = $this->cvRepository->storeNewStaffJoinDate($request->all());
         ResponseData($data);
     }
+
+    public function createCommunicationForm(Request $request){
+        $data = $this->cvRepository->createCommunicationForm($request->all());
+        ResponseData($data);
+    }
+
+    public function getCommunicationForm($staffId){
+        $data = $this->cvRepository->getCommunicationForm($staffId);
+        ResponseData($data);
+    }
 }
