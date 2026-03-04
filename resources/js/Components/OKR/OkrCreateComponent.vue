@@ -320,6 +320,10 @@ export default {
             }
         },
         selectedDepartmentChange(){
+            this.selectedRole = null;
+            this.roleList = [];
+            this.sopList = [];
+            this.selectedSop = null;
             this.getRoleList();
         },
         async getRoleList(){
