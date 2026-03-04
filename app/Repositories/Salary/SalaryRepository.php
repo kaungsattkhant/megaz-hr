@@ -727,7 +727,11 @@ class SalaryRepository implements SalaryRepositoryInterface
     foreach ($salaryBatchStaffs as $salaryBatchStaff) {
       $staff = $salaryBatchStaff->staff; //stafflist based on batch
       $salary = $staff->salary;   //basic salary
-      if ($salary) {
+      $checkIns = CheckIn::where('staff_id', $staff->id)
+        ->whereBetween('check_in_date_time', [$startDate, $endDate])
+        ->whereBetween('check_out_date_time', [$startDate, $endDate])
+        ->get();
+      if ($salary && $checkIns->isNotEmpty()) {
         $totalAllowance = 0;
         $totalDeduction = 0;
         foreach ($salary->salarySetup->salaryAllowances as $salaryAllowance) {
@@ -806,10 +810,7 @@ class SalaryRepository implements SalaryRepositoryInterface
         }
         $actualWorkDays = max(0, $totalDays - $offDayCount - $unpaidLeaveCount - $publicHolidays);
         $actualBasicSalary = $actualWorkDays > 0 ?  ($salary->basic_salary) / $actualWorkDays : 0;
-        $checkIns = CheckIn::where('staff_id', $staff->id)
-          ->whereBetween('check_in_date_time', [$startDate, $endDate])
-          ->whereBetween('check_out_date_time', [$startDate, $endDate])
-          ->get();
+        
 
 
         $totalWorkedHours = 0;
