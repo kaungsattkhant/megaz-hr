@@ -47,7 +47,27 @@ class ObjectiveController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // 'priority' => ['required', 'integer', 'between:1,10'],
+            'objective_name' => ['required', 'string'],
+
+            'okr_point' => ['required', 'integer', 'min:1'],
+
+            'type' => ['required', 'in:daily,occassionally'],
+
+            'repetition' => ['required', 'integer', 'min:1'],
+
+            'role_id' => ['required', 'integer', 'exists:roles,id'],
+
+            'sop_id' => ['required', 'integer', 'exists:sops,id'],
+
+            'objective_key' => ['required', 'json'],
+
+            'accountable_id' => ['required', 'integer', 'exists:staff,id'],
+
+            'consulted_id' => ['nullable', 'integer', 'exists:staff,id'],
+
+            'informed_id' => ['nullable', 'integer', 'exists:staff,id'],
+
+            'priority' => ['required', 'integer', 'between:1,10'],
         ]);
         $data = $this->objectiveRepository->store($request->all());
         ResponseData($data);
