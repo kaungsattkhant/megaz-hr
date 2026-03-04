@@ -13,13 +13,13 @@ if ("serviceWorker" in navigator) {
 }
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCvUQJCbpIMC02ceunLnZI7Dyq5VrEjw2M",
-  authDomain: "megaz-78046.firebaseapp.com",
-  projectId: "megaz-78046",
-  storageBucket: "megaz-78046.firebasestorage.app",
-  messagingSenderId: "144736503266",
-  appId: "1:144736503266:web:50908d34738ad48d93a5bb",
-  measurementId: "G-20WGQM0S3T"
+  apiKey: "AIzaSyD_Rc-Exu4Dx2luwa2M1q-6A-wg_wwJDH4",
+  authDomain: "megaz-hros.firebaseapp.com",
+  projectId: "megaz-hros",
+  storageBucket: "megaz-hros.firebasestorage.app",
+  messagingSenderId: "823941269115",
+  appId: "1:823941269115:web:1b1b94177d8b1a8d3044de",
+  measurementId: "G-J8JNQ4FGNS"
 };
 
 // Initialize Firebase
