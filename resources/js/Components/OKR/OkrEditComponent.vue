@@ -350,10 +350,10 @@ export default {
                 this.alertValidationMessage(`Objective Name`);
                 return 1;
             }
-            else if(!this.selectedRole){
-                this.alertValidationMessage(`Role`);
-                return 1;
-            }
+            // else if(!this.selectedRole){
+            //     this.alertValidationMessage(`Role`);
+            //     return 1;
+            // }
             else if(!this.selectedSop){
                 this.alertValidationMessage(`SOP`);
                 return 1;
