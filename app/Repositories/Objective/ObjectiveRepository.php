@@ -186,7 +186,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     );
                 }
             }
-            if ($objective->type === "daily") {
+            if ($objective->type === "daily" && !isset($validatedData['id'])) {
                 //directly assign okr 
                 $staffLists = Staff::staffByRole($validatedData['role_id'])
                     ->whereIn('status', [
