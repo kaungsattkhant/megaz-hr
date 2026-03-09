@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Objective;
 
+use App\Enums\OkrStageEnum;
+use App\Enums\PDCAEnum;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Item;
@@ -152,6 +154,7 @@ class ObjectiveRepository implements ObjectiveInterface
         try {
             DB::beginTransaction();
             $validatedData['created_by'] = UserData()->id;
+            $validatedData['project_id'] = $validatedData['project_id'] ?? 1;
             $objective = Objective::updateOrCreate(
                 ['id' => $validatedData['id'] ?? null],
                 $validatedData
@@ -214,20 +217,21 @@ class ObjectiveRepository implements ObjectiveInterface
         DB::beginTransaction();
         try {
             if (isset($validatedData['okr_assign'])) {
-                $okrAssigns = json_decode($validatedData['okr_assign'], true);
-                if (!is_array($okrAssigns)) {
-                    return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
-                }
-                $staffIds = collect($okrAssigns)
-                    ->pluck('staff_id')
-                    ->filter()      // remove null/empty
-                    ->values()
-                    ->toArray();
-                foreach ($okrAssigns as $okrAssign) {
+                // $okrAssigns = json_decode($validatedData['okr_assign'], true);
+                // if (!is_array($okrAssigns)) {
+                //     return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
+                // }
+                // $staffIds = collect($okrAssigns)
+                //     ->pluck('staff_id')
+                //     ->filter()      // remove null/empty
+                //     ->values()
+                //     ->toArray();
+                foreach ($validatedData['okr_assign'] as $okrAssign) {
                     $objective = Objective::findOrFail($okrAssign['objective_id']);
                     $objectiveAssign = ObjectiveAssign::create([
                         'objective_id' => $okrAssign['objective_id'],
-                        'staff_id' => $okrAssign['staff_id']
+                        'staff_id' => $okrAssign['staff_id'],
+                        'created_by' => \UserData()->id,
                     ]);
                     $objectiveStaff = ObjectiveStaff::create(
                         [
@@ -235,6 +239,7 @@ class ObjectiveRepository implements ObjectiveInterface
                             'end_date' => $okrAssign['end_date'],
                             'okr_point' => $objective->okr_point,
                             'objective_assign_id' => $objectiveAssign->id,
+                            'stage' => PDCAEnum::NOTYET->value,
                         ]
                     );
                     // dd($objectiveStaff);
@@ -244,8 +249,6 @@ class ObjectiveRepository implements ObjectiveInterface
                     ];
                     $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
                 }
-             
-
             }
             DB::commit();
             return $objectiveStaff;
@@ -419,7 +422,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     ->first();
                 if (!$objectiveStaff) {
                     $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->whereIn('status', ['assigned','rejected']) //rejected  from accountable 
+                        ->whereIn('status', ['assigned', 'rejected']) //rejected  from accountable 
                         ->whereDate('start_date', $currentDate)
                         ->orderBy('repetition_count', 'asc')
                         ->first();
@@ -476,7 +479,7 @@ class ObjectiveRepository implements ObjectiveInterface
         return $objectiveAssigns;
         // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
-    public function getDailyObjectiveByAccountable($request,$staffId)
+    public function getDailyObjectiveByAccountable($request, $staffId)
     {
         $authUser = UserData()->id ?? null;
         if (!$authUser) {
@@ -671,38 +674,89 @@ class ObjectiveRepository implements ObjectiveInterface
 
     public function updateDailyObjective($data, $objStaffId)
     {
-        $objStaff = ObjectiveStaff::findOrFail($objStaffId);
-        $objective = $objStaff->objectiveAssign->objective;
-        $objectiveAssign = $objStaff->objectiveAssign;
-        $updateData = [];
-        $userId = UserData()->id;
-        if (!checkRoles(['Supervisor', 'Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {
-            ResponseMessage('Permission is not allowed', 403);
-            return;
-        }
-        if ($objective->accountable_id == $userId) {
-            // if(!in_array($data['status'], ['approved', 'cancelled'])){
-            //     ResponseMessage('Status is invalid', 403);
-            // }
-            $updateData = $this->getManagerUpdateData($data, $userId);
-        } elseif ($objectiveAssign->staff_id == $userId) {
-            if (!in_array($data['status'], ['in_progress', 'completed'])) {
-                ResponseMessage('Status is invalid', 403);
+        DB::beginTransaction();
+        try {
+            $objStaff = ObjectiveStaff::findOrFail($objStaffId);
+            $objective = $objStaff->objectiveAssign->objective;
+            $objectiveAssign = $objStaff->objectiveAssign;
+            $updateData = [];
+            $userId = UserData()->id;
+            if (in_array($data['stage'], ['plan', 'do', 'done'])) {
+                // if ($objectiveAssign->staff_id == $userId) {
+                // if (!in_array($data['stage'], ['plan', 'do', 'done'])) {
+                //     \ResponseMessage('Stage is invalid', 402);
+                // }
+                if ($objectiveAssign->staff_id != $userId) {
+                    ResponseMessage('Permission is not allowed', 403);
+                }
+                if ($data['stage'] == 'plan') {
+                    $updateData['plan_at'] = now();
+                    $updateData['plan_by'] = $userId;
+                }
+                if ($data['stage'] == 'do') {
+                    $updateData['do_at'] = now();
+                    $updateData['do_by'] = $userId;
+                }
+                if ($data['stage'] == 'done') {
+                    $updateData['done_at'] = now();
+                    $updateData['done_by'] = $userId;
+                    if (isset($data['complete_okr_keys'])) {
+                        $completeOkrKeys = json_decode($data['complete_okr_keys'], true);
+                        if (!is_array($completeOkrKeys)) {
+                            return ResponseMessage('Invalid JSON format for OKR assigns.', 400);
+                        }
+                        foreach ($completeOkrKeys as $completeOkrKey) {
+                            CompletedObjectiveKey::updateOrCreate(
+                                [
+                                    'objective_key_id' => $completeOkrKey['objective_key_id'],
+                                    'objective_staff_id' => $objStaffId
+                                ],
+                                [
+                                    'objective_key_id' => $completeOkrKey['objective_key_id'],
+                                    'objective_staff_id' => $objStaffId,
+                                ]
+                            );
+                        }
+                    }
+                }
             }
-            $updateData = $this->getStaffUpdateData($data, $userId, $objStaffId);
-        } else {
-            ResponseMessage('Permission is not allowed', 403);
+
+
+            //this action by accountable
+            if (in_array($data['stage'], ['completed', 'check'])) {
+                if ($objective->accountable_id != $userId) {
+                    ResponseMessage('Permission is not allowed', 403);
+                }
+                if ($data['stage'] == 'completed') {
+                    $updateData['completed_at'] = now();
+                    $updateData['completed_by'] = $userId;
+                }
+                if ($data['stage'] == 'check') {
+                    $updateData['check_at'] = now();
+                    $updateData['check_by'] = $userId;
+                }
+            }
+            $updateData['stage'] = $data['stage'];
+            $updateData['okr_point'] = $data['okr_point'];
+            $objStaff->update($updateData);
+            DB::commit();
+            return $objStaff;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-        // dd($objStaff->objectiveAssign->objective);
-        // if (checkRoles(['Supervisor'])) {
-        //     $updateData = $this->getSupervisorUpdateData($data, $userId);
-        // } elseif (checkRoles(['Manager'])) {
+        // if ($objective->accountable_id == $userId) {
         //     $updateData = $this->getManagerUpdateData($data, $userId);
-        // } else {
+        // } elseif ($objectiveAssign->staff_id == $userId) {
+        //     if (!in_array($data['stage'], ['plan', 'do'])) {
+        //         ResponseMessage('Status is invalid', 403);
+        //     }
         //     $updateData = $this->getStaffUpdateData($data, $userId, $objStaffId);
+        // } else {
+        //     ResponseMessage('Permission is not allowed', 403);
         // }
-        $objStaff->update($updateData);
-        return $objStaff;
+
     }
     public function rejectObjectKeyByObjectiveStaffId($data)
     {
@@ -713,16 +767,23 @@ class ObjectiveRepository implements ObjectiveInterface
                 \ResponseMessage('User not authenticated', 404);
             }
             $objectiveStaff = ObjectiveStaff::find($data['objective_staff_id']);
+            $objective = $objectiveStaff->objectiveAssign->objective;
             if (!$objectiveStaff) {
                 \ResponseMessage('Objective Staff Not found', 404);
             }
-            if ($objectiveStaff->status == 'rejected') {
-                \ResponseMessage('Objective  is already rejected', 419);
+            if ($objective->accountable_id != $authUser->id) {
+                \ResponseMessage('Authorization is invalid', 419);
             }
+            // if ($objectiveStaff->status == 'rejected') {
+            //     \ResponseMessage('Objective  is already rejected', 419);
+            // }
             $objectiveStaff->update([
                 'completed_at'   => null,
                 'completed_by'   => null,
-                'status'         => 'rejected',
+                'do_at'          => null,
+                'do_by'          => null,
+                'status'         => 'do',
+                'stage' => OkrStageEnum::DO->value,
                 'reject_remark'  => $data['reject_remark'] ?? null,
                 'rejected_at'    => now(),
                 'rejected_by'    => $authUser->id,
@@ -824,7 +885,7 @@ class ObjectiveRepository implements ObjectiveInterface
         return $updateData;
     }
 
-    public function getCompletedObjKeysByStaffId($request,$objectiveId, $staffId)
+    public function getCompletedObjKeysByStaffId($request, $objectiveId, $staffId)
     {
         $today = Carbon::parse($request->date) ?? now()->format('Y-m-d');
         $objectives = Objective::with([

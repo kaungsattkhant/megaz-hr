@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PDCAEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,8 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('objectives', function (Blueprint $table) {
-            $table->unsignedInteger('project_id')->nullable();
+        Schema::create('meeting_minute_instructions', function (Blueprint $table) {
+            $table->id();
+         
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('objectives', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('meeting_minute_instructions');
     }
 };

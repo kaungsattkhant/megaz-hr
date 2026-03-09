@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('objectives', function (Blueprint $table) {
-            $table->unsignedInteger('project_id')->nullable();
+        Schema::create('instruction_key_results', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('instruction_id')->constrained('instructions')->cascadeOnDelete();
+            $table->unsignedInteger('objective_key_id');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('objectives', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('instruction_key_results');
     }
 };
