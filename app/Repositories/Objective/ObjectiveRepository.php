@@ -500,6 +500,9 @@ class ObjectiveRepository implements ObjectiveInterface
                     ->orderBy('repetition_count', 'asc');
             }
         ])
+            ->whereHas('objectiveStaff', function ($q) use ($currentDate) {
+                $q->whereDate('start_date', $currentDate);
+            })
             ->join('objectives', 'objectives.id', '=', 'objective_assigns.objective_id')
             ->where('objective_assigns.staff_id', $staffId)
             ->orderByRaw('objectives.priority IS NULL')
