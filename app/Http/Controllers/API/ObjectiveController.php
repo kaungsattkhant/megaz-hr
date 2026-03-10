@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use App\Enums\OkrStageEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ObjectiveAssignCreateRequest;
 use App\Http\Requests\Objective\AssignRequest;
-use App\Http\Requests\Objective\ObjImgRequest;
-use App\Http\Requests\Objective\ObjectiveRequest;
-use App\Repositories\Objective\ObjectiveInterface;
 use App\Http\Requests\Objective\KtvProductTreeRequest;
+use App\Http\Requests\Objective\ObjectiveRequest;
+use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\StaffMobile\RejectObjectiveKeyRequest;
 use App\Http\Resources\CompleteObjectivesResource;
+use App\Repositories\Objective\ObjectiveInterface;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ObjectiveController extends Controller
 {
@@ -127,7 +130,7 @@ class ObjectiveController extends Controller
     }
 
 
-    public function storeAssignDutiesByObjectives(Request $request)
+    public function storeAssignDutiesByObjectives(ObjectiveAssignCreateRequest $request)
     {
         $data = $this->objectiveRepository->storeAssignDutiesByObjectives($request->all());
         ResponseData($data);
@@ -190,6 +193,10 @@ class ObjectiveController extends Controller
 
     public function updateDailyObjective(Request $request, $objKeyStaffId)
     {
+        $request->validate([
+            'stage'=>['required','string',Rule::in(OkrStageEnum::getValues())],
+            'okr_point'=>['required'],
+        ]);
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
         ResponseData($data);
     }

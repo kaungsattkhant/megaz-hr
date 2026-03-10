@@ -260,7 +260,10 @@ class Staff extends Authenticatable implements AuditableContract
     {
         return $this->hasMany(MenuStep::class, 'staff_id');
     }
-
+    public function objective_assigns()
+    {
+        return $this->hasMany(ObjectiveAssign::class);
+    }
     public function completed_objectives()
     {
         return $this->hasMany(ObjectiveStaff::class, 'completed_by');

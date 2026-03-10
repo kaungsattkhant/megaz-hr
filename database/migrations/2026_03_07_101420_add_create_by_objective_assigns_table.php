@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('objectives', function (Blueprint $table) {
-            $table->unsignedInteger('project_id')->nullable();
+        Schema::table('objective_assigns', function (Blueprint $table) {
+            $table->unsignedInteger('created_by');
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('objectives', function (Blueprint $table) {
+        Schema::table('objective_assigns', function (Blueprint $table) {
             //
         });
     }

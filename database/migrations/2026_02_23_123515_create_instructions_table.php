@@ -18,13 +18,13 @@ return new class extends Migration
             $table->double('okr_point')->nullable();
             $table->unsignedInteger('project_id');
             $table->enum('tag', [PDCAEnum::getValues()])->nullable();
-            $table->unsignedInteger('assigned_to')->nullable();
-            $table->dateTime('start_date')->nullable();
-            $table->dateTime('due_date')->nullable();
-            $table->longText('reamark')->nullable();
-            $table->unsignedInteger('accountable_id')->nullable();
-            $table->unsignedInteger('consulted_id')->nullable();
-            $table->unsignedInteger('informed_id')->nullable();
+            // $table->unsignedInteger('assigned_to')->nullable();
+            // $table->dateTime('start_date')->nullable();
+            // $table->dateTime('due_date')->nullable();
+            // $table->longText('reamark')->nullable();
+            // $table->unsignedInteger('accountable_id')->nullable();
+            // $table->unsignedInteger('consulted_id')->nullable();
+            // $table->unsignedInteger('informed_id')->nullable();
             $table->timestamps();
         });
     }
