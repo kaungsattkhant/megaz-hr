@@ -133,6 +133,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- {{ okr.okr_total_point }} -->
+                                          
                                     </td>
                                 </tr>
                                 <tr v-if="expandedOkrIndex === index">

@@ -264,7 +264,16 @@ export default {
                         this.sopList.push(sop)
                     })
                 });
-                this.selectedSop = this.sopList.find(sop => sop.id === detail.sop_id);
+                if(this.sopList.length > 0){
+                    console.log('sop list', this.sopList);
+                }
+                else{
+                    console.log('sop list not found');
+                }
+                if(this.sopList.length > 0){
+                    console.log('sop list is here');
+                    this.selectedSop = this.sopList.find(sop => Number(sop.id) === Number(detail.sop.id));
+                }
             }
             this.objName = detail.objective_name;
             this.selectedOkrPoint = detail.okr_point;
@@ -283,15 +292,22 @@ export default {
             }
         },
         selectedDepartmentChange(){
+            this.selectedRole = null;
+            this.roleList = [];
+            this.sopList = [];
+            this.selectedSop = null;
             this.getRoleList();
         },
         async getRoleList(){
-            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment , token: this.getToken()});
+            console.log('selected department is ' + this.selectedDepartment.id);
+            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
             if(response.data){
                 this.roleList = response.data;
             }
         },
         roleChanged(){
+            this.selectedSop = null;
+            this.sopList = [];
             this.getSopList();
         },
         async getSopList(){
