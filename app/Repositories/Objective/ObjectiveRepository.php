@@ -380,14 +380,114 @@ class ObjectiveRepository implements ObjectiveInterface
         return DailyObjKeyStaffResource::collection($objectives);
     }
 
+    // public function getdailyObjectivesByStaffId(Request $request, $staffId)
+    // {
+    //     $authUser = UserData()->id ?? null;
+    //     if (!$authUser) {
+    //         ResponseMessage('Authorized user not found', 401);
+    //     }
+    //     // $currentDate = now()->toDateString();
+    //     $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
+
+    //     $objectiveAssigns = ObjectiveAssign::with([
+    //         'objective.objectiveKeys',
+    //         'objective.accountable:id,name',
+    //         'objective.consulted:id,name',
+    //         'objective.informed:id,name',
+    //         'objective.project:id,name',
+    //     ])
+    //         ->where('staff_id', $staffId)
+    //         ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
+    //             $query->whereDate('start_date', $currentDate);
+    //         })
+    //         ->orderByRaw('(SELECT objectives.priority FROM objectives WHERE objectives.id = objective_assigns.objective_id) IS NULL')
+    //         ->orderBy(
+    //             Objective::select('priority')
+    //                 ->whereColumn('objectives.id', 'objective_assigns.objective_id')
+    //         )
+    //         ->orderBy('id', 'desc')
+    //         ->get();
+
+    //     foreach ($objectiveAssigns as $objectiveAssign) {
+    //         $objectiveAssign->approver = false;
+    //         if ($objectiveAssign->objective->accountable_id == $authUser) {
+    //             $objectiveAssign->approver = true;
+    //         }
+    //         $objType = $objectiveAssign->objective->type;
+    //         if ($objType == 'daily') {
+    //             $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+    //                 ->orderBy('repetition_count', 'asc')
+    //                 ->where('status', 'do')
+    //                 ->whereDate('start_date', $currentDate)
+    //                 ->first();
+    //             if (!$objectiveStaff) {
+    //                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+    //                     ->whereIn('status', ['do', 'rejected']) //rejected  from accountable 
+    //                     ->whereDate('start_date', $currentDate)
+    //                     ->orderBy('repetition_count', 'asc')
+    //                     ->first();
+    //             }
+    //             if ($objectiveStaff) {
+
+    //                 $objectiveStaffCollection = collect([$objectiveStaff]);
+    //                 $objectiveAssign->setRelation('objectiveStaff', $objectiveStaffCollection);
+
+    //                 $totalRepetition = $objectiveAssign->objective->repetition;
+    //                 $completedRepetitions = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+    //                     ->whereDate('start_date', $currentDate)
+    //                     ->whereIn('status', ['done','completed'])
+    //                     ->count();
+    //                 $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
+    //                 foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
+    //                     $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+    //                         ->where('objective_staff_id', $objectiveStaff->id)
+    //                         ->first();
+    //                     $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+    //                 }
+    //             } else {
+    //                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+    //                     ->where('status', 'completed')
+    //                     ->whereDate('start_date', $currentDate)
+    //                     ->orderBy('repetition_count', 'desc')
+    //                     ->first();
+    //                 $objectiveAssign->setRelation('objectiveStaff', collect([$objectiveStaff]));
+    //                 if ($objectiveStaff) {
+    //                     foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
+    //                         $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+    //                             ->where('objective_staff_id', $objectiveStaff->id)
+    //                             ->first();
+    //                         $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+    //                     }
+    //                 }
+    //             }
+    //         } else {
+    //             $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
+    //                 ->whereDate('start_date', $currentDate)
+    //                 ->get();
+    //             $objectiveAssign->setRelation('objectiveStaff', $objectiveStaff);
+
+    //             foreach ($objectiveStaff as $objStaff) {
+    //                 foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
+    //                     $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
+    //                         ->where('objective_staff_id', $objStaff->id)
+    //                         ->first();
+    //                     $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return $objectiveAssigns;
+    //     // return dailyObjectiveByStaffId::collection($objectiveAssigns);
+    // }
     public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
         $authUser = UserData()->id ?? null;
+
         if (!$authUser) {
             ResponseMessage('Authorized user not found', 401);
         }
-        // $currentDate = now()->toDateString();
-        $currentDate = Carbon::parse($request->date) ?? now()->format('Y-m-d');
+
+        $currentDate = Carbon::parse($request->date ?? now())->toDateString();
 
         $objectiveAssigns = ObjectiveAssign::with([
             'objective.objectiveKeys',
@@ -395,90 +495,89 @@ class ObjectiveRepository implements ObjectiveInterface
             'objective.consulted:id,name',
             'objective.informed:id,name',
             'objective.project:id,name',
+            'objectiveStaff' => function ($q) use ($currentDate) {
+                $q->whereDate('start_date', $currentDate)
+                    ->orderBy('repetition_count', 'asc');
+            }
         ])
-            ->where('staff_id', $staffId)
-            ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
-                $query->whereDate('start_date', $currentDate);
-            })
-            ->orderByRaw('(SELECT objectives.priority FROM objectives WHERE objectives.id = objective_assigns.objective_id) IS NULL')
-            ->orderBy(
-                Objective::select('priority')
-                    ->whereColumn('objectives.id', 'objective_assigns.objective_id')
-            )
-            ->orderBy('id', 'desc')
+            ->join('objectives', 'objectives.id', '=', 'objective_assigns.objective_id')
+            ->where('objective_assigns.staff_id', $staffId)
+            ->orderByRaw('objectives.priority IS NULL')
+            ->orderBy('objectives.priority')
+            ->orderByDesc('objective_assigns.id')
+            ->select('objective_assigns.*')
             ->get();
 
+        // collect objective_staff ids
+        $objectiveStaffIds = $objectiveAssigns
+            ->pluck('objectiveStaff')
+            ->flatten()
+            ->pluck('id')
+            ->filter();
+
+        // preload completed keys
+        $completedKeys = CompletedObjectiveKey::whereIn('objective_staff_id', $objectiveStaffIds)
+            ->get()
+            ->groupBy('objective_staff_id');
+
         foreach ($objectiveAssigns as $objectiveAssign) {
-            $objectiveAssign->approver = false;
-            if ($objectiveAssign->objective->accountable_id == $authUser) {
-                $objectiveAssign->approver = true;
-            }
-            $objType = $objectiveAssign->objective->type;
-            if ($objType == 'daily') {
-                $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                    ->orderBy('repetition_count', 'asc')
-                    ->where('status', 'in_progress')
-                    ->whereDate('start_date', $currentDate)
-                    ->first();
-                if (!$objectiveStaff) {
-                    $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->whereIn('status', ['assigned', 'rejected']) //rejected  from accountable 
-                        ->whereDate('start_date', $currentDate)
-                        ->orderBy('repetition_count', 'asc')
-                        ->first();
-                }
+
+            $objectiveAssign->approver =
+                $objectiveAssign->objective->accountable_id == $authUser;
+
+            $objectiveStaffCollection = $objectiveAssign->objectiveStaff;
+
+            if ($objectiveAssign->objective->type === 'daily') {
+
+                $objectiveStaff =
+                    $objectiveStaffCollection->where('status', 'do')->first()
+                    ?? $objectiveStaffCollection->whereIn('status', ['do', 'rejected'])->first()
+                    ?? $objectiveStaffCollection->where('status', 'completed')->sortByDesc('repetition_count')->first();
+
+                $objectiveAssign->setRelation(
+                    'objectiveStaff',
+                    $objectiveStaff ? collect([$objectiveStaff]) : collect([])
+                );
+
                 if ($objectiveStaff) {
 
-                    $objectiveStaffCollection = collect([$objectiveStaff]);
-                    $objectiveAssign->setRelation('objectiveStaff', $objectiveStaffCollection);
-
                     $totalRepetition = $objectiveAssign->objective->repetition;
-                    $completedRepetitions = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->whereDate('start_date', $currentDate)
-                        ->whereIn('status', ['completed', 'approved'])
+
+                    $completedRepetitions = $objectiveStaffCollection
+                        ->whereIn('status', ['done', 'completed'])
                         ->count();
-                    $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
+
+                    $objectiveAssign->objective->remaining_repetitions =
+                        $totalRepetition - $completedRepetitions;
+
                     foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
-                        $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
-                            ->where('objective_staff_id', $objectiveStaff->id)
-                            ->first();
-                        $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
-                    }
-                } else {
-                    $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->where('status', 'completed')
-                        ->whereDate('start_date', $currentDate)
-                        ->orderBy('repetition_count', 'desc')
-                        ->first();
-                    $objectiveAssign->setRelation('objectiveStaff', collect([$objectiveStaff]));
-                    if ($objectiveStaff) {
-                        foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
-                            $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
-                                ->where('objective_staff_id', $objectiveStaff->id)
-                                ->first();
-                            $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
-                        }
+
+                        $objectiveKey->is_done =
+                            isset($completedKeys[$objectiveStaff->id]) &&
+                            $completedKeys[$objectiveStaff->id]
+                            ->where('objective_key_id', $objectiveKey->id)
+                            ->count() > 0 ? 1 : 0;
                     }
                 }
             } else {
-                $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                    ->whereDate('start_date', $currentDate)
-                    ->get();
-                $objectiveAssign->setRelation('objectiveStaff', $objectiveStaff);
 
-                foreach ($objectiveStaff as $objStaff) {
+                foreach ($objectiveStaffCollection as $objStaff) {
+
                     foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
-                        $completedObjectiveKey = CompletedObjectiveKey::where('objective_key_id', $objectiveKey->id)
-                            ->where('objective_staff_id', $objStaff->id)
-                            ->first();
-                        $objectiveKey->is_done = $completedObjectiveKey ? 1 : 0;
+
+                        $objectiveKey->is_done =
+                            isset($completedKeys[$objStaff->id]) &&
+                            $completedKeys[$objStaff->id]
+                            ->where('objective_key_id', $objectiveKey->id)
+                            ->count() > 0 ? 1 : 0;
                     }
                 }
             }
         }
+
         return $objectiveAssigns;
-        // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
+    //not use
     public function getDailyObjectiveByAccountable($request, $staffId)
     {
         $authUser = UserData()->id ?? null;
@@ -514,30 +613,16 @@ class ObjectiveRepository implements ObjectiveInterface
             if ($objType == 'daily') {
                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
                     ->orderBy('repetition_count', 'asc')
-                    ->where('status', 'in_progress')
+                    ->where('status', 'do')
                     ->whereDate('start_date', $currentDate)
                     ->first();
                 if (!$objectiveStaff) {
                     $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                        ->where('status', 'assigned')
+                        ->where('status', 'do')
                         ->whereDate('start_date', $currentDate)
                         ->orderBy('repetition_count', 'asc')
                         ->first();
                 }
-
-                // if (!$objectiveStaff && $objectiveAssign->objective->repetition > 1) {
-                //     $lastCompletedRepetition = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                //         ->whereDate('start_date', $currentDate)
-                //         ->where('status', 'completed')
-                //         ->max('repetition_count');
-                //     if ($lastCompletedRepetition && $lastCompletedRepetition < $objectiveAssign->objective->repetition) {
-                //         $nextRepetition = $lastCompletedRepetition + 1;
-                //         $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-                //             ->whereDate('start_date', $currentDate)
-                //             ->where('repetition_count', $nextRepetition)
-                //             ->first();
-                //     }
-                // }
 
                 if ($objectiveStaff) {
                     $objectiveStaffCollection = collect([$objectiveStaff]);
@@ -546,7 +631,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     $totalRepetition = $objectiveAssign->objective->repetition;
                     $completedRepetitions = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
                         ->whereDate('start_date', $currentDate)
-                        ->whereIn('status', ['completed', 'approved'])
+                        ->whereIn('status', ['completed', 'done'])
                         ->count();
                     $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
                     foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
@@ -588,19 +673,25 @@ class ObjectiveRepository implements ObjectiveInterface
             }
         }
         return $objectiveAssigns;
-        // return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
     }
 
     public function getStaffByAccountable($staffId)
     {
         //$staffId is accountable
-        $staffIds = ObjectiveAssign::whereHas('objective', function ($q) use ($staffId) {
-            $q->where('accountable_id', $staffId);
-        })
-            ->distinct()
-            ->pluck('staff_id');
+        // $staffIds = ObjectiveAssign::whereHas('objective', function ($q) use ($staffId) {
+        //     $q->where('accountable_id', $staffId);
+        // })
+        //     ->distinct()
+        //     ->pluck('staff_id');
 
-        $staff = Staff::with(['department', 'roles'])->whereIn('id', $staffIds)->get();
+        // $staff = Staff::with(['department', 'roles'])->whereIn('id', $staffIds)->get();
+        // return $staff;
+        $staff = Staff::with(['department', 'roles'])
+            ->whereHas('objective_assigns.objective', function ($q) use ($staffId) {
+                $q->where('accountable_id', $staffId);
+            })
+            ->get();
+
         return $staff;
     }
 
@@ -895,14 +986,14 @@ class ObjectiveRepository implements ObjectiveInterface
                 $query->where('staff_id', $staffId);
             },
             'objectiveAssigns.objectiveStaff' => function ($query) use ($today) {
-                $query->whereIn('status', ['completed', 'approved']);
+                $query->whereIn('status', ['completed', 'done']);
                 $query->whereDate('start_date', $today);
             }
         ])->where('id', $objectiveId)
             ->whereHas('objectiveAssigns', function ($q) use ($staffId, $today) {
                 $q->where('staff_id', $staffId);
                 $q->whereHas('objectiveStaff', function ($query) use ($today) {
-                    $query->whereIn('status', ['completed', 'approved']);
+                    $query->whereIn('status', ['completed', 'done']);
                     $query->whereDate('start_date', $today);
                 });
             })->first();
