@@ -623,7 +623,6 @@ class ObjectiveRepository implements ObjectiveInterface
             ->whereHas('objectiveStaff', function ($query) use ($currentDate) {
                 $query->whereDate('start_date', $currentDate);
             })->get();
-        // dd($objectiveAssigns);
 
         foreach ($objectiveAssigns as $objectiveAssign) {
             $objectiveAssign->approver = false;
