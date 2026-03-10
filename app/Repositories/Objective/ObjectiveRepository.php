@@ -135,7 +135,7 @@ class ObjectiveRepository implements ObjectiveInterface
     public function getObjectiveById(Request $request, $objId)
     {
 
-        return Objective::with(['role.department', 'sop', 'objectiveKeys', 'accountable', 'consulted', 'informed'])->where('id', $objId)->get();
+        return Objective::with(['role.department', 'sop', 'objectiveKeys', 'accountable', 'consulted', 'informed','project'])->where('id', $objId)->get();
     }
 
     public function deleteObjective($objId)
