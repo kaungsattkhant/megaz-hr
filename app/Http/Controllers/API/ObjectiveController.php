@@ -54,9 +54,9 @@ class ObjectiveController extends Controller
 
             'okr_point' => ['required', 'integer', 'min:1'],
 
-            'type' => ['required', 'in:daily,occassionally'],
+            'type' => ['required', 'in:daily,occasionally'],
 
-            'repetition' => ['required', 'integer', 'min:1'],
+            'repetition' => ['required_if:type,daily', 'integer', 'min:1'],
 
             'role_id' => ['required', 'integer', 'exists:roles,id'],
 
