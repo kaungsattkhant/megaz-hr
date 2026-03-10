@@ -49,7 +49,33 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-6"></div>
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Project
+                </label>
+                <multiselect
+                    v-model="selectedProject"
+                    :options="projectList"
+                    :multiple="false"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="false"
+                    placeholder="Project"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"
+                    >
+                </multiselect>
+                <!-- <input type="number" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+            </div>
+            <div class="mb-4 col-span-1 pb-0 rounded-md">
+                <label for="" class="label-form mb-5">
+                    &nbsp;
+                </label>
+                <button data-te-toggle="modal" data-te-target="#addProjectModal" > <i class="fal fa-plus"></i> </button>
+            </div>
+            <div class="col-span-2"></div>
             <div class="mb-4 col-span-4">
                 <label for="" class="label-form mb-3">
                     Accountable
@@ -83,19 +109,25 @@
                 </label>
 
             </div> -->
-            <div class="mb-4 col-span-3">
+            <div class="mb-4 col-span-2">
                 <label for="" class="label-form mb-3">
                     Objective
                 </label>
                 <input type="text" v-model="objName" class="input-ui ">
             </div>
-            <div class="col-span-3">
+            <div class="col-span-2">
                 <label for="" class="label-form mb-3">
                     OKR Point
                 </label>
                 <input type="number" v-model="selectedOkrPoint" class="input-ui ">
             </div>
-            <div class="mb-6 col-span-3">
+            <div class="col-span-2">
+                <label for="" class="label-form mb-3">
+                    Priority
+                </label>
+                <input type="number" v-model="selectedPriority" class="input-ui ">
+            </div>
+            <div class="mb-6 col-span-2">
                 <label for="" class="label-form mb-3">
                     Type
                 </label>
@@ -108,13 +140,16 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-3" v-if="selectedType?.value === 'daily'">
+            <div class="col-span-2" v-if="selectedType?.value === 'daily'">
                 <label for="" class="label-form mb-3">
                     Repetition
                 </label>
                 <input type="number" v-model="selectedRepition" class="input-ui ">
             </div>
-            <div class="col-span-3" v-else></div>
+            <div class="col-span-2" v-else></div>
+
+            <div class="col-span-2"></div>
+
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Key Result
@@ -227,7 +262,57 @@
 
         </div>
 
+<div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="addProjectModal" tabindex="-1" aria-labelledby="add_category_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_category_modalLabel">
+                            Create Project
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close" id="btn-close-create-project-modal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4 pb-0 rounded-md">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Name
+                            </label>
+                            <input type="text" v-model="projectName" autocomplete="off"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <LoadingButton
+                            :loading="projectCreateLoading"
+                            text="Create"
+                            loadingText="Loading..."
+                            @click="createProject"
+                        />
+                        <!-- <button type="button" @click="createCategory()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </template>
@@ -237,10 +322,12 @@ import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
 import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import LoadingButton from "../Common/LoadingButton.vue";
 
 export default {
     components: {
-        Multiselect
+        Multiselect,
+        LoadingButton
     },
     data() {
         return {
@@ -261,6 +348,7 @@ export default {
             selectedRole:null,
             key_result:null,
             selectedOkrPoint:null,
+            selectedPriority: null,
             selectedDate:null,
             duration:null,
 
@@ -280,6 +368,11 @@ export default {
             accountableStaff: null,
             consultedStaff: null,
             informedStaff: null,
+
+            projectList: [],
+            selectedProject: null,
+            projectName: null,
+            projectCreateLoading: false,
         };
     },
 
@@ -347,6 +440,33 @@ export default {
                 });
             }
         },
+        createProject(){
+            this.projectCreateLoading = true;
+            if(!this.projectName){
+                this.projectCreateLoading = false;
+                this.showToastMessage("Name of the project is required");
+                return;
+            }
+            let formData = new FormData();
+            formData.append('name', this.projectName);
+            postApiData({url: `/api/projects`, form_data: formData, token: this.getToken()})
+            .then((response)=>{
+                this.projectCreateLoading = false;
+                if(response.data){
+                    this.projectList.push(response.data);
+                    this.selectedProject = response.data;
+                }                
+            });
+            document.getElementById('btn-close-create-project-modal').click();
+        },
+        getProjectList(){
+            getApiData({url: `/api/projects`, token: this.getToken()})
+            .then((response)=>{
+                if(response.success){
+                    this.projectList = response.data;
+                }
+            });
+        },
 
 
         btnclickedCreateOkr(){
@@ -370,9 +490,17 @@ export default {
                 this.alertValidationMessage(`SOP`);
                 return 1;
             }
+            else if(!this.selectedProject){
+                this.alertValidationMessage(`Project`);
+                return 1;
+            }
             else if(!this.selectedOkrPoint){
                 this.alertValidationMessage(`OKR Point`);
                 return 1;
+            }
+            else if(!this.selectedPriority){
+                this.alertValidationMessage('Priority');
+                return;
             }
 
             else if(!this.selectedType){
@@ -421,11 +549,13 @@ export default {
 
             formData.append('role_id', this.selectedRole.id);
             formData.append('sop_id', this.selectedSop.id);
+            formData.append('project_id', this.selectedProject.id);
             // formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.key_result_list));
             formData.append('accountable_id', this.accountableStaff.id);
             formData.append('consulted_id', this.consultedStaff.id);
             formData.append('informed_id', this.informedStaff.id);
+            formData.append('priority', this.selectedPriority);
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
@@ -467,6 +597,7 @@ export default {
         this.getDepartment();
         this.getStaffList();
         // this.getSopList();
+        this.getProjectList();
 
     },
 

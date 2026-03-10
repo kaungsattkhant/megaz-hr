@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Repositories\Contract;
+
+interface ContractRepositoryInterface
+{
+    public function list($request);
+
+    public function updateOrCreate(array $data);
+
+    public function detail($contract);
+
+    public function getContractList();
+
+    public function getContractStaffList($request);
+
+    public function addStaffToContract(array $data);
+
+    public function signedContract(array $data);
+
+    public function updateStatus(array $data);
+}

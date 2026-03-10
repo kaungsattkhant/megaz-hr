@@ -1,20 +1,24 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AssetItemEquipmentAssignController;
+use App\Http\Controllers\API\BenefitController;
+use App\Http\Controllers\API\ContractCategoryController;
+use App\Http\Controllers\API\ContractController;
 use App\Http\Controllers\API\CvController;
 use App\Http\Controllers\API\ExamController;
-use App\Http\Controllers\API\LeaveController;
-use App\Http\Controllers\API\SalaryController;
-use App\Http\Controllers\API\BenefitController;
-use App\Http\Controllers\API\LocationController;
-use App\Http\Controllers\API\OffDayHrController;
 use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
-use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\LeaveController;
+use App\Http\Controllers\API\LocationController;
+use App\Http\Controllers\API\MeetingMinuteController;
 use App\Http\Controllers\API\MenuItemImportController;
-use App\Http\Controllers\API\StaffTimeShiftController;
+use App\Http\Controllers\API\OffDayHrController;
+use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\API\ResignationController;
+use App\Http\Controllers\API\SalaryController;
 use App\Http\Controllers\API\StaffEquipmentHandoverController;
-use App\Http\Controllers\API\AssetItemEquipmentAssignController;
+use App\Http\Controllers\API\StaffTimeShiftController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -23,7 +27,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
     Route::post('/public_holidays', 'createPublicHoliday');
     Route::post('off_day_settings/toggle', 'toggleOffDaySetting');
-    Route::get('off_day_settings','getOffDaySetting');
+    Route::get('off_day_settings', 'getOffDaySetting');
 
     Route::get('/off_day_requests', 'getOffDayRequests');
     Route::post('/off_day_requests/{id}/status', 'updateOffDayRequestStatus');
@@ -84,7 +88,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
     Route::delete('/pay_slips/{id}', 'deletePaySlip');
-    Route::get('pay_slips/confirm/{id}','confirmPaySlip');
+    Route::get('pay_slips/confirm/{id}', 'confirmPaySlip');
 
     Route::get('/export-salary', 'exportSalary');
     //mobile
@@ -104,12 +108,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/cvs', 'getAllCvs');
     Route::post('/cvs/{id}', 'updateCv');
     Route::delete('/cvs/{id}', 'deleteCv');
-    Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
+    // Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
     Route::get('/cvs/{id}', 'getCvById');
     Route::post('/cvs/{id}/status', 'updateCvStatus');
     Route::get('/salary_setup/department/{departmentId}/role/{roleId}', 'getSalarySetupByDepartmentIdAndRoleId');
     Route::post('/new-staff-salary', 'createNewStaffSalary');
     Route::post('/new-staff-join-date', 'storeNewStaffJoinDate');
+    Route::get('communication_form/{id}','getCommunicationForm');
   });
   Route::prefix('hr')->controller(ExamController::class)->group(function () {
     Route::get('/exams', 'getAllExams');
@@ -121,8 +126,8 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/grades/{id}', 'deleteGrade');
     Route::delete('/exam_questions/{id}', 'deleteExamQuestion');
     Route::post('toggle/exam_questions/{id}', 'toggleExamQuestion');
-    Route::get('get_exam_by_role/{id}/exam_type/{examType}','getExamByRole');
-    Route::post('staff_exam/answer','answerExamQuestion');
+    Route::get('get_exam_by_role/{id}/exam_type/{examType}', 'getExamByRole');
+    Route::post('staff_exam/answer', 'answerExamQuestion');
   });
   Route::prefix('hr')->controller(InterviewController::class)->group(function () {
     Route::get('/interviews-by-role/{roleId}', 'getInterviewsByRoleId');
@@ -136,7 +141,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/added_location', 'addedLocation');
     Route::get('/locations/{locationId}/floor/{floorId}', 'getPlaceByLocationAndFloorId');
     Route::post('/places/{placeId}/assign-staff', 'assignStaffToPlace');
-    Route::get('places','getAllPlace');
+    Route::get('places', 'getAllPlace');
   });
   Route::prefix('hr')->controller(StaffTimeShiftController::class)->group(function () {
     Route::post('/staff_time_shifts', 'createStaffTimeShift');
@@ -181,7 +186,30 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/benefit_by_type/{type}', 'getBenefitByType');
   });
 
+  Route::prefix('contract_categories')->controller(ContractCategoryController::class)->group(function () {
+    Route::post('/', 'store');
+    Route::get('/', 'index');
+  });
+  Route::prefix('contracts')->controller(ContractController::class)->group(function () {
+    Route::post('/', 'store');
+    Route::get('/', 'index');
+    Route::post('add_staff', 'addStaffToContract');
+    Route::get('/staff', 'getContractStaff');
+    Route::post('/update_status','updateStatus');
+  });
+  Route::prefix('projects')->controller(ProjectController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('{projectId}/instruction_by_project','getInstructionByProject');
+  });
+  Route::prefix('meeting_minutes')->controller(MeetingMinuteController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+    Route::get('/{meetingMinute}', 'show');
+  });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {
   Route::post('/cvs', 'createCv');
+  Route::post('/communication_form', 'createCommunicationForm');
+  Route::get('departments/{depId}/roles/{role_id}/skills', 'skillByRoleAndDepartment');
 });

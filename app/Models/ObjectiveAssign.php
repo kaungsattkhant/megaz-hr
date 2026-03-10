@@ -14,6 +14,8 @@ class ObjectiveAssign extends Model
     protected $fillable = [
         'objective_id',
         'staff_id',
+        'created_at',
+        'created_by',
     ];
 
     protected $hidden = [

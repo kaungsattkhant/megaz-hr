@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use App\Enums\OkrStageEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ObjectiveAssignCreateRequest;
 use App\Http\Requests\Objective\AssignRequest;
-use App\Http\Requests\Objective\ObjImgRequest;
-use App\Http\Requests\Objective\ObjectiveRequest;
-use App\Repositories\Objective\ObjectiveInterface;
 use App\Http\Requests\Objective\KtvProductTreeRequest;
+use App\Http\Requests\Objective\ObjectiveRequest;
+use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\StaffMobile\RejectObjectiveKeyRequest;
 use App\Http\Resources\CompleteObjectivesResource;
+use App\Repositories\Objective\ObjectiveInterface;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ObjectiveController extends Controller
 {
@@ -46,7 +49,9 @@ class ObjectiveController extends Controller
 
     public function store(Request $request)
     {
-
+        $request->validate([
+            // 'priority' => ['required', 'integer', 'between:1,10'],
+        ]);
         $data = $this->objectiveRepository->store($request->all());
         ResponseData($data);
     }
@@ -105,7 +110,7 @@ class ObjectiveController extends Controller
     }
 
 
-    public function storeAssignDutiesByObjectives(Request $request)
+    public function storeAssignDutiesByObjectives(ObjectiveAssignCreateRequest $request)
     {
         $data = $this->objectiveRepository->storeAssignDutiesByObjectives($request->all());
         ResponseData($data);
@@ -132,6 +137,9 @@ class ObjectiveController extends Controller
 
     public function objectiveLists(Request $request)
     {
+        $request->validate([
+            'date'=>['required'],
+        ]);
         $data = $this->objectiveRepository->objectiveLists($request);
         ResponseData($data);
     }
@@ -165,6 +173,10 @@ class ObjectiveController extends Controller
 
     public function updateDailyObjective(Request $request, $objKeyStaffId)
     {
+        $request->validate([
+            'stage'=>['required','string',Rule::in(OkrStageEnum::getValues())],
+            'okr_point'=>['required'],
+        ]);
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
         ResponseData($data);
     }
@@ -186,9 +198,9 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getdailyObjectivesByStaffId($request, $staffId);
         ResponseData($data);
     }
-    public function getDailyObjectiveByAccountable($staffId)
+    public function getDailyObjectiveByAccountable(Request $request,$staffId)
     {
-        $data = $this->objectiveRepository->getDailyObjectiveByAccountable($staffId);
+        $data = $this->objectiveRepository->getDailyObjectiveByAccountable($request,$staffId);
         ResponseData($data);
     }
 
@@ -197,9 +209,9 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getCompletedObjKeysByStaffId($objectiveId,$staffId)
+    public function getCompletedObjKeysByStaffId(Request $request,$objectiveId,$staffId)
     {
-        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($objectiveId,$staffId);
+        $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($request,$objectiveId,$staffId);
         ResponseData(new CompleteObjectivesResource($data));
     }
 

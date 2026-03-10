@@ -27,7 +27,10 @@ class StaffRepository implements StaffRepositoryInterface
 
         $staffQuery = Staff::orderByDesc('id')
             ->with(['department', 'roles',  'bank', 'staffCertifications'])
-            ->where('is_cv', 0)
+            ->whereIn('status', [
+                StaffStatus::PROBATION->value,
+                StaffStatus::PERMANENT->value,
+            ])
             ->when($request->search_input, function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search_input . '%');
             })
@@ -50,7 +53,11 @@ class StaffRepository implements StaffRepositoryInterface
     public function staffList($request)
     {
         $departmentId = $request->department_id;
-        $data = Staff::with(['department', 'roles'])->where('is_cv', 0)
+        $data = Staff::with(['department', 'roles'])
+            ->whereIn('status', [
+                StaffStatus::PROBATION->value,
+                StaffStatus::PERMANENT->value,
+            ])
             ->when($departmentId, function ($query) use ($departmentId) {
                 $query->where('department_id', $departmentId);
             })->orderByDesc('id')->get();
@@ -541,6 +548,7 @@ class StaffRepository implements StaffRepositoryInterface
                 \ResponseMessage('Invalid staff status.', 422);
             }
             $staff->status = $request->status;
+            $staff->probation_period = $request->probation_period ?? 0;
             $staff->save();
             DB::commit();
             return $staff;

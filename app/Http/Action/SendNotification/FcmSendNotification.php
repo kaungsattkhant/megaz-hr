@@ -32,6 +32,10 @@ trait FcmSendNotification
             'model'=>$model
         ]);
         Log::info('Model Map',[$morphMapName]);
+        $createdBy=\UserData()->id??null;
+        if(isset($data['type']) && $data['type']=='joined_date'){ //send notification from schedule
+            $createdBy=$model->confirmed_by;
+        }
         $notification = Notification::updateOrCreate(
             [
                 'notificationable_id' => $model->id,
@@ -41,7 +45,7 @@ trait FcmSendNotification
                 'title' => $data['title'],
                 'preview' => $data['preview'],
                 'date_time' => now(),
-                'created_by' => \UserData() ? \UserData()->id : null,
+                'created_by' => $createdBy,
             ]
         );
         Log::info('Notification Person');

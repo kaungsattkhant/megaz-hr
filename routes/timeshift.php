@@ -58,7 +58,7 @@ Route::middleware('auth:api')->group(function () {
 
   Route::controller(ParticipantNotificationController::class)->group(function () {
     Route::get('/staff_by_department/{departmentId}/role/{roleId}', 'getStaffByDepartmentRole');
-    Route::post('/meetings', 'storeMeetings');
+    Route::post('/meetings', 'storeMeetings')->middleware('permission:meeting.create');
     Route::get('/meetings/{meetingId}', 'showMeeting');
     Route::get('/meetings', 'getMeetings');
     Route::post('/meetings/{meetingId}', 'updateMeeting');

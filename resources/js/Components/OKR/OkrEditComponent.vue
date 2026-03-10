@@ -76,19 +76,25 @@
                 :preselect-first="false"></multiselect>
             </div>
 
-            <div class="mb-4 col-span-3">
+            <div class="mb-4 col-span-2">
                 <label for="" class="label-form mb-3">
                     Objective
                 </label>
                 <input type="text" v-model="objName" class="input-ui ">
             </div>
-            <div class="col-span-3">
+            <div class="col-span-2">
                 <label for="" class="label-form mb-3">
                     OKR Point
                 </label>
                 <input type="number" v-model="selectedOkrPoint" class="input-ui ">
             </div>
-            <div class="mb-6 col-span-3">
+            <div class="col-span-2">
+                <label for="" class="label-form mb-3">
+                    Priority
+                </label>
+                <input type="number" v-model="selectedPriority" class="input-ui ">
+            </div>
+            <div class="mb-6 col-span-2">
                 <label for="" class="label-form mb-3">
                     Type
                 </label>
@@ -101,13 +107,15 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-3" v-if="selectedType?.value === 'daily'">
+            <div class="col-span-2" v-if="selectedType?.value === 'daily'">
                 <label for="" class="label-form mb-3">
                     Repetition
                 </label>
                 <input type="number" v-model="selectedRepition" class="input-ui ">
             </div>
-            <div class="col-span-3" v-else></div>
+            <div class="col-span-2" v-else></div>
+
+            <div class="col-span-2"></div>
 
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
@@ -196,6 +204,7 @@ export default {
             selectedDate:[],
             key_result:null,
             selectedOkrPoint:null,
+            selectedPriority: null,
             duration:null,
 
             key_result_list:[],
@@ -268,6 +277,7 @@ export default {
             }
             this.objName = detail.objective_name;
             this.selectedOkrPoint = detail.okr_point;
+            this.selectedPriority = detail.priority;
             this.selectedType = this.typeList.find(type => type.value === detail.type)
             if(detail.type === 'daily'){
                 this.selectedRepition = detail.repetition;
@@ -368,6 +378,10 @@ export default {
                 this.alertValidationMessage(`OKR Point`);
                 return 1;
             }
+            else if(!this.selectedPriority){
+                this.alertValidationMessage(`Priority`);
+                return 1;
+            }
             else if(!this.selectedType){
                 this.alertValidationMessage(`Type`);
                 return 1;
@@ -389,6 +403,7 @@ export default {
             let formData = new FormData();
             formData.append('objective_name', this.objName);
             formData.append('okr_point', this.selectedOkrPoint);
+            formData.append('priority', this.selectedPriority);
             formData.append('type', this.selectedType.value);
             if(this.selectedType.value === 'daily'){
                 formData.append('repetition', this.selectedRepition);

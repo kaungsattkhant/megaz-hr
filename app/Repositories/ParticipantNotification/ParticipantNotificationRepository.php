@@ -1261,7 +1261,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getMeetingsByStaffId($staffId, $request)
   {
-    $staff = Staff::with('department', 'roles')->find($staffId);
+    $staff = Staff::with('department', 'roles')
+      ->find($staffId);
     if (!$staff) {
       return ResponseData(null, 400, false, 'Staff not found.');
     }
@@ -1278,11 +1279,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role',
       'participants.role.department',
     ])
-      ->whereHas('participants', function ($query) use ($staffId, $departmentId, $roleIds) {
-        $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
-          $subQuery->where('staff_id', $staffId)
-            ->orWhere('department_id', $departmentId)
-            ->orWhereIn('role_id', $roleIds);
+
+      ->when(isset($search) && ($search === "upcoming" || $search === "completed"), function ($queryMain) use ($staffId, $departmentId, $roleIds) {
+        $queryMain->whereHas('participants', function ($query) use ($staffId, $departmentId, $roleIds) {
+          $query->where(function ($subQuery) use ($staffId, $departmentId, $roleIds) {
+            $subQuery->where('staff_id', $staffId)
+              ->orWhere('department_id', $departmentId)
+              ->orWhereIn('role_id', $roleIds);
+          });
         });
       })
       ->when(isset($search) && $search === "upcoming", function ($query) use ($currentDateTime) {
@@ -1290,6 +1294,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       })
       ->when(isset($search) && $search === "completed", function ($query) use ($currentDateTime) {
         return $query->where('to_date', '<', $currentDateTime);
+      })
+      ->when(isset($search) && $search === "created_meeting", function ($query) use ($staffId) {
+        return $query->where('created_by',$staffId);
       })
       ->orderBy('id', 'desc')
       ->get();
