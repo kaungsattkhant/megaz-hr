@@ -545,6 +545,7 @@ export default {
 
             formData.append('role_id', this.selectedRole.id);
             formData.append('sop_id', this.selectedSop.id);
+            formData.append('project_id', this.selectedProject.id);
             // formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.key_result_list));
             formData.append('accountable_id', this.accountableStaff.id);
