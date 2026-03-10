@@ -21,8 +21,6 @@ return new class extends Migration
             $table->dateTime('do_at')->nullable();
             $table->unsignedInteger('done_by')->nullable();
             $table->dateTime('done_at')->nullable();
-            $table->unsignedInteger('completed_by')->nullable();
-            $table->dateTime('completed_at')->nullable();
             $table->unsignedInteger('check_by')->nullable();
             $table->dateTime('check_at')->nullable();
             $table->unsignedInteger('act_by')->nullable();
