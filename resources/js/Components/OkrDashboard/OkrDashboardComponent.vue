@@ -133,6 +133,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- {{ okr.okr_total_point }} -->
+                                          
                                     </td>
                                     
                                     <!-- <td class="whitespace-nowrap">
