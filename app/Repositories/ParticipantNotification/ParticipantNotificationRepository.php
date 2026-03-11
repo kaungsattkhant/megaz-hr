@@ -277,6 +277,50 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     // }
   }
 
+  public function getStaffByMeeting($meetingId){
+    $participants = Participant::where('participantable_id', $meetingId)
+      ->where('participantable_type', 'meeting')
+      ->get();
+
+    $staffIds = [];
+    $departmentIds = [];
+    $roleIds = [];
+
+    foreach ($participants as $p) {
+      if (!empty($p->staff_id)) $staffIds[] = $p->staff_id;
+      if (!empty($p->department_id)) $departmentIds[] = $p->department_id;
+      if (!empty($p->role_id)) $roleIds[] = $p->role_id;
+    }
+
+    $staffIds = array_unique($staffIds);
+    $departmentIds = array_unique($departmentIds);
+    $roleIds = array_unique($roleIds);
+
+    if (empty($staffIds) && empty($departmentIds) && empty($roleIds)) {
+      return collect();
+    }
+
+    $query = Staff::query();
+
+    $query->where(function ($q) use ($staffIds, $departmentIds, $roleIds) {
+      if (!empty($staffIds)) {
+        $q->orWhereIn('id', $staffIds);
+      }
+      if (!empty($departmentIds)) {
+        $q->orWhereIn('department_id', $departmentIds);
+      }
+      if (!empty($roleIds)) {
+        $q->orWhereHas('roles', function ($qr) use ($roleIds) {
+          $qr->whereIn('id', $roleIds);
+        });
+      }
+    });
+
+    $staffs = $query->with(['department', 'roles'])->get()->unique('id')->values();
+
+    return $staffs;
+  }
+
   public function storeTraining($data)
   {
     DB::beginTransaction();

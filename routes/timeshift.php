@@ -63,6 +63,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/meetings', 'getMeetings');
     Route::post('/meetings/{meetingId}', 'updateMeeting');
     Route::delete('/meetings/{meetingId}', 'deleteMeeting');
+    Route::get('staff_by_meeting/{meetingId}', 'getStaffByMeeting');
 
     Route::get('/trainings', 'getTrainings');
     Route::get('/trainings/{trainingId}', 'getTrainingById');
