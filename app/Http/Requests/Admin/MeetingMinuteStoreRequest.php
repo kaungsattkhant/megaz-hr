@@ -51,6 +51,12 @@ class MeetingMinuteStoreRequest extends FormRequest
             'instructions.*.due_date' => ['required','after_or_equal:instructions.*.start_date'],
             'instructions.*.instruction_objective_key' => ['required', 'array', 'min:1'],
             'instructions.*.instruction_objective_key.*.name' => ['required'],
+            'kpi_snapshots' => ['required', 'array', 'min:1'],
+            'kpi_snapshots.*.kpi_snapshot_id' => ['required', 'integer', 'exists:kpi_snapshots,id'],
+            'kpi_snapshots.*.value'=>['required'],
+            'alignments' => ['required', 'array', 'min:1'],
+            'alignments.*.alignment_id' => ['required', 'integer', 'exists:alignments,id'],
+            'alignments.*.remark' => ['required'],
             // 'instructions.*.instruction_objective_key.*' => ['integer', 'distinct', 'exists:objective_keys,id'],
         ];
     }

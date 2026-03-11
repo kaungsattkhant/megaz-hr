@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AlignmentController;
 use App\Http\Controllers\API\AssetItemEquipmentAssignController;
 use App\Http\Controllers\API\BenefitController;
 use App\Http\Controllers\API\ContractCategoryController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\API\CvController;
 use App\Http\Controllers\API\ExamController;
 use App\Http\Controllers\API\HandBookeController;
 use App\Http\Controllers\API\InterviewController;
+use App\Http\Controllers\API\KpiSnapshotController;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\LocationController;
 use App\Http\Controllers\API\MeetingMinuteController;
@@ -206,6 +208,13 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/', 'index');
     Route::post('/', 'store');
     Route::get('/{meetingMinute}', 'show');
+  });
+  Route::prefix('kpi_snapshots')->controller(KpiSnapshotController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'store');
+  });
+  Route::prefix('alignments')->controller(AlignmentController::class)->group(function () {
+    Route::get('/', 'index');
   });
 });
 Route::prefix('hr')->controller(CvController::class)->group(function () {

@@ -124,7 +124,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
 
                 $keptInstructionIds[] = $instruction->id;
                 $instruction->objectiveKeys()->sync($objectiveKeyIds);
-                $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
+                // $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
             }
 
             if (!empty($data['id'])) {
@@ -134,8 +134,31 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                     $meetingMinute->instructions()->delete();
                 }
             }
+            // sync alignments pivot (alignment_id, remark)
+            if (!empty($data['alignments'])) {
+                $alignmentSync = [];
+                foreach ($data['alignments'] as $a) {
+                    if (empty($a['alignment_id'])) continue;
+                    $alignmentSync[$a['alignment_id']] = ['remark' => $a['remark'] ?? null];
+                }
+                $meetingMinute->alignments()->sync($alignmentSync);
+            } else {
+                $meetingMinute->alignments()->sync([]);
+            }
+
+            // sync kpi snapshots pivot (kpi_snapshot_id, value)
+            if (!empty($data['kpi_snapshots'])) {
+                $kpiSync = [];
+                foreach ($data['kpi_snapshots'] as $k) {
+                    if (empty($k['kpi_snapshot_id'])) continue;
+                    $kpiSync[$k['kpi_snapshot_id']] = ['value' => $k['value'] ?? null];
+                }
+                $meetingMinute->kpiSnapshots()->sync($kpiSync);
+            } else {
+                $meetingMinute->kpiSnapshots()->sync([]);
+            }
             DB::commit();
-            return $meetingMinute->load(['meeting', 'attendances', 'instructions.objectiveKeys']);
+            return $meetingMinute->load(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots']);
         } catch (\Throwable $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
@@ -145,7 +168,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
 
     public function detail($meetingMinute)
     {
-        return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys'])->findOrFail($meetingMinute->id);
+        return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->findOrFail($meetingMinute->id);
     }
 
     public function delete($meetingMinute)

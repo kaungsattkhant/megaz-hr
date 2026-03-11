@@ -35,6 +35,24 @@ class MeetingMinuteListResource extends JsonResource
                     ];
                 })->values();
             }),
+            'alignments' => $this->whenLoaded('alignments', function () {
+                return $this->alignments->map(function ($alignment) {
+                    return [
+                        'id' => $alignment->id,
+                        'name' => $alignment->name,
+                        'remark'=>$alignment->pivot->remark,
+                    ];
+                })->values();
+            }),
+            'kpi_snapshots' => $this->whenLoaded('kpiSnapshots', function () {
+                return $this->kpiSnapshots->map(function ($kpiSnapshot) {
+                    return [
+                        'id' => $kpiSnapshot->id,
+                        'name' => $kpiSnapshot->name,
+                        'value' => $kpiSnapshot->pivot->value,
+                    ];
+                })->values();
+            }),
             'instructions' => $this->whenLoaded('instructions', function () {
                 return $this->instructions->map(function ($instruction) {
                     return [
