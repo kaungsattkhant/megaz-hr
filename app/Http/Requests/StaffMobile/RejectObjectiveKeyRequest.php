@@ -22,7 +22,7 @@ class RejectObjectiveKeyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:rejected',
+            'stage' => 'required|in:rejected',
             "objective_staff_id"=> "required|exists:objective_staff,id",
             'reject_objective_keys'   => 'required|array',
             'reject_objective_keys.*' => 'integer|exists:objective_keys,id',

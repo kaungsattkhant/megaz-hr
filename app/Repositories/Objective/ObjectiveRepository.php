@@ -995,7 +995,6 @@ class ObjectiveRepository implements ObjectiveInterface
                 'completed_by'   => null,
                 'do_at'          => null,
                 'do_by'          => null,
-                'status'         => 'do',
                 'stage' => OkrStageEnum::DO->value,
                 'reject_remark'  => $data['reject_remark'] ?? null,
                 'rejected_at'    => now(),
