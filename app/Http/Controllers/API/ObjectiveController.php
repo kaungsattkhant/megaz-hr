@@ -195,7 +195,7 @@ class ObjectiveController extends Controller
     {
         $request->validate([
             'stage'=>['required','string',Rule::in(OkrStageEnum::getValues())],
-            'okr_point' => ['required_if:stage,do,done,completed'],
+            'okr_point' => ['required_if:completed,check'],
         ]);
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
         ResponseData($data);
