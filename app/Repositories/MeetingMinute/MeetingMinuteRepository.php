@@ -45,6 +45,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 ['id' => $data['id'] ?? null],
                 [
                     'meeting_id' => $data['meeting_id'],
+                    'old_meeting_id'=>$data['old_meeting_id'] ?? null,
                     'meeting_minute' => $data['meeting_minute'],
                     // 'is_active' => $data['is_active'] ?? true,
                 ]
@@ -91,6 +92,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                         'end_date' => $instructionData['due_date'],
                         'okr_point' => $instructionData['okr_point'],
                         'objective_assign_id' => $objectiveAssign->id,
+                        'tag'=> $instructionData['tag'],
                     ]
                 );
                 $notificationData = [
@@ -169,6 +171,11 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
     public function detail($meetingMinute)
     {
         return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->findOrFail($meetingMinute->id);
+    }
+
+    public function getMeetingMinuteByMeetingId($meetingId){
+        return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->where('meeting_id', $meetingId)->firstOrFail();
+        
     }
 
     public function delete($meetingMinute)

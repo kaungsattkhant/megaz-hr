@@ -16,6 +16,7 @@ class MeetingMinute extends Model
         'meeting_id',
         'meeting_minute',
         'is_active',
+        'old_meeting_id',
     ];
 
     public function meeting()

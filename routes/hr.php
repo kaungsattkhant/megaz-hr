@@ -208,6 +208,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/', 'index');
     Route::post('/', 'store');
     Route::get('/{meetingMinute}', 'show');
+    Route::get('meeting/{meetingId}','getMeetingMinuteByMeetingId');
   });
   Route::prefix('kpi_snapshots')->controller(KpiSnapshotController::class)->group(function () {
     Route::get('/', 'index');

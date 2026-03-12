@@ -11,4 +11,6 @@ interface MeetingMinuteRepositoryInterface
     public function detail($meetingMinute);
 
     public function delete($meetingMinute);
+    
+    public function getMeetingMinuteByMeetingId($meetingId);
 }
