@@ -27,6 +27,7 @@ class MeetingMinuteListResource extends JsonResource
                     'title' => $this->meeting->title ?? null,
                 ];
             }),
+            'old_meeting'=>new MeetingMinuteListResource($this->old_meeting),
             'attendances' => $this->whenLoaded('attendances', function () {
                 return $this->attendances->map(function ($staff) {
                     return [

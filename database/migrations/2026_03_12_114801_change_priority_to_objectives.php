@@ -14,8 +14,8 @@ return new class extends Migration
     {
         Schema::table('objectives', function (Blueprint $table) {
             //
-            // $table->dropColumn('priority');
-            // $table->enum('priority',PriorityEnum::getValues())->default(PriorityEnum::NOT_URGENT_IMPORTANT->value);
+            $table->dropColumn('priority');
+            $table->enum('priority',PriorityEnum::getValues())->default(PriorityEnum::NOT_URGENT_NOT_IMPORTANT->value);
         });
     }
 

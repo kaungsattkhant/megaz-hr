@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('meeting_minutes', function (Blueprint $table) {
             //
-            // $table->dropColumn(['tag','priority']);
             $table->unsignedInteger('old_meeting_id')->nullable();
         });
     }

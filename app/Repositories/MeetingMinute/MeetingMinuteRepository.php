@@ -2,6 +2,7 @@
 
 namespace App\Repositories\MeetingMinute;
 
+use App\Enums\OkrStageEnum;
 use App\Models\Instruction;
 use App\Models\Meeting;
 use App\Models\MeetingMinute;
@@ -92,7 +93,8 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                         'end_date' => $instructionData['due_date'],
                         'okr_point' => $instructionData['okr_point'],
                         'objective_assign_id' => $objectiveAssign->id,
-                        'tag'=> $instructionData['tag'],
+                        // 'stage'=>OkrStageEnum::NOTYET->value,
+                        'stage' =>$instructionData['stage'],
                     ]
                 );
                 $notificationData = [
@@ -112,11 +114,11 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->objective_id = $objective->id;
                 $instruction->okr_point = $instructionData['okr_point'] ?? null;
                 $instruction->project_id = $instructionData['project_id'];
-                $instruction->tag = $instructionData['tag'] ?? null;
+                // $instruction->tag = $instructionData['tag'] ?? null;
                 $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
                 $instruction->start_date = $instructionData['start_date'] ?? null;
                 $instruction->due_date = $instructionData['due_date'] ?? null;
-                $instruction->priority = $instructionData['priority'] ?? null;
+                // $instruction->priority = $instructionData['priority'] ?? null;
                 $instruction->remark = $instructionData['remark'] ?? ($instructionData['remark'] ?? null);
                 $instruction->accountable_id = $instructionData['accountable'] ?? ($instructionData['accountable_id'] ?? null);
                 $instruction->consulted_id = $instructionData['consulted_id'] ?? null;

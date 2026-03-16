@@ -23,6 +23,10 @@ class MeetingMinute extends Model
     {
         return $this->belongsTo(Meeting::class);
     }
+    public function old_meeting()
+    {
+        return $this->belongsTo(Meeting::class);
+    }
     public function instructions()
     {
         return $this->hasMany(Instruction::class);
