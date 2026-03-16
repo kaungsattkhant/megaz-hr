@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NotiType\NotiTypeRequest;
+use App\Http\Resources\StaffListResource;
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 
 class ParticipantNotificationController extends Controller
@@ -50,6 +51,13 @@ class ParticipantNotificationController extends Controller
         $data = $this->ParticipantNotificationRepository->deleteMeeting($meetingId);
         ResponseData($data);
     }
+
+    public function getStaffByMeeting($meetingId)
+    {
+        $data = $this->ParticipantNotificationRepository->getStaffByMeeting($meetingId);
+        return StaffListResource::collection($data);
+    }
+
 
     public function storeTraining(Request $request)
     {

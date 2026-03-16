@@ -37,4 +37,10 @@ class MeetingMinuteController extends Controller
         return new MeetingMinuteListResource($meetingMinute);
     }
 
+    public function getMeetingMinuteByMeetingId($meetingId)
+    {
+        $meetingMinute = $this->meetingMinuteRepo->getMeetingMinuteByMeetingId($meetingId);
+        return new MeetingMinuteListResource($meetingMinute);
+    }
+
 }
