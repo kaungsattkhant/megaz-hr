@@ -2,21 +2,24 @@
 
 namespace App\Repositories\Benefit;
 
-use Carbon\Carbon;
+use App\Enums\StaffStatus;
+use App\Http\Action\SendNotification\FcmSendNotification;
+use App\Http\Resources\Admin\BenefitListResource;
+use App\Http\Resources\Mobile\BenefitRequestResourceList;
+use App\Http\Resources\Mobile\StaffAdvanceResource;
 use App\Models\Advance;
-use App\Models\Benefit;
-use Illuminate\Http\Request;
 use App\Models\AdvancePayment;
+use App\Models\Benefit;
 use App\Models\BenefitRequest;
+use App\Models\Staff;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\Admin\BenefitListResource;
-use App\Http\Resources\Mobile\StaffAdvanceResource;
-use App\Http\Resources\Mobile\BenefitRequestResourceList;
 
 class BenefitRepository implements BenefitInterface
 {
-
+    use FcmSendNotification;
     public function list($data)
     {
         $query = Benefit::orderBy('id', 'desc')->get();
@@ -31,14 +34,14 @@ class BenefitRepository implements BenefitInterface
 
     public function updateOrCreateBenefit($request)
     {
-        $data=$request;
+        $data = $request;
         DB::beginTransaction(); // start transaction
         try {
             if (!isset($data['id'])) {
                 $data['id'] = null;
             }
             $data['created_by'] = \UserData()->id;
-        
+
             $benefit = Benefit::updateOrCreate(['id' => $data['id']], $data);
             DB::commit();
             return $benefit;
@@ -58,11 +61,11 @@ class BenefitRepository implements BenefitInterface
         DB::beginTransaction(); // start transaction
         try {
             $benefitRequest = BenefitRequest::find($data['id']);
-            if($benefitRequest->status=='confirmed' || $benefitRequest->status == 'cancelled'){
-                \ResponseMessage('Status updated fail!',419); //status already updated 
+            if ($benefitRequest->status == 'confirmed' || $benefitRequest->status == 'cancelled') {
+                \ResponseMessage('Status updated fail!', 419); //status already updated 
             }
-                $benefitRequest->status = $data['status'];
-            if ($data['status'] == 'confirmed') { 
+            $benefitRequest->status = $data['status'];
+            if ($data['status'] == 'confirmed') {
                 $benefitRequest->confirmed_at = now();
                 $benefitRequest->confirmed_by = \UserData()->id;
             }
@@ -89,7 +92,7 @@ class BenefitRepository implements BenefitInterface
 
     public function createBenefitRequest($request)
     {
-        $data=$request->all();
+        $data = $request->all();
         DB::beginTransaction(); // start transaction
         try {
             if ($request->hasFile('image')) {
@@ -99,6 +102,17 @@ class BenefitRepository implements BenefitInterface
             }
             $benefitRequest = BenefitRequest::create($data);
             DB::commit();
+            $notificationData = [
+                'title' => 'Benefit Request',
+                'preview' => 'Benefit Request has been created',
+            ];
+            $allStaff = Staff::whereIn('status', [
+                StaffStatus::PROBATION->value,
+                StaffStatus::PERMANENT->value,
+            ])
+                ->where('id', '!=', $benefitRequest->staff_id)
+                ->get();
+            $this->sendFcmNotification($benefitRequest, $allStaff, $notificationData);
             return $benefitRequest;
         } catch (\Exception $e) {
             DB::rollBack(); // rollback all queries if any error occurs

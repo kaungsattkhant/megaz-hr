@@ -2,23 +2,24 @@
 
 namespace App\Repositories\Leave;
 
-use App\Models\Leave;
-use App\Models\Staff;
-use App\Models\ExitPass;
 use App\Enums\StaffStatus;
+use App\Events\LeaveUpdateNotificationRequest;
+use App\Events\SendDepartmentNotification;
+use App\Http\Action\SendNotification\FcmSendNotification;
+use App\Http\Action\SendNotification\SendNotification;
 use App\Models\ExitCategory;
-use App\Models\LeaveCategory;
+use App\Models\ExitPass;
+use App\Models\Leave;
 use App\Models\LeaveAllowance;
+use App\Models\LeaveCategory;
+use App\Models\Staff;
 use App\Services\LeaveService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Events\SendDepartmentNotification;
-use App\Events\LeaveUpdateNotificationRequest;
-use App\Http\Action\SendNotification\SendNotification;
 
 class LeaveRepository implements LeaveRepositoryInterface
 {
-  use SendNotification;
+  use SendNotification, FcmSendNotification;
 
   private LeaveService $leaveService;
   public function __construct(LeaveService $leaveService)
@@ -193,6 +194,16 @@ class LeaveRepository implements LeaveRepositoryInterface
         'is_unpaid_leave' => $data['is_unpaid_leave'] ?? null,
       ]);
       DB::commit();
+      $staff= Staff::find($data['staff_id']);
+      $notificationData = [
+        'title' => 'Leave Request',
+        'preview' => "{$staff->name} has requested for leave",
+      ];
+      $allStaff = Staff::whereIn('status', [
+        StaffStatus::PROBATION->value,
+        StaffStatus::PERMANENT->value,
+      ])->where('id', '!=', $leave->staff_id)->get();
+      $this->sendFcmNotification($leave, $allStaff, $notificationData);
       ResponseData($leave);
     } catch (\Exception $e) {
       DB::rollback();
@@ -442,8 +453,17 @@ class LeaveRepository implements LeaveRepositoryInterface
       $exitPass->arrival_date_time = $request['arrival_date_time'];
       $exitPass->status = $request['status'];
       $exitPass->save();
-
       DB::commit();
+      //send
+      $notificationData = [
+        'title' => 'Exit Pass',
+        'preview' => 'Exit Pass has been created',
+      ];
+      $allStaff = Staff::whereIn('status', [
+        StaffStatus::PROBATION->value,
+        StaffStatus::PERMANENT->value,
+      ])->where('id','!=', $exitPass->staff_id)->get();
+      $this->sendFcmNotification($exitPass, $allStaff, $notificationData);
       ResponseData($exitPass);
     } catch (\Exception $e) {
       DB::rollback();

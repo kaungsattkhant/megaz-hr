@@ -68,12 +68,15 @@ class AppServiceProvider extends ServiceProvider
             'staff_equipment_assign' => 'App\Models\StaffEquipmentAssign',
             'accrued' => 'App\Models\Accrued',
             'leave' => 'App\Models\Leave',
+            'exit_pass' => 'App\Models\ExitPass',
             'staff_equipment_handover' => 'App\Models\StaffEquipmentHandover',
             'staff_equipment_handover_item' => 'App\Models\StaffEquipmentHandoverItem',
             'lost_item' => 'App\Models\LostItem',
             'pack' => 'App\Models\Pack',
             'objective_staff' => 'App\Models\ObjectiveStaff',
             'objective_assign' => 'App\Models\ObjectiveAssign',
+            'overtime' => 'App\Models\Overtime',
+            'benefit_request' => 'App\Models\BenefitRequest',
         ]);
     }
 }
