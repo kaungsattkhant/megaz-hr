@@ -9,6 +9,7 @@ use App\Models\PaySlip;
 use App\Models\Overtime;
 use App\Models\Allowance;
 use App\Enums\StaffStatus;
+use App\Http\Action\SendNotification\FcmSendNotification;
 use App\Models\DayInOffDay;
 use App\Models\OvertimeFee;
 use App\Models\SalaryBatch;
@@ -24,6 +25,7 @@ use App\Http\Resources\Mobile\PaySlipResource;
 
 class SalaryRepository implements SalaryRepositoryInterface
 {
+  use FcmSendNotification;
   public function getAllowances($request)
   {
     $query =  Allowance::with('role.department')->orderBy('id', 'desc');
@@ -364,6 +366,7 @@ class SalaryRepository implements SalaryRepositoryInterface
         ]
       );
       DB::commit();
+
       ResponseData($overtimeFee);
     } catch (\Exception $e) {
       DB::rollback();
@@ -440,6 +443,16 @@ class SalaryRepository implements SalaryRepositoryInterface
         ]
       );
       DB::commit();
+      $staff = Staff::find($data['staff_id']);
+      $notificationData = [
+        'title' => 'Overtime ',
+        'preview' => "{$staff->name} has requested overtime",
+      ];
+      $allStaff = Staff::whereIn('status', [
+        StaffStatus::PROBATION->value,
+        StaffStatus::PERMANENT->value,
+      ])->where('id', '!=', $overtime->staff_id)->get();
+      $this->sendFcmNotification($overtime, $allStaff, $notificationData);
       ResponseData($overtime);
     } catch (\Exception $e) {
       DB::rollback();
@@ -493,6 +506,16 @@ class SalaryRepository implements SalaryRepositoryInterface
         $overtime->status = 'confirmed';
         $overtime->confirmed_at = now();
         $overtime->confirmed_by = UserData()->id;
+        $staff = Staff::find($overtime->staff_id);
+        $notificationData = [
+          'title' => 'Overtime ',
+          'preview' => "Overtime has been confirmed",
+        ];
+        // $allStaff = Staff::whereIn('status', [
+        //   StaffStatus::PROBATION->value,
+        //   StaffStatus::PERMANENT->value,
+        // ])->where('id', '!=', $overtime->staff_id)->get();
+        $this->sendFcmNotification($overtime, $staff, $notificationData);
       }
 
       $overtime->save();
