@@ -8,6 +8,7 @@ enum PDCAEnum : string
 {
     //
     use EnumTrait;
+    case NOTYET = 'not_yet';
     case PLAN = 'plan';
     case DO = 'do';
     case CHECK = 'check';

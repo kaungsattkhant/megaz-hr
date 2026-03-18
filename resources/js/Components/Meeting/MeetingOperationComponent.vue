@@ -123,7 +123,7 @@
                                 {{ staff.staff.name }}
                             </td>
                             <td class=" px-6 py-3 font-medium text-left">
-                                <button>
+                                <button @click="removeMeetingStaffBtnClicked(index)">
                                     <i class="fal fa-times  pr-3" ></i>
                                 </button>
                             </td>
@@ -151,7 +151,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Objective Name
                 </label>
-                <multiselect
+                <!-- <multiselect
                     v-model="selectedObjective"
                     :options="objectiveList"
                     :multiple="false"
@@ -163,9 +163,9 @@
                     track-by="id"
                     :preselect-first="false"
                     @select="objectiveSelectChanged">
-                </multiselect>
-                <!-- <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                </multiselect> -->
+                <input type="text" v-model="objectiveName" placeholder="Objective Name" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
             <div class="mb-4 col-span-4 pb-0 rounded-md">
@@ -177,22 +177,22 @@
             </div>
 
             <div class="mb-4 col-span-4 pb-0 rounded-md">
-                <!-- <label for="" class="block text-sm text-black mb-3">
-                    Assigned Person
+                <label for="" class="block text-sm text-black mb-3">
+                    SOP
                 </label>
                 <multiselect
-                    v-model="assignedStaff"
-                    :options="allStaffList"
+                    v-model="selectedSop"
+                    :options="sopList"
                     :multiple="false"
                     :close-on-select="true"
                     :clear-on-select="false"
                     :preserve-search="false"
-                    placeholder="Accountable"
-                    label="name"
+                    placeholder="SOP"
+                    label="sop"
                     track-by="id"
                     :preselect-first="false"
                     >
-                </multiselect> -->
+                </multiselect>
             </div>
 
             <div class="mb-4 col-span-3 pb-0 rounded-md">
@@ -355,6 +355,7 @@
             </div>
 
             <div class="col-span-3"></div>
+            
 
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -389,7 +390,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Key Result
                 </label>
-                <multiselect
+                <!-- <multiselect
                     v-model="selectedObjectiveKeys"
                     :options="objectiveKeys"
                     :multiple="true"
@@ -401,14 +402,14 @@
                     track-by="id"
                     :preselect-first="false"
                     >
-                </multiselect>
-                <!-- <input type="number" autocomplete="off"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                </multiselect> -->
+                <input type="text" v-model="keyResultName" placeholder="Key Result" autocomplete="off"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
             <div class="col-span-3">
                 <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-10"
-                :disabled="selectedObjectiveKeys.length < 1">
+                @click="addKeyResult">
                     Add
                 </button>
             </div>
@@ -426,12 +427,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(objectiveKey, index) in selectedObjectiveKeys">
+                        <tr class="" v-for="(keyResult, index) in keyResults">
                             <td class=" pr-6 pl-2 py-3 font-medium ">
-                                {{ objectiveKey.name }}
+                                {{ keyResult.name }}
                             </td>
                             <td class=" px-6 py-3 font-medium text-left">
-                                <button @click="removeSelectedObjectiveKey(objectiveKey.id, index)">
+                                <button @click="removeKeyResult(index)">
                                     <i class="fal fa-times  pr-3" ></i>
                                 </button>
                             </td>
@@ -447,12 +448,25 @@
             </div>
 
             <hr class="col-span-12 my-6">
-            <div class=" col-span-12 mb-10">
+
+            <div class=" col-span-12 mb-10" v-if="meetingInstructions.length > 0">
                 <table class="min-w-[50%] text-sm font-light ml-2">
                     <thead class="font-medium text-left ">
                         <tr>
                             <th scope="col" class=" pr-6 pl-2 py-3 ">
-                                Instruction
+                                Objective
+                            </th>
+                            <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                Project
+                            </th>
+                            <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                Type
+                            </th>
+                            <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                Priority
+                            </th>
+                            <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                Remark
                             </th>
                             <th scope="col" class=" px-6 py-3">
 
@@ -460,12 +474,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="">
+                        <tr class="" v-for="(instruction, index) in meetingInstructions">
                             <td class=" pr-6 pl-2 py-3 font-medium ">
-                                Key REsult 1
+                                {{ instruction.objective_name }}
+                            </td>
+                            <td class=" pr-6 pl-2 py-3 font-medium ">
+                                {{ instruction.project.name }}
+                            </td>
+                            <td class=" pr-6 pl-2 py-3 font-medium capitalize">
+                                {{ instruction.tag }}
+                            </td>
+                            <td class=" pr-6 pl-2 py-3 font-medium ">
+                                {{ instruction.priority }}
+                            </td>
+                            <td class=" pr-6 pl-2 py-3 font-medium ">
+                                {{ instruction.remark }}
                             </td>
                             <td class=" px-6 py-3 font-medium text-left">
-                                <button>
+                                <button @click="removeMeetingInstructionBtnClicked(index)">
                                     <i class="fal fa-times  pr-3" ></i>
                                 </button>
                             </td>
@@ -637,11 +663,34 @@ export default {
 
             projectName: null,
             projectCreateLoading: false,
+
+            sopList: [],
+            selectedSop: null,
+
+            objectiveName: null,
+
+            keyResults: [],
+            keyResultName: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        addKeyResult(){
+            if(!this.keyResultName){
+                this.showToastMessage("Key result name must be present");
+                return;
+            }
+            this.keyResults.push({
+                "name": this.keyResultName
+            });
+            this.keyResultName = null;
+        },
+
+        removeKeyResult(index){
+            this.keyResults.splice(index, 1);
+        },
 
         createProject(){
             this.projectCreateLoading = true;
@@ -738,6 +787,10 @@ export default {
             this.selectedStaff = [];
         },
 
+        removeMeetingStaffBtnClicked(index){
+            this.meetingStaff.splice(index, 1);
+        },
+
         objectiveSelectChanged(){
             this.objectiveKeys = this.selectedObjective.objective_keys;
             this.okrPoint = this.selectedObjective.okr_point;
@@ -748,10 +801,10 @@ export default {
         },
 
         addInstructionBtnClicked(){
-            if(!this.selectedObjective){
-                this.showToastMessage("Objective must be selected");
-                return;
-            }
+            // if(!this.selectedObjective){
+            //     this.showToastMessage("Objective must be selected");
+            //     return;
+            // }
             if(!this.okrPoint){
                 this.showToastMessage("OKR point must be assigned");
                 return;
@@ -772,8 +825,8 @@ export default {
                 this.showToastMessage("Priority must be assigned");
                 return;
             }
-            if(this.selectedObjectiveKeys.length < 1){
-                this.showToastMessage("At least one objective key result must be selected");
+            if(this.keyResults.length < 1){
+                this.showToastMessage("At least one objective key result must be entered");
                 return;
             }
             if(!this.startDate || !this.dueDate){
@@ -785,13 +838,18 @@ export default {
                 return;
             }
 
+            if(!this.selectedSop){
+                this.showToastMessage("SOP must be selected");
+                return;
+            }
+
             let instructionObjectiveKeys = [];
-            this.selectedObjectiveKeys.forEach(element => {
-                instructionObjectiveKeys.push(element.id);
+            this.keyResults.forEach(element => {
+                instructionObjectiveKeys.push(element);
             });
             this.showToastMessage("Instruction can now be entered", "success", "OK");
             this.meetingInstructions.push({
-                "objective_id": this.selectedObjective.id,
+                // "objective_id": this.selectedObjective.id,
                 "okr_point": this.okrPoint,
                 "project_id": this.selectedProject.id,
                 'tag': this.selectedTag.value,
@@ -804,11 +862,18 @@ export default {
                 "responsible_id": this.responsibleStaff.id,
                 "consulted_id": this.consultedStaff.id,
                 "informed_id": this.informedStaff.id,
-                "instruction_objective_key": instructionObjectiveKeys
+                "instruction_objective_key": instructionObjectiveKeys,
+                "role_id": this.selectedSop.role_id,
+                "objective_name": this.objectiveName,
+                "project": this.selectedProject,
+                "sop_id": this.selectedSop.id,
             });
 
-            this.resetInputs();
-            console.log(this.meetingInstructions);
+            this.resetInputs();            
+        },
+
+        removeMeetingInstructionBtnClicked(index){
+            this.meetingInstructions.splice(index, 1);
         },
 
         async createBtnClicked(){
@@ -850,6 +915,9 @@ export default {
         },
 
         resetInputs(){
+            this.objectiveName = null;
+            this.keyResults = [];
+            this.selectedSop = null;
             this.selectedObjective = null;
             this.selectedObjectiveKeys = [];
             this.okrPoint = null;
@@ -874,12 +942,20 @@ export default {
             });
         },
 
+        async getSopList(){            
+            getApiData({url: `/api/get_sop`, token: this.getToken()})
+            .then((response)=>{
+                this.sopList = response.data;
+            });
+        },
+
     },
     created(){
         this.getDepartmentList();
         this.getAllStaffList();
         this.getObjectiveList();
         this.getProjectList();
+        this.getSopList();
     },
 
     mounted() {

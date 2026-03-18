@@ -2,6 +2,7 @@
 
 namespace App\Repositories\MeetingMinute;
 
+use App\Enums\OkrStageEnum;
 use App\Models\Instruction;
 use App\Models\Meeting;
 use App\Models\MeetingMinute;
@@ -45,6 +46,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 ['id' => $data['id'] ?? null],
                 [
                     'meeting_id' => $data['meeting_id'],
+                    'old_meeting_id'=>$data['old_meeting_id'] ?? null,
                     'meeting_minute' => $data['meeting_minute'],
                     // 'is_active' => $data['is_active'] ?? true,
                 ]
@@ -91,6 +93,8 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                         'end_date' => $instructionData['due_date'],
                         'okr_point' => $instructionData['okr_point'],
                         'objective_assign_id' => $objectiveAssign->id,
+                        // 'stage'=>OkrStageEnum::NOTYET->value,
+                        'stage' =>$instructionData['stage'],
                     ]
                 );
                 $notificationData = [
@@ -110,11 +114,11 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->objective_id = $objective->id;
                 $instruction->okr_point = $instructionData['okr_point'] ?? null;
                 $instruction->project_id = $instructionData['project_id'];
-                $instruction->tag = $instructionData['tag'] ?? null;
+                // $instruction->tag = $instructionData['tag'] ?? null;
                 $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
                 $instruction->start_date = $instructionData['start_date'] ?? null;
                 $instruction->due_date = $instructionData['due_date'] ?? null;
-                $instruction->priority = $instructionData['priority'] ?? null;
+                // $instruction->priority = $instructionData['priority'] ?? null;
                 $instruction->remark = $instructionData['remark'] ?? ($instructionData['remark'] ?? null);
                 $instruction->accountable_id = $instructionData['accountable'] ?? ($instructionData['accountable_id'] ?? null);
                 $instruction->consulted_id = $instructionData['consulted_id'] ?? null;
@@ -124,7 +128,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
 
                 $keptInstructionIds[] = $instruction->id;
                 $instruction->objectiveKeys()->sync($objectiveKeyIds);
-                $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
+                // $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
             }
 
             if (!empty($data['id'])) {
@@ -134,8 +138,31 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                     $meetingMinute->instructions()->delete();
                 }
             }
+            // sync alignments pivot (alignment_id, remark)
+            if (!empty($data['alignments'])) {
+                $alignmentSync = [];
+                foreach ($data['alignments'] as $a) {
+                    if (empty($a['alignment_id'])) continue;
+                    $alignmentSync[$a['alignment_id']] = ['remark' => $a['remark'] ?? null];
+                }
+                $meetingMinute->alignments()->sync($alignmentSync);
+            } else {
+                $meetingMinute->alignments()->sync([]);
+            }
+
+            // sync kpi snapshots pivot (kpi_snapshot_id, value)
+            if (!empty($data['kpi_snapshots'])) {
+                $kpiSync = [];
+                foreach ($data['kpi_snapshots'] as $k) {
+                    if (empty($k['kpi_snapshot_id'])) continue;
+                    $kpiSync[$k['kpi_snapshot_id']] = ['value' => $k['value'] ?? null];
+                }
+                $meetingMinute->kpiSnapshots()->sync($kpiSync);
+            } else {
+                $meetingMinute->kpiSnapshots()->sync([]);
+            }
             DB::commit();
-            return $meetingMinute->load(['meeting', 'attendances', 'instructions.objectiveKeys']);
+            return $meetingMinute->load(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots']);
         } catch (\Throwable $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
@@ -145,7 +172,12 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
 
     public function detail($meetingMinute)
     {
-        return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys'])->findOrFail($meetingMinute->id);
+        return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->findOrFail($meetingMinute->id);
+    }
+
+    public function getMeetingMinuteByMeetingId($meetingId){
+        return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->where('meeting_id', $meetingId)->firstOrFail();
+        
     }
 
     public function delete($meetingMinute)

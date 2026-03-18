@@ -27,11 +27,30 @@ class MeetingMinuteListResource extends JsonResource
                     'title' => $this->meeting->title ?? null,
                 ];
             }),
+            'old_meeting'=>new MeetingMinuteListResource($this->old_meeting),
             'attendances' => $this->whenLoaded('attendances', function () {
                 return $this->attendances->map(function ($staff) {
                     return [
                         'id' => $staff->id,
                         'name' => $staff->name,
+                    ];
+                })->values();
+            }),
+            'alignments' => $this->whenLoaded('alignments', function () {
+                return $this->alignments->map(function ($alignment) {
+                    return [
+                        'id' => $alignment->id,
+                        'name' => $alignment->name,
+                        'remark'=>$alignment->pivot->remark,
+                    ];
+                })->values();
+            }),
+            'kpi_snapshots' => $this->whenLoaded('kpiSnapshots', function () {
+                return $this->kpiSnapshots->map(function ($kpiSnapshot) {
+                    return [
+                        'id' => $kpiSnapshot->id,
+                        'name' => $kpiSnapshot->name,
+                        'value' => $kpiSnapshot->pivot->value,
                     ];
                 })->values();
             }),

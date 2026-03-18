@@ -563,6 +563,8 @@ Route::view('/meeting/{id}/operation', 'meeting.operation_meeting');
 Route::middleware(['departments:meeting.edit'])->group(function () {
     Route::view('/meeting/{id}/edit', 'meeting.edit');
 });
+Route::view('/project', 'project.index');
+Route::view('/project/{id}/instruction', 'project.project_instruction');
 
 // training
 Route::middleware(['departments:training'])->group(function () {
@@ -672,6 +674,7 @@ Route::view('/resignations', 'resignations.index')->name('resignations.index');
 Route::view('/cv/form', 'CV.form')->name('CV.form');
 Route::view('/cv', 'CV.index')->name('CV.index')->middleware('departments:cv');
 Route::view('/cv/{id}/detail', 'CV.detail');
+Route::view('/cv/{id}/ocf', 'CV.ocf');
 Route::view('/exam', 'exams.index')->name('exams.index')->middleware('departments:exam');
 Route::view('/exam/create', 'exams.create')->name('exams.create');
 Route::view('/exam/{id}/edit', 'exams.edit');
