@@ -12,43 +12,44 @@ use App\Events\CompleteKitchenOrderNotificationRequest;
 
 class NotificationRepository implements NotificationInterface
 {
-    public function list($request){
-        return Notification::orderBy('id','desc')
-        ->with(['notificationUsers'])
-        ->whereHas('notificationUsers',function($query){
-            $query->where('staff_id',UserData()->id);
-        })
-        ->where('notificationable_type','purchase_order')
-        ->get();
+    public function list($request)
+    {
+        return Notification::orderBy('id', 'desc')
+            ->with(['notificationUsers'])
+            ->whereHas('notificationUsers', function ($query) {
+                $query->where('staff_id', UserData()->id);
+            })
+            // ->where('notificationable_type','purchase_order')
+            ->whereIn('notificationable_type', ['purchase_order', 'leave', 'overtime', 'benefit_request', 'exit_pass'])
+
+            ->get();
     }
 
     public function setSeenNotifications($staffId, array $notificationIds)
     {
         $userNotifications = NotificationUser::where('staff_id', $staffId)
-        ->whereIn('notification_id', $notificationIds)
-        ->whereHas('notification',function($q){
-            $q->where('notificationable_type','purchase_order');
-        })
-        ->where('is_read_count', 0)
-        ->get();
+            ->whereIn('notification_id', $notificationIds)
+            ->whereHas('notification', function ($q) {
+                $q->where('notificationable_type', 'purchase_order');
+            })
+            ->where('is_read_count', 0)
+            ->get();
 
-        if($userNotifications && count($userNotifications) > 0){
+        if ($userNotifications && count($userNotifications) > 0) {
             DB::beginTransaction();
-            try{
-                foreach($userNotifications as $userNotification){
+            try {
+                foreach ($userNotifications as $userNotification) {
                     $userNotification->is_read_count = 1;
                     $userNotification->save();
                 }
                 DB::commit();
 
                 return true;
-            }
-            catch(Exception $e){
+            } catch (Exception $e) {
                 DB::rollBack();
 
                 return false;
             }
-
         }
 
         return true;
@@ -57,20 +58,19 @@ class NotificationRepository implements NotificationInterface
     public function markReadNotification($staffId, $notificationId)
     {
         $userNotification = NotificationUser::where('staff_id', $staffId)
-        ->where('notification_id', $notificationId)
-        ->where('is_read', 0)
-        ->first();
+            ->where('notification_id', $notificationId)
+            ->where('is_read', 0)
+            ->first();
 
-        if($userNotification){
+        if ($userNotification) {
             DB::beginTransaction();
-            try{
+            try {
                 $userNotification->is_read = 1;
                 $userNotification->save();
                 DB::commit();
 
                 return true;
-            }
-            catch(Exception $e){
+            } catch (Exception $e) {
                 DB::rollBack();
 
                 return false;
@@ -79,11 +79,11 @@ class NotificationRepository implements NotificationInterface
 
         return true;
     }
-    public function sendPosNotification($request){
-        $roleId=3;
+    public function sendPosNotification($request)
+    {
+        $roleId = 3;
         $cateringDepartment = Department::getBySlugOrFail('catering');
-        $roleId=Role::getRoleIdByDepartment($cateringDepartment->id,'Staff');
+        $roleId = Role::getRoleIdByDepartment($cateringDepartment->id, 'Staff');
         broadcast(new CompleteKitchenOrderNotificationRequest($roleId));
     }
-
 }

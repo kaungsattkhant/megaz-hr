@@ -110,6 +110,9 @@ class BenefitRepository implements BenefitInterface
                 StaffStatus::PROBATION->value,
                 StaffStatus::PERMANENT->value,
             ])
+                ->whereHas('features', function ($query) {
+                    $query->where('module', 'benefit_request');
+                })
                 ->where('id', '!=', $benefitRequest->staff_id)
                 ->get();
             $this->sendFcmNotification($benefitRequest, $allStaff, $notificationData);

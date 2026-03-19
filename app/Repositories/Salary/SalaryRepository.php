@@ -451,7 +451,11 @@ class SalaryRepository implements SalaryRepositoryInterface
       $allStaff = Staff::whereIn('status', [
         StaffStatus::PROBATION->value,
         StaffStatus::PERMANENT->value,
-      ])->where('id', '!=', $overtime->staff_id)->get();
+      ])
+        ->whereHas('features', function ($query) {
+          $query->where('module', 'over-time');
+        })
+      ->where('id', '!=', $overtime->staff_id)->get();
       $this->sendFcmNotification($overtime, $allStaff, $notificationData);
       ResponseData($overtime);
     } catch (\Exception $e) {
