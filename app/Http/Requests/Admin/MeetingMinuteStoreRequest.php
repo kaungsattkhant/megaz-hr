@@ -43,7 +43,7 @@ class MeetingMinuteStoreRequest extends FormRequest
             'instructions.*.project_id' => ['required', 'integer', 'exists:projects,id'],
             'instructions.*.stage' => ['required', Rule::in(OkrStageEnum::getValues())],
             'instructions.*.priority' => ['required', Rule::in(PriorityEnum::getValues())],
-            'instructions.*.assign_to' => ['required', 'integer', 'exists:staff,id'],
+            // 'instructions.*.assign_to' => ['required', 'integer', 'exists:staff,id'],
             'instructions.*.responsible_id' => ['required', 'integer', 'exists:staff,id'],
             'instructions.*.sop_id' => ['required', 'integer', 'exists:sops,id'],
             'instructions.*.role_id' => ['required', 'integer', 'exists:roles,id'],
