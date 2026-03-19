@@ -202,7 +202,11 @@ class LeaveRepository implements LeaveRepositoryInterface
       $allStaff = Staff::whereIn('status', [
         StaffStatus::PROBATION->value,
         StaffStatus::PERMANENT->value,
-      ])->where('id', '!=', $leave->staff_id)->get();
+      ])
+        ->whereHas('features', function ($query) {
+          $query->where('module', 'leave');
+        })
+      ->where('id', '!=', $leave->staff_id)->get();
       $this->sendFcmNotification($leave, $allStaff, $notificationData);
       ResponseData($leave);
     } catch (\Exception $e) {
@@ -462,7 +466,11 @@ class LeaveRepository implements LeaveRepositoryInterface
       $allStaff = Staff::whereIn('status', [
         StaffStatus::PROBATION->value,
         StaffStatus::PERMANENT->value,
-      ])->where('id','!=', $exitPass->staff_id)->get();
+      ])
+        ->whereHas('features', function ($query) {
+          $query->where('module', 'exit-pass');
+        })
+      ->where('id','!=', $exitPass->staff_id)->get();
       $this->sendFcmNotification($exitPass, $allStaff, $notificationData);
       ResponseData($exitPass);
     } catch (\Exception $e) {
