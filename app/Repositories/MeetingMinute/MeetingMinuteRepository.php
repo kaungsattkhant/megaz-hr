@@ -115,7 +115,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->okr_point = $instructionData['okr_point'] ?? null;
                 $instruction->project_id = $instructionData['project_id'];
                 // $instruction->tag = $instructionData['tag'] ?? null;
-                $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
+                // $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
                 $instruction->start_date = $instructionData['start_date'] ?? null;
                 $instruction->due_date = $instructionData['due_date'] ?? null;
                 // $instruction->priority = $instructionData['priority'] ?? null;
