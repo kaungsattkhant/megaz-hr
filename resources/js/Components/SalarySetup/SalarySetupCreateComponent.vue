@@ -356,11 +356,11 @@ export default {
         },
 
         btnClickedCreateSalarySetup(){
-            if(this.allowanceList.length < 1){
-                this.alertValidationMessage(`Allowance`);
-                return 1;
-            }
-            else if(!this.selectedRole){
+            // if(this.allowanceList.length < 1){
+            //     this.alertValidationMessage(`Allowance`);
+            //     return 1;
+            // }
+            if(!this.selectedRole){
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
@@ -376,11 +376,15 @@ export default {
             let formData = new FormData();
             formData.append('basic_salary',this.basic_salary);
             formData.append('role_id',this.selectedRole.id);
-            formData.append('salary_allowances', JSON.stringify(this.allowanceList));
+            if(this.allowanceList.length > 0){
+                formData.append('salary_allowances', JSON.stringify(this.allowanceList));
+            }
             let response = await postApiData({url:`/api/hr/salary_setups`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/salary_setup`);
+
+                
             }
         },
 
