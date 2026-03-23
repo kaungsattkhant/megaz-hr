@@ -383,6 +383,8 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/salary_setup`);
+
+                
             }
         },
 
