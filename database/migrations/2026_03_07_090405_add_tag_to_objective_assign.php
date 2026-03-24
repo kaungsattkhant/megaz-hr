@@ -25,7 +25,7 @@ return new class extends Migration
             $table->dateTime('check_at')->nullable();
             $table->unsignedInteger('act_by')->nullable();
             $table->dateTime('act_at')->nullable();
-            $table->dropColumn(['status', 'manager_checked_by', 'manager_checked_at','in_progress_at','in_progress_by','approved_at','approved_by']);
+            // $table->dropColumn(['status', 'manager_checked_by', 'manager_checked_at','in_progressed_at','in_progressed_by','approved_at','approved_by']);
         });
     }
 
