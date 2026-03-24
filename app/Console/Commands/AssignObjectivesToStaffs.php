@@ -46,8 +46,7 @@ class AssignObjectivesToStaffs extends Command
                     ->whereIn('status', [
                         StaffStatus::PROBATION->value,
                         StaffStatus::PERMANENT->value,
-                    ]);
-
+                 ]);
                 foreach ($staffLists as $staff) {
                     $existingAssign = ObjectiveAssign::where('objective_id', $objective->id)
                         ->where('staff_id', $staff->id)
@@ -63,16 +62,24 @@ class AssignObjectivesToStaffs extends Command
                             ]
                         );
                         for ($i = 1; $i <= $objective->repetition; $i++) {
-                            ObjectiveStaff::create(
-                                [
-                                    'objective_assign_id' => $objectiveAssign->id,
-                                    'repetition_count' => $i,
-                                    'start_date' => $today,
-                                    'end_date' => $today,
-                                    'status' => 'assigned',
-                                    'okr_point' => $objective->okr_point,
-                                ]
-                            );
+                            // $objective=ObjectiveStaff::create(
+                            //     [
+                            //         'objective_assign_id' => $objectiveAssign->id,
+                            //         'repetition_count' => $i,
+                            //         'start_date' => $today,
+                            //         'end_date' => $today,
+                            //         'stage' => 'not_yet',
+                            //         'okr_point' => $objective->okr_point,
+                            //     ]
+                            // );
+                            $objectiveStaff = ObjectiveStaff::create([
+                                'objective_assign_id' => $objectiveAssign->id,
+                                'repetition_count' => $i,
+                                'start_date' => $today,
+                                'end_date' => $today,
+                                'stage' => 'not_yet',
+                                'okr_point' => $objective->okr_point,
+                            ]);
                         }
                     }
                 }
