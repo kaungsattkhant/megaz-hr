@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('instructions', function (Blueprint $table) {
             //
-            $table->dropColumn('reamark');
+            // $table->dropColumn('reamark');
             $table->longText('remark')->nullable();
             $table->integer('priority')->nullable();
             $table->unsignedInteger('responsible_id')->nullable();
