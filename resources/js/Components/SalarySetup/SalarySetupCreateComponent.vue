@@ -384,6 +384,14 @@ export default {
                 console.log('successed')
                 window.location.replace(`/salary_setup`);
             }
+            else{
+                this.$notify({
+                    title: `Error message`,
+                    text: response.message,
+                    type: "warn"
+                });
+
+            }
         },
 
 
