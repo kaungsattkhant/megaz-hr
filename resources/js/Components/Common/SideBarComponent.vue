@@ -35,13 +35,13 @@
                         <div
                             class="flex flex-col space-y-4 w-full items-center"
                         >
-                            <button
+                            <!-- <button
                                 data-tab="tab1"
                                 class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer"
                                 title="Report"
                             >
                                 <i class="fal fa-chart-line"></i>
-                            </button>
+                            </button> -->
                             <button
                                 v-show="
                                     hasAnyPermission([
@@ -62,7 +62,7 @@
                             >
                                 <i class="fal fa-network-wired"></i>
                             </button>
-                            <button
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'item',
@@ -76,7 +76,7 @@
                                 title="Item"
                             >
                                 <i class="fal fa-hand-receiving"></i>
-                            </button>
+                            </button> -->
                             <button
                                 v-show="
                                     hasAnyPermission([
@@ -143,7 +143,7 @@
                             >
                                 <i class="fal fa-layer-group"></i>
                             </button>
-                            <button
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'menu-category',
@@ -158,8 +158,8 @@
                                 title="Menu"
                             >
                                 <i class="fal fa-salad"></i>
-                            </button>
-                            <button
+                            </button> -->
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'room-discount',
@@ -176,8 +176,8 @@
                                 title="Promotion"
                             >
                                 <i class="fal fa-badge-percent"></i>
-                            </button>
-                            <button
+                            </button> -->
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'cashbook',
@@ -200,8 +200,8 @@
                                 title="Financial"
                             >
                                 <i class="fal fa-sack-dollar"></i>
-                            </button>
-                            <button
+                            </button> -->
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'menu',
@@ -215,8 +215,8 @@
                                 title="MRP"
                             >
                                 <i class="fal fa-project-diagram"></i>
-                            </button>
-                            <button
+                            </button> -->
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'purchase-order',
@@ -232,8 +232,8 @@
                                 title="Order"
                             >
                                 <i class="fal fa-shopping-bag"></i>
-                            </button>
-                            <button
+                            </button> -->
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'inventory-stock',
@@ -248,8 +248,8 @@
                                 title="Inventory"
                             >
                                 <i class="fal fa-warehouse"></i>
-                            </button>
-                            <button
+                            </button> -->
+                            <!-- <button
                                 v-show="
                                     hasAnyPermission([
                                         'event',
@@ -274,7 +274,7 @@
                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                     />
                                 </svg>
-                            </button>
+                            </button> -->
                             <!-- <button data-tab="tab-sample" class="tab-btn w-12 h-12 rounded-lg active-nav-item flex items-center justify-center cursor-pointer" title="Sample">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -292,7 +292,7 @@
                 id="sidebar_scroll_list"
             >
                 <div class="relative w-[256px] pt-12">
-                    <div class="tab-content" id="tab1">
+                    <!-- <div class="tab-content" id="tab1">
                         <ul>
                             <li>
                                 <button
@@ -562,7 +562,7 @@
                                 </div>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
                     <div class="tab-content" id="tab-setup">
                         <ul
@@ -610,7 +610,7 @@
                                     Areas
                                 </a>
                             </li>
-                            <li v-show="checkFeaturePermission('room')">
+                            <!-- <li v-show="checkFeaturePermission('room')">
                                 <a
                                     href="/rooms"
                                     class="flex items-center sidebar-gap-x"
@@ -665,10 +665,10 @@
                                     <i class="far fa-hat-chef"></i>
                                     Cooking Place
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
-                    <div class="tab-content" id="tab-item">
+                    <!-- <div class="tab-content" id="tab-item">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -745,7 +745,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
                     <div class="tab-content" id="tab-hr">
                         <ul
                             v-show="
@@ -833,6 +833,15 @@
                                 >
                                     <i class="fal fa-users"></i>
                                     Meeting
+                                </a>
+                            </li>
+                            <li v-show="checkFeaturePermission('meeting')">
+                                <a
+                                    href="/project"
+                                    class="flex items-center sidebar-gap-x"
+                                >
+                                    <i class="fal fa-chart-network"></i>
+                                    Project
                                 </a>
                             </li>
                             <li v-show="checkFeaturePermission('training')">
@@ -1285,7 +1294,7 @@
                         </ul>
                     </div>
 
-                    <div class="tab-content" id="tab-menu">
+                    <!-- <div class="tab-content" id="tab-menu">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -1352,9 +1361,9 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
-                    <div class="tab-content" id="tab-promotion">
+                    <!-- <div class="tab-content" id="tab-promotion">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -1507,9 +1516,9 @@
                                 </div>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
-                    <div class="tab-content" id="tab-financial">
+                    <!-- <div class="tab-content" id="tab-financial">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -1543,7 +1552,6 @@
                                     aria-expanded="false"
                                     aria-controls="collapseExample"
                                 >
-                                    <!-- <img class=" sidebar-img" src="{{ asset('img/cash_book.png') }}" alt=""> -->
                                     <i class="fal fa-sack-dollar"></i>
                                     Cash Book
                                 </button>
@@ -1707,7 +1715,6 @@
                                     aria-expanded="false"
                                     aria-controls="collapseExample"
                                 >
-                                    <!-- <img class=" sidebar-img" src="{{ asset('img/bank_book.png') }}" alt=""> -->
                                     <i class="fal fa-money-check-alt pr-3"></i>
                                     Bank Book
                                 </button>
@@ -1818,9 +1825,9 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
-                    <div class="tab-content" id="tab-mrp">
+                    <!-- <div class="tab-content" id="tab-mrp">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -1883,9 +1890,9 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
-                    <div class="tab-content" id="tab-order">
+                    <!-- <div class="tab-content" id="tab-order">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -1983,9 +1990,9 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
-                    <div class="tab-content" id="tab-inventory">
+                    <!-- <div class="tab-content" id="tab-inventory">
                         <ul
                             v-show="
                                 hasAnyPermission([
@@ -2070,9 +2077,9 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
 
-                    <div class="tab-content" id="tab-okr">
+                    <!-- <div class="tab-content" id="tab-okr">
                         <ul
                             v-show="
                                 hasAnyPermission(['event', 'asset-assignment'])
@@ -2105,7 +2112,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div

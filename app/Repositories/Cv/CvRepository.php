@@ -2,17 +2,21 @@
 
 namespace App\Repositories\Cv;
 
+use App\Enums\ContractStaffEnum;
+use App\Enums\ContractTypeEnum;
 use App\Enums\StaffStatus;
 use App\Http\Action\SendNotification\FcmSendNotification;
-use App\Models\Skill;
-use App\Models\Staff;
-use App\Models\Salary;
-use App\Models\SalarySetup;
-use App\Models\SalaryAllowance;
-use Illuminate\Support\Facades\DB;
-use App\Models\StaffEmergencyContact;
 use App\Http\Action\SendNotification\SendNotification;
 use App\Models\CommunicationForm;
+use App\Models\Contract;
+use App\Models\ContractStaff;
+use App\Models\Salary;
+use App\Models\SalaryAllowance;
+use App\Models\SalarySetup;
+use App\Models\Skill;
+use App\Models\Staff;
+use App\Models\StaffEmergencyContact;
+use Illuminate\Support\Facades\DB;
 
 class CvRepository implements CvRepositoryInterface
 {
@@ -305,6 +309,18 @@ class CvRepository implements CvRepositoryInterface
           'status' => StaffStatus::PROBATION->value,
         ]
       );
+      //attach orientiation contracts to staff 
+      $contractIds = Contract::where('type', ContractTypeEnum::ORIENTATION->value)
+        ->pluck('id');
+      $data = $contractIds->map(function ($contractId) use ($staff) {
+        return [
+          'staff_id' => $staff->id,
+          'contract_id' => $contractId,
+          'created_at' => now(),
+          'updated_at' => now(),
+        ];
+      })->toArray();
+      ContractStaff::insert($data);
       //send notificaiton 
       $allStaff = Staff::whereIn('status', [
         StaffStatus::PROBATION->value,

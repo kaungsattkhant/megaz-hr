@@ -4,37 +4,30 @@ namespace App\Repositories\Objective;
 
 use App\Enums\OkrStageEnum;
 use App\Enums\PDCAEnum;
-use Exception;
-use Carbon\Carbon;
-use App\Models\Item;
-use App\Models\Role;
-use App\Models\Staff;
+use App\Enums\StaffStatus;
+use App\Http\Action\SendNotification\FcmSendNotification;
+use App\Http\Resources\Admin\Okr\OkrByStaffResource;
+use App\Http\Resources\AssignResource;
+use App\Http\Resources\DailyObjKeyStaffResource;
+use App\Http\Resources\KtvObjectiveRsource;
+use App\Models\CompletedObjectiveKey;
 use App\Models\Entity;
 use App\Models\KtvItem;
-use App\Models\Objective;
 use App\Models\KtvObjective;
-use App\Models\ObjectiveKey;
-use Illuminate\Http\Request;
 use App\Models\KtvProductTree;
-use App\Models\ObjectiveStaff;
+use App\Models\Objective;
 use App\Models\ObjectiveAssign;
+use App\Models\ObjectiveKey;
 use App\Models\ObjectiveKeyDuty;
-use App\Models\ObjectivekeyStaff;
-use Illuminate\Support\Facades\DB;
+use App\Models\ObjectiveStaff;
 use App\Models\ObjectiveStaffImage;
-use Illuminate\Support\Facades\Auth;
-use App\Models\CompletedObjectiveKey;
-use App\Http\Resources\AssignResource;
-use App\Models\ObjectiveKeyStaffImage;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\Role;
+use App\Models\Staff;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\ObjectiveResource;
-use App\Http\Resources\KtvObjectiveRsource;
-use App\Http\Resources\dailyObjectiveByStaffId;
-use App\Http\Resources\DailyObjKeyStaffResource;
-use App\Http\Resources\KtvProductTreeEditResource;
-use App\Http\Resources\Admin\Okr\OkrByStaffResource;
-use App\Http\Action\SendNotification\FcmSendNotification;
 
 class ObjectiveRepository implements ObjectiveInterface
 {
@@ -188,8 +181,35 @@ class ObjectiveRepository implements ObjectiveInterface
                     );
                 }
             }
-            if ($objective->type === "daily") {
-                Artisan::call('app:assign-objectives-to-staffs');
+            if ($objective->type === "daily" && !isset($validatedData['id'])) {
+                //directly assign okr 
+                $staffLists = Staff::staffByRole($validatedData['role_id'])
+                    ->whereIn('status', [
+                        StaffStatus::PROBATION->value,
+                        StaffStatus::PERMANENT->value,
+                    ]);
+                foreach ($staffLists as $staff) {
+                    $objectiveAssign = ObjectiveAssign::create(
+                        [
+                            'objective_id' => $objective->id,
+                            'staff_id' => $staff->id,
+                        ]
+                    );
+                    for ($i = 1; $i <= $objective->repetition; $i++) {
+                        $objectiveStaff = ObjectiveStaff::create(
+                            [
+                                'objective_assign_id' => $objectiveAssign->id,
+                                'repetition_count' => $i,
+                                'start_date' => Carbon::today(),
+                                'end_date' => Carbon::today(),
+                                'status' => 'assigned',
+                                'okr_point' => $objective->okr_point,
+                            ]
+                        );
+                    }
+                }
+
+                // Artisan::call('app:assign-objectives-to-staffs');
             }
             DB::commit();
             return $objective;
