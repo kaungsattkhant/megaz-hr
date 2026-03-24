@@ -48,10 +48,10 @@ class AreaRepository implements AreaRepositoryInterface
             }
             $area = Area::updateOrCreate(['id' => $data['id']], $data);
             $menuCategories = $area->menuCategories;
-            if (!isset($data['menu_category_ids'])) {
+            if ($data['area_category_id']==2 && !isset($data['menu_category_ids'])) {
                 ResponseMessage('Menu Category Ids is required', 419);
             }
-            if (isset($data['menu_category_ids'])) {
+            if ($data['area_category_id'] == 2 && isset($data['menu_category_ids'])) {
                 //work code
                 // foreach ($menuCategories as $menuC) {
                 //     MenuArea::where('menu_category_area_id', $menuC->pivot->id)->delete();
