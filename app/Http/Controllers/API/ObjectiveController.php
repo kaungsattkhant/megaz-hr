@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Enums\OkrStageEnum;
+use App\Enums\PriorityEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ObjectiveAssignCreateRequest;
 use App\Http\Requests\Objective\AssignRequest;
@@ -70,7 +71,7 @@ class ObjectiveController extends Controller
 
             'informed_id' => ['nullable', 'integer', 'exists:staff,id'],
 
-            'priority' => ['required', 'integer', 'between:1,10'],
+            'priority' => ['required', Rule::in(PriorityEnum::getValues())],
         ]);
         $data = $this->objectiveRepository->store($request->all());
         ResponseData($data);

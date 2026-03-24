@@ -389,11 +389,11 @@ export default {
         },
 
         btnClickedEditSalarySetup(){
-            if(this.allowanceList.length < 1){
-                this.alertValidationMessage(`Allowance`);
-                return 1;
-            }
-            else if(!this.selectedRole){
+            // if(this.allowanceList.length < 1){
+            //     this.alertValidationMessage(`Allowance`);
+            //     return 1;
+            // }
+            if(!this.selectedRole){
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
@@ -414,6 +414,14 @@ export default {
             if(response.success){
                 console.log('successed')
                 window.location.replace(`/salary_setup`);
+            }
+            else{
+                this.$notify({
+                    title: `Error message`,
+                    text: response.message,
+                    type: "warn"
+                });
+
             }
         },
 
