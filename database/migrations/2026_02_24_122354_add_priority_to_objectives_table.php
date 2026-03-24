@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('objectives', function (Blueprint $table) {
             //
-            $table->integer('priority')->nullable();
+            // $table->integer('priority')->nullable();
         });
     }
 
