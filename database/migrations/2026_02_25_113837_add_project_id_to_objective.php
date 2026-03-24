@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('objectives', function (Blueprint $table) {
             $table->unsignedInteger('project_id')->nullable();
+            $table->enum('priority', PriorityEnum::getValues())->default(PriorityEnum::NOT_URGENT_NOT_IMPORTANT->value);
         });
     }
 
