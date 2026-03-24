@@ -62,24 +62,16 @@ class AssignObjectivesToStaffs extends Command
                             ]
                         );
                         for ($i = 1; $i <= $objective->repetition; $i++) {
-                            // $objective=ObjectiveStaff::create(
-                            //     [
-                            //         'objective_assign_id' => $objectiveAssign->id,
-                            //         'repetition_count' => $i,
-                            //         'start_date' => $today,
-                            //         'end_date' => $today,
-                            //         'stage' => 'not_yet',
-                            //         'okr_point' => $objective->okr_point,
-                            //     ]
-                            // );
-                            $objectiveStaff = ObjectiveStaff::create([
-                                'objective_assign_id' => $objectiveAssign->id,
-                                'repetition_count' => $i,
-                                'start_date' => $today,
-                                'end_date' => $today,
-                                'stage' => 'not_yet',
-                                'okr_point' => $objective->okr_point,
-                            ]);
+                            ObjectiveStaff::create(
+                                [
+                                    'objective_assign_id' => $objectiveAssign->id,
+                                    'repetition_count' => $i,
+                                    'start_date' => $today,
+                                    'end_date' => $today,
+                                    'stage' => 'not_yet',
+                                    'okr_point' => $objective->okr_point,
+                                ]
+                            );
                         }
                     }
                 }
