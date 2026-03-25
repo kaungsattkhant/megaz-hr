@@ -22,18 +22,18 @@ class CompleteObjectivesResource extends JsonResource
             'role_name' => $this->role->name,
             'type' => $this->type,
             'repetition' => $this->repetition ?? null,
-            'objective_keys' => $this->whenLoaded('objectiveKeys') 
-                ? $this->objectiveKeys->map(function($key) {
+            'objective_keys' => $this->whenLoaded('objectiveKeys')
+                ? $this->objectiveKeys->map(function ($key) {
                     return [
                         'id' => $key->id,
                         'objective_id' => $key->objective_id,
                         'name' => $key->name,
                     ];
-                }) 
+                })
                 : [],
-                'objective_staff' => $this->whenLoaded('objectiveAssigns') 
-                ? collect($this->objectiveAssigns)->flatMap(function($assign) {
-                    return $assign->objectiveStaff->map(function($objectiveStaff) {
+            'objective_staff' => $this->whenLoaded('objectiveAssigns')
+                ? collect($this->objectiveAssigns)->flatMap(function ($assign) {
+                    return $assign->objectiveStaff->map(function ($objectiveStaff) {
                         return [
                             'id' => $objectiveStaff->id,
                             'start_date' => $objectiveStaff->start_date,
@@ -43,16 +43,27 @@ class CompleteObjectivesResource extends JsonResource
                             'completed_by' => $objectiveStaff->completed_by,
                             'approved_at' => $objectiveStaff->approved_at,
                             'approved_by' => $objectiveStaff->approved_by,
+                            'stage' => $objectiveStaff->stage,
+                            'done_by' => $objectiveStaff->done_by,
+                            'done_at' => $objectiveStaff->done_at,
+                            'check_by' => $objectiveStaff->check_by,
+                            'check_at' => $objectiveStaff->check_at,
+                            'act_by' => $objectiveStaff->act_by,
+                            'act_at' => $objectiveStaff->act_at,
+                            'okr_point' => $objectiveStaff->okr_point,
+                            'remark' => $objectiveStaff->remark,
+                            'rejected_at' => $objectiveStaff->rejected_at,
+                            'rejected_by' => $objectiveStaff->rejected_by,
                             'okr_point' => $objectiveStaff->okr_point,
                             'remark' => $objectiveStaff->remark,
                             'repetition_count' => $objectiveStaff->repetition_count,
-                            'completed_objective_keys' => isset($objectiveStaff->completedObjectiveKeys) ? $objectiveStaff->completedObjectiveKeys->map(function($completedObjectiveKey) {
+                            'completed_objective_keys' => isset($objectiveStaff->completedObjectiveKeys) ? $objectiveStaff->completedObjectiveKeys->map(function ($completedObjectiveKey) {
                                 return [
                                     'id' => $completedObjectiveKey->id,
                                     'objective_key_id' => $completedObjectiveKey->objective_key_id,
                                     'objective_staff_id' => $completedObjectiveKey->objective_staff_id,
                                 ];
-                            }):[],
+                            }) : [],
                         ];
                     });
                 })
