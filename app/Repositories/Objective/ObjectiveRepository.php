@@ -202,7 +202,7 @@ class ObjectiveRepository implements ObjectiveInterface
                                 'repetition_count' => $i,
                                 'start_date' => Carbon::today(),
                                 'end_date' => Carbon::today(),
-                                'status' => 'assigned',
+                                'stage' => 'not_yet',
                                 'okr_point' => $objective->okr_point,
                             ]
                         );
@@ -1107,14 +1107,14 @@ class ObjectiveRepository implements ObjectiveInterface
                 $query->where('staff_id', $staffId);
             },
             'objectiveAssigns.objectiveStaff' => function ($query) use ($today) {
-                $query->whereIn('status', ['completed', 'done']);
+                $query->whereIn('stage', ['completed', 'done']);
                 $query->whereDate('start_date', $today);
             }
         ])->where('id', $objectiveId)
             ->whereHas('objectiveAssigns', function ($q) use ($staffId, $today) {
                 $q->where('staff_id', $staffId);
                 $q->whereHas('objectiveStaff', function ($query) use ($today) {
-                    $query->whereIn('status', ['completed', 'done']);
+                    $query->whereIn('stage', ['completed', 'done']);
                     $query->whereDate('start_date', $today);
                 });
             })->first();
