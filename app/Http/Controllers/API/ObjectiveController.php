@@ -233,7 +233,12 @@ class ObjectiveController extends Controller
     public function getCompletedObjKeysByStaffId(Request $request,$objectiveId,$staffId)
     {
         $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($request,$objectiveId,$staffId);
-        ResponseData(new CompleteObjectivesResource($data));
+        if($data){
+            ResponseData(new CompleteObjectivesResource($data));
+        }
+        \ResponseData($data);
+        // return $data;
+        //  $data ? ResponseData($data) :  ResponseData(new CompleteObjectivesResource($data));
     }
 
     //ktvProductTree

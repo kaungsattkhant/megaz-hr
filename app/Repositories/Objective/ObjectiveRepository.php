@@ -1118,7 +1118,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     $query->whereDate('start_date', $today);
                 });
             })->first();
-        return $objectives;
+        return $objectives ;
     }
 
     //ktv
