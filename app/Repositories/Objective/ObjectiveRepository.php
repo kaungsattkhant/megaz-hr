@@ -555,7 +555,7 @@ class ObjectiveRepository implements ObjectiveInterface
             if ($objectiveAssign->objective->type === 'daily') {
 
                 $objectiveStaff =
-                    $objectiveStaffCollection->whereIn('stage', ['not_yet','plan','do'])->first()
+                    $objectiveStaffCollection->whereIn('stage', ['not_yet','plan','do','done','check','completed','act'])->first()
                     ?? $objectiveStaffCollection->whereIn('stage', ['do', 'rejected'])->first()
                     ?? $objectiveStaffCollection->where('stage', 'completed')->sortByDesc('repetition_count')->first();
                 $objectiveAssign->setRelation(
@@ -646,7 +646,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
         foreach ($objectiveAssigns as $objectiveAssign) {
 
-            $objectiveAssign->approver =
+            $objectiveAssign->approver =    
                 $objectiveAssign->objective->accountable_id == $authUser;
 
             $staffCollection = $objectiveAssign->objectiveStaff;
@@ -654,7 +654,7 @@ class ObjectiveRepository implements ObjectiveInterface
             if ($objectiveAssign->objective->type === 'daily') {
 
                 $objectiveStaff =
-                    $staffCollection->whereIn('stage', ['not_yet','plan','do'])->first()
+                    $staffCollection->whereIn('stage', ['not_yet', 'plan', 'do', 'done', 'check', 'completed', 'act'])->first()
                     ?? $staffCollection->where('stage', 'completed')->sortByDesc('repetition_count')->first();
 
                 $objectiveAssign->setRelation(
