@@ -69,7 +69,7 @@ class AssignObjectivesToStaffs extends Command
                                     'repetition_count' => $i,
                                     'start_date' => $today,
                                     'end_date' => $today,
-                                    'status' => 'assigned',
+                                    'stage' => 'not_yet',
                                     'okr_point' => $objective->okr_point,
                                 ]
                             );
