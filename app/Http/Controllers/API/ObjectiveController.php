@@ -53,7 +53,7 @@ class ObjectiveController extends Controller
         $request->validate([
             'objective_name' => ['required', 'string'],
 
-            'okr_point' => ['required', 'integer', 'min:1'],
+            'okr_point' => ['required'],
 
             'type' => ['required', 'in:daily,occasionally'],
 
