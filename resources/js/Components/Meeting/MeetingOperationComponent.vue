@@ -620,6 +620,71 @@
                             Add
                         </button>
                     </div>
+
+                    <div class=" col-span-12 mb-10 mt-10" v-if="meetingInstructions.length > 0" >
+                        <div> Instructions </div>
+                        <table class="min-w-[50%] text-sm font-light ml-2">
+                            <thead class="font-medium text-left ">
+                                <tr>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Respsonsible
+                                    </th>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Accountable
+                                    </th>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Consulted
+                                    </th>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Informed
+                                    </th>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Due Date
+                                    </th>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Start Date
+                                    </th>
+                                    <th scope="col" class=" pr-6 pl-2 py-3 ">
+                                        Priority
+                                    </th>
+                                    <th scope="col" class=" px-6 py-3">
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="" v-for="(meetingInstruction, index) in meetingInstructions">
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.responsible_name }}
+                                    </td>
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.accountable_name }}
+                                    </td>
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.consulted_name }}
+                                    </td>
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.informed_name }}
+                                    </td>
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.due_date }}
+                                    </td>
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.start_date }}
+                                    </td>
+                                    <td class=" pr-6 pl-2 py-3 font-medium ">
+                                        {{ meetingInstruction.priority_name }}
+                                    </td>
+                                    <td class=" px-6 py-3 font-medium text-left">
+                                        <button @click="removeMeetingInstructionBtnClicked(index)">
+                                            <i class="fal fa-times  pr-3" ></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
                   </div>                    
                 </div>
             </div>
@@ -1098,15 +1163,20 @@ export default {
                 "project_id": this.selectedProject.id,
                 'stage': this.selectedTag.value,                
                 "priority": this.selectedPriority.value,
+                "priority_name": this.selectedPriority.name,
                 "sop_id": this.selectedSop.id,
                 "role_id": this.selectedSop.role_id,
                 "start_date": this.startDate,
                 "due_date": this.dueDate,
                 "remark": this.remark,
                 "accountable": this.accountableStaff.id,
+                "accountable_name": this.accountableStaff.name,
                 "responsible_id": this.responsibleStaff.id,
+                "responsible_name": this.responsibleStaff.name,
                 "consulted_id": this.consultedStaff.id,
+                "consulted_name": this.consultedStaff.name,
                 "informed_id": this.informedStaff.id,
+                "informed_name": this.informedStaff.name,
                 "instruction_objective_key": instructionObjectiveKeys,
                 // "project": this.selectedProject,                
             });
@@ -1127,8 +1197,8 @@ export default {
                 this.showToastMessage("Meeting minute must be present");
                 return;
             }
-            if(this.meetingStaff.length < 2){
-                this.showToastMessage("Meeting instruction cannot be created with less than 2 attendee");
+            if(this.meetingStaff.length < 1){
+                this.showToastMessage("Meeting instruction cannot be created with less than 1 attendee");
                 return;
             }
             if(this.kpiContainer.length < 1){
@@ -1173,8 +1243,11 @@ export default {
             );
             if(response.status > 199 && response.status < 300){
                 this.showToastMessage("OK", "success", "Success");
-                return;
                 window.location.replace("/meeting");
+            }
+            else{
+                this.showToastMessage("Something went wrong", "error", "Error");
+                return;
             }
         },
 
