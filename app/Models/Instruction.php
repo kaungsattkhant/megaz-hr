@@ -12,6 +12,7 @@ class Instruction extends Model
         'objective_id',
         'okr_point',
         'project_id',
+        'objective_staff_id',
         'tag',
         'assigned_to',
         'start_date',
@@ -27,6 +28,10 @@ class Instruction extends Model
     public function objective()
     {
         return $this->belongsTo(Objective::class, 'objective_id');
+    }
+    public function objective_staff()
+    {
+        return $this->belongsTo(ObjectiveStaff::class, 'objective_staff_id');
     }
     public function project()
     {
