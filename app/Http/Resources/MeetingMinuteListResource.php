@@ -63,9 +63,9 @@ class MeetingMinuteListResource extends JsonResource
                             'id' => $instruction->objective_id,
                             'objective_name' => $instruction->objective ? $instruction->objective->objective_name : null,
                             'okr_point' => $instruction->objective ? $instruction->objective->okr_point : null,
-                            'tag' => $instruction->objective_staff ? $instruction->objective->objective_staff : null,
+                            'stage' => $instruction->objective_staff ? $instruction->objective_staff->stage : null,
                             'start_date' => $instruction->objective_staff ? $instruction->objective_staff->start_date : null,
-                            'due_date' => $instruction->objective_staff ? $instruction->objective_staff->due_date : null,
+                            'due_date' => $instruction->objective_staff ? $instruction->objective_staff->end_date : null,
                             'remark' => $instruction->objective_staff ? $instruction->objective_staff->remark : null,
                             'accountable' => $instruction->objective && $instruction->objective->accountable ? [
                                 'id' => $instruction->objective->accountable->id,
