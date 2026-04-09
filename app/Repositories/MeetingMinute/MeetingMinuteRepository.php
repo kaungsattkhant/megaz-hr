@@ -46,7 +46,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 ['id' => $data['id'] ?? null],
                 [
                     'meeting_id' => $data['meeting_id'],
-                    'old_meeting_id'=>$data['old_meeting_id'] ?? null,
+                    'old_meeting_id' => $data['old_meeting_id'] ?? null,
                     'meeting_minute' => $data['meeting_minute'],
                     // 'is_active' => $data['is_active'] ?? true,
                 ]
@@ -70,7 +70,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                     'informed_id' => $instructionData['informed_id'],
                     'responsible_id' => $instructionData['responsible_id'],
                     'priority' => $instructionData['priority'],
-                    'project_id'=>$instructionData['project_id'],
+                    'project_id' => $instructionData['project_id'],
                 ]);
                 $objectiveKeyIds = [];
                 foreach ($instructionData['instruction_objective_key'] as $objectiveKey) {
@@ -94,7 +94,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                         'okr_point' => $instructionData['okr_point'],
                         'objective_assign_id' => $objectiveAssign->id,
                         // 'stage'=>OkrStageEnum::NOTYET->value,
-                        'stage' =>$instructionData['stage'],
+                        'stage' => $instructionData['stage'],
                     ]
                 );
                 $notificationData = [
@@ -115,6 +115,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->okr_point = $instructionData['okr_point'] ?? null;
                 $instruction->project_id = $instructionData['project_id'];
                 $instruction->responsible_id = $instructionData['responsible_id'] ?? null;
+                $instruction->objective_staff_id = $objectiveStaff->id ?? null;
                 // $instruction->tag = $instructionData['tag'] ?? null;
                 // $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
                 // $instruction->start_date = $instructionData['start_date'] ?? null;
@@ -175,9 +176,9 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
         return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->findOrFail($meetingMinute->id);
     }
 
-    public function getMeetingMinuteByMeetingId($meetingId){
+    public function getMeetingMinuteByMeetingId($meetingId)
+    {
         return MeetingMinute::with(['meeting', 'attendances', 'instructions.objectiveKeys', 'alignments', 'kpiSnapshots'])->where('meeting_id', $meetingId)->firstOrFail();
-        
     }
 
     public function delete($meetingMinute)

@@ -63,10 +63,10 @@ class MeetingMinuteListResource extends JsonResource
                             'id' => $instruction->objective_id,
                             'objective_name' => $instruction->objective ? $instruction->objective->objective_name : null,
                             'okr_point' => $instruction->objective ? $instruction->objective->okr_point : null,
-                            'tag' => $instruction->objective ? $instruction->objective->tag : null,
-                            'start_date' => $instruction->objective ? $instruction->objective->start_date : null,
-                            'due_date' => $instruction->objective ? $instruction->objective->due_date : null,
-                            'remark' => $instruction->objective ? $instruction->objective->remark : null,
+                            'tag' => $instruction->objective_staff ? $instruction->objective->objective_staff : null,
+                            'start_date' => $instruction->objective_staff ? $instruction->objective_staff->start_date : null,
+                            'due_date' => $instruction->objective_staff ? $instruction->objective_staff->due_date : null,
+                            'remark' => $instruction->objective_staff ? $instruction->objective_staff->remark : null,
                             'accountable' => $instruction->objective && $instruction->objective->accountable ? [
                                 'id' => $instruction->objective->accountable->id,
                                 'name' => $instruction->objective->accountable->name,
@@ -79,21 +79,25 @@ class MeetingMinuteListResource extends JsonResource
                                 'id' => $instruction->objective->informed->id,
                                 'name' => $instruction->objective->informed->name,
                             ] : null,
+                            'responsible' => $instruction->responsible ? [
+                                'id' => $instruction->responsible->id,
+                                'name' => $instruction->responsible->name,
+                            ] : null,
                         ],
                         'project' => $instruction->project ? [
                             'id' => $instruction->project->id,
                             'name' => $instruction->project->name,
                         ] : null,
                      
-                        'priority' => $instruction->priority,
-                        'assigned' => $instruction->assignedTo ? [
-                            'id' => $instruction->assignedTo->id,
-                            'name' => $instruction->assignedTo->name,
-                        ] : null,
-                        'responsible' => $instruction->responsible ? [
-                            'id' => $instruction->responsible->id,
-                            'name' => $instruction->responsible->name,
-                        ] : null,
+                        // 'priority' => $instruction->priority,g
+                        // 'assigned' => $instruction->assignedTo ? [
+                        //     'id' => $instruction->assignedTo->id,
+                        //     'name' => $instruction->assignedTo->name,
+                        // ] : null,
+                        // 'responsible' => $instruction->responsible ? [
+                        //     'id' => $instruction->responsible->id,
+                        //     'name' => $instruction->responsible->name,
+                        // ] : null,
                         
                         'instruction_objective_key' => $instruction->relationLoaded('objectiveKeys')
                             ? $instruction->objectiveKeys->map(function ($objectiveKey) {
