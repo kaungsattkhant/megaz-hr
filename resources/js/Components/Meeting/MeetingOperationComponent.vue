@@ -964,6 +964,8 @@ export default {
 
             kpiSnapshotName: null,
             kpiSnapshotCreateLoading: false,
+
+            invitedStaff: [],
         };
     },
 
@@ -983,6 +985,23 @@ export default {
             }
 
             return `${base} border-transparent text-neutral-500 focus:border-transparent dark:text-white/50`;
+        },
+
+        getInvitedStaff(){
+            getApiData({url: `/api/staff_by_meeting/${this.meetingId}`, token: this.getToken()})
+            .then((response)=>{
+                if(response.data.length > 0){
+                    console.log(response.data);    
+                    response.data.forEach(invitedStaff=>{
+                        this.meetingStaff.push({
+                            'staff': {id: invitedStaff.id, name: invitedStaff.name},
+                            'department': invitedStaff.department,
+                            'role': invitedStaff.roles[0]
+                        });
+                    });
+                }
+                
+            });
         },
 
         addKeyResult(){
@@ -1423,6 +1442,7 @@ export default {
         this.getOldMeetingsList();
         this.getKpiSnapshots();
         this.getSevenSAlignments();
+        this.getInvitedStaff();
     },
 
     mounted() {
