@@ -1313,18 +1313,18 @@ export default {
         },
 
         oldMeetingSelected(){
-            getApiData({url: `/api/staff_by_meeting/${this.selectedOldMeeting.id}`, token: this.getToken()})
-            .then((response)=>{
-                // let meetingStaff = response.data;
-                response.data.forEach(staff => {
-                    this.meetingStaff.push({
-                        'staff': {id: staff.id, name: staff.name},
-                        'department': staff.department,
-                        'role': staff.roles[0]
-                    });
-                });
-                console.log(response.data);
-            });
+            // getApiData({url: `/api/staff_by_meeting/${this.selectedOldMeeting.id}`, token: this.getToken()})
+            // .then((response)=>{
+            //     // let meetingStaff = response.data;
+            //     response.data.forEach(staff => {
+            //         this.meetingStaff.push({
+            //             'staff': {id: staff.id, name: staff.name},
+            //             'department': staff.department,
+            //             'role': staff.roles[0]
+            //         });
+            //     });
+            //     console.log(response.data);
+            // });
 
             // let participants = this.selectedOldMeeting.participants;
 
