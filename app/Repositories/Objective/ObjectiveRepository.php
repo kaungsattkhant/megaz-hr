@@ -202,7 +202,7 @@ class ObjectiveRepository implements ObjectiveInterface
                                 'repetition_count' => $i,
                                 'start_date' => Carbon::today(),
                                 'end_date' => Carbon::today(),
-                                'status' => 'assigned',
+                                'stage' => 'not_yet',
                                 'okr_point' => $objective->okr_point,
                             ]
                         );
@@ -437,12 +437,12 @@ class ObjectiveRepository implements ObjectiveInterface
     //         if ($objType == 'daily') {
     //             $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
     //                 ->orderBy('repetition_count', 'asc')
-    //                 ->where('status', 'do')
+    //                 ->where('stage', 'do')
     //                 ->whereDate('start_date', $currentDate)
     //                 ->first();
     //             if (!$objectiveStaff) {
     //                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-    //                     ->whereIn('status', ['do', 'rejected']) //rejected  from accountable 
+    //                     ->whereIn('stage', ['do', 'rejected']) //rejected  from accountable 
     //                     ->whereDate('start_date', $currentDate)
     //                     ->orderBy('repetition_count', 'asc')
     //                     ->first();
@@ -455,7 +455,7 @@ class ObjectiveRepository implements ObjectiveInterface
     //                 $totalRepetition = $objectiveAssign->objective->repetition;
     //                 $completedRepetitions = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
     //                     ->whereDate('start_date', $currentDate)
-    //                     ->whereIn('status', ['done','completed'])
+    //                     ->whereIn('stage', ['done','completed'])
     //                     ->count();
     //                 $objectiveAssign->objective->remaining_repetitions = $totalRepetition - $completedRepetitions;
     //                 foreach ($objectiveAssign->objective->objectiveKeys as $objectiveKey) {
@@ -466,7 +466,7 @@ class ObjectiveRepository implements ObjectiveInterface
     //                 }
     //             } else {
     //                 $objectiveStaff = ObjectiveStaff::where('objective_assign_id', $objectiveAssign->id)
-    //                     ->where('status', 'completed')
+    //                     ->where('stage', 'completed')
     //                     ->whereDate('start_date', $currentDate)
     //                     ->orderBy('repetition_count', 'desc')
     //                     ->first();
@@ -499,6 +499,7 @@ class ObjectiveRepository implements ObjectiveInterface
     //     return $objectiveAssigns;
     //     // return dailyObjectiveByStaffId::collection($objectiveAssigns);
     // }
+
     public function getdailyObjectivesByStaffId(Request $request, $staffId)   //daily objective list
     {
         $authUser = UserData()->id ?? null;
@@ -554,10 +555,9 @@ class ObjectiveRepository implements ObjectiveInterface
             if ($objectiveAssign->objective->type === 'daily') {
 
                 $objectiveStaff =
-                    $objectiveStaffCollection->where('status', 'do')->first()
-                    ?? $objectiveStaffCollection->whereIn('status', ['do', 'rejected'])->first()
-                    ?? $objectiveStaffCollection->where('status', 'completed')->sortByDesc('repetition_count')->first();
-
+                    $objectiveStaffCollection->whereIn('stage', ['not_yet','plan','do','done','check','completed','act'])->first()
+                    ?? $objectiveStaffCollection->whereIn('stage', ['do', 'rejected'])->first()
+                    ?? $objectiveStaffCollection->where('stage', 'completed')->sortByDesc('repetition_count')->first();
                 $objectiveAssign->setRelation(
                     'objectiveStaff',
                     $objectiveStaff ? collect([$objectiveStaff]) : collect([])
@@ -568,7 +568,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     $totalRepetition = $objectiveAssign->objective->repetition;
 
                     $completedRepetitions = $objectiveStaffCollection
-                        ->whereIn('status', ['done', 'completed'])
+                        ->whereIn('stage', ['done', 'completed'])
                         ->count();
 
                     $objectiveAssign->objective->remaining_repetitions =
@@ -646,7 +646,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
         foreach ($objectiveAssigns as $objectiveAssign) {
 
-            $objectiveAssign->approver =
+            $objectiveAssign->approver =    
                 $objectiveAssign->objective->accountable_id == $authUser;
 
             $staffCollection = $objectiveAssign->objectiveStaff;
@@ -654,8 +654,8 @@ class ObjectiveRepository implements ObjectiveInterface
             if ($objectiveAssign->objective->type === 'daily') {
 
                 $objectiveStaff =
-                    $staffCollection->where('status', 'do')->first()
-                    ?? $staffCollection->where('status', 'completed')->sortByDesc('repetition_count')->first();
+                    $staffCollection->whereIn('stage', ['not_yet', 'plan', 'do', 'done', 'check', 'completed', 'act'])->first()
+                    ?? $staffCollection->where('stage', 'completed')->sortByDesc('repetition_count')->first();
 
                 $objectiveAssign->setRelation(
                     'objectiveStaff',
@@ -667,7 +667,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     $totalRepetition = $objectiveAssign->objective->repetition;
 
                     $completedRepetitions = $staffCollection
-                        ->whereIn('status', ['completed','done','check'])
+                        ->whereIn('stage', ['completed','done','check'])
                         ->count();
 
                     $objectiveAssign->objective->remaining_repetitions =
@@ -1107,18 +1107,18 @@ class ObjectiveRepository implements ObjectiveInterface
                 $query->where('staff_id', $staffId);
             },
             'objectiveAssigns.objectiveStaff' => function ($query) use ($today) {
-                $query->whereIn('status', ['completed', 'done']);
+                $query->whereIn('stage', ['completed', 'done']);
                 $query->whereDate('start_date', $today);
             }
         ])->where('id', $objectiveId)
             ->whereHas('objectiveAssigns', function ($q) use ($staffId, $today) {
                 $q->where('staff_id', $staffId);
                 $q->whereHas('objectiveStaff', function ($query) use ($today) {
-                    $query->whereIn('status', ['completed', 'done']);
+                    $query->whereIn('stage', ['completed', 'done']);
                     $query->whereDate('start_date', $today);
                 });
             })->first();
-        return $objectives;
+        return $objectives ;
     }
 
     //ktv

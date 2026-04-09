@@ -13,3 +13,4 @@ enum PriorityEnum :string
     case URGENT_NOT_IMPORTANT = 'urgent_not_important';
     case NOT_URGENT_NOT_IMPORTANT = 'not_urgent_not_important';
 }
+

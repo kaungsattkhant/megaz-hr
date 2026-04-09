@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Enums\OkrStageEnum;
+use App\Enums\PriorityEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ObjectiveAssignCreateRequest;
 use App\Http\Requests\Objective\AssignRequest;
@@ -52,7 +53,7 @@ class ObjectiveController extends Controller
         $request->validate([
             'objective_name' => ['required', 'string'],
 
-            'okr_point' => ['required', 'integer', 'min:1'],
+            'okr_point' => ['required'],
 
             'type' => ['required', 'in:daily,occasionally'],
 
@@ -70,7 +71,7 @@ class ObjectiveController extends Controller
 
             'informed_id' => ['nullable', 'integer', 'exists:staff,id'],
 
-            'priority' => ['required', 'integer', 'between:1,10'],
+            'priority' => ['required', Rule::in(PriorityEnum::getValues())],
         ]);
         $data = $this->objectiveRepository->store($request->all());
         ResponseData($data);
@@ -232,7 +233,12 @@ class ObjectiveController extends Controller
     public function getCompletedObjKeysByStaffId(Request $request,$objectiveId,$staffId)
     {
         $data = $this->objectiveRepository->getCompletedObjKeysByStaffId($request,$objectiveId,$staffId);
-        ResponseData(new CompleteObjectivesResource($data));
+        if($data){
+            ResponseData(new CompleteObjectivesResource($data));
+        }
+        \ResponseData($data);
+        // return $data;
+        //  $data ? ResponseData($data) :  ResponseData(new CompleteObjectivesResource($data));
     }
 
     //ktvProductTree

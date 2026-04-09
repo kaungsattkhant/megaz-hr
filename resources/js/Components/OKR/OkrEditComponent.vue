@@ -92,7 +92,15 @@
                 <label for="" class="label-form mb-3">
                     Priority
                 </label>
-                <input type="number" v-model="selectedPriority" class="input-ui ">
+                <!-- <input type="number" v-model="selectedPriority" class="input-ui "> -->
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type"
+                        data-te-select-filter="true" name="" id="" v-model="selectedPriority" class="input-ui !text-black">
+                        <option :value="type" v-for="(type, index) in priorityList"
+                            :key="index"> {{ type.name }} </option>
+                    </select>
+                </div>
             </div>
             <div class="mb-6 col-span-2">
                 <label for="" class="label-form mb-3">
@@ -215,6 +223,13 @@ export default {
 
             sopList: [],
             selectedSop: null,
+
+            priorityList: [
+                { name: 'Urgent, Important', value: 'urgent_important' },
+                { name: 'Not Urgent, Important', value: 'not_urgent_important' },
+                { name: 'Urgent, Not Important', value: 'urgent_not_important' },
+                { name: 'Not Urgent, Not Important', value: 'not_urgent_not_important' },
+            ],
             typeList: [
                 { name: 'Daily', value: 'daily' },
                 { name: 'Occasionally', value: 'occasionally' },
@@ -277,7 +292,8 @@ export default {
             }
             this.objName = detail.objective_name;
             this.selectedOkrPoint = detail.okr_point;
-            this.selectedPriority = detail.priority;
+            // this.selectedPriority = detail.priority;
+            this.selectedPriority = this.priorityList.find(pri => pri.value === detail.priority)
             this.selectedType = this.typeList.find(type => type.value === detail.type)
             if(detail.type === 'daily'){
                 this.selectedRepition = detail.repetition;
@@ -403,7 +419,7 @@ export default {
             let formData = new FormData();
             formData.append('objective_name', this.objName);
             formData.append('okr_point', this.selectedOkrPoint);
-            formData.append('priority', this.selectedPriority);
+            formData.append('priority', this.selectedPriority.value);
             formData.append('type', this.selectedType.value);
             if(this.selectedType.value === 'daily'){
                 formData.append('repetition', this.selectedRepition);
@@ -426,7 +442,7 @@ export default {
             // }
             else {
                 this.$notify({
-                    title: `Input validation`,
+                    title: `Error Message`,
                     text: response.message,
                     type: "warn"
                 });

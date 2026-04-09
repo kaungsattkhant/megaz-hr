@@ -386,6 +386,14 @@ export default {
 
                 
             }
+            else{
+                this.$notify({
+                    title: `Error message`,
+                    text: response.message,
+                    type: "warn"
+                });
+
+            }
         },
 
 

@@ -46,8 +46,7 @@ class AssignObjectivesToStaffs extends Command
                     ->whereIn('status', [
                         StaffStatus::PROBATION->value,
                         StaffStatus::PERMANENT->value,
-                    ]);
-
+                 ]);
                 foreach ($staffLists as $staff) {
                     $existingAssign = ObjectiveAssign::where('objective_id', $objective->id)
                         ->where('staff_id', $staff->id)
@@ -69,7 +68,7 @@ class AssignObjectivesToStaffs extends Command
                                     'repetition_count' => $i,
                                     'start_date' => $today,
                                     'end_date' => $today,
-                                    'status' => 'assigned',
+                                    'stage' => 'not_yet',
                                     'okr_point' => $objective->okr_point,
                                 ]
                             );
