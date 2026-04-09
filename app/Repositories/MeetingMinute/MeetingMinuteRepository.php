@@ -114,6 +114,7 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 $instruction->objective_id = $objective->id;
                 $instruction->okr_point = $instructionData['okr_point'] ?? null;
                 $instruction->project_id = $instructionData['project_id'];
+                $instruction->responsible_id = $instructionData['responsible_id'] ?? null;
                 // $instruction->tag = $instructionData['tag'] ?? null;
                 // $instruction->assigned_to = $instructionData['assign_to'] ?? ($instructionData['assigned_to'] ?? null);
                 // $instruction->start_date = $instructionData['start_date'] ?? null;
@@ -122,7 +123,6 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 // $instruction->remark = $instructionData['remark'] ?? ($instructionData['remark'] ?? null);
                 // $instruction->accountable_id = $instructionData['accountable'] ?? ($instructionData['accountable_id'] ?? null);
                 // $instruction->consulted_id = $instructionData['consulted_id'] ?? null;
-                // $instruction->responsible_id = $instructionData['responsible_id'] ?? null;
                 // $instruction->informed_id = $instructionData['informed_id'] ?? null;
                 $instruction->save();
 

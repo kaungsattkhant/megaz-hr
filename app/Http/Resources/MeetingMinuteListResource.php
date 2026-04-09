@@ -62,17 +62,29 @@ class MeetingMinuteListResource extends JsonResource
                         'objective' => [
                             'id' => $instruction->objective_id,
                             'objective_name' => $instruction->objective ? $instruction->objective->objective_name : null,
+                            'okr_point' => $instruction->objective ? $instruction->objective->okr_point : null,
+                            'tag' => $instruction->objective ? $instruction->objective->tag : null,
+                            'start_date' => $instruction->objective ? $instruction->objective->start_date : null,
+                            'due_date' => $instruction->objective ? $instruction->objective->due_date : null,
+                            'remark' => $instruction->objective ? $instruction->objective->remark : null,
+                            'accountable' => $instruction->objective && $instruction->objective->accountable ? [
+                                'id' => $instruction->objective->accountable->id,
+                                'name' => $instruction->objective->accountable->name,
+                            ] : null,
+                            'consulted' => $instruction->objective && $instruction->objective->consulted ? [
+                                'id' => $instruction->objective->consulted->id,
+                                'name' => $instruction->objective->consulted->name,
+                            ] : null,
+                            'informed' => $instruction->objective && $instruction->objective->informed ? [
+                                'id' => $instruction->objective->informed->id,
+                                'name' => $instruction->objective->informed->name,
+                            ] : null,
                         ],
-                        'okr_point' => $instruction->okr_point,
                         'project' => $instruction->project ? [
                             'id' => $instruction->project->id,
                             'name' => $instruction->project->name,
                         ] : null,
-                        'tag' => $instruction->tag,
-                       
-                        'start_date' => $instruction->start_date,
-                        'due_date' => $instruction->due_date,
-                        'remark' => $instruction->remark,
+                     
                         'priority' => $instruction->priority,
                         'assigned' => $instruction->assignedTo ? [
                             'id' => $instruction->assignedTo->id,
@@ -82,18 +94,7 @@ class MeetingMinuteListResource extends JsonResource
                             'id' => $instruction->responsible->id,
                             'name' => $instruction->responsible->name,
                         ] : null,
-                        'accountable' => $instruction->accountable ? [
-                            'id' => $instruction->accountable->id,
-                            'name' => $instruction->accountable->name,
-                        ] : null,
-                        'consulted' => $instruction->consulted ? [
-                            'id' => $instruction->consulted->id,
-                            'name' => $instruction->consulted->name,
-                        ] : null,
-                        'informed' => $instruction->informed ? [
-                            'id' => $instruction->informed->id,
-                            'name' => $instruction->informed->name,
-                        ] : null,
+                        
                         'instruction_objective_key' => $instruction->relationLoaded('objectiveKeys')
                             ? $instruction->objectiveKeys->map(function ($objectiveKey) {
                                 return [
