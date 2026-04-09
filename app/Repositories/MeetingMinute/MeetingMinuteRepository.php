@@ -126,7 +126,6 @@ class MeetingMinuteRepository implements MeetingMinuteRepositoryInterface
                 // $instruction->consulted_id = $instructionData['consulted_id'] ?? null;
                 // $instruction->informed_id = $instructionData['informed_id'] ?? null;
                 $instruction->save();
-
                 $keptInstructionIds[] = $instruction->id;
                 $instruction->objectiveKeys()->sync($objectiveKeyIds);
                 // $this->sendFcmNotification($objectiveStaff, $objectiveAssign->staff, $notificationData);
