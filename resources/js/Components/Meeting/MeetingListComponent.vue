@@ -95,15 +95,22 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
 
-                                        {{ meeting.chaired_by.name }}
+                                        {{ meeting.chaired_by?.name }}
                                     </td>
                                     <td class="whitespace-nowrap " v-show="['meeting.edit', 'meeting.delete'].some(f => feature.includes(f))">
-                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/operation'" v-if="feature.includes('meeting.edit')">
-                                            <i class="fal fa-clock"></i>
-                                        </a>
+
+                                        <button class="pr-2" :href="'/meeting_minutes/' + meeting.id" v-if="feature.includes('meeting.edit')"
+                                        @click="meetingDetail(meeting.id)"
+                                        >
+                                            <i class="fal fa-info-circle"></i>
+                                        </button>
 
                                         <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'" v-if="feature.includes('meeting.edit')">
                                             <i class="fal fa-pen"></i>
+                                        </a>
+
+                                        <a class="pr-2" :href="'/meeting/' + meeting.id + '/operation'" v-if="feature.includes('meeting.edit')">
+                                            <i class="fal fa-clock"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
@@ -226,6 +233,15 @@ export default {
     methods: {
         ...mapGetters(['getToken', 'getFeature']),
 
+        showToastMessage(message, type = "warn", title = null) {
+            let toastTittle = title?? null;
+            this.$notify({
+                title: toastTittle,
+                text: `${message}`,
+                type: `${type}`
+            });
+        },
+
         async getMeetingList(pageNumber) {
             this.loading = true;
             let url = `/api/meetings?page=` + pageNumber;
@@ -251,6 +267,19 @@ export default {
                 this.getMeetingList()
             }
         },
+
+        meetingDetail(id){
+            getApiData({url: `/api/meeting_minutes/${id}`, token: this.getToken()})
+            .then((response)=>{
+                if(response.data){
+                    console.log('meeting min data');
+                    window.location.replace(`/meeting/${id}/detail`);
+                }else{
+                    this.showToastMessage('No meeting minutes for this meeting', 'warn');
+                }
+                console.log(response);
+            });
+        }
     },
 
     created() {

@@ -560,6 +560,7 @@ Route::middleware(['departments:meeting.create'])->group(function () {
     Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
 });
 Route::view('/meeting/{id}/operation', 'meeting.operation_meeting');
+Route::view('/meeting/{id}/detail', 'meeting.detail');
 Route::middleware(['departments:meeting.edit'])->group(function () {
     Route::view('/meeting/{id}/edit', 'meeting.edit');
 });
