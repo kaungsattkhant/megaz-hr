@@ -128,7 +128,7 @@ class ObjectiveRepository implements ObjectiveInterface
     public function getObjectiveById(Request $request, $objId)
     {
 
-        return Objective::with(['role.department', 'sop', 'objectiveKeys', 'accountable', 'consulted', 'informed','project'])->where('id', $objId)->get();
+        return Objective::with(['role.department', 'sop', 'objectiveKeys', 'accountable', 'consulted', 'informed', 'project'])->where('id', $objId)->get();
     }
 
     public function deleteObjective($objId)
@@ -555,7 +555,7 @@ class ObjectiveRepository implements ObjectiveInterface
             if ($objectiveAssign->objective->type === 'daily') {
 
                 $objectiveStaff =
-                    $objectiveStaffCollection->whereIn('stage', ['not_yet','plan','do','done','check','completed','act'])->first()
+                    $objectiveStaffCollection->whereIn('stage', ['not_yet', 'plan', 'do', 'done', 'check', 'completed', 'act'])->first()
                     ?? $objectiveStaffCollection->whereIn('stage', ['do', 'rejected'])->first()
                     ?? $objectiveStaffCollection->where('stage', 'completed')->sortByDesc('repetition_count')->first();
                 $objectiveAssign->setRelation(
@@ -646,7 +646,7 @@ class ObjectiveRepository implements ObjectiveInterface
 
         foreach ($objectiveAssigns as $objectiveAssign) {
 
-            $objectiveAssign->approver =    
+            $objectiveAssign->approver =
                 $objectiveAssign->objective->accountable_id == $authUser;
 
             $staffCollection = $objectiveAssign->objectiveStaff;
@@ -667,7 +667,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     $totalRepetition = $objectiveAssign->objective->repetition;
 
                     $completedRepetitions = $staffCollection
-                        ->whereIn('stage', ['completed','done','check'])
+                        ->whereIn('stage', ['completed', 'done', 'check'])
                         ->count();
 
                     $objectiveAssign->objective->remaining_repetitions =
@@ -1118,7 +1118,7 @@ class ObjectiveRepository implements ObjectiveInterface
                     $query->whereDate('start_date', $today);
                 });
             })->first();
-        return $objectives ;
+        return $objectives;
     }
 
     //ktv
@@ -1228,5 +1228,52 @@ class ObjectiveRepository implements ObjectiveInterface
             DB::rollBack();
             throw $e;
         }
+    }
+    public function getObjectiveStaffByProject($projectId)
+    {
+        return Objective::with([
+            'objectiveKeys:id,objective_id,name',
+            'objectiveAssigns.staff:id,name,profile_image_path,profile_image_url',
+            'objectiveAssigns.objective_assign_staff:id,objective_assign_id,end_date,start_date',
+        ])
+            ->where('project_id', $projectId)
+            ->get()
+            ->map(function ($objective) {
+                $objStaff = optional(
+                    $objective->objectiveAssigns
+                        ->pluck('objective_assign_staff')
+                        ->filter()
+                        ->sortBy('end_date')
+                        ->first()
+                );
+                // $startDate = optional(
+                //     $objective->objectiveAssigns
+                //         ->pluck('objective_assign_staff')
+                //         ->filter()
+                //         // ->sortBy('start_date')
+                //         ->first()
+                // )->start_date;
+                return [
+                    'objective_name' => $objective->objective_name,
+                    'due_date' => $objStaff->end_date,
+                    'start_date' => $objStaff->start_date,
+                    'objective_keys' => $objective->objectiveKeys->map(function ($key) {
+                        return [
+                            'id' => $key->id,
+                            'name' => $key->name,
+                        ];
+                    })->values(),
+                    'objective_staff' => $objective->objectiveAssigns->map(function ($assign) {
+                        return [
+                            'staff_id' => $assign->staff->id ?? null,
+                            'staff_name' => $assign->staff->name ?? null,
+                            'profile_image_path' => $assign->staff->profile_image_path ?? null,
+                            // 'profile_image_url' => $assign->staff->profile_image_url ?? null,
+                        ];
+                    })->filter(function ($staff) {
+                        return $staff['staff_id'] !== null;
+                    })->unique('staff_id')->values(),
+                ];
+            });
     }
 }

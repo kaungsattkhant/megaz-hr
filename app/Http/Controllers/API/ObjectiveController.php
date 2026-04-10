@@ -12,6 +12,7 @@ use App\Http\Requests\Objective\ObjectiveRequest;
 use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\StaffMobile\RejectObjectiveKeyRequest;
 use App\Http\Resources\CompleteObjectivesResource;
+use App\Http\Resources\ObjectiveStaffByProjectListResource;
 use App\Repositories\Objective\ObjectiveInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -277,5 +278,11 @@ class ObjectiveController extends Controller
     {
         $data = $this->objectiveRepository->updateKtvObjTree($request, $ktvObjTreeId);
         ResponseData($data);
+    }
+
+    public function getObjectiveStaffByProject($projectId){
+        $data = $this->objectiveRepository->getObjectiveStaffByProject($projectId);
+        return ObjectiveStaffByProjectListResource::collection($data);
+        // ResponseData($data);
     }
 }

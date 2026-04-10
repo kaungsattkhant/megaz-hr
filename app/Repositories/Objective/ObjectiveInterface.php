@@ -15,6 +15,7 @@ interface ObjectiveInterface
   public function store(array $validatedData);
   // public function update(array $validatedData, int $objId);
   public function deleteObjective($objId);
+  public function getObjectiveStaffByProject($projectId);
 
   //assign duties keyresults
   public function getObjectiveKeysByStaffId(int $staffId);

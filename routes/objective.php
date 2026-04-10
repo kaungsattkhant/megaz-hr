@@ -16,6 +16,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/objectives/{id}', 'deleteObjective');
     Route::get('dashboard-okr', 'dashboardOkr');
     Route::get('okr_assign_by_staff', 'okrAssignByStaff');
+    Route::get('objective_staff_by_project/{project_id}','getObjectiveStaffByProject');
 
     //okr assign duties by objective staff
     Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
