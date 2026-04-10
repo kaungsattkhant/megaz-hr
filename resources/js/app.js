@@ -296,6 +296,7 @@ import ContractComponent from './Components/Contract/ContractComponent.vue';
 import ContractCreateComponent from './Components/Contract/ContractCreateComponent.vue';
 import SignedContractsListComponent from './Components/Contract/SignedContractsListComponent.vue';
 import MeetingOperationComponent from './Components/Meeting/MeetingOperationComponent.vue';
+import MeetingDetailComponent from './Components/Meeting/MeetingDetailComponent.vue';
 import ProjectListComponent from './Components/Project/ProjectListComponent.vue';
 import ProjectInstructionComponent from './Components/Project/ProjectInstructionComponent.vue';
 
@@ -571,6 +572,7 @@ app.component('ContractComponent',ContractComponent);
 app.component('ContractCreateComponent',ContractCreateComponent);
 app.component('SignedContractsListComponent',SignedContractsListComponent);
 app.component('MeetingOperationComponent',MeetingOperationComponent);
+app.component('MeetingDetailComponent',MeetingDetailComponent);
 app.component('ProjectListComponent',ProjectListComponent);
 app.component('ProjectInstructionComponent',ProjectInstructionComponent);
 
