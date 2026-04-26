@@ -16,7 +16,7 @@
     },
     {
         "module": "staff",
-        "name": "Staff Active On/Off",
+        "name": "Staff Active On\/Off",
         "slug": "staff.toggle"
     },
     {
@@ -77,12 +77,12 @@
     {
         "module": "complain",
         "name": "deleteComplain",
-        "slug": "complain.delete"
+        "slug": "complaint.delete"
     },
     {
         "module": "complain",
         "name": "complainStatusChange",
-        "slug": "complain.toggle"
+        "slug": "complaint.toggle"
     },
     {
         "module": "complain",
@@ -114,33 +114,11 @@
         "name": "ComplaintCategory",
         "slug": "complaint-category"
     },
-   
     {
-        "module": "duty",
-        "name": "createDuty",
-        "slug": "duty.create"
+        "module": "menu-area",
+        "name": "Menu Area List",
+        "slug": "menu-area"
     },
-    {
-        "module": "duty",
-        "name": "listDuties",
-        "slug": "duty"
-    },
-    {
-        "module": "duty",
-        "name": "updateDuty",
-        "slug": "duty.update"
-    },
-    {
-        "module": "duty",
-        "name": "deleteDuty",
-        "slug": "duty.delete"
-    },
-    {
-        "module": "duty",
-        "name": "dutyDetail",
-        "slug": "duty.edit"
-    },
-  
     {
         "module": "skill",
         "name": "Skill List",
@@ -161,7 +139,6 @@
         "name": "Skill Delete",
         "slug": "skill.delete"
     },
-    
     {
         "module": "area",
         "name": "Area List",
@@ -179,7 +156,7 @@
     },
     {
         "module": "area",
-        "name": "Area Active On/Off",
+        "name": "Area Active On\/Off",
         "slug": "area.toggle"
     },
     {
@@ -192,7 +169,6 @@
         "name": "staff balance create",
         "slug": "staff-balance.create"
     },
-   
     {
         "module": "okr",
         "name": "OKR create",
@@ -235,7 +211,7 @@
     },
     {
         "module": "okr-dashboard",
-        "name": "okr-dashboard list ",
+        "name": "okr-dashboard list",
         "slug": "okr-dashboard"
     },
     {
@@ -300,7 +276,7 @@
     },
     {
         "module": "meeting",
-        "name": "meeting list ",
+        "name": "meeting list",
         "slug": "meeting"
     },
     {
@@ -365,7 +341,7 @@
     },
     {
         "module": "warning",
-        "name": "warning edit ",
+        "name": "warning edit",
         "slug": "warning.edit"
     },
     {
@@ -379,21 +355,6 @@
         "slug": "off-day"
     },
     {
-        "module": "off day",
-        "name": "off-day create",
-        "slug": "off-day.create"
-    },
-    {
-        "module": "off day",
-        "name": "off-day edit",
-        "slug": "off-day.edit"
-    },
-    {
-        "module": "off day",
-        "name": "off-day delete",
-        "slug": "off-day.delete"
-    },
-    {
         "module": "leave-allowance",
         "name": "leave-allowance list",
         "slug": "leave-allowance"
@@ -405,7 +366,7 @@
     },
     {
         "module": "leave-allowance",
-        "name": "leave-allowance edit ",
+        "name": "leave-allowance edit",
         "slug": "leave-allowance.edit"
     },
     {
@@ -425,7 +386,7 @@
     },
     {
         "module": "leave",
-        "name": "leave delete ",
+        "name": "leave delete",
         "slug": "leave.delete"
     },
     {
@@ -580,7 +541,7 @@
     },
     {
         "module": "resignation-categories",
-        "name": "resignation-categories create ",
+        "name": "resignation-categories create",
         "slug": "resignation-categories.create"
     },
     {
@@ -719,21 +680,6 @@
         "slug": "location"
     },
     {
-        "module": "accrual",
-        "name": "accrual list",
-        "slug": "accrual"
-    },
-    {
-        "module": "accrual",
-        "name": "accrual create",
-        "slug": "accrual.create"
-    },
-    {
-        "module": "accrual",
-        "name": "accrual detail",
-        "slug": "accrual.detail"
-    },
-    {
         "module": "shift-assignment",
         "name": "shift-assignment list",
         "slug": "shift-assignment"
@@ -742,26 +688,6 @@
         "module": "shift-assignment",
         "name": "shift-assignment create",
         "slug": "shift-assignment.create"
-    },
-    {
-        "module": "equipment-assignment",
-        "name": "equipment-assignment list",
-        "slug": "equipment-assignment"
-    },
-    {
-        "module": "equipment-assignment",
-        "name": "equipment-assignment create",
-        "slug": "equipment-assignment.create"
-    },
-    {
-        "module": "asset-assignment",
-        "name": "asset-assignment list",
-        "slug": "asset-assignment"
-    },
-    {
-        "module": "asset-assignment",
-        "name": "asset-assignment create",
-        "slug": "asset-assignment.create"
     },
     {
         "module": "handbook",
@@ -777,31 +703,6 @@
         "module": "handbook",
         "name": "handbook delete",
         "slug": "handbook.delete"
-    },
-    {
-        "module": "loan-creditor-account",
-        "name": "loan-creditor-account list",
-        "slug": "loan-creditor-account"
-    },
-    {
-        "module": "loan-creditor-account",
-        "name": "loan-creditor-account create",
-        "slug": "loan-creditor-account.create"
-    },
-    {
-        "module": "loan",
-        "name": "loan list",
-        "slug": "loan"
-    },
-    {
-        "module": "loan",
-        "name": "loan create",
-        "slug": "loan.create"
-    },
-    {
-        "module": "loan",
-        "name": "loan detail",
-        "slug": "loan.detail"
     },
     {
         "module": "benefit",

@@ -182,10 +182,14 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/raw-item-import', 'rawItemImport');
   });
 
-  Route::prefix('benefit_requests')->controller(BenefitController::class)->group(function () {
-    Route::post('/', 'createBenefitRequest');
+  Route::prefix('benefits')->controller(BenefitController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::post('/', 'updateOrCreateBenefit');
+    Route::get('/{id}', 'detailBenefit');
+  });
+  Route::prefix('admin/benefit_requests')->controller(BenefitController::class)->group(function () {
     Route::get('/', 'listBenefitRequest');
-    Route::get('/benefit_by_type/{type}', 'getBenefitByType');
+    Route::post('/update_status', 'updateStatusBenefitRequest');
   });
 
   Route::prefix('contract_categories')->controller(ContractCategoryController::class)->group(function () {

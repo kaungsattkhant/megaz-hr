@@ -4,11 +4,7 @@ namespace App\Repositories\Area;
 
 use App\Models\Area;
 use App\Models\MenuArea;
-use App\Models\MenuPlace;
-use App\Models\AreaCategory;
-use App\Models\MenuCategory;
 use Illuminate\Http\Request;
-use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
 
 class AreaRepository implements AreaRepositoryInterface
@@ -100,47 +96,48 @@ class AreaRepository implements AreaRepositoryInterface
                 $insertData = [];
                 $now = now();
 
-                foreach ($menuCategoryIds as $menuCategoryId) {
-                    // Get menu places and unique cooking_area_ids
-                    $menuPlaces = MenuPlace::with('cooking_place.area')
-                        ->whereHas('menu', fn($q) => $q->where('menu_category_id', $menuCategoryId))
-                        ->get();
+                //tem command for hr feature only
+                // foreach ($menuCategoryIds as $menuCategoryId) {
+                //     // Get menu places and unique cooking_area_ids
+                //     $menuPlaces = MenuPlace::with('cooking_place.area')
+                //         ->whereHas('menu', fn($q) => $q->where('menu_category_id', $menuCategoryId))
+                //         ->get();
 
-                    // Extract unique cooking area IDs only
-                    $cookingAreaIds = $menuPlaces
-                        ->pluck('cooking_place.area_id')
-                        ->unique()
-                        ->filter()
-                        ->values();
+                //     // Extract unique cooking area IDs only
+                //     $cookingAreaIds = $menuPlaces
+                //         ->pluck('cooking_place.area_id')
+                //         ->unique()
+                //         ->filter()
+                //         ->values();
 
-                    if ($cookingAreaIds->isEmpty()) {
-                        continue;
-                    }
+                //     if ($cookingAreaIds->isEmpty()) {
+                //         continue;
+                //     }
 
-                    // Fetch menu category areas for this category + selling area
-                    $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategoryId)
-                        ->where('selling_area_id', $area->id)
-                        ->get();
+                //     // Fetch menu category areas for this category + selling area
+                //     $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategoryId)
+                //         ->where('selling_area_id', $area->id)
+                //         ->get();
 
-                    if ($menuCategoryAreas->isEmpty()) {
-                        continue;
-                    }
+                //     if ($menuCategoryAreas->isEmpty()) {
+                //         continue;
+                //     }
 
-                    // Determine which one should be default — the *last* cooking area
-                    $defaultCookingAreaId = $cookingAreaIds->last();
+                //     // Determine which one should be default — the *last* cooking area
+                //     $defaultCookingAreaId = $cookingAreaIds->last();
 
-                    foreach ($menuCategoryAreas as $menuCategoryArea) {
-                        foreach ($cookingAreaIds as $cookingAreaId) {
-                            $insertData[] = [
-                                'menu_category_area_id' => $menuCategoryArea->id,
-                                'cooking_area_id' => $cookingAreaId,
-                                'is_default' => $cookingAreaId == $defaultCookingAreaId ? 1 : 0,
-                                'created_at' => $now,
-                                'updated_at' => $now,
-                            ];
-                        }
-                    }
-                }
+                //     foreach ($menuCategoryAreas as $menuCategoryArea) {
+                //         foreach ($cookingAreaIds as $cookingAreaId) {
+                //             $insertData[] = [
+                //                 'menu_category_area_id' => $menuCategoryArea->id,
+                //                 'cooking_area_id' => $cookingAreaId,
+                //                 'is_default' => $cookingAreaId == $defaultCookingAreaId ? 1 : 0,
+                //                 'created_at' => $now,
+                //                 'updated_at' => $now,
+                //             ];
+                //         }
+                //     }
+                // }
 
                 // Bulk upsert for performance
                 if (!empty($insertData)) {

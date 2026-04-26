@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-        InvoiceService::observe(InvoiceServiceObserver::class);
+        // InvoiceService::observe(InvoiceServiceObserver::class);
         Relation::enforceMorphMap([
             'department' => 'App\Models\Department',
             'area' => 'App\Models\Area',
