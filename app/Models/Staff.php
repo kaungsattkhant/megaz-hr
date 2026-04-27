@@ -10,7 +10,7 @@ use App\Models\Salary;
 use App\Models\Overtime;
 use App\Models\Inventory;
 use App\Models\Department;
-use App\Models\TaskDetail;
+// use App\Models\TaskDetail;
 use App\Models\LeaveAllowance;
 use App\Models\StaffTimeshift;
 use App\Models\SalaryBatchStaff;
@@ -144,10 +144,10 @@ class Staff extends Authenticatable implements AuditableContract
     }
 
 
-    public function task_details()
-    {
-        return $this->hasMany(TaskDetail::class, 'staff_id');
-    }
+    // public function task_details()
+    // {
+    //     return $this->hasMany(TaskDetail::class, 'staff_id');
+    // }
 
 
     // public function tasks()
@@ -189,10 +189,10 @@ class Staff extends Authenticatable implements AuditableContract
         return $this->belongsToMany(Permission::class);
     }
 
-    public function completed_tasks()
-    {
-        return $this->hasMany(TaskDetail::class, 'completed_by');
-    }
+    // public function completed_tasks()
+    // {
+    //     return $this->hasMany(TaskDetail::class, 'completed_by');
+    // }
 
     public function hasRoles($dept, $name)
     {
@@ -247,19 +247,19 @@ class Staff extends Authenticatable implements AuditableContract
         return $this->hasOne(StaffBalance::class)->latest();
     }
 
-    public function duties()
-    {
-        return $this->hasMany(Duty::class);
-    }
+    // public function duties()
+    // {
+    //     return $this->hasMany(Duty::class);
+    // }
 
     #scope
 
     #end
 
-    public function menuSteps(): HasMany
-    {
-        return $this->hasMany(MenuStep::class, 'staff_id');
-    }
+    // public function menuSteps(): HasMany
+    // {
+    //     return $this->hasMany(MenuStep::class, 'staff_id');
+    // }
     public function objective_assigns()
     {
         return $this->hasMany(ObjectiveAssign::class);

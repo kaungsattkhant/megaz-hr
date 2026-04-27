@@ -39,28 +39,39 @@ class DatabaseSeeder extends Seeder
             // ServiceCategorySeeder::class, //important
             // GpsSeeder::class,
 
-            ComplaintCategorySeeder::class,
+            // ComplaintCategorySeeder::class,
+            // // InventorySeeder::class,
+            // FeatureSeeder::class,
+            // DepartmentSeeder::class,
+            // // AreaCategorySeeder::class, //tem command
+            // AreaSeeder::class,
+            // RoleSeeder::class,
+            // GenderSeeder::class,
+            // AccessoryCategorySeeder::class,
+            // MenuCategorySeeder::class,
+            // ServiceCategorySeeder::class,
+            // HeadAccountSeeder::class,
+            // SubAccountSeeder::class,
+            // AccountTableSeeder::class,
+            // // RoomAndTableSeeder::class,
             // InventorySeeder::class,
+            // StaffSeeder::class,
+            // GpsSeeder::class,
+            // DepartmentFeatureSeeder::class,
+            // NrcTownshipSeeder::class,
+            // ExtraTagSeeder::class,
+            // OffDaySettingSeeder::class,
+
+            //hr seeder 
+            ComplaintCategorySeeder::class,
             FeatureSeeder::class,
             DepartmentSeeder::class,
-            // AreaCategorySeeder::class, //tem command
             AreaSeeder::class,
             RoleSeeder::class,
             GenderSeeder::class,
-            AccessoryCategorySeeder::class,
-            MenuCategorySeeder::class,
-            ServiceCategorySeeder::class,
-            HeadAccountSeeder::class,
-            SubAccountSeeder::class,
-            AccountTableSeeder::class,
-            // RoomAndTableSeeder::class,
-            InventorySeeder::class,
             StaffSeeder::class,
             GpsSeeder::class,
             DepartmentFeatureSeeder::class,
-            NrcTownshipSeeder::class,
-            ExtraTagSeeder::class,
-            OffDaySettingSeeder::class,
         ]);
     }
 }

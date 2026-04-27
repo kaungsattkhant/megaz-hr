@@ -262,7 +262,7 @@ class StaffRepository implements StaffRepositoryInterface
             'inventories',
             'emergencyContacts',
             'gender',
-            'completed_tasks',
+            // 'completed_tasks',
             'features',
             'skills',
             'bank',
