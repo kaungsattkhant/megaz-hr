@@ -16,6 +16,7 @@ use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\NrcTownshipSeeder;
 use Database\Seeders\ComplaintCategorySeeder;
 use Database\Seeders\ExtraTagSeeder;
+use Termwind\Components\Hr;
 
 class DatabaseSeeder extends Seeder
 {
@@ -64,7 +65,8 @@ class DatabaseSeeder extends Seeder
 
             //hr seeder 
             ComplaintCategorySeeder::class,
-            FeatureSeeder::class,
+            // FeatureSeeder::class,
+            HrFeatureSeeder::class,
             DepartmentSeeder::class,
             AreaSeeder::class,
             RoleSeeder::class,
