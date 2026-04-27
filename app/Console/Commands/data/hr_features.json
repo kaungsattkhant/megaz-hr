@@ -235,6 +235,21 @@
         "slug": "time-shift.delete"
     },
     {
+        "module": "shift",
+        "name": "shift list",
+        "slug": "shift"
+    },
+    {
+        "module": "shift",
+        "name": "shift create",
+        "slug": "shift.create"
+    },
+    {
+        "module": "shift",
+        "name": "shift edit",
+        "slug": "shift.edit"
+    },
+    {
         "module": "gps",
         "name": "gps list",
         "slug": "gps"
@@ -353,6 +368,16 @@
         "module": "off day",
         "name": "off day list",
         "slug": "off-day"
+    },
+    {
+        "module": "offday-setting",
+        "name": "offday setting list",
+        "slug": "offday-setting"
+    },
+    {
+        "module": "offday-setting",
+        "name": "offday setting create",
+        "slug": "offday-setting"
     },
     {
         "module": "leave-allowance",
@@ -633,6 +658,16 @@
         "module": "cv",
         "name": "cv delete",
         "slug": "cv.delete"
+    },
+    {
+        "module": "contract",
+        "name": "Contract list",
+        "slug": "contract"
+    },
+    {
+        "module": "contract",
+        "name": "Contract create",
+        "slug": "contract.create"
     },
     {
         "module": "exam",
